@@ -26,7 +26,7 @@ contract EAS {
         // The value of the attestation category.
         string data;
 
-        // A list of attestations IDs, belonging to a specific account and category.
+        // A list of attestations IDs, belonging to this category.
         uint256[] attestationIds;
 
         // Reverse lookup between attesters and their respective attestations.
@@ -40,7 +40,7 @@ contract EAS {
     uint256 public attestationsCount;
 
     // A global mapping between attestations and their IDs.
-    mapping (uint256 => Attestation) private attestationsRegistry;
+    mapping (uint256 => Attestation) private db;
 
     /// @dev Triggered when an attestation category is enabled.
     ///
@@ -103,9 +103,9 @@ contract EAS {
 
         // Invalidate all existing attestations.
         //
-        // Note: we are aware that, in the case of large number of existing attestation, this method can exceed the
-        // the block gas limit and fail. This issue will be handled and mitigated in future versions.
-        invalidateAttestations(msg.sender, _categoryId);
+        // Note: we are aware to the fact, in the case of large number of existing attestation, this method can exceed
+        // the the block gas limit and fail. This issue will be handled and mitigated in future versions.
+        invalidateAttestations(category);
 
         emit CategoryDataUpdated(msg.sender, _categoryId, _data);
     }
@@ -123,7 +123,7 @@ contract EAS {
         // If the msg.sender has already attested to this category - just update its attestation time and data.
         uint256 attestationId = category.lookup[msg.sender];
         if (attestationId != 0) {
-            Attestation storage attestation = attestationsRegistry[attestationId];
+            Attestation storage attestation = db[attestationId];
             attestation.time = block.timestamp;
             attestation.data = _data;
         } else {
@@ -138,7 +138,7 @@ contract EAS {
             category.attestationIds.push(newAttestationId);
             category.lookup[msg.sender] = newAttestationId;
 
-            attestationsRegistry[newAttestationId] = attestation;
+            db[newAttestationId] = attestation;
         }
 
         emit Attested(msg.sender, _recipient, _categoryId);
@@ -165,21 +165,18 @@ contract EAS {
     }
 
     /// @dev Invalidation attestations to a specific category.
-    /// @param _recipient The recipient the attestation.
-    /// @param _categoryId The ID of the attestation category.
-    function invalidateAttestations(address _recipient, uint16 _categoryId) private {
-        Category storage category = attestations[_recipient][_categoryId];
-
-        uint256 length = category.attestationIds.length;
+    /// @param _category The attestation category.
+    function invalidateAttestations(Category storage _category) private {
+        uint256 length = _category.attestationIds.length;
         for (uint256 i = 0; i < length; ++i) {
-            uint256 id = category.attestationIds[i];
-            Attestation memory attestation = attestationsRegistry[id];
+            uint256 id = _category.attestationIds[i];
+            Attestation memory attestation = db[id];
 
-            delete category.lookup[attestation.from];
-            delete attestationsRegistry[id];
+            delete _category.lookup[attestation.from];
+            delete db[id];
         }
 
-        delete category.attestationIds;
+        delete _category.attestationIds;
         attestationsCount = attestationsCount.sub(length);
     }
 }
