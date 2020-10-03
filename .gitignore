@@ -1,0 +1,15 @@
+.DS_Store
+.vscode/
+*/**/.DS_Store
+
+/node_modules
+npm-debug.log
+
+/build
+/.coverage_artifacts
+/.coverage_contracts
+/coverage
+/coverageEnv
+/coverage.json
+/allFiredEvents
+/scTopics
