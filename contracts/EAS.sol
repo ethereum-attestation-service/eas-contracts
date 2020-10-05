@@ -14,6 +14,7 @@ contract EAS {
     struct Attestation {
         address from;
         uint256 time;
+        uint256 expirationTime;
         string data;
     }
 
@@ -66,7 +67,8 @@ contract EAS {
     /// @param _attester The attesting account.
     /// @param _recipient The recipient the attestation.
     /// @param _aio The ID of the AIO.
-    event Attested(address indexed _attester, address indexed _recipient, uint16 indexed _aio);
+    /// @param _expirationTime The expiration time of the attestation.
+    event Attested(address indexed _attester, address indexed _recipient, uint16 indexed _aio, uint256 _expirationTime);
 
     /// @dev Enables attestations to a specific AIO.
     ///
@@ -114,22 +116,26 @@ contract EAS {
     ///
     /// @param _recipient The recipient the attestation.
     /// @param _aio The ID of the AIO.
+    /// @param _expirationTime The expiration time of the attestation.
     /// @param _data The additional attestation data.
-    function attest(address _recipient, uint16 _aio, string calldata _data) public {
+    function attest(address _recipient, uint16 _aio, uint256 _expirationTime, string calldata _data) public {
         AttestationIdentityObject storage aio = attestations[_recipient][_aio];
 
         require(aio.enabled && _recipient != msg.sender, "ERR_INVALID_AIO");
+        require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        // If the msg.sender has already attested to this AIO - just update its attestation time and data.
+        // If the msg.sender has already attested to this AIO - just update its attestation data.
         uint256 attestationId = aio.lookup[msg.sender];
         if (attestationId != 0) {
             Attestation storage attestation = db[attestationId];
             attestation.time = block.timestamp;
+            attestation.expirationTime = _expirationTime;
             attestation.data = _data;
         } else {
             Attestation memory attestation = Attestation({
                 from: msg.sender,
                 time: block.timestamp,
+                expirationTime: _expirationTime,
                 data: _data
             });
 
@@ -141,7 +147,7 @@ contract EAS {
             db[newAttestationId] = attestation;
         }
 
-        emit Attested(msg.sender, _recipient, _aio);
+        emit Attested(msg.sender, _recipient, _aio, _expirationTime);
     }
 
     /// @dev Enables/disables attesting to a specific AIO.
