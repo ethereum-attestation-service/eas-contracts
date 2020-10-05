@@ -70,6 +70,13 @@ contract EAS {
     /// @param _expirationTime The expiration time of the attestation.
     event Attested(address indexed _attester, address indexed _recipient, uint16 indexed _aio, uint256 _expirationTime);
 
+    /// @dev Triggered when an attestation has been revoked.
+    ///
+    /// @param _attester The attesting account.
+    /// @param _recipient The recipient the attestation.
+    /// @param _aio The ID of the AIO.
+    event Revoked(address indexed _attester, address indexed _recipient, uint16 indexed _aio);
+
     /// @dev Enables attestations to a specific AIO.
     ///
     /// @param _aio The ID of the AIO.
@@ -148,6 +155,34 @@ contract EAS {
         }
 
         emit Attested(msg.sender, _recipient, _aio, _expirationTime);
+    }
+
+    /// @dev Revokes an existing attestation to a specific AIO.
+    ///
+    /// @param _recipient The recipient the attestation.
+    /// @param _aio The ID of the AIO.
+    function revoke(address _recipient, uint16 _aio) public {
+        AttestationIdentityObject storage aio = attestations[_recipient][_aio];
+
+        uint256 attestationId = aio.lookup[msg.sender];
+        require(attestationId != 0, "ERR_NO_ATTESTATION");
+
+        uint256[] storage attestationIds = aio.attestationIds;
+        uint256 length = attestationIds.length;
+        for (uint256 i = 0; i < length; ++i) {
+            if (attestationIds[i] == attestationId) {
+                // Swap the requested element with the last element and then delete it using pop.
+                attestationIds[i] = attestationIds[length - 1];
+                attestationIds.pop();
+
+                break;
+            }
+        }
+
+        delete aio.lookup[msg.sender];
+        delete db[attestationId];
+
+        emit Revoked(msg.sender, _recipient, _aio);
     }
 
     /// @dev Enables/disables attesting to a specific AIO.
