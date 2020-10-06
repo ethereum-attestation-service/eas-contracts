@@ -58,7 +58,6 @@ contract EAS {
     function attest(address _recipient, uint32 _ao, uint256 _expirationTime, string calldata _data) public {
         AttestationObject storage ao = attestations[_recipient][_ao];
 
-        require(_recipient != msg.sender, "ERR_INVALID_ATTESTER");
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
         Attestation memory attestation = Attestation({
