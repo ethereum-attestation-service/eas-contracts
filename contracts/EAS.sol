@@ -2,122 +2,52 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-
 /// @title EAS - Ethereum Attestation Service
 contract EAS {
-    using SafeMath for uint256;
-
     string constant public VERSION = "0.1";
+
+    bytes32 constant private EMPTY_UUID = bytes32(0x0);
+    string constant private HASH_SEPARATOR = "@";
 
     // A data struct representing a single attestation.
     struct Attestation {
+        bytes32 uuid;
+        uint32 aio;
         address from;
         uint256 time;
         uint256 expirationTime;
+        uint256 revocationTime;
         string data;
     }
 
-    // A data struct representing attestations to a specific AIO (by their IDs), as well as a reverse lookup for
-    // attesters.
+    // A data struct representing attestations to a specific AIO (by their UIIDs).
     struct AttestationIdentityObject {
-        // Whether it's possible to attest to this AIO.
-        bool enabled;
-
-        // The value of the attestation AIO.
-        string data;
-
         // A list of attestations IDs, belonging to this AIO.
-        uint256[] attestationIds;
-
-        // Reverse lookup between attesters and their respective attestations.
-        mapping (address => uint256) lookup;
+        bytes32[] attestationUIIDs;
     }
 
     // A mapping between an account, its AIOs and their respective attestations.
-    mapping (address => mapping (uint16 => AttestationIdentityObject)) private attestations;
+    mapping (address => mapping (uint32 => AttestationIdentityObject)) private attestations;
 
-    // Count of attestations.
+    // A global mapping between attestations and their UUIDs.
+    mapping (bytes32 => Attestation) private db;
+
+    // A global counter for the total number of attestations.
     uint256 public attestationsCount;
-
-    // A global mapping between attestations and their IDs.
-    mapping (uint256 => Attestation) private db;
-
-    /// @dev Triggered when an AIO is enabled.
-    ///
-    /// @param _recipient The recipient the attestation.
-    /// @param _aio The ID of the AIO.
-    event AIOEnabled(address indexed _recipient, uint16 indexed _aio);
-
-    /// @dev Triggered when an AIO is disabled.
-    ///
-    /// @param _recipient The recipient the attestation.
-    /// @param _aio The ID of the AIO.
-    event AIODisabled(address indexed _recipient, uint16 indexed _aio);
-
-    /// @dev Triggered when the data of an AIO is updated.
-    ///
-    /// @param _recipient The recipient the attestation.
-    /// @param _aio The ID of the AIO.
-    /// @param _data The value of the AIO.
-    event AIODataUpdated(address indexed _recipient, uint16 indexed _aio, string _data);
 
     /// @dev Triggered when an attestation has been made.
     ///
     /// @param _attester The attesting account.
-    /// @param _recipient The recipient the attestation.
     /// @param _aio The ID of the AIO.
-    /// @param _expirationTime The expiration time of the attestation.
-    event Attested(address indexed _attester, address indexed _recipient, uint16 indexed _aio, uint256 _expirationTime);
+    /// @param _uuid The UUID the revoked attestation.
+    event Attested(address indexed _attester, uint32 indexed _aio, bytes32 indexed _uuid);
 
     /// @dev Triggered when an attestation has been revoked.
     ///
     /// @param _attester The attesting account.
-    /// @param _recipient The recipient the attestation.
     /// @param _aio The ID of the AIO.
-    event Revoked(address indexed _attester, address indexed _recipient, uint16 indexed _aio);
-
-    /// @dev Enables attestations to a specific AIO.
-    ///
-    /// @param _aio The ID of the AIO.
-    function enableAIO(uint16 _aio) public {
-        setAIO(_aio, true);
-    }
-
-    /// @dev Disables attestations to a specific AIO.
-    ///
-    /// @param _aio The ID of the AIO.
-    function disableAIO(uint16 _aio) public {
-        setAIO(_aio, false);
-    }
-
-    /// @dev Sets the value of the AIO.
-    ///
-    /// @param _aio The ID of the AIO.
-    /// @param _data The value of the AIO.
-    ///
-    /// @notice Setting a new data will invalidate all existing attestations.
-    function setAIOData(uint16 _aio, string calldata _data) public {
-        AttestationIdentityObject storage aio = attestations[msg.sender][_aio];
-
-        // Check if the data is actually different than the existing data.
-        string memory data = aio.data;
-
-        if (bytes(data).length == bytes(_data).length &&
-            keccak256(abi.encodePacked(data)) == keccak256(abi.encodePacked(_data))) {
-            return;
-        }
-
-        aio.data = _data;
-
-        // Invalidate all existing attestations.
-        //
-        // Note: we are aware to the fact, in the case of large number of existing attestation, this method can exceed
-        // the the block gas limit and fail. This issue will be handled and mitigated in future versions.
-        invalidateAttestations(aio);
-
-        emit AIODataUpdated(msg.sender, _aio, _data);
-    }
+    /// @param _uuid The UUID the revoked attestation.
+    event Revoked(address indexed _attester, uint32 indexed _aio, bytes32 indexed _uuid);
 
     /// @dev Attests to a specific AIO.
     ///
@@ -125,99 +55,74 @@ contract EAS {
     /// @param _aio The ID of the AIO.
     /// @param _expirationTime The expiration time of the attestation.
     /// @param _data The additional attestation data.
-    function attest(address _recipient, uint16 _aio, uint256 _expirationTime, string calldata _data) public {
+    function attest(address _recipient, uint32 _aio, uint256 _expirationTime, string calldata _data) public {
         AttestationIdentityObject storage aio = attestations[_recipient][_aio];
 
-        require(aio.enabled && _recipient != msg.sender, "ERR_INVALID_AIO");
+        require(_recipient != msg.sender, "ERR_INVALID_ATTESTER");
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        // If the msg.sender has already attested to this AIO - just update its attestation data.
-        uint256 attestationId = aio.lookup[msg.sender];
-        if (attestationId != 0) {
-            Attestation storage attestation = db[attestationId];
-            attestation.time = block.timestamp;
-            attestation.expirationTime = _expirationTime;
-            attestation.data = _data;
-        } else {
-            Attestation memory attestation = Attestation({
-                from: msg.sender,
-                time: block.timestamp,
-                expirationTime: _expirationTime,
-                data: _data
-            });
+        Attestation memory attestation = Attestation({
+            uuid: EMPTY_UUID,
+            aio: _aio,
+            from: msg.sender,
+            time: block.timestamp,
+            expirationTime: _expirationTime,
+            revocationTime: 0,
+            data: _data
+        });
 
-            uint256 newAttestationId = ++attestationsCount;
+        bytes32 uuid = getUUID(attestation);
+        attestation.uuid = uuid;
 
-            aio.attestationIds.push(newAttestationId);
-            aio.lookup[msg.sender] = newAttestationId;
+        aio.attestationUIIDs.push(uuid);
 
-            db[newAttestationId] = attestation;
-        }
+        db[uuid] = attestation;
+        attestationsCount++;
 
-        emit Attested(msg.sender, _recipient, _aio, _expirationTime);
+        emit Attested(msg.sender, _aio, uuid);
     }
 
     /// @dev Revokes an existing attestation to a specific AIO.
     ///
-    /// @param _recipient The recipient the attestation.
-    /// @param _aio The ID of the AIO.
-    function revoke(address _recipient, uint16 _aio) public {
-        AttestationIdentityObject storage aio = attestations[_recipient][_aio];
+    /// @param _uuid The UUID of the attestation to revoke.
+    function revoke(bytes32 _uuid) public {
+        Attestation storage attestation = db[_uuid];
+        require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
 
-        uint256 attestationId = aio.lookup[msg.sender];
-        require(attestationId != 0, "ERR_NO_ATTESTATION");
+        attestation.revocationTime = block.timestamp;
 
-        uint256[] storage attestationIds = aio.attestationIds;
-        uint256 length = attestationIds.length;
-        for (uint256 i = 0; i < length; ++i) {
-            if (attestationIds[i] == attestationId) {
-                // Swap the requested element with the last element and then delete it using pop.
-                attestationIds[i] = attestationIds[length - 1];
-                attestationIds.pop();
-
-                break;
-            }
-        }
-
-        delete aio.lookup[msg.sender];
-        delete db[attestationId];
-
-        emit Revoked(msg.sender, _recipient, _aio);
+        emit Revoked(msg.sender, attestation.aio, EMPTY_UUID);
     }
 
-    /// @dev Enables/disables attesting to a specific AIO.
+    /// @dev Returns an existing attestation by UUID.
     ///
-    /// @param _aio The ID of the AIO.
-    /// @param _enable Whether to enable/disable attestation to a specific AIO.
-    function setAIO(uint16 _aio, bool _enable) private {
-        AttestationIdentityObject storage aio = attestations[msg.sender][_aio];
+    /// @param _uuid The UUID of the attestation to retrieve.
+    ///
+    /// @return The attestation data members.
+    function getAttestation(bytes32 _uuid) public view returns (uint32, address, uint256, uint256, uint256, string memory) {
+        Attestation memory attestation = db[_uuid];
 
-        if (aio.enabled == _enable) {
-            return;
-        }
-
-        aio.enabled = _enable;
-
-        if (_enable) {
-            emit AIOEnabled(msg.sender, _aio);
-        } else {
-            emit AIODisabled(msg.sender, _aio);
-        }
+        return (
+            attestation.aio,
+            attestation.from,
+            attestation.time,
+            attestation.expirationTime,
+            attestation.revocationTime,
+            attestation.data
+        );
     }
 
-    /// @dev Invalidation attestations to a specific AIO.
-    /// @param _aio The AIO.
-    function invalidateAttestations(AttestationIdentityObject storage _aio) private {
-        uint256 length = _aio.attestationIds.length;
-        for (uint256 i = 0; i < length; ++i) {
-            uint256 id = _aio.attestationIds[i];
-            Attestation memory attestation = db[id];
-
-            delete _aio.lookup[attestation.from];
-            delete db[id];
-        }
-
-        delete _aio.attestationIds;
-        attestationsCount = attestationsCount.sub(length);
+    /// @dev Calculates a UUID for a given attestation.
+    ///
+    /// @param _attestation The input attestation.
+    function getUUID(Attestation memory _attestation) private view returns (bytes32) {
+        return keccak256(abi.encodePacked(
+            _attestation.aio, HASH_SEPARATOR,
+            _attestation.from, HASH_SEPARATOR,
+            _attestation.time, HASH_SEPARATOR,
+            _attestation.expirationTime, HASH_SEPARATOR,
+            _attestation.data, HASH_SEPARATOR,
+            attestationsCount, HASH_SEPARATOR
+        ));
     }
 }
