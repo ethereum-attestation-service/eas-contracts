@@ -13,3 +13,6 @@ npm-debug.log
 /coverage.json
 /allFiredEvents
 /scTopics
+
+.env*
+!.env.template

@@ -1,4 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
+require('dotenv').config();
+
 require('babel-register');
 require('babel-polyfill');
 
@@ -12,6 +14,10 @@ require('chai')
 const ganache = require('ganache-core');
 /* eslint-enable import/no-extraneous-dependencies */
 
+const HDWalletProvider = require('truffle-hdwallet-provider');
+
+const { ROPSTEN_MNEMONIC, ROPSTEN_INFURA_URL } = process.env;
+
 module.exports = {
   networks: {
     development: {
@@ -20,6 +26,15 @@ module.exports = {
         total_accounts: 100,
         default_balance_ether: 1000
       })
+    },
+    ganache: {
+      network_id: '*',
+      host: '127.0.0.1',
+      port: 7545
+    },
+    ropsten: {
+      provider: () => new HDWalletProvider(ROPSTEN_MNEMONIC, ROPSTEN_INFURA_URL),
+      network_id: 3
     }
   },
   plugins: ['solidity-coverage'],
