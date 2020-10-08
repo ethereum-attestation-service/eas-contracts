@@ -16,7 +16,7 @@ const ganache = require('ganache-core');
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
 
-const { ROPSTEN_MNEMONIC, ROPSTEN_INFURA_URL } = process.env;
+const { RINKEBY_MNEMONIC, RINKEBY_INFURA_URL } = process.env;
 
 module.exports = {
   networks: {
@@ -32,9 +32,9 @@ module.exports = {
       host: '127.0.0.1',
       port: 7545
     },
-    ropsten: {
-      provider: () => new HDWalletProvider(ROPSTEN_MNEMONIC, ROPSTEN_INFURA_URL),
-      network_id: 3
+    rinkeby: {
+      provider: () => new HDWalletProvider(RINKEBY_MNEMONIC, RINKEBY_INFURA_URL),
+      network_id: 4
     }
   },
   plugins: ['solidity-coverage'],
