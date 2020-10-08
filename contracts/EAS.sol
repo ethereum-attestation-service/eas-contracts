@@ -2,6 +2,8 @@
 
 pragma solidity 0.6.12;
 
+import "./AORegistry.sol";
+
 /// @title EAS - Ethereum Attestation Service
 contract EAS {
     string constant public VERSION = "0.1";
@@ -12,26 +14,29 @@ contract EAS {
     // A data struct representing a single attestation.
     struct Attestation {
         bytes32 uuid;
-        uint32 ao;
+        uint256 ao;
         address to;
         address from;
         uint256 time;
         uint256 expirationTime;
         uint256 revocationTime;
-        string data;
+        bytes data;
     }
 
-    // A data struct representing attestations to a specific AO (by their UIIDs).
-    struct AttestationObject {
+    // A data struct representing attestations to a specific AO (Attestation Object) by their UIIDs.
+    struct AO {
         // A list of attestations IDs, belonging to this AO.
         bytes32[] attestationUIIDs;
     }
 
+    // The AO global registry.
+    AORegistry public aoRegistry;
+
     // A mapping between an account and its received attestations.
-    mapping (address => mapping (uint32 => AttestationObject)) private receivedAttestations;
+    mapping (address => mapping (uint256 => AO)) private receivedAttestations;
 
     // A mapping between an account and its sent attestations.
-    mapping (address => mapping (uint32 => AttestationObject)) private sentAttestations;
+    mapping (address => mapping (uint256 => AO)) private sentAttestations;
 
     // A global mapping between attestations and their UUIDs.
     mapping (bytes32 => Attestation) private db;
@@ -44,14 +49,23 @@ contract EAS {
     /// @param _attester The attesting account.
     /// @param _ao The ID of the AO.
     /// @param _uuid The UUID the revoked attestation.
-    event Attested(address indexed _attester, uint32 indexed _ao, bytes32 indexed _uuid);
+    event Attested(address indexed _attester, uint256 indexed _ao, bytes32 indexed _uuid);
 
     /// @dev Triggered when an attestation has been revoked.
     ///
     /// @param _attester The attesting account.
     /// @param _ao The ID of the AO.
     /// @param _uuid The UUID the revoked attestation.
-    event Revoked(address indexed _attester, uint32 indexed _ao, bytes32 indexed _uuid);
+    event Revoked(address indexed _attester, uint256 indexed _ao, bytes32 indexed _uuid);
+
+    /// @dev Creates a new EAS instance.
+    ///
+    /// @param _aoRegistry The address of the global AO registry.
+    constructor(AORegistry _aoRegistry) public {
+        require(address(_aoRegistry) != address(0x0), "ERR_INVALID_ADDRESS");
+
+        aoRegistry = _aoRegistry;
+    }
 
     /// @dev Attests to a specific AO.
     ///
@@ -59,8 +73,16 @@ contract EAS {
     /// @param _ao The ID of the AO.
     /// @param _expirationTime The expiration time of the attestation.
     /// @param _data The additional attestation data.
-    function attest(address _recipient, uint32 _ao, uint256 _expirationTime, string calldata _data) public {
+    function attest(address _recipient, uint256 _ao, uint256 _expirationTime, bytes calldata _data) public {
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
+
+        uint256 id;
+        bytes memory schema;
+        ISchemaVerifier verifier;
+        (id, schema, verifier) = aoRegistry.getAO(_ao);
+
+        require(id > 0, "ERR_INVALID_AO");
+        require(address(verifier) == address(0x0) || verifier.verify(schema, _data), "ERR_INVALID_DATA");
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
@@ -76,10 +98,10 @@ contract EAS {
         bytes32 uuid = getUUID(attestation);
         attestation.uuid = uuid;
 
-        AttestationObject storage receivedAo = receivedAttestations[_recipient][_ao];
+        AO storage receivedAo = receivedAttestations[_recipient][_ao];
         receivedAo.attestationUIIDs.push(uuid);
 
-        AttestationObject storage sentAo = sentAttestations[msg.sender][_ao];
+        AO storage sentAo = sentAttestations[msg.sender][_ao];
         sentAo.attestationUIIDs.push(uuid);
 
         db[uuid] = attestation;
@@ -106,7 +128,7 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
     /// @return The attestation data members.
-    function getAttestation(bytes32 _uuid) public view returns (uint32, address, address, uint256, uint256, uint256, string memory) {
+    function getAttestation(bytes32 _uuid) public view returns (uint256, address, address, uint256, uint256, uint256, bytes memory) {
         Attestation memory attestation = db[_uuid];
 
         return (
@@ -126,7 +148,7 @@ contract EAS {
     /// @param _ao The ID of the AO.
     ///
     /// @return An array of attestation UUIDs.
-    function getReceivedAttestationsUUIDs(address _recipient, uint32 _ao) public view returns (bytes32[] memory) {
+    function getReceivedAttestationsUUIDs(address _recipient, uint256 _ao) public view returns (bytes32[] memory) {
         return receivedAttestations[_recipient][_ao].attestationUIIDs;
     }
 
@@ -136,7 +158,7 @@ contract EAS {
     /// @param _ao The ID of the AO.
     ///
     /// @return An array of attestation UUIDs.
-    function getSentAttestationsUUIDs(address _attester, uint32 _ao) public view returns (bytes32[] memory) {
+    function getSentAttestationsUUIDs(address _attester, uint256 _ao) public view returns (bytes32[] memory) {
         return sentAttestations[_attester][_ao].attestationUIIDs;
     }
 
