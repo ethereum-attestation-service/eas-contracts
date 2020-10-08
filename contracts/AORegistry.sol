@@ -6,6 +6,8 @@ import "./ISchemaVerifier.sol";
 
 /// @title The global AO registry.
 contract AORegistry {
+    string constant public VERSION = "0.1";
+
     // A data struct representing a record for a submitted AO (Attestation Object).
     struct AORecord {
         uint256 id;
