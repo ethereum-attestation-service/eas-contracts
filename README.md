@@ -1,1 +1,1 @@
-# Decentralized Identity Protocol
+# Ethereum Attestation Service
