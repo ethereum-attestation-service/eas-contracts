@@ -46,17 +46,19 @@ contract EAS {
 
     /// @dev Triggered when an attestation has been made.
     ///
+    /// @param _recipient The recipient the attestation.
     /// @param _attester The attesting account.
     /// @param _ao The ID of the AO.
     /// @param _uuid The UUID the revoked attestation.
-    event Attested(address indexed _attester, uint256 indexed _ao, bytes32 indexed _uuid);
+    event Attested(address indexed _recipient, address indexed _attester, uint256 indexed _ao, bytes32 _uuid);
 
     /// @dev Triggered when an attestation has been revoked.
     ///
+    /// @param _recipient The recipient the attestation.
     /// @param _attester The attesting account.
     /// @param _ao The ID of the AO.
     /// @param _uuid The UUID the revoked attestation.
-    event Revoked(address indexed _attester, uint256 indexed _ao, bytes32 indexed _uuid);
+    event Revoked(address indexed _recipient, address indexed _attester, uint256 indexed _ao, bytes32 _uuid);
 
     /// @dev Creates a new EAS instance.
     ///
@@ -107,7 +109,7 @@ contract EAS {
         db[uuid] = attestation;
         attestationsCount++;
 
-        emit Attested(msg.sender, _ao, uuid);
+        emit Attested(_recipient, msg.sender, _ao, uuid);
     }
 
     /// @dev Revokes an existing attestation to a specific AO.
@@ -121,7 +123,7 @@ contract EAS {
 
         attestation.revocationTime = block.timestamp;
 
-        emit Revoked(msg.sender, attestation.ao, _uuid);
+        emit Revoked(attestation.to, msg.sender, attestation.ao, _uuid);
     }
 
     /// @dev Returns an existing attestation by UUID.
