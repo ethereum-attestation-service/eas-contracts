@@ -116,11 +116,12 @@ contract EAS {
     function revoke(bytes32 _uuid) public {
         Attestation storage attestation = db[_uuid];
         require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
-        require(attestation.from != msg.sender, "ERR_ACCESS_DENIED");
+        require(attestation.from == msg.sender, "ERR_ACCESS_DENIED");
+        require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
 
         attestation.revocationTime = block.timestamp;
 
-        emit Revoked(msg.sender, attestation.ao, EMPTY_UUID);
+        emit Revoked(msg.sender, attestation.ao, _uuid);
     }
 
     /// @dev Returns an existing attestation by UUID.
