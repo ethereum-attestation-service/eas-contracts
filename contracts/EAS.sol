@@ -85,11 +85,15 @@ contract EAS {
 
         uint256 id;
         bytes memory schema;
-        ISchemaVerifier verifier;
+        IAOVerifier verifier;
         (id, schema, verifier) = aoRegistry.getAO(_ao);
 
         require(id > 0, "ERR_INVALID_AO");
-        require(address(verifier) == address(0x0) || verifier.verify(schema, _data), "ERR_INVALID_DATA");
+        require(
+            address(verifier) == address(0x0) ||
+                verifier.verify(_recipient, schema, _data, _expirationTime, msg.sender, msg.value),
+            "ERR_INVALID_ATTESTATION_DATA"
+        );
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,

@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-import "./ISchemaVerifier.sol";
+import "./IAOVerifier.sol";
 
 /// @title The global AO registry.
 contract AORegistry {
@@ -12,7 +12,7 @@ contract AORegistry {
     struct AORecord {
         uint256 id;
         bytes schema;
-        ISchemaVerifier verifier;
+        IAOVerifier verifier;
     }
 
     // A global mapping between AO records and their IDs.
@@ -27,13 +27,13 @@ contract AORegistry {
     /// @param _schema The AO schema.
     /// @param _verifier An optional AO schema verifier.
     /// @param _from The address of the account used to register the AO.
-    event Registered(uint256 indexed _id, bytes _schema, ISchemaVerifier indexed _verifier, address indexed _from);
+    event Registered(uint256 indexed _id, bytes _schema, IAOVerifier indexed _verifier, address indexed _from);
 
     /// @dev Submits and reserve a new AO.
     ///
     /// @param _schema The AO data schema.
     /// @param _verifier An optional AO schema verifier.
-    function register(bytes calldata _schema, ISchemaVerifier _verifier) public {
+    function register(bytes calldata _schema, IAOVerifier _verifier) public {
         uint256 id = ++aoCount;
 
         registry[id] = AORecord({id: id, schema: _schema, verifier: _verifier});
@@ -52,7 +52,7 @@ contract AORegistry {
         returns (
             uint256,
             bytes memory,
-            ISchemaVerifier
+            IAOVerifier
         )
     {
         AORecord memory ao = registry[_id];
