@@ -16,4 +16,4 @@ class BaseContract {
   }
 }
 
-export default BaseContract;
+module.exports = BaseContract;
