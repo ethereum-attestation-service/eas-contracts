@@ -75,12 +75,14 @@ contract EAS {
     /// @param _ao The ID of the AO.
     /// @param _expirationTime The expiration time of the attestation.
     /// @param _data The additional attestation data.
+    ///
+    /// @return The UUID of the new attestation.
     function attest(
         address _recipient,
         uint256 _ao,
         uint256 _expirationTime,
         bytes calldata _data
-    ) public {
+    ) public payable returns (bytes32) {
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
         uint256 id;
@@ -119,6 +121,8 @@ contract EAS {
         attestationsCount++;
 
         emit Attested(_recipient, msg.sender, uuid, _ao);
+
+        return uuid;
     }
 
     /// @dev Revokes an existing attestation to a specific AO.
@@ -144,6 +148,7 @@ contract EAS {
         public
         view
         returns (
+            bytes32,
             uint256,
             address,
             address,
@@ -156,6 +161,7 @@ contract EAS {
         Attestation memory attestation = db[_uuid];
 
         return (
+            attestation.uuid,
             attestation.ao,
             attestation.to,
             attestation.from,
