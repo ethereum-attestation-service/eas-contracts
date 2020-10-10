@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { BN, expectRevert, expectEvent, constants, time } = require('@openzeppelin/test-helpers');
-const { ZERO_ADDRESS, MAX_UINT256 } = constants;
+const { ZERO_ADDRESS, ZERO_BYTES32, MAX_UINT256 } = constants;
 const { duration, latest } = time;
 
 const AORegistry = require('./helpers/aoRegistry');
@@ -9,8 +9,9 @@ const EAS = require('./helpers/eas');
 const TestAORecipientVerifier = artifacts.require('TestAORecipientVerifier');
 const TestAODataVerifier = artifacts.require('TestAODataVerifier');
 const TestAOExpirationTimeVerifier = artifacts.require('TestAOExpirationTimeVerifier');
-const TestAOSenderVerifier = artifacts.require('TestAOSenderVerifier');
+const TestAOAttesterVerifier = artifacts.require('TestAOAttesterVerifier');
 const TestAOValueVerifier = artifacts.require('TestAOValueVerifier');
+const TestAOAttestationVerifier = artifacts.require('TestAOAttestationVerifier');
 
 contract('EAS', (accounts) => {
   const ZERO_BYTES = '0x00';
@@ -204,7 +205,7 @@ contract('EAS', (accounts) => {
         const targetSender = accounts[5];
 
         beforeEach(async () => {
-          const verifier = await TestAOSenderVerifier.new(targetSender);
+          const verifier = await TestAOAttesterVerifier.new(targetSender);
 
           await registry.register(svid4, verifier.address);
         });
@@ -238,6 +239,27 @@ contract('EAS', (accounts) => {
 
         it('should allow attesting with correct msg.value', async () => {
           await testAttestation(recipient, vid4, expirationTime, data, { value: targetValue });
+        });
+      });
+
+      context('with attestation verifier', async () => {
+        let uuid;
+
+        beforeEach(async () => {
+          await eas.attest(recipient, id1, expirationTime, data);
+          uuid = await eas.getLastUUID();
+
+          const verifier = await TestAOAttestationVerifier.new(eas.getAddress());
+
+          await registry.register(svid4, verifier.address);
+        });
+
+        it('should revert when attesting to a non-existing attestation', async () => {
+          await testFailedAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, 'ERR_INVALID_ATTESTATION_DATA');
+        });
+
+        it('should allow attesting to an existing attestation', async () => {
+          await testAttestation(recipient, vid4, expirationTime, uuid);
         });
       });
     });
