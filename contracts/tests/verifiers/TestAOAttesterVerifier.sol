@@ -4,11 +4,12 @@ pragma solidity 0.6.12;
 
 import "../../IAOVerifier.sol";
 
-contract TestAOSenderVerifier is IAOVerifier {
-    address public targetSender;
+/// @title A sample AO verifier that checks whether the attestation is from a specific attester.
+contract TestAOAttesterVerifier is IAOVerifier {
+    address public targetAttester;
 
-    constructor(address _targetSender) public {
-        targetSender = _targetSender;
+    constructor(address _targetAttester) public {
+        targetAttester = _targetAttester;
     }
 
     function verify(
@@ -19,6 +20,6 @@ contract TestAOSenderVerifier is IAOVerifier {
         address _msgSender,
         uint256 /* _msgValue */
     ) public virtual override view returns (bool) {
-        return _msgSender == targetSender;
+        return _msgSender == targetAttester;
     }
 }
