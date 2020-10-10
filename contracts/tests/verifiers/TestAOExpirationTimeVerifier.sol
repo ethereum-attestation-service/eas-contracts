@@ -4,6 +4,7 @@ pragma solidity 0.6.12;
 
 import "../../IAOVerifier.sol";
 
+/// @title A sample AO verifier that checks whether the expiration time is later than a specific timestamp.
 contract TestAOExpirationTimeVerifier is IAOVerifier {
     uint256 public validAfter;
 
