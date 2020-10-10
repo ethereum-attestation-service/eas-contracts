@@ -23,10 +23,10 @@ contract EAS {
         bytes data;
     }
 
-    // A data struct representing attestations to a specific AO (Attestation Object) by their UIIDs.
+    // A data struct representing attestations to a specific AO (Attestation Object) by their UUIDs.
     struct AO {
         // A list of attestations IDs, belonging to this AO.
-        bytes32[] attestationUIIDs;
+        bytes32[] attestationUUIDs;
     }
 
     // The AO global registry.
@@ -112,10 +112,10 @@ contract EAS {
         attestation.uuid = uuid;
 
         AO storage receivedAo = receivedAttestations[_recipient][_ao];
-        receivedAo.attestationUIIDs.push(uuid);
+        receivedAo.attestationUUIDs.push(uuid);
 
         AO storage sentAo = sentAttestations[msg.sender][_ao];
-        sentAo.attestationUIIDs.push(uuid);
+        sentAo.attestationUUIDs.push(uuid);
 
         db[uuid] = attestation;
         attestationsCount++;
@@ -179,7 +179,7 @@ contract EAS {
     ///
     /// @return An array of attestation UUIDs.
     function getReceivedAttestationsUUIDs(address _recipient, uint256 _ao) public view returns (bytes32[] memory) {
-        return receivedAttestations[_recipient][_ao].attestationUIIDs;
+        return receivedAttestations[_recipient][_ao].attestationUUIDs;
     }
 
     /// @dev Returns all sent attestations UUIDs.
@@ -189,7 +189,7 @@ contract EAS {
     ///
     /// @return An array of attestation UUIDs.
     function getSentAttestationsUUIDs(address _attester, uint256 _ao) public view returns (bytes32[] memory) {
-        return sentAttestations[_attester][_ao].attestationUIIDs;
+        return sentAttestations[_attester][_ao].attestationUUIDs;
     }
 
     /// @dev Calculates a UUID for a given attestation.
