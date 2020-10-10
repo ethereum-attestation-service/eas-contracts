@@ -6,7 +6,7 @@ import "./ISchemaVerifier.sol";
 
 /// @title The global AO registry.
 contract AORegistry {
-    string constant public VERSION = "0.1";
+    string public constant VERSION = "0.1";
 
     // A data struct representing a record for a submitted AO (Attestation Object).
     struct AORecord {
@@ -16,7 +16,7 @@ contract AORegistry {
     }
 
     // A global mapping between AO records and their IDs.
-    mapping (uint256 => AORecord) private registry;
+    mapping(uint256 => AORecord) private registry;
 
     // A global counter for the total number of attestations.
     uint256 public aoCount;
@@ -36,11 +36,7 @@ contract AORegistry {
     function register(bytes calldata _schema, ISchemaVerifier _verifier) public {
         uint256 id = ++aoCount;
 
-        registry[id] = AORecord({
-            id: id,
-            schema: _schema,
-            verifier: _verifier
-        });
+        registry[id] = AORecord({id: id, schema: _schema, verifier: _verifier});
 
         emit Registered(id, _schema, _verifier, msg.sender);
     }
@@ -50,13 +46,17 @@ contract AORegistry {
     /// @param _id The ID of the AO to retrieve.
     ///
     /// @return The AO data members.
-    function getAO(uint256 _id) public view returns (uint256, bytes memory, ISchemaVerifier) {
+    function getAO(uint256 _id)
+        public
+        view
+        returns (
+            uint256,
+            bytes memory,
+            ISchemaVerifier
+        )
+    {
         AORecord memory ao = registry[_id];
 
-        return (
-            ao.id,
-            ao.schema,
-            ao.verifier
-        );
+        return (ao.id, ao.schema, ao.verifier);
     }
 }

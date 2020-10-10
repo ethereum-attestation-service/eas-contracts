@@ -6,10 +6,10 @@ import "./AORegistry.sol";
 
 /// @title EAS - Ethereum Attestation Service
 contract EAS {
-    string constant public VERSION = "0.1";
+    string public constant VERSION = "0.1";
 
-    bytes32 constant private EMPTY_UUID = bytes32(0x0);
-    string constant private HASH_SEPARATOR = "@";
+    bytes32 private constant EMPTY_UUID = bytes32(0x0);
+    string private constant HASH_SEPARATOR = "@";
 
     // A data struct representing a single attestation.
     struct Attestation {
@@ -33,13 +33,13 @@ contract EAS {
     AORegistry public aoRegistry;
 
     // A mapping between an account and its received attestations.
-    mapping (address => mapping (uint256 => AO)) private receivedAttestations;
+    mapping(address => mapping(uint256 => AO)) private receivedAttestations;
 
     // A mapping between an account and its sent attestations.
-    mapping (address => mapping (uint256 => AO)) private sentAttestations;
+    mapping(address => mapping(uint256 => AO)) private sentAttestations;
 
     // A global mapping between attestations and their UUIDs.
-    mapping (bytes32 => Attestation) private db;
+    mapping(bytes32 => Attestation) private db;
 
     // A global counter for the total number of attestations.
     uint256 public attestationsCount;
@@ -75,7 +75,12 @@ contract EAS {
     /// @param _ao The ID of the AO.
     /// @param _expirationTime The expiration time of the attestation.
     /// @param _data The additional attestation data.
-    function attest(address _recipient, uint256 _ao, uint256 _expirationTime, bytes calldata _data) public {
+    function attest(
+        address _recipient,
+        uint256 _ao,
+        uint256 _expirationTime,
+        bytes calldata _data
+    ) public {
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
         uint256 id;
@@ -131,7 +136,19 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
     /// @return The attestation data members.
-    function getAttestation(bytes32 _uuid) public view returns (uint256, address, address, uint256, uint256, uint256, bytes memory) {
+    function getAttestation(bytes32 _uuid)
+        public
+        view
+        returns (
+            uint256,
+            address,
+            address,
+            uint256,
+            uint256,
+            uint256,
+            bytes memory
+        )
+    {
         Attestation memory attestation = db[_uuid];
 
         return (
@@ -169,14 +186,24 @@ contract EAS {
     ///
     /// @param _attestation The input attestation.
     function getUUID(Attestation memory _attestation) private view returns (bytes32) {
-        return keccak256(abi.encodePacked(
-            _attestation.ao, HASH_SEPARATOR,
-            _attestation.to, HASH_SEPARATOR,
-            _attestation.from, HASH_SEPARATOR,
-            _attestation.time, HASH_SEPARATOR,
-            _attestation.expirationTime, HASH_SEPARATOR,
-            _attestation.data, HASH_SEPARATOR,
-            attestationsCount, HASH_SEPARATOR
-        ));
+        return
+            keccak256(
+                abi.encodePacked(
+                    _attestation.ao,
+                    HASH_SEPARATOR,
+                    _attestation.to,
+                    HASH_SEPARATOR,
+                    _attestation.from,
+                    HASH_SEPARATOR,
+                    _attestation.time,
+                    HASH_SEPARATOR,
+                    _attestation.expirationTime,
+                    HASH_SEPARATOR,
+                    _attestation.data,
+                    HASH_SEPARATOR,
+                    attestationsCount,
+                    HASH_SEPARATOR
+                )
+            );
     }
 }
