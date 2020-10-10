@@ -1,7 +1,5 @@
-import chai from 'chai';
-import { BN, expectRevert } from '@openzeppelin/test-helpers';
-
-const { expect } = chai;
+const { expect } = require('chai');
+const { BN, expectRevert } = require('@openzeppelin/test-helpers');
 
 const EAS = artifacts.require('EAS');
 
