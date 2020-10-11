@@ -13,9 +13,10 @@ contract TestEAS is EAS {
         address _recipient,
         uint256 _ao,
         uint256 _expirationTime,
+        bytes32 _refUUID,
         bytes calldata _data
     ) public payable returns (bytes32) {
-        lastUUID = super.attest(_recipient, _ao, _expirationTime, _data);
+        lastUUID = super.attest(_recipient, _ao, _expirationTime, _refUUID, _data);
 
         return lastUUID;
     }
