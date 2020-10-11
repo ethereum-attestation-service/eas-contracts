@@ -64,29 +64,45 @@ class EAS extends BaseContract {
       time: attestation[4],
       expirationTime: attestation[5],
       revocationTime: attestation[6],
-      data: attestation[7]
+      refUUID: attestation[7],
+      data: attestation[8]
     };
   }
 
   async getReceivedAttestationsUUIDs(recipient, ao) {
-    return await this.contract.getReceivedAttestationsUUIDs.call(EAS.getAddress(recipient), ao);
+    return this.contract.getReceivedAttestationsUUIDs.call(EAS.getAddress(recipient), ao);
   }
 
   async getSentAttestationsUUIDs(attester, ao) {
-    return await this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
+    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
   }
 
-  async attest(recipient, ao, expirationTime, data, options = {}) {
+  async getSentAttestationsUUIDs(attester, ao) {
+    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
+  }
+
+  async getAttestationsOfAttestations(uuid) {
+    return this.contract.getAttestationsOfAttestations.call(EAS.toBytes32(uuid));
+  }
+
+  async attest(recipient, ao, expirationTime, refUUID, data, options = {}) {
     let encodedData = data;
     if (typeof data === 'string' && !data.startsWith('0x')) {
       encodedData = web3.utils.asciiToHex(encodedData);
     }
 
     if (!isEmpty(options)) {
-      return this.contract.testAttest(EAS.getAddress(recipient), ao, expirationTime, encodedData, options);
+      return this.contract.testAttest(
+        EAS.getAddress(recipient),
+        ao,
+        expirationTime,
+        EAS.toBytes32(refUUID),
+        encodedData,
+        options
+      );
     }
 
-    return this.contract.testAttest(EAS.getAddress(recipient), ao, expirationTime, encodedData);
+    return this.contract.testAttest(EAS.getAddress(recipient), ao, expirationTime, EAS.toBytes32(refUUID), encodedData);
   }
 
   async revoke(uuid, options = {}) {

@@ -8,7 +8,7 @@ import "./AORegistry.sol";
 contract EAS {
     string public constant VERSION = "0.1";
 
-    bytes32 private constant EMPTY_UUID = bytes32(0x0);
+    bytes32 private constant EMPTY_UUID = 0;
     string private constant HASH_SEPARATOR = "@";
 
     // A data struct representing a single attestation.
@@ -33,7 +33,7 @@ contract EAS {
     // The AO global registry.
     AORegistry public aoRegistry;
 
-    // A mapping between attestations and their corresponding attestations
+    // A mapping between attestations and their corresponding attestations.
     mapping(bytes32 => bytes32[]) public attestationsOfAttestations;
 
     // A mapping between an account and its received attestations.
@@ -90,7 +90,6 @@ contract EAS {
     ) public payable returns (bytes32) {
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        // Added scope to avoid deep stack error
         {
             uint256 id;
             bytes memory schema;
@@ -130,6 +129,7 @@ contract EAS {
         attestationsCount++;
 
         if (_refUUID != 0) {
+            require(exists(_refUUID), "ERR_NO_ATTESTATION");
             attestationsOfAttestations[_refUUID].push(uuid);
         }
 
@@ -187,6 +187,15 @@ contract EAS {
         );
     }
 
+    /// @dev Checks whether an attestation exists.
+    ///
+    /// @param _uuid The UUID of the attestation to retrieve.
+    ///
+    /// @return Whether an attestation exists.
+    function exists(bytes32 _uuid) public view returns (bool) {
+        return db[_uuid].uuid != 0;
+    }
+
     /// @dev Returns all received attestations UUIDs.
     ///
     /// @param _recipient The recipient the attestation.
@@ -205,6 +214,15 @@ contract EAS {
     /// @return An array of attestation UUIDs.
     function getSentAttestationsUUIDs(address _attester, uint256 _ao) public view returns (bytes32[] memory) {
         return sentAttestations[_attester][_ao].attestationUUIDs;
+    }
+
+    /// @dev Returns all attestations of a specific attestation.
+    ///
+    /// @param _uuid The UUID of the attestation to retrieve.
+    ///
+    /// @return An array of attestation UUIDs.
+    function getAttestationsOfAttestations(bytes32 _uuid) public view returns (bytes32[] memory) {
+        return attestationsOfAttestations[_uuid];
     }
 
     /// @dev Calculates a UUID for a given attestation.

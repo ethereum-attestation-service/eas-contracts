@@ -36,10 +36,10 @@ contract('EAS', (accounts) => {
   });
 
   describe('attesting', async () => {
-    const testAttestation = async (recipient, ao, expirationTime, data, options = {}) => {
+    const testAttestation = async (recipient, ao, expirationTime, refUUID, data, options = {}) => {
       const prevAttestationsCount = await eas.getAttestationsCount();
 
-      const res = await eas.attest(recipient, ao, expirationTime, data, options);
+      const res = await eas.attest(recipient, ao, expirationTime, refUUID, data, options);
       const lastUUID = await eas.getLastUUID();
       const attester = options.from || sender;
 
@@ -60,6 +60,7 @@ contract('EAS', (accounts) => {
       expect(attestation.time).to.be.bignumber.equal(await latest());
       expect(attestation.expirationTime).to.be.bignumber.equal(expirationTime);
       expect(attestation.revocationTime).to.be.bignumber.equal(new BN(0));
+      expect(attestation.refUUID).to.eql(refUUID);
       expect(attestation.data).to.eql(data);
 
       const receivedAttestationsUUIDs = await eas.getReceivedAttestationsUUIDs(recipient, ao);
@@ -67,10 +68,17 @@ contract('EAS', (accounts) => {
 
       const sentAttestationsUUIDs = await eas.getSentAttestationsUUIDs(attester, ao);
       expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.eql(attestation.uuid);
+
+      if (refUUID != ZERO_BYTES32) {
+        const attestationsOfAttestations = await eas.getAttestationsOfAttestations(refUUID);
+        expect(attestationsOfAttestations[attestationsOfAttestations.length - 1]).to.eql(attestation.uuid);
+      }
+
+      return attestation.uuid;
     };
 
-    const testFailedAttestation = async (recipient, ao, expirationTime, data, err, options = {}) => {
-      await expectRevert(eas.attest(recipient, ao, expirationTime, data), err, options);
+    const testFailedAttestation = async (recipient, ao, expirationTime, refUUID, data, err, options = {}) => {
+      await expectRevert(eas.attest(recipient, ao, expirationTime, refUUID, data), err, options);
     };
 
     const sender = accounts[0];
@@ -85,11 +93,11 @@ contract('EAS', (accounts) => {
     });
 
     it('should revert when attesting to an unregistered AO', async () => {
-      await testFailedAttestation(recipient, new BN(10000), expirationTime, data, 'ERR_INVALID_AO');
+      await testFailedAttestation(recipient, new BN(10000), expirationTime, ZERO_BYTES32, data, 'ERR_INVALID_AO');
     });
 
     it('should revert when attesting to an invalid AO', async () => {
-      await testFailedAttestation(recipient, new BN(0), expirationTime, data, 'ERR_INVALID_AO');
+      await testFailedAttestation(recipient, new BN(0), expirationTime, ZERO_BYTES32, data, 'ERR_INVALID_AO');
     });
 
     context('with registered AOs', async () => {
@@ -110,34 +118,45 @@ contract('EAS', (accounts) => {
 
       it('should revert when attesting with passed expiration time', async () => {
         const expired = (await latest()).sub(duration.days(1));
-        await testFailedAttestation(recipient, id1, expired, data, 'ERR_INVALID_EXPIRATION_TIME');
+        await testFailedAttestation(recipient, id1, expired, ZERO_BYTES32, data, 'ERR_INVALID_EXPIRATION_TIME');
       });
 
       it('should allow attestation to an empty recipient', async () => {
-        await testAttestation(ZERO_ADDRESS, id1, expirationTime, data);
+        await testAttestation(ZERO_ADDRESS, id1, expirationTime, ZERO_BYTES32, data);
       });
 
       it('should allow self attestations', async () => {
-        await testAttestation(sender, id2, expirationTime, data, { from: sender });
+        await testAttestation(sender, id2, expirationTime, ZERO_BYTES32, data, { from: sender });
       });
 
       it('should allow multiple attestations', async () => {
-        await testAttestation(recipient, id1, expirationTime, data);
-        await testAttestation(recipient2, id1, expirationTime, data);
+        await testAttestation(recipient, id1, expirationTime, ZERO_BYTES32, data);
+        await testAttestation(recipient2, id1, expirationTime, ZERO_BYTES32, data);
       });
 
       it('should allow multiple attestations to the same AO', async () => {
-        await testAttestation(recipient, id3, expirationTime, data);
-        await testAttestation(recipient, id3, expirationTime, data);
-        await testAttestation(recipient, id3, expirationTime, data);
+        await testAttestation(recipient, id3, expirationTime, ZERO_BYTES32, data);
+        await testAttestation(recipient, id3, expirationTime, ZERO_BYTES32, data);
+        await testAttestation(recipient, id3, expirationTime, ZERO_BYTES32, data);
       });
 
       it('should allow attestation without expiration time', async () => {
-        await testAttestation(recipient, id1, MAX_UINT256, data);
+        await testAttestation(recipient, id1, MAX_UINT256, ZERO_BYTES32, data);
       });
 
       it('should allow attestation without any data', async () => {
-        await testAttestation(recipient, id3, expirationTime, ZERO_BYTES);
+        await testAttestation(recipient, id3, expirationTime, ZERO_BYTES32, ZERO_BYTES);
+      });
+
+      it('should store referenced attestation', async () => {
+        await eas.attest(recipient, id1, expirationTime, ZERO_BYTES32, data);
+        uuid = await eas.getLastUUID();
+
+        await testAttestation(recipient, id3, expirationTime, uuid, data);
+      });
+
+      it('should revert when attesting to a non-existing attestation', async () => {
+        await testFailedAttestation(recipient, id3, expirationTime, accounts[9], data, 'ERR_NO_ATTESTATION');
       });
 
       context('with recipient verifier', async () => {
@@ -150,11 +169,18 @@ contract('EAS', (accounts) => {
         });
 
         it('should revert when attesting to a wrong recipient', async () => {
-          await testFailedAttestation(recipient, vid4, expirationTime, data, 'ERR_INVALID_ATTESTATION_DATA');
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            data,
+            'ERR_INVALID_ATTESTATION_DATA'
+          );
         });
 
         it('should allow attesting to the correct recipient', async () => {
-          await testAttestation(targetRecipient, vid4, expirationTime, data);
+          await testAttestation(targetRecipient, vid4, expirationTime, ZERO_BYTES32, data);
         });
       });
 
@@ -166,13 +192,27 @@ contract('EAS', (accounts) => {
         });
 
         it('should revert when attesting with wrong data', async () => {
-          await testFailedAttestation(recipient, vid4, expirationTime, '0x1234', 'ERR_INVALID_ATTESTATION_DATA');
-          await testFailedAttestation(recipient, vid4, expirationTime, '0x02', 'ERR_INVALID_ATTESTATION_DATA');
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            '0x1234',
+            'ERR_INVALID_ATTESTATION_DATA'
+          );
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            '0x02',
+            'ERR_INVALID_ATTESTATION_DATA'
+          );
         });
 
         it('should allow attesting with correct data', async () => {
-          await testAttestation(recipient, vid4, expirationTime, '0x00');
-          await testAttestation(recipient, vid4, expirationTime, '0x01');
+          await testAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, '0x00');
+          await testAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, '0x01');
         });
       });
 
@@ -191,13 +231,14 @@ contract('EAS', (accounts) => {
             recipient,
             vid4,
             validAfter.sub(duration.days(1)),
+            ZERO_BYTES32,
             data,
             'ERR_INVALID_ATTESTATION_DATA'
           );
         });
 
         it('should allow attesting with the correct expiration time', async () => {
-          await testAttestation(recipient, vid4, validAfter.add(duration.seconds(1)), data);
+          await testAttestation(recipient, vid4, validAfter.add(duration.seconds(1)), ZERO_BYTES32, data);
         });
       });
 
@@ -211,13 +252,21 @@ contract('EAS', (accounts) => {
         });
 
         it('should revert when attesting to the wrong msg.sender', async () => {
-          await testFailedAttestation(recipient, vid4, expirationTime, data, 'ERR_INVALID_ATTESTATION_DATA', {
-            from: sender
-          });
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            data,
+            'ERR_INVALID_ATTESTATION_DATA',
+            {
+              from: sender
+            }
+          );
         });
 
         it('should allow attesting to the correct msg.sender', async () => {
-          await testAttestation(recipient, vid4, expirationTime, data, { from: targetSender });
+          await testAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, data, { from: targetSender });
         });
       });
 
@@ -231,14 +280,29 @@ contract('EAS', (accounts) => {
         });
 
         it('should revert when attesting with wrong msg.value', async () => {
-          await testFailedAttestation(recipient, vid4, expirationTime, data, 'ERR_INVALID_ATTESTATION_DATA');
-          await testFailedAttestation(recipient, vid4, expirationTime, data, 'ERR_INVALID_ATTESTATION_DATA', {
-            value: targetValue.sub(new BN(1))
-          });
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            data,
+            'ERR_INVALID_ATTESTATION_DATA'
+          );
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            data,
+            'ERR_INVALID_ATTESTATION_DATA',
+            {
+              value: targetValue.sub(new BN(1))
+            }
+          );
         });
 
         it('should allow attesting with correct msg.value', async () => {
-          await testAttestation(recipient, vid4, expirationTime, data, { value: targetValue });
+          await testAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, data, { value: targetValue });
         });
       });
 
@@ -246,7 +310,7 @@ contract('EAS', (accounts) => {
         let uuid;
 
         beforeEach(async () => {
-          await eas.attest(recipient, id1, expirationTime, data);
+          await eas.attest(recipient, id1, expirationTime, ZERO_BYTES32, data);
           uuid = await eas.getLastUUID();
 
           const verifier = await TestAOAttestationVerifier.new(eas.getAddress());
@@ -255,11 +319,18 @@ contract('EAS', (accounts) => {
         });
 
         it('should revert when attesting to a non-existing attestation', async () => {
-          await testFailedAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, 'ERR_INVALID_ATTESTATION_DATA');
+          await testFailedAttestation(
+            recipient,
+            vid4,
+            expirationTime,
+            ZERO_BYTES32,
+            ZERO_BYTES32,
+            'ERR_INVALID_ATTESTATION_DATA'
+          );
         });
 
         it('should allow attesting to an existing attestation', async () => {
-          await testAttestation(recipient, vid4, expirationTime, uuid);
+          await testAttestation(recipient, vid4, expirationTime, ZERO_BYTES32, uuid);
         });
       });
     });
@@ -282,7 +353,7 @@ contract('EAS', (accounts) => {
       const now = await latest();
       expirationTime = now.add(duration.days(30));
 
-      await eas.attest(recipient, id1, expirationTime, data);
+      await eas.attest(recipient, id1, expirationTime, ZERO_BYTES32, data);
       uuid = await eas.getLastUUID();
     });
 
