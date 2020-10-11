@@ -20,6 +20,7 @@ contract EAS {
         uint256 time;
         uint256 expirationTime;
         uint256 revocationTime;
+        bytes32 refUUID;
         bytes data;
     }
 
@@ -31,6 +32,9 @@ contract EAS {
 
     // The AO global registry.
     AORegistry public aoRegistry;
+
+    // A mapping between attestations and their corresponding attestations
+    mapping(bytes32 => bytes32[]) public attestationsOfAttestations;
 
     // A mapping between an account and its received attestations.
     mapping(address => mapping(uint256 => AO)) private receivedAttestations;
@@ -81,21 +85,25 @@ contract EAS {
         address _recipient,
         uint256 _ao,
         uint256 _expirationTime,
+        bytes32 _refUUID,
         bytes calldata _data
     ) public payable returns (bytes32) {
         require(_expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        uint256 id;
-        bytes memory schema;
-        IAOVerifier verifier;
-        (id, schema, verifier) = aoRegistry.getAO(_ao);
+        // Added scope to avoid deep stack error
+        {
+            uint256 id;
+            bytes memory schema;
+            IAOVerifier verifier;
+            (id, schema, verifier) = aoRegistry.getAO(_ao);
 
-        require(id > 0, "ERR_INVALID_AO");
-        require(
-            address(verifier) == address(0x0) ||
-                verifier.verify(_recipient, schema, _data, _expirationTime, msg.sender, msg.value),
-            "ERR_INVALID_ATTESTATION_DATA"
-        );
+            require(id > 0, "ERR_INVALID_AO");
+            require(
+                address(verifier) == address(0x0) ||
+                    verifier.verify(_recipient, schema, _data, _expirationTime, msg.sender, msg.value),
+                "ERR_INVALID_ATTESTATION_DATA"
+            );
+        }
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
@@ -105,6 +113,7 @@ contract EAS {
             time: block.timestamp,
             expirationTime: _expirationTime,
             revocationTime: 0,
+            refUUID: _refUUID,
             data: _data
         });
 
@@ -119,6 +128,10 @@ contract EAS {
 
         db[uuid] = attestation;
         attestationsCount++;
+
+        if (_refUUID != 0) {
+            attestationsOfAttestations[_refUUID].push(uuid);
+        }
 
         emit Attested(_recipient, msg.sender, uuid, _ao);
 
@@ -155,6 +168,7 @@ contract EAS {
             uint256,
             uint256,
             uint256,
+            bytes32,
             bytes memory
         )
     {
@@ -168,6 +182,7 @@ contract EAS {
             attestation.time,
             attestation.expirationTime,
             attestation.revocationTime,
+            attestation.refUUID,
             attestation.data
         );
     }
