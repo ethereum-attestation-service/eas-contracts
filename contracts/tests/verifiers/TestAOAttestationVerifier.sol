@@ -21,9 +21,7 @@ contract TestAOAttestationVerifier is IAOVerifier {
         address, /* _msgSender */
         uint256 /* _msgValue */
     ) public virtual override view returns (bool) {
-        (bytes32 uuid, , , , , , , , ) = eas.getAttestation(toBytes32(_data, 0));
-
-        return uuid != bytes32(0x0);
+        return eas.exists(toBytes32(_data, 0));
     }
 
     function toBytes32(bytes memory _bytes, uint256 _start) private pure returns (bytes32) {
