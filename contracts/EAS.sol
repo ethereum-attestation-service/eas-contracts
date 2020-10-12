@@ -34,7 +34,7 @@ contract EAS {
     AORegistry public aoRegistry;
 
     // A mapping between attestations and their corresponding attestations.
-    mapping(bytes32 => bytes32[]) public attestationsOfAttestations;
+    mapping(bytes32 => bytes32[]) public relatedAttestations;
 
     // A mapping between an account and its received attestations.
     mapping(address => mapping(uint256 => AO)) private receivedAttestations;
@@ -130,7 +130,7 @@ contract EAS {
 
         if (_refUUID != 0) {
             require(exists(_refUUID), "ERR_NO_ATTESTATION");
-            attestationsOfAttestations[_refUUID].push(uuid);
+            relatedAttestations[_refUUID].push(uuid);
         }
 
         emit Attested(_recipient, msg.sender, uuid, _ao);
@@ -221,8 +221,8 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getAttestationsOfAttestations(bytes32 _uuid) public view returns (bytes32[] memory) {
-        return attestationsOfAttestations[_uuid];
+    function getRelatedAttestations(bytes32 _uuid) public view returns (bytes32[] memory) {
+        return relatedAttestations[_uuid];
     }
 
     /// @dev Calculates a UUID for a given attestation.

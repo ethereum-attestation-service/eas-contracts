@@ -70,8 +70,8 @@ contract('EAS', (accounts) => {
       expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.eql(attestation.uuid);
 
       if (refUUID != ZERO_BYTES32) {
-        const attestationsOfAttestations = await eas.getAttestationsOfAttestations(refUUID);
-        expect(attestationsOfAttestations[attestationsOfAttestations.length - 1]).to.eql(attestation.uuid);
+        const relatedAttestations = await eas.getRelatedAttestations(refUUID);
+        expect(relatedAttestations[relatedAttestations.length - 1]).to.eql(attestation.uuid);
       }
 
       return attestation.uuid;
