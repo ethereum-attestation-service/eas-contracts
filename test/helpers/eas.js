@@ -81,8 +81,8 @@ class EAS extends BaseContract {
     return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
   }
 
-  async getAttestationsOfAttestations(uuid) {
-    return this.contract.getAttestationsOfAttestations.call(EAS.toBytes32(uuid));
+  async getRelatedAttestations(uuid) {
+    return this.contract.getRelatedAttestations.call(EAS.toBytes32(uuid));
   }
 
   async attest(recipient, ao, expirationTime, refUUID, data, options = {}) {
