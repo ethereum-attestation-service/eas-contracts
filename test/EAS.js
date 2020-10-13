@@ -40,9 +40,9 @@ contract('EAS', (accounts) => {
       const attester = options.from || sender;
 
       const prevAttestationsCount = await eas.getAttestationsCount();
-      const prevReceivedAttestationsUUIDsCount = await eas.getReceivedAttestationsUUIDsCount(recipient, ao);
-      const prevSentAttestationsUUIDsCount = await eas.getSentAttestationsUUIDsCount(attester, ao);
-      const prevRelatedAttestationsUUIDsCount = await eas.getRelatedAttestationsUUIDsCount(refUUID);
+      const prevReceivedAttestationsUUIDsCount = await eas.getReceivedAttestationUUIDsCount(recipient, ao);
+      const prevSentAttestationsUUIDsCount = await eas.getSentAttestationUUIDsCount(attester, ao);
+      const prevRelatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
 
       const res = await eas.attest(recipient, ao, expirationTime, refUUID, data, options);
       const lastUUID = await eas.getLastUUID();
@@ -67,9 +67,9 @@ contract('EAS', (accounts) => {
       expect(attestation.refUUID).to.eql(refUUID);
       expect(attestation.data).to.eql(data);
 
-      const receivedAttestationsUUIDsCount = await eas.getReceivedAttestationsUUIDsCount(recipient, ao);
+      const receivedAttestationsUUIDsCount = await eas.getReceivedAttestationUUIDsCount(recipient, ao);
       expect(receivedAttestationsUUIDsCount).to.be.bignumber.equal(prevReceivedAttestationsUUIDsCount.add(new BN(1)));
-      const receivedAttestationsUUIDs = await eas.getReceivedAttestationsUUIDs(
+      const receivedAttestationsUUIDs = await eas.getReceivedAttestationUUIDs(
         recipient,
         ao,
         0,
@@ -78,17 +78,17 @@ contract('EAS', (accounts) => {
       expect(receivedAttestationsUUIDs).to.have.lengthOf(receivedAttestationsUUIDsCount);
       expect(receivedAttestationsUUIDs[receivedAttestationsUUIDs.length - 1]).to.eql(attestation.uuid);
 
-      const sentAttestationsUUIDsCount = await eas.getSentAttestationsUUIDsCount(attester, ao);
+      const sentAttestationsUUIDsCount = await eas.getSentAttestationUUIDsCount(attester, ao);
       expect(sentAttestationsUUIDsCount).to.be.bignumber.equal(prevSentAttestationsUUIDsCount.add(new BN(1)));
-      const sentAttestationsUUIDs = await eas.getSentAttestationsUUIDs(attester, ao, 0, sentAttestationsUUIDsCount);
+      const sentAttestationsUUIDs = await eas.getSentAttestationUUIDs(attester, ao, 0, sentAttestationsUUIDsCount);
       expect(sentAttestationsUUIDs).to.have.lengthOf(sentAttestationsUUIDsCount);
       expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.eql(attestation.uuid);
 
       if (refUUID != ZERO_BYTES32) {
-        const relatedAttestationsUUIDsCount = await eas.getRelatedAttestationsUUIDsCount(refUUID);
+        const relatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
         expect(relatedAttestationsUUIDsCount).to.be.bignumber.equal(prevRelatedAttestationsUUIDsCount.add(new BN(1)));
 
-        const relatedAttestationsUUIDs = await eas.getRelatedAttestationsUUIDs(
+        const relatedAttestationsUUIDs = await eas.getRelatedAttestationUUIDs(
           refUUID,
           0,
           relatedAttestationsUUIDsCount
@@ -470,19 +470,19 @@ contract('EAS', (accounts) => {
         const [start, length] = slice;
 
         it('should return received attestations', async () => {
-          expect(await eas.getReceivedAttestationsUUIDs(recipient, id1, start, length)).to.have.members(
+          expect(await eas.getReceivedAttestationUUIDs(recipient, id1, start, length)).to.have.members(
             receivedAttestations[recipient].slice(start, start + length)
           );
         });
 
         it('should return sent attestations', async () => {
-          expect(await eas.getSentAttestationsUUIDs(sender, id1, start, length)).to.have.members(
+          expect(await eas.getSentAttestationUUIDs(sender, id1, start, length)).to.have.members(
             sentAttestations[sender].slice(start, start + length)
           );
         });
 
         it('should return related attestations', async () => {
-          expect(await eas.getRelatedAttestationsUUIDs(refUUID, start, length)).to.have.members(
+          expect(await eas.getRelatedAttestationUUIDs(refUUID, start, length)).to.have.members(
             relatedAttestations[refUUID].slice(start, start + length)
           );
         });
@@ -499,15 +499,15 @@ contract('EAS', (accounts) => {
         const [start, length] = slice;
 
         it('should revert on received attestations', async () => {
-          await expectRevert(eas.getReceivedAttestationsUUIDs(recipient, id1, start, length), 'ERR_INVALID_OFFSET');
+          await expectRevert(eas.getReceivedAttestationUUIDs(recipient, id1, start, length), 'ERR_INVALID_OFFSET');
         });
 
         it('should revert on sent attestations', async () => {
-          await expectRevert(eas.getSentAttestationsUUIDs(sender, id1, start, length), 'ERR_INVALID_OFFSET');
+          await expectRevert(eas.getSentAttestationUUIDs(sender, id1, start, length), 'ERR_INVALID_OFFSET');
         });
 
         it('should revert on related attestations', async () => {
-          await expectRevert(eas.getRelatedAttestationsUUIDs(refUUID, start, length), 'ERR_INVALID_OFFSET');
+          await expectRevert(eas.getRelatedAttestationUUIDs(refUUID, start, length), 'ERR_INVALID_OFFSET');
         });
       });
     });

@@ -204,7 +204,7 @@ contract EAS {
     /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getReceivedAttestationsUUIDs(
+    function getReceivedAttestationUUIDs(
         address _recipient,
         uint256 _ao,
         uint256 _start,
@@ -228,7 +228,7 @@ contract EAS {
     /// @param _ao The ID of the AO.
     ///
     /// @return The number of attestations.
-    function getReceivedAttestationsUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
+    function getReceivedAttestationUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
         return receivedAttestations[_recipient][_ao].attestationUUIDs.length;
     }
 
@@ -240,7 +240,7 @@ contract EAS {
     /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getSentAttestationsUUIDs(
+    function getSentAttestationUUIDs(
         address _attester,
         uint256 _ao,
         uint256 _start,
@@ -264,7 +264,7 @@ contract EAS {
     /// @param _ao The ID of the AO.
     ///
     /// @return The number of attestations.
-    function getSentAttestationsUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
+    function getSentAttestationUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
         return sentAttestations[_recipient][_ao].attestationUUIDs.length;
     }
 
@@ -275,7 +275,7 @@ contract EAS {
     /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getRelatedAttestationsUUIDs(
+    function getRelatedAttestationUUIDs(
         bytes32 _uuid,
         uint256 _start,
         uint256 _length
@@ -297,7 +297,7 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
     /// @return The number of related attestations.
-    function getRelatedAttestationsUUIDsCount(bytes32 _uuid) public view returns (uint256) {
+    function getRelatedAttestationUUIDsCount(bytes32 _uuid) public view returns (uint256) {
         return relatedAttestations[_uuid].length;
     }
 
