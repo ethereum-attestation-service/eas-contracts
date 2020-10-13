@@ -212,6 +212,10 @@ contract EAS {
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = receivedAttestations[_recipient][_ao].attestationUUIDs;
 
+        if (attestations.length == 0) {
+            return new bytes32[](0);
+        }
+
         require(_start < attestations.length, "ERR_INVALID_OFFSET");
 
         if (attestations.length < _start + _length) {
@@ -252,6 +256,10 @@ contract EAS {
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = sentAttestations[_attester][_ao].attestationUUIDs;
 
+        if (attestations.length == 0) {
+            return new bytes32[](0);
+        }
+
         require(_start < attestations.length, "ERR_INVALID_OFFSET");
 
         if (attestations.length < _start + _length) {
@@ -289,6 +297,10 @@ contract EAS {
         uint256 _length
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = relatedAttestations[_uuid];
+
+        if (attestations.length == 0) {
+            return new bytes32[](0);
+        }
 
         require(attestations.length > _start, "ERR_INVALID_OFFSET");
 
