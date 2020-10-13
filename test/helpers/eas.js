@@ -69,20 +69,28 @@ class EAS extends BaseContract {
     };
   }
 
-  async getReceivedAttestationsUUIDs(recipient, ao) {
-    return this.contract.getReceivedAttestationsUUIDs.call(EAS.getAddress(recipient), ao);
+  async getReceivedAttestationsUUIDs(recipient, ao, start, length) {
+    return this.contract.getReceivedAttestationsUUIDs.call(EAS.getAddress(recipient), ao, start, length);
   }
 
-  async getSentAttestationsUUIDs(attester, ao) {
-    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
+  async getReceivedAttestationsUUIDsCount(recipient, ao) {
+    return this.contract.getReceivedAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
   }
 
-  async getSentAttestationsUUIDs(attester, ao) {
-    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao);
+  async getSentAttestationsUUIDs(attester, ao, start, length) {
+    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao, start, length);
   }
 
-  async getRelatedAttestations(uuid) {
-    return this.contract.getRelatedAttestations.call(EAS.toBytes32(uuid));
+  async getSentAttestationsUUIDsCount(recipient, ao) {
+    return this.contract.getSentAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
+  }
+
+  async getRelatedAttestationsUUIDs(uuid, start, length) {
+    return this.contract.getRelatedAttestationsUUIDs.call(EAS.toBytes32(uuid), start, length);
+  }
+
+  async getRelatedAttestationsUUIDsCount(recipient, ao) {
+    return this.contract.getRelatedAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
   }
 
   async attest(recipient, ao, expirationTime, refUUID, data, options = {}) {
