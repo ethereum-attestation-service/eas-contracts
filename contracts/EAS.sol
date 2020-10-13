@@ -196,39 +196,26 @@ contract EAS {
         return db[_uuid].uuid != 0;
     }
 
-    /// @dev Returns all received attestations UUIDs.
+    /// @dev Returns all received attestation UUIDs.
     ///
     /// @param _recipient The recipient the attestation.
     /// @param _ao The ID of the AO.
     /// @param _start The offset to start from.
     /// @param _length The number of total members to retrieve.
+    /// @param _reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     ///
     /// @return An array of attestation UUIDs.
     function getReceivedAttestationUUIDs(
         address _recipient,
         uint256 _ao,
         uint256 _start,
-        uint256 _length
+        uint256 _length,
+        bool _reverseOrder
     ) public view returns (bytes32[] memory) {
-        bytes32[] memory attestations = receivedAttestations[_recipient][_ao].attestationUUIDs;
-        if (attestations.length == 0) {
-            return new bytes32[](0);
-        }
-
-        require(_start < attestations.length, "ERR_INVALID_OFFSET");
-        if (attestations.length < _start + _length) {
-            _length = attestations.length - _start;
-        }
-
-        bytes32[] memory res = new bytes32[](_length);
-        for (uint256 i = 0; i < _length; ++i) {
-            res[i] = attestations[_start + i];
-        }
-
-        return res;
+        return sliceUUIDs(receivedAttestations[_recipient][_ao].attestationUUIDs, _start, _length, _reverseOrder);
     }
 
-    /// @dev Returns the number of received attestations UUIDs.
+    /// @dev Returns the number of received attestation UUIDs.
     ///
     /// @param _recipient The recipient the attestation.
     /// @param _ao The ID of the AO.
@@ -238,39 +225,26 @@ contract EAS {
         return receivedAttestations[_recipient][_ao].attestationUUIDs.length;
     }
 
-    /// @dev Returns all sent attestations UUIDs.
+    /// @dev Returns all sent attestation UUIDs.
     ///
     /// @param _attester The recipient the attestation.
     /// @param _ao The ID of the AO.
     /// @param _start The offset to start from.
     /// @param _length The number of total members to retrieve.
+    /// @param _reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     ///
     /// @return An array of attestation UUIDs.
     function getSentAttestationUUIDs(
         address _attester,
         uint256 _ao,
         uint256 _start,
-        uint256 _length
+        uint256 _length,
+        bool _reverseOrder
     ) public view returns (bytes32[] memory) {
-        bytes32[] memory attestations = sentAttestations[_attester][_ao].attestationUUIDs;
-        if (attestations.length == 0) {
-            return new bytes32[](0);
-        }
-
-        require(_start < attestations.length, "ERR_INVALID_OFFSET");
-        if (attestations.length < _start + _length) {
-            _length = attestations.length - _start;
-        }
-
-        bytes32[] memory res = new bytes32[](_length);
-        for (uint256 i = 0; i < _length; ++i) {
-            res[i] = attestations[_start + i];
-        }
-
-        return res;
+        return sliceUUIDs(sentAttestations[_attester][_ao].attestationUUIDs, _start, _length, _reverseOrder);
     }
 
-    /// @dev Returns the number of sent attestations UUIDs.
+    /// @dev Returns the number of sent attestation UUIDs.
     ///
     /// @param _recipient The recipient the attestation.
     /// @param _ao The ID of the AO.
@@ -285,32 +259,19 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     /// @param _start The offset to start from.
     /// @param _length The number of total members to retrieve.
+    /// @param _reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     ///
     /// @return An array of attestation UUIDs.
     function getRelatedAttestationUUIDs(
         bytes32 _uuid,
         uint256 _start,
-        uint256 _length
+        uint256 _length,
+        bool _reverseOrder
     ) public view returns (bytes32[] memory) {
-        bytes32[] memory attestations = relatedAttestations[_uuid];
-        if (attestations.length == 0) {
-            return new bytes32[](0);
-        }
-
-        require(attestations.length > _start, "ERR_INVALID_OFFSET");
-        if (attestations.length < _start + _length) {
-            _length = attestations.length - _start;
-        }
-
-        bytes32[] memory res = new bytes32[](_length);
-        for (uint256 i = 0; i < _length; ++i) {
-            res[i] = attestations[_start + i];
-        }
-
-        return res;
+        return sliceUUIDs(relatedAttestations[_uuid], _start, _length, _reverseOrder);
     }
 
-    /// @dev Returns the number of related attestations UUIDs.
+    /// @dev Returns the number of related attestation UUIDs.
     ///
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
@@ -342,5 +303,39 @@ contract EAS {
                     HASH_SEPARATOR
                 )
             );
+    }
+
+    /// @dev Returns a slice in an array of attestation UUIDs.
+    ///
+    /// @param _uuids The array of attestation UUIDs.
+    /// @param _start The offset to start from.
+    /// @param _length The number of total members to retrieve.
+    /// @param _reverseOrder Whether the offset starts from the end and the data is returned in reverse.
+    ///
+    /// @return An array of attestation UUIDs.
+    function sliceUUIDs(
+        bytes32[] memory _uuids,
+        uint256 _start,
+        uint256 _length,
+        bool _reverseOrder
+    ) private pure returns (bytes32[] memory) {
+        uint256 attestationsLength = _uuids.length;
+        if (attestationsLength == 0) {
+            return new bytes32[](0);
+        }
+
+        require(_start < attestationsLength, "ERR_INVALID_OFFSET");
+
+        if (attestationsLength < _start + _length) {
+            _length = attestationsLength - _start;
+        }
+
+        bytes32[] memory res = new bytes32[](_length);
+
+        for (uint256 i = 0; i < _length; ++i) {
+            res[i] = _uuids[_reverseOrder ? attestationsLength - (_start + i + 1) : _start + i];
+        }
+
+        return res;
     }
 }
