@@ -201,21 +201,21 @@ contract EAS {
     /// @param _recipient The recipient the attestation.
     /// @param _ao The ID of the AO.
     /// @param _start The offset to start from.
-    /// @param _size The number of total members to retrieve.
+    /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
     function getReceivedAttestationsUUIDs(
         address _recipient,
         uint256 _ao,
         uint256 _start,
-        uint256 _size
+        uint256 _length
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = receivedAttestations[_recipient][_ao].attestationUUIDs;
 
-        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+        require(attestations.length >= _start + _length, "ERR_INVALID_OFFSET");
 
-        bytes32[] memory res = new bytes32[](_size);
-        for (uint256 i = 0; i < _size; ++i) {
+        bytes32[] memory res = new bytes32[](_length);
+        for (uint256 i = 0; i < _length; ++i) {
             res[i] = attestations[_start + i];
         }
 
@@ -237,21 +237,21 @@ contract EAS {
     /// @param _attester The recipient the attestation.
     /// @param _ao The ID of the AO.
     /// @param _start The offset to start from.
-    /// @param _size The number of total members to retrieve.
+    /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
     function getSentAttestationsUUIDs(
         address _attester,
         uint256 _ao,
         uint256 _start,
-        uint256 _size
+        uint256 _length
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = sentAttestations[_attester][_ao].attestationUUIDs;
 
-        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+        require(attestations.length >= _start + _length, "ERR_INVALID_OFFSET");
 
-        bytes32[] memory res = new bytes32[](_size);
-        for (uint256 i = 0; i < _size; ++i) {
+        bytes32[] memory res = new bytes32[](_length);
+        for (uint256 i = 0; i < _length; ++i) {
             res[i] = attestations[_start + i];
         }
 
@@ -272,20 +272,20 @@ contract EAS {
     ///
     /// @param _uuid The UUID of the attestation to retrieve.
     /// @param _start The offset to start from.
-    /// @param _size The number of total members to retrieve.
+    /// @param _length The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
     function getRelatedAttestationsUUIDs(
         bytes32 _uuid,
         uint256 _start,
-        uint256 _size
+        uint256 _length
     ) public view returns (bytes32[] memory) {
         bytes32[] memory attestations = relatedAttestations[_uuid];
 
-        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+        require(attestations.length >= _start + _length, "ERR_INVALID_OFFSET");
 
-        bytes32[] memory res = new bytes32[](_size);
-        for (uint256 i = 0; i < _size; ++i) {
+        bytes32[] memory res = new bytes32[](_length);
+        for (uint256 i = 0; i < _length; ++i) {
             res[i] = attestations[_start + i];
         }
 
