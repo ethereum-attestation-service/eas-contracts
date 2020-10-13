@@ -200,29 +200,105 @@ contract EAS {
     ///
     /// @param _recipient The recipient the attestation.
     /// @param _ao The ID of the AO.
+    /// @param _start The offset to start from.
+    /// @param _size The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getReceivedAttestationsUUIDs(address _recipient, uint256 _ao) public view returns (bytes32[] memory) {
-        return receivedAttestations[_recipient][_ao].attestationUUIDs;
+    function getReceivedAttestationsUUIDs(
+        address _recipient,
+        uint256 _ao,
+        uint256 _start,
+        uint256 _size
+    ) public view returns (bytes32[] memory) {
+        bytes32[] memory attestations = receivedAttestations[_recipient][_ao].attestationUUIDs;
+
+        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+
+        bytes32[] memory res = new bytes32[](_size);
+        for (uint256 i = 0; i < _size; ++i) {
+            res[i] = attestations[_start + i];
+        }
+
+        return res;
+    }
+
+    /// @dev Returns the number of received attestations UUIDs.
+    ///
+    /// @param _recipient The recipient the attestation.
+    /// @param _ao The ID of the AO.
+    ///
+    /// @return The number of attestations.
+    function getReceivedAttestationsUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
+        return receivedAttestations[_recipient][_ao].attestationUUIDs.length;
     }
 
     /// @dev Returns all sent attestations UUIDs.
     ///
     /// @param _attester The recipient the attestation.
     /// @param _ao The ID of the AO.
+    /// @param _start The offset to start from.
+    /// @param _size The number of total members to retrieve.
     ///
     /// @return An array of attestation UUIDs.
-    function getSentAttestationsUUIDs(address _attester, uint256 _ao) public view returns (bytes32[] memory) {
-        return sentAttestations[_attester][_ao].attestationUUIDs;
+    function getSentAttestationsUUIDs(
+        address _attester,
+        uint256 _ao,
+        uint256 _start,
+        uint256 _size
+    ) public view returns (bytes32[] memory) {
+        bytes32[] memory attestations = sentAttestations[_attester][_ao].attestationUUIDs;
+
+        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+
+        bytes32[] memory res = new bytes32[](_size);
+        for (uint256 i = 0; i < _size; ++i) {
+            res[i] = attestations[_start + i];
+        }
+
+        return res;
     }
 
-    /// @dev Returns all attestations of a specific attestation.
+    /// @dev Returns the number of sent attestations UUIDs.
+    ///
+    /// @param _recipient The recipient the attestation.
+    /// @param _ao The ID of the AO.
+    ///
+    /// @return The number of attestations.
+    function getSentAttestationsUUIDsCount(address _recipient, uint256 _ao) public view returns (uint256) {
+        return sentAttestations[_recipient][_ao].attestationUUIDs.length;
+    }
+
+    /// @dev Returns all attestations related to a specific attestation.
+    ///
+    /// @param _uuid The UUID of the attestation to retrieve.
+    /// @param _start The offset to start from.
+    /// @param _size The number of total members to retrieve.
+    ///
+    /// @return An array of attestation UUIDs.
+    function getRelatedAttestationsUUIDs(
+        bytes32 _uuid,
+        uint256 _start,
+        uint256 _size
+    ) public view returns (bytes32[] memory) {
+        bytes32[] memory attestations = relatedAttestations[_uuid];
+
+        require(attestations.length >= _start + _size, "ERR_INVALID_OFFSET");
+
+        bytes32[] memory res = new bytes32[](_size);
+        for (uint256 i = 0; i < _size; ++i) {
+            res[i] = attestations[_start + i];
+        }
+
+        return res;
+    }
+
+    /// @dev Returns the number of related attestations UUIDs.
     ///
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
-    /// @return An array of attestation UUIDs.
-    function getRelatedAttestations(bytes32 _uuid) public view returns (bytes32[] memory) {
-        return relatedAttestations[_uuid];
+    /// @return The number of related attestations.
+    function getRelatedAttestationsUUIDsCount(bytes32 _uuid) public view returns (uint256) {
+        return relatedAttestations[_uuid].length;
     }
 
     /// @dev Calculates a UUID for a given attestation.
