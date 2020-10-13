@@ -69,28 +69,28 @@ class EAS extends BaseContract {
     };
   }
 
-  async getReceivedAttestationsUUIDs(recipient, ao, start, length) {
-    return this.contract.getReceivedAttestationsUUIDs.call(EAS.getAddress(recipient), ao, start, length);
+  async getReceivedAttestationUUIDs(recipient, ao, start, length) {
+    return this.contract.getReceivedAttestationUUIDs.call(EAS.getAddress(recipient), ao, start, length);
   }
 
-  async getReceivedAttestationsUUIDsCount(recipient, ao) {
-    return this.contract.getReceivedAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
+  async getReceivedAttestationUUIDsCount(recipient, ao) {
+    return this.contract.getReceivedAttestationUUIDsCount.call(EAS.getAddress(recipient), ao);
   }
 
-  async getSentAttestationsUUIDs(attester, ao, start, length) {
-    return this.contract.getSentAttestationsUUIDs.call(EAS.getAddress(attester), ao, start, length);
+  async getSentAttestationUUIDs(attester, ao, start, length) {
+    return this.contract.getSentAttestationUUIDs.call(EAS.getAddress(attester), ao, start, length);
   }
 
-  async getSentAttestationsUUIDsCount(recipient, ao) {
-    return this.contract.getSentAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
+  async getSentAttestationUUIDsCount(recipient, ao) {
+    return this.contract.getSentAttestationUUIDsCount.call(EAS.getAddress(recipient), ao);
   }
 
-  async getRelatedAttestationsUUIDs(uuid, start, length) {
-    return this.contract.getRelatedAttestationsUUIDs.call(EAS.toBytes32(uuid), start, length);
+  async getRelatedAttestationUUIDs(uuid, start, length) {
+    return this.contract.getRelatedAttestationUUIDs.call(EAS.toBytes32(uuid), start, length);
   }
 
-  async getRelatedAttestationsUUIDsCount(recipient, ao) {
-    return this.contract.getRelatedAttestationsUUIDsCount.call(EAS.getAddress(recipient), ao);
+  async getRelatedAttestationUUIDsCount(recipient, ao) {
+    return this.contract.getRelatedAttestationUUIDsCount.call(EAS.getAddress(recipient), ao);
   }
 
   async attest(recipient, ao, expirationTime, refUUID, data, options = {}) {
