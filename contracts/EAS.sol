@@ -129,7 +129,7 @@ contract EAS {
         attestationsCount++;
 
         if (_refUUID != 0) {
-            require(exists(_refUUID), "ERR_NO_ATTESTATION");
+            require(isAttestationValid(_refUUID), "ERR_NO_ATTESTATION");
             relatedAttestations[_refUUID].push(uuid);
         }
 
@@ -192,7 +192,7 @@ contract EAS {
     /// @param _uuid The UUID of the attestation to retrieve.
     ///
     /// @return Whether an attestation exists.
-    function exists(bytes32 _uuid) public view returns (bool) {
+    function isAttestationValid(bytes32 _uuid) public view returns (bool) {
         return db[_uuid].uuid != 0;
     }
 
