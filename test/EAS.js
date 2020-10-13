@@ -446,7 +446,6 @@ contract('EAS', (accounts) => {
       relatedAttestations[refUUID] = [];
 
       for (let i = 0; i < attestationsCount; ++i) {
-        console.log(i);
         await eas.attest(recipient, id1, MAX_UINT256, refUUID, data, { from: sender });
 
         const uuid = await eas.getLastUUID();
