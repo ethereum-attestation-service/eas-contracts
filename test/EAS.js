@@ -468,6 +468,33 @@ contract('EAS', (accounts) => {
       describe(`slice [${slice}]`, async () => {
         const [start, length] = slice;
 
+        it('should return an empty array of received attestations', async () => {
+          expect(await eas.getReceivedAttestationUUIDs(recipient, id2, start, length)).to.be.empty();
+        });
+
+        it('should return an empty array of sent attestations', async () => {
+          expect(await eas.getSentAttestationUUIDs(sender, id2, start, length)).to.be.empty();
+        });
+
+        it('should return an empty array of related attestations', async () => {
+          expect(await eas.getRelatedAttestationUUIDs(ZERO_BYTES32, start, length)).to.be.empty();
+        });
+      });
+    });
+
+    [
+      [0, attestationsCount],
+      [0, 1],
+      [10, 1],
+      [0, 1000],
+      [1, 2000],
+      [1000, attestationsCount - 1000],
+      [2000, attestationsCount - 2000],
+      [2999, attestationsCount - 2999]
+    ].forEach((slice) => {
+      describe(`slice [${slice}]`, async () => {
+        const [start, length] = slice;
+
         it('should return received attestations', async () => {
           expect(await eas.getReceivedAttestationUUIDs(recipient, id1, start, length)).to.have.members(
             receivedAttestations[recipient].slice(start, start + length)
