@@ -407,4 +407,109 @@ contract('EAS', (accounts) => {
       await expectRevert(eas.revoke(uuid), 'ERR_ALREADY_REVOKED');
     });
   });
+
+  describe('pagination', async () => {
+    const attestationsCount = 3000;
+
+    let registry;
+    let eas;
+
+    const sender = accounts[0];
+    const sender2 = accounts[1];
+    const recipient = accounts[3];
+    const recipient2 = accounts[4];
+    let expirationTime;
+    const data = '0x1234';
+    let refUUID;
+
+    const sentAttestations = {};
+    const receivedAttestations = {};
+    const relatedAttestations = {};
+
+    const id1 = new BN(1);
+    const id2 = new BN(2);
+    const sid1 = 'ID1';
+    const sid2 = 'ID2';
+
+    before(async () => {
+      registry = await AORegistry.new();
+      eas = await EAS.new(registry);
+
+      await registry.register(sid1, ZERO_ADDRESS);
+      await registry.register(sid2, ZERO_ADDRESS);
+
+      await eas.attest(recipient2, id2, MAX_UINT256, ZERO_BYTES32, data, { from: sender2 });
+      refUUID = await eas.getLastUUID();
+
+      sentAttestations[sender] = [];
+      receivedAttestations[recipient] = [];
+      relatedAttestations[refUUID] = [];
+
+      for (let i = 0; i < attestationsCount; ++i) {
+        console.log(i);
+        await eas.attest(recipient, id1, MAX_UINT256, refUUID, data, { from: sender });
+
+        const uuid = await eas.getLastUUID();
+        sentAttestations[sender].push(uuid);
+        receivedAttestations[recipient].push(uuid);
+        relatedAttestations[refUUID].push(uuid);
+      }
+    });
+
+    [
+      [0, attestationsCount],
+      [0, 1],
+      [10, 1],
+      [0, 1000],
+      [1, 2000],
+      [1000, attestationsCount - 1000],
+      [2000, attestationsCount - 2000],
+      [2999, attestationsCount - 2999]
+    ].forEach((slice) => {
+      describe(`slice [${slice}]`, async () => {
+        const [start, length] = slice;
+
+        it('should return received attestations', async () => {
+          expect(await eas.getReceivedAttestationsUUIDs(recipient, id1, start, length)).to.have.members(
+            receivedAttestations[recipient].slice(start, start + length)
+          );
+        });
+
+        it('should return sent attestations', async () => {
+          expect(await eas.getSentAttestationsUUIDs(sender, id1, start, length)).to.have.members(
+            sentAttestations[sender].slice(start, start + length)
+          );
+        });
+
+        it('should return related attestations', async () => {
+          expect(await eas.getRelatedAttestationsUUIDs(refUUID, start, length)).to.have.members(
+            relatedAttestations[refUUID].slice(start, start + length)
+          );
+        });
+      });
+    });
+
+    [
+      [0, attestationsCount + 1],
+      [attestationsCount + 1000, 1],
+      [5000, attestationsCount - 5000 + 1],
+      [attestationsCount + 10000000, 1]
+    ].forEach((slice) => {
+      describe(`slice [${slice}]`, async () => {
+        const [start, length] = slice;
+
+        it('should revert on received attestations', async () => {
+          await expectRevert(eas.getReceivedAttestationsUUIDs(recipient, id1, start, length), 'ERR_INVALID_OFFSET');
+        });
+
+        it('should revert on sent attestations', async () => {
+          await expectRevert(eas.getSentAttestationsUUIDs(sender, id1, start, length), 'ERR_INVALID_OFFSET');
+        });
+
+        it('should revert on related attestations', async () => {
+          await expectRevert(eas.getRelatedAttestationsUUIDs(refUUID, start, length), 'ERR_INVALID_OFFSET');
+        });
+      });
+    });
+  });
 });
