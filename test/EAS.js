@@ -489,10 +489,9 @@ contract('EAS', (accounts) => {
     });
 
     [
-      [0, attestationsCount + 1],
       [attestationsCount + 1000, 1],
-      [5000, attestationsCount - 5000 + 1],
-      [attestationsCount + 10000000, 1]
+      [attestationsCount + 10000000, 100],
+      [attestationsCount + 1, 1]
     ].forEach((slice) => {
       describe(`slice [${slice}]`, async () => {
         const [start, length] = slice;
@@ -507,6 +506,35 @@ contract('EAS', (accounts) => {
 
         it('should revert on related attestations', async () => {
           await expectRevert(eas.getRelatedAttestationUUIDs(refUUID, start, length), 'ERR_INVALID_OFFSET');
+        });
+      });
+    });
+
+    [
+      [0, attestationsCount + 1],
+      [20, attestationsCount - 20 + 1],
+      [800, attestationsCount - 800 + 1000],
+      [attestationsCount - 1, 10000]
+    ].forEach((slice) => {
+      describe(`slice [${slice}]`, async () => {
+        const [start, length] = slice;
+
+        it('should trim the length of the received attestations', async () => {
+          expect(await eas.getReceivedAttestationUUIDs(recipient, id1, start, length)).to.have.members(
+            receivedAttestations[recipient].slice(start, attestationsCount)
+          );
+        });
+
+        it('should trim the length of the  sent attestations', async () => {
+          expect(await eas.getSentAttestationUUIDs(sender, id1, start, length)).to.have.members(
+            sentAttestations[sender].slice(start, attestationsCount)
+          );
+        });
+
+        it('should trim the length of the  related attestations', async () => {
+          expect(await eas.getRelatedAttestationUUIDs(refUUID, start, length)).to.have.members(
+            relatedAttestations[refUUID].slice(start, attestationsCount)
+          );
         });
       });
     });
