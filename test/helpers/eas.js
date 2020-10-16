@@ -3,8 +3,6 @@ const { isEmpty } = require('lodash');
 const BaseContract = require('./baseContract');
 const TestEASContract = artifacts.require('TestEAS');
 
-const HASH_SEPARATOR = '@';
-
 class EAS extends BaseContract {
   constructor(aoRegistry) {
     super();

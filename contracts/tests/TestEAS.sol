@@ -7,16 +7,16 @@ import "../EAS.sol";
 contract TestEAS is EAS {
     bytes32 public lastUUID;
 
-    constructor(AORegistry _aoRegistry) public EAS(_aoRegistry) {}
+    constructor(AORegistry aoRegistry) public EAS(aoRegistry) {}
 
     function testAttest(
-        address _recipient,
-        uint256 _ao,
-        uint256 _expirationTime,
-        bytes32 _refUUID,
-        bytes calldata _data
+        address recipient,
+        uint256 ao,
+        uint256 expirationTime,
+        bytes32 refUUID,
+        bytes calldata data
     ) public payable returns (bytes32) {
-        lastUUID = super.attest(_recipient, _ao, _expirationTime, _refUUID, _data);
+        lastUUID = super.attest(recipient, ao, expirationTime, refUUID, data);
 
         return lastUUID;
     }

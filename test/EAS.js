@@ -27,7 +27,7 @@ contract('EAS', (accounts) => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await eas.getVersion()).to.eql('0.1');
+      expect(await eas.getVersion()).to.eql('0.2');
     });
 
     it('should initialize without any attestations categories or attestations', async () => {
@@ -48,10 +48,10 @@ contract('EAS', (accounts) => {
       const lastUUID = await eas.getLastUUID();
 
       expectEvent(res, EVENTS.attested, {
-        _recipient: recipient,
-        _attester: attester,
-        _uuid: lastUUID,
-        _ao: ao
+        recipient: recipient,
+        attester: attester,
+        uuid: lastUUID,
+        ao: ao
       });
 
       expect(await eas.getAttestationsCount()).to.be.bignumber.equal(prevAttestationsCount.add(new BN(1)));
@@ -84,7 +84,7 @@ contract('EAS', (accounts) => {
       expect(sentAttestationsUUIDs).to.have.lengthOf(sentAttestationsUUIDsCount);
       expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.eql(attestation.uuid);
 
-      if (refUUID != ZERO_BYTES32) {
+      if (refUUID !== ZERO_BYTES32) {
         const relatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
         expect(relatedAttestationsUUIDsCount).to.be.bignumber.equal(prevRelatedAttestationsUUIDsCount.add(new BN(1)));
 
@@ -173,7 +173,7 @@ contract('EAS', (accounts) => {
 
       it('should store referenced attestation', async () => {
         await eas.attest(recipient, id1, expirationTime, ZERO_BYTES32, data);
-        uuid = await eas.getLastUUID();
+        const uuid = await eas.getLastUUID();
 
         await testAttestation(recipient, id3, expirationTime, uuid, data);
       });
@@ -392,10 +392,10 @@ contract('EAS', (accounts) => {
       const res = await eas.revoke(uuid);
 
       expectEvent(res, EVENTS.revoked, {
-        _recipient: recipient,
-        _attester: sender,
-        _uuid: uuid,
-        _ao: id1
+        recipient: recipient,
+        attester: sender,
+        uuid: uuid,
+        ao: id1
       });
 
       const attestation = await eas.getAttestation(uuid);

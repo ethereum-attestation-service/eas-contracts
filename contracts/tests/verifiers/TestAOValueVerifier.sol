@@ -6,20 +6,20 @@ import "../../IAOVerifier.sol";
 
 /// @title A sample AO verifier that checks whether a specific amount of ETH was sent with an attestation.
 contract TestAOValueVerifier is IAOVerifier {
-    uint256 public targetValue;
+    uint256 public _targetValue;
 
-    constructor(uint256 _targetValue) public {
-        targetValue = _targetValue;
+    constructor(uint256 targetValue) public {
+        _targetValue = targetValue;
     }
 
     function verify(
-        address, /* _recipient */
-        bytes calldata, /* _schema */
-        bytes calldata, /* _data */
-        uint256, /* _expirationTime */
-        address, /* _msgSender */
-        uint256 _msgValue
+        address, /* recipient */
+        bytes calldata, /* schema */
+        bytes calldata, /* data */
+        uint256, /* expirationTime */
+        address, /* msgSender */
+        uint256 msgValue
     ) public virtual override view returns (bool) {
-        return _msgValue == targetValue;
+        return msgValue == _targetValue;
     }
 }

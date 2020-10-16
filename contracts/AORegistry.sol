@@ -10,43 +10,43 @@ contract AORegistry {
 
     // A data struct representing a record for a submitted AO (Attestation Object).
     struct AORecord {
-        uint256 id;
-        bytes schema;
-        IAOVerifier verifier;
+        uint256 _id;
+        bytes _schema;
+        IAOVerifier _verifier;
     }
 
     // A global mapping between AO records and their IDs.
-    mapping(uint256 => AORecord) private registry;
+    mapping(uint256 => AORecord) private _registry;
 
     // A global counter for the total number of attestations.
     uint256 public aoCount;
 
     /// @dev Triggered when a new AO has been registered.
     ///
-    /// @param _id The AO id.
-    /// @param _schema The AO schema.
-    /// @param _verifier An optional AO schema verifier.
-    /// @param _from The address of the account used to register the AO.
-    event Registered(uint256 indexed _id, bytes _schema, IAOVerifier indexed _verifier, address indexed _from);
+    /// @param id The AO id.
+    /// @param schema The AO schema.
+    /// @param verifier An optional AO schema verifier.
+    /// @param from The address of the account used to register the AO.
+    event Registered(uint256 indexed id, bytes schema, IAOVerifier indexed verifier, address indexed from);
 
     /// @dev Submits and reserve a new AO.
     ///
-    /// @param _schema The AO data schema.
-    /// @param _verifier An optional AO schema verifier.
-    function register(bytes calldata _schema, IAOVerifier _verifier) public {
+    /// @param schema The AO data schema.
+    /// @param verifier An optional AO schema verifier.
+    function register(bytes calldata schema, IAOVerifier verifier) public {
         uint256 id = ++aoCount;
 
-        registry[id] = AORecord({id: id, schema: _schema, verifier: _verifier});
+        _registry[id] = AORecord({_id: id, _schema: schema, _verifier: verifier});
 
-        emit Registered(id, _schema, _verifier, msg.sender);
+        emit Registered(id, schema, verifier, msg.sender);
     }
 
     /// @dev Returns an existing AO by ID.
     ///
-    /// @param _id The ID of the AO to retrieve.
+    /// @param id The ID of the AO to retrieve.
     ///
     /// @return The AO data members.
-    function getAO(uint256 _id)
+    function getAO(uint256 id)
         public
         view
         returns (
@@ -55,8 +55,8 @@ contract AORegistry {
             IAOVerifier
         )
     {
-        AORecord memory ao = registry[_id];
+        AORecord memory ao = _registry[id];
 
-        return (ao.id, ao.schema, ao.verifier);
+        return (ao._id, ao._schema, ao._verifier);
     }
 }

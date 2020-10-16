@@ -33,10 +33,10 @@ contract('AORegistry', (accounts) => {
 
       const res = await registry.register(schema, verifier);
       expectEvent(res, EVENTS.registered, {
-        _id: id,
-        _schema: schema,
-        _verifier: verifier,
-        _from: sender
+        id: id,
+        schema: schema,
+        verifier: verifier,
+        from: sender
       });
 
       expect(await registry.getAOCount()).to.be.bignumber.equal(id);

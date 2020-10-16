@@ -3,16 +3,16 @@
 pragma solidity 0.6.12;
 
 contract Migrations {
-    address public owner = msg.sender;
-    uint256 public lastCompletedMigration;
+    address public _owner = msg.sender;
+    uint256 public _lastCompletedMigration;
 
     modifier restricted() {
-        require(msg.sender == owner, "ERR_INVALID_ACCESS");
+        require(msg.sender == _owner, "ERR_INVALID_ACCESS");
 
         _;
     }
 
     function setCompleted(uint256 completed) public restricted {
-        lastCompletedMigration = completed;
+        _lastCompletedMigration = completed;
     }
 }
