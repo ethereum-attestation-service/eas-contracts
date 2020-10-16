@@ -10,9 +10,9 @@ contract AORegistry {
 
     // A data struct representing a record for a submitted AO (Attestation Object).
     struct AORecord {
-        uint256 _id;
-        bytes _schema;
-        IAOVerifier _verifier;
+        uint256 id;
+        bytes schema;
+        IAOVerifier verifier;
     }
 
     // A global mapping between AO records and their IDs.
@@ -36,7 +36,7 @@ contract AORegistry {
     function register(bytes calldata schema, IAOVerifier verifier) public {
         uint256 id = ++aoCount;
 
-        _registry[id] = AORecord({_id: id, _schema: schema, _verifier: verifier});
+        _registry[id] = AORecord({id: id, schema: schema, verifier: verifier});
 
         emit Registered(id, schema, verifier, msg.sender);
     }
@@ -57,6 +57,6 @@ contract AORegistry {
     {
         AORecord memory ao = _registry[id];
 
-        return (ao._id, ao._schema, ao._verifier);
+        return (ao.id, ao.schema, ao.verifier);
     }
 }
