@@ -13,15 +13,15 @@ contract EAS {
 
     // A data struct representing a single attestation.
     struct Attestation {
-        bytes32 _uuid;
-        uint256 _ao;
-        address _to;
-        address _from;
-        uint256 _time;
-        uint256 _expirationTime;
-        uint256 _revocationTime;
-        bytes32 _refUUID;
-        bytes _data;
+        bytes32 uuid;
+        uint256 ao;
+        address to;
+        address from;
+        uint256 time;
+        uint256 expirationTime;
+        uint256 revocationTime;
+        bytes32 refUUID;
+        bytes data;
     }
 
     // The AO global registry.
@@ -97,19 +97,19 @@ contract EAS {
         );
 
         Attestation memory attestation = Attestation({
-            _uuid: EMPTY_UUID,
-            _ao: ao,
-            _to: recipient,
-            _from: msg.sender,
-            _time: block.timestamp,
-            _expirationTime: expirationTime,
-            _revocationTime: 0,
-            _refUUID: refUUID,
-            _data: data
+            uuid: EMPTY_UUID,
+            ao: ao,
+            to: recipient,
+            from: msg.sender,
+            time: block.timestamp,
+            expirationTime: expirationTime,
+            revocationTime: 0,
+            refUUID: refUUID,
+            data: data
         });
 
         bytes32 uuid = _getUUID(attestation);
-        attestation._uuid = uuid;
+        attestation.uuid = uuid;
 
         _receivedAttestations[recipient][ao].push(uuid);
         _sentAttestations[msg.sender][ao].push(uuid);
@@ -132,13 +132,13 @@ contract EAS {
     /// @param uuid The UUID of the attestation to revoke.
     function revoke(bytes32 uuid) public {
         Attestation storage attestation = _db[uuid];
-        require(attestation._uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
-        require(attestation._from == msg.sender, "ERR_ACCESS_DENIED");
-        require(attestation._revocationTime == 0, "ERR_ALREADY_REVOKED");
+        require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
+        require(attestation.from == msg.sender, "ERR_ACCESS_DENIED");
+        require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
 
-        attestation._revocationTime = block.timestamp;
+        attestation.revocationTime = block.timestamp;
 
-        emit Revoked(attestation._to, msg.sender, uuid, attestation._ao);
+        emit Revoked(attestation.to, msg.sender, uuid, attestation.ao);
     }
 
     /// @dev Returns an existing attestation by UUID.
@@ -164,15 +164,15 @@ contract EAS {
         Attestation memory attestation = _db[uuid];
 
         return (
-            attestation._uuid,
-            attestation._ao,
-            attestation._to,
-            attestation._from,
-            attestation._time,
-            attestation._expirationTime,
-            attestation._revocationTime,
-            attestation._refUUID,
-            attestation._data
+            attestation.uuid,
+            attestation.ao,
+            attestation.to,
+            attestation.from,
+            attestation.time,
+            attestation.expirationTime,
+            attestation.revocationTime,
+            attestation.refUUID,
+            attestation.data
         );
     }
 
@@ -182,7 +182,7 @@ contract EAS {
     ///
     /// @return Whether an attestation exists.
     function isAttestationValid(bytes32 uuid) public view returns (bool) {
-        return _db[uuid]._uuid != 0;
+        return _db[uuid].uuid != 0;
     }
 
     /// @dev Returns all received attestation UUIDs.
@@ -276,17 +276,17 @@ contract EAS {
         return
             keccak256(
                 abi.encodePacked(
-                    attestation._ao,
+                    attestation.ao,
                     HASH_SEPARATOR,
-                    attestation._to,
+                    attestation.to,
                     HASH_SEPARATOR,
-                    attestation._from,
+                    attestation.from,
                     HASH_SEPARATOR,
-                    attestation._time,
+                    attestation.time,
                     HASH_SEPARATOR,
-                    attestation._expirationTime,
+                    attestation.expirationTime,
                     HASH_SEPARATOR,
-                    attestation._data,
+                    attestation.data,
                     HASH_SEPARATOR,
                     attestationsCount,
                     HASH_SEPARATOR
