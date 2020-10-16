@@ -7,7 +7,7 @@
     "max-len": ["error", 150, 2],
     "indent": [
       "error",
-      4,
+      2,
       {
         "SwitchCase": 1
       }
@@ -17,7 +17,7 @@
     "no-await-in-loop": "off",
     "no-restricted-syntax": "off",
     "function-paren-newline": ["error", "consistent"],
-    "space-before-function-paren": "error",
+    "space-before-function-paren": "off",
     "no-continue": "off",
     "arrow-body-style": "off",
     "no-loop-func": "off"

@@ -6,20 +6,20 @@ pragma solidity 0.6.12;
 interface IAOVerifier {
     /// @dev Verifies whether the specified attestation data conforms to the spec.
     ///
-    /// @param _recipient The recipient the attestation.
-    /// @param _schema The AO data schema.
-    /// @param _data The actual attestation data.
-    /// @param _expirationTime The expiration time of the attestation.
-    /// @param _msgSender The sender of the original attestation message.
-    /// @param _msgValue The number of wei send with the original attestation message.
+    /// @param recipient The recipient the attestation.
+    /// @param schema The AO data schema.
+    /// @param data The actual attestation data.
+    /// @param expirationTime The expiration time of the attestation.
+    /// @param msgSender The sender of the original attestation message.
+    /// @param msgValue The number of wei send with the original attestation message.
     ///
     /// @return Whether the data is valid according to the scheme.
     function verify(
-        address _recipient,
-        bytes calldata _schema,
-        bytes calldata _data,
-        uint256 _expirationTime,
-        address _msgSender,
-        uint256 _msgValue
+        address recipient,
+        bytes calldata schema,
+        bytes calldata data,
+        uint256 expirationTime,
+        address msgSender,
+        uint256 msgValue
     ) external view returns (bool);
 }

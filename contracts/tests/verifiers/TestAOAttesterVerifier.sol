@@ -6,20 +6,20 @@ import "../../IAOVerifier.sol";
 
 /// @title A sample AO verifier that checks whether the attestation is from a specific attester.
 contract TestAOAttesterVerifier is IAOVerifier {
-    address public targetAttester;
+    address public _targetAttester;
 
-    constructor(address _targetAttester) public {
-        targetAttester = _targetAttester;
+    constructor(address targetAttester) public {
+        _targetAttester = targetAttester;
     }
 
     function verify(
-        address, /* _recipient */
-        bytes calldata, /* _schema */
-        bytes calldata, /* _data */
-        uint256, /* _expirationTime */
-        address _msgSender,
-        uint256 /* _msgValue */
+        address, /* recipient */
+        bytes calldata, /* schema */
+        bytes calldata, /* data */
+        uint256, /* expirationTime */
+        address msgSender,
+        uint256 /* msgValue */
     ) public virtual override view returns (bool) {
-        return _msgSender == targetAttester;
+        return msgSender == _targetAttester;
     }
 }

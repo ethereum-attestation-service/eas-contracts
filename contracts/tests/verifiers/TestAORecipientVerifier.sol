@@ -6,20 +6,20 @@ import "../../IAOVerifier.sol";
 
 /// @title A sample AO verifier that checks whether the attestation is to a specific recipient.
 contract TestAORecipientVerifier is IAOVerifier {
-    address public targetRecipient;
+    address public _targetRecipient;
 
-    constructor(address _targetRecipient) public {
-        targetRecipient = _targetRecipient;
+    constructor(address targetRecipient) public {
+        _targetRecipient = targetRecipient;
     }
 
     function verify(
-        address _recipient,
-        bytes calldata, /* _schema */
-        bytes calldata, /* _data */
-        uint256, /* _expirationTime */
-        address, /* _msgSender */
-        uint256 /* _msgValue */
+        address recipient,
+        bytes calldata, /* schema */
+        bytes calldata, /* data */
+        uint256, /* expirationTime */
+        address, /* msgSender */
+        uint256 /* msgValue */
     ) public virtual override view returns (bool) {
-        return _recipient == targetRecipient;
+        return recipient == _targetRecipient;
     }
 }
