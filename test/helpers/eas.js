@@ -5,7 +5,6 @@ const { utils } = require('ethers');
 const BaseContract = require('./baseContract');
 
 const { hexlify } = utils;
-const accounts = require('../accounts.json');
 const TestEASContract = artifacts.require('TestEAS');
 
 class EAS extends BaseContract {
@@ -106,7 +105,7 @@ class EAS extends BaseContract {
     return this.contract.testAttest(EAS.getAddress(recipient), ao, expirationTime, EAS.toBytes32(refUUID), encodedData);
   }
 
-  async attestByProxy(recipient, ao, expirationTime, refUUID, data, attester, options = {}) {
+  async attestByProxy(recipient, ao, expirationTime, refUUID, data, attester, privateKey, options = {}) {
     let encodedData = data;
     if (typeof data === 'string' && !data.startsWith('0x')) {
       encodedData = hexlify(encodedData);
@@ -122,7 +121,6 @@ class EAS extends BaseContract {
       nonce
     );
 
-    const privateKey = accounts.privateKeys[attester.toLowerCase()];
     const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
 
     if (!isEmpty(options)) {
@@ -161,11 +159,10 @@ class EAS extends BaseContract {
     return this.contract.revoke(EAS.toBytes32(uuid));
   }
 
-  async revokeByProxy(uuid, attester, options = {}) {
+  async revokeByProxy(uuid, attester, privateKey, options = {}) {
     const nonce = await this.eip712Verifier.getNonce(attester);
     const digest = await this.eip712Verifier.getRevokeDigest(EAS.toBytes32(uuid), nonce);
 
-    const privateKey = accounts.privateKeys[attester.toLowerCase()];
     const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
 
     if (!isEmpty(options)) {
