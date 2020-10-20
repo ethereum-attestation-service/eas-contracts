@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { BN, expectRevert, expectEvent, constants, time } = require('@openzeppelin/test-helpers');
+const { privateKeys } = require('./accounts.json');
 const { ZERO_ADDRESS, ZERO_BYTES32, MAX_UINT256 } = constants;
 const { duration, latest } = time;
 
@@ -48,18 +49,19 @@ contract('EAS', (accounts) => {
   });
 
   describe('attesting', async () => {
-    for (const proxy of [false, true]) {
-      const sender = accounts[0];
-      const attester = !proxy ? sender : accounts[5];
-      const recipient = accounts[1];
-      const recipient2 = accounts[2];
-      let expirationTime;
-      const data = '0x1234';
+    const sender = accounts[0];
+    const recipient = accounts[1];
+    const recipient2 = accounts[2];
+    let expirationTime;
+    const data = '0x1234';
 
-      beforeEach(async () => {
-        const now = await latest();
-        expirationTime = now.add(duration.days(30));
-      });
+    beforeEach(async () => {
+      const now = await latest();
+      expirationTime = now.add(duration.days(30));
+    });
+
+    for (const proxy of [false, true]) {
+      const attester = !proxy ? sender : accounts[5];
 
       context(`${proxy ? 'via an EIP712 proxy' : 'directly'}`, async () => {
         const testAttestation = async (recipient, ao, expirationTime, refUUID, data, attester, options = {}) => {
@@ -73,7 +75,16 @@ contract('EAS', (accounts) => {
           if (!proxy) {
             res = await eas.attest(recipient, ao, expirationTime, refUUID, data, options);
           } else {
-            res = await eas.attestByProxy(recipient, ao, expirationTime, refUUID, data, attester, options);
+            res = await eas.attestByProxy(
+              recipient,
+              ao,
+              expirationTime,
+              refUUID,
+              data,
+              attester,
+              privateKeys[attester.toLowerCase()],
+              options
+            );
           }
 
           const lastUUID = await eas.getLastUUID();
@@ -146,9 +157,21 @@ contract('EAS', (accounts) => {
           options = {}
         ) => {
           if (!proxy) {
-            await expectRevert(eas.attest(recipient, ao, expirationTime, refUUID, data), err, options);
+            await expectRevert(eas.attest(recipient, ao, expirationTime, refUUID, data, options), err);
           } else {
-            await expectRevert(eas.attestByProxy(recipient, ao, expirationTime, refUUID, data, attester), err, options);
+            await expectRevert(
+              eas.attestByProxy(
+                recipient,
+                ao,
+                expirationTime,
+                refUUID,
+                data,
+                attester,
+                privateKeys[attester.toLowerCase()],
+                options
+              ),
+              err
+            );
           }
         };
 
@@ -440,21 +463,38 @@ contract('EAS', (accounts) => {
         });
       });
     }
+
+    it('should revert when proxy attesting with a wrong signature', async () => {
+      const wrongPrivateKey = 'a9dcee9c1cf039f10935e36e127657cb790ca5d37dbe09f37a2af84883c61e5a';
+
+      await expectRevert(
+        eas.attestByProxy(recipient, new BN(10), expirationTime, ZERO_BYTES32, ZERO_BYTES32, sender, wrongPrivateKey),
+        'ERR_INVALID_SIGNATURE'
+      );
+    });
   });
 
   describe('revocation', async () => {
+    const id1 = new BN(1);
+    const sid1 = 'ID1';
+    let uuid;
+
+    const recipient = accounts[1];
+    const sender = accounts[0];
+    const sender2 = accounts[2];
+
+    let expirationTime;
+    const data = '0x1234';
+
+    beforeEach(async () => {
+      await registry.register(sid1, ZERO_ADDRESS);
+
+      const now = await latest();
+      expirationTime = now.add(duration.days(30));
+    });
+
     for (const proxy of [false, true]) {
-      const id1 = new BN(1);
-      const sid1 = 'ID1';
-      let uuid;
-
-      const recipient = accounts[1];
-      const sender = accounts[0];
       const attester = !proxy ? sender : accounts[5];
-      const sender2 = accounts[2];
-
-      let expirationTime;
-      const data = '0x1234';
 
       const testRevocation = async (uuid, attester, options = {}) => {
         let res;
@@ -462,7 +502,7 @@ contract('EAS', (accounts) => {
         if (!proxy) {
           res = await eas.revoke(uuid, options);
         } else {
-          res = await eas.revokeByProxy(uuid, attester, options);
+          res = await eas.revokeByProxy(uuid, attester, privateKeys[attester.toLowerCase()], options);
         }
 
         expectEvent(res, EVENTS.revoked, {
@@ -480,17 +520,12 @@ contract('EAS', (accounts) => {
         if (!proxy) {
           await expectRevert(eas.revoke(uuid, options), err);
         } else {
-          await expectRevert(eas.revokeByProxy(uuid, attester, options), err);
+          await expectRevert(eas.revokeByProxy(uuid, attester, privateKeys[attester.toLowerCase()], options), err);
         }
       };
 
       context(`${proxy ? 'via an EIP712 proxy' : 'directly'}`, async () => {
         beforeEach(async () => {
-          await registry.register(sid1, ZERO_ADDRESS);
-
-          const now = await latest();
-          expirationTime = now.add(duration.days(30));
-
           await eas.attest(recipient, id1, expirationTime, ZERO_BYTES32, data, { from: attester });
           uuid = await eas.getLastUUID();
         });
@@ -513,6 +548,12 @@ contract('EAS', (accounts) => {
         });
       });
     }
+
+    it('should revert when proxy revoking with a wrong signature', async () => {
+      const wrongPrivateKey = 'a9dcee9c1cf039f10935e36e127657cb790ca5d37dbe09f37a2af84883c61e5a';
+
+      await expectRevert(eas.revokeByProxy(ZERO_BYTES32, sender, wrongPrivateKey), 'ERR_INVALID_SIGNATURE');
+    });
   });
 
   describe('pagination', async () => {
