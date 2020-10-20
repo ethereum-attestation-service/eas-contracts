@@ -1,24 +1,30 @@
 const { isEmpty } = require('lodash');
+const { ecsign } = require('ethereumjs-util');
+const { utils } = require('ethers');
 
 const BaseContract = require('./baseContract');
+
+const { hexlify } = utils;
+const accounts = require('../accounts.json');
 const TestEASContract = artifacts.require('TestEAS');
 
 class EAS extends BaseContract {
-  constructor(aoRegistry) {
+  constructor(aoRegistry, eip712Verifier) {
     super();
 
     this.aoRegistry = aoRegistry;
+    this.eip712Verifier = eip712Verifier;
   }
 
-  static async new(aoRegistry) {
-    const registry = new EAS(aoRegistry);
-    await registry.deploy();
+  static async new(aoRegistry, eip712Verifier) {
+    const eas = new EAS(aoRegistry, eip712Verifier);
+    await eas.deploy();
 
-    return registry;
+    return eas;
   }
 
   async deploy() {
-    this.contract = await TestEASContract.new(EAS.getAddress(this.aoRegistry));
+    this.contract = await TestEASContract.new(EAS.getAddress(this.aoRegistry), EAS.getAddress(this.eip712Verifier));
   }
 
   static getEvents() {
@@ -26,17 +32,6 @@ class EAS extends BaseContract {
       attested: 'Attested',
       revoked: 'Revoked'
     };
-  }
-
-  static toBytes32(data) {
-    let bytes = data;
-
-    if (!bytes.startsWith('0x')) {
-      bytes = `0x${bytes}`;
-    }
-
-    const strLength = 2 + 2 * 32; // '0x' + 32 words.
-    return bytes.padEnd(strLength, '0');
   }
 
   async getVersion() {
@@ -111,12 +106,80 @@ class EAS extends BaseContract {
     return this.contract.testAttest(EAS.getAddress(recipient), ao, expirationTime, EAS.toBytes32(refUUID), encodedData);
   }
 
+  async attestByProxy(recipient, ao, expirationTime, refUUID, data, attester, options = {}) {
+    let encodedData = data;
+    if (typeof data === 'string' && !data.startsWith('0x')) {
+      encodedData = hexlify(encodedData);
+    }
+
+    const nonce = await this.eip712Verifier.getNonce(attester);
+    const digest = await this.eip712Verifier.getAttestDigest(
+      EAS.getAddress(recipient),
+      ao,
+      expirationTime,
+      EAS.toBytes32(refUUID),
+      encodedData,
+      nonce
+    );
+
+    const privateKey = accounts.privateKeys[attester.toLowerCase()];
+    const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
+
+    if (!isEmpty(options)) {
+      return this.contract.testAttestByProxy(
+        EAS.getAddress(recipient),
+        ao,
+        expirationTime,
+        EAS.toBytes32(refUUID),
+        encodedData,
+        EAS.getAddress(attester),
+        v,
+        hexlify(r),
+        hexlify(s),
+        options
+      );
+    }
+
+    return this.contract.testAttestByProxy(
+      EAS.getAddress(recipient),
+      ao,
+      expirationTime,
+      EAS.toBytes32(refUUID),
+      encodedData,
+      EAS.getAddress(attester),
+      v,
+      hexlify(r),
+      hexlify(s)
+    );
+  }
+
   async revoke(uuid, options = {}) {
     if (!isEmpty(options)) {
       return this.contract.revoke(EAS.toBytes32(uuid), options);
     }
 
     return this.contract.revoke(EAS.toBytes32(uuid));
+  }
+
+  async revokeByProxy(uuid, attester, options = {}) {
+    const nonce = await this.eip712Verifier.getNonce(attester);
+    const digest = await this.eip712Verifier.getRevokeDigest(EAS.toBytes32(uuid), nonce);
+
+    const privateKey = accounts.privateKeys[attester.toLowerCase()];
+    const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
+
+    if (!isEmpty(options)) {
+      return this.contract.revokeByProxy(
+        EAS.toBytes32(uuid),
+        EAS.getAddress(attester),
+        v,
+        hexlify(r),
+        hexlify(s),
+        options
+      );
+    }
+
+    return this.contract.revokeByProxy(EAS.toBytes32(uuid), EAS.getAddress(attester), v, hexlify(r), hexlify(s));
   }
 }
 

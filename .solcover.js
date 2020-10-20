@@ -1,3 +1,5 @@
+const accounts = require('./test/accounts.json');
+
 module.exports = {
   testCommand: 'node --max-old-space-size=4096 ../node_modules/.bin/truffle run coverage',
   compileCommand: 'node --max-old-space-size=4096 ../node_modules/.bin/truffle compile',
@@ -5,7 +7,8 @@ module.exports = {
   norpc: true,
   skipFiles: ['Migrations.sol', 'tests'],
   providerOptions: {
-    total_accounts: 100,
-    defaultEtherBalance: 1000
+    accounts: Object.values(accounts.privateKeys).map((privateKey) => {
+      return { secretKey: Buffer.from(privateKey, 'hex'), balance: 1000 ** 18 };
+    })
   }
 };

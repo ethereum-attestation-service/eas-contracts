@@ -3,6 +3,7 @@
 pragma solidity 0.6.12;
 
 import "./AORegistry.sol";
+import "./EIP712Verifier.sol";
 
 /// @title EAS - Ethereum Attestation Service
 contract EAS {
@@ -26,6 +27,9 @@ contract EAS {
 
     // The AO global registry.
     AORegistry public aoRegistry;
+
+    // The EIP712 verifier used to verify signed attestations.
+    EIP712Verifier public eip712Verifier;
 
     // A mapping between attestations and their corresponding attestations.
     mapping(bytes32 => bytes32[]) private _relatedAttestations;
@@ -61,10 +65,13 @@ contract EAS {
     /// @dev Creates a new EAS instance.
     ///
     /// @param registry The address of the global AO registry.
-    constructor(AORegistry registry) public {
-        require(address(registry) != address(0x0), "ERR_INVALID_ADDRESS");
+    /// @param verifier The address of the EIP712 verifier.
+    constructor(AORegistry registry, EIP712Verifier verifier) public {
+        require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
+        require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
 
         aoRegistry = registry;
+        eip712Verifier = verifier;
     }
 
     /// @dev Attests to a specific AO.
@@ -83,63 +90,62 @@ contract EAS {
         bytes32 refUUID,
         bytes calldata data
     ) public payable returns (bytes32) {
-        require(expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
+        return _attest(recipient, ao, expirationTime, refUUID, data, msg.sender);
+    }
 
-        uint256 id;
-        bytes memory schema;
-        IAOVerifier verifier;
-        (id, schema, verifier) = aoRegistry.getAO(ao);
+    /// @dev Attests to a specific AO using a provided EIP712 signature.
+    ///
+    /// @param recipient The recipient the attestation.
+    /// @param ao The ID of the AO.
+    /// @param expirationTime The expiration time of the attestation.
+    /// @param refUUID An optional related attestation's UUID.
+    /// @param data The additional attestation data.
+    /// @param attester The attesting account.
+    /// @param v The recovery ID.
+    /// @param r The x-coordinate of the nonce R.
+    /// @param s The signature data.
+    ///
+    /// @return The UUID of the new attestation.
+    function attestByProxy(
+        address recipient,
+        uint256 ao,
+        uint256 expirationTime,
+        bytes32 refUUID,
+        bytes calldata data,
+        address attester,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public payable returns (bytes32) {
+        eip712Verifier.attest(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
 
-        require(id > 0, "ERR_INVALID_AO");
-        require(
-            address(verifier) == address(0x0) ||
-                verifier.verify(recipient, schema, data, expirationTime, msg.sender, msg.value),
-            "ERR_INVALID_ATTESTATION_DATA"
-        );
-
-        Attestation memory attestation = Attestation({
-            uuid: EMPTY_UUID,
-            ao: ao,
-            to: recipient,
-            from: msg.sender,
-            time: block.timestamp,
-            expirationTime: expirationTime,
-            revocationTime: 0,
-            refUUID: refUUID,
-            data: data
-        });
-
-        bytes32 uuid = _getUUID(attestation);
-        attestation.uuid = uuid;
-
-        _receivedAttestations[recipient][ao].push(uuid);
-        _sentAttestations[msg.sender][ao].push(uuid);
-
-        _db[uuid] = attestation;
-        attestationsCount++;
-
-        if (refUUID != 0) {
-            require(isAttestationValid(refUUID), "ERR_NO_ATTESTATION");
-            _relatedAttestations[refUUID].push(uuid);
-        }
-
-        emit Attested(recipient, msg.sender, uuid, ao);
-
-        return uuid;
+        return _attest(recipient, ao, expirationTime, refUUID, data, attester);
     }
 
     /// @dev Revokes an existing attestation to a specific AO.
     ///
     /// @param uuid The UUID of the attestation to revoke.
     function revoke(bytes32 uuid) public {
-        Attestation storage attestation = _db[uuid];
-        require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
-        require(attestation.from == msg.sender, "ERR_ACCESS_DENIED");
-        require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
+        return _revoke(uuid, msg.sender);
+    }
 
-        attestation.revocationTime = block.timestamp;
+    /// @dev Attests to a specific AO using a provided EIP712 signature.
+    ///
+    /// @param uuid The UUID of the attestation to revoke.
+    /// @param attester The attesting account.
+    /// @param v The recovery ID.
+    /// @param r The x-coordinate of the nonce R.
+    /// @param s The signature data.
+    function revokeByProxy(
+        bytes32 uuid,
+        address attester,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        eip712Verifier.revoke(uuid, attester, v, r, s);
 
-        emit Revoked(attestation.to, msg.sender, uuid, attestation.ao);
+        _revoke(uuid, attester);
     }
 
     /// @dev Returns an existing attestation by UUID.
@@ -268,6 +274,84 @@ contract EAS {
     /// @return The number of related attestations.
     function getRelatedAttestationUUIDsCount(bytes32 uuid) public view returns (uint256) {
         return _relatedAttestations[uuid].length;
+    }
+
+    /// @dev Attests to a specific AO.
+    ///
+    /// @param recipient The recipient the attestation.
+    /// @param ao The ID of the AO.
+    /// @param expirationTime The expiration time of the attestation.
+    /// @param refUUID An optional related attestation's UUID.
+    /// @param data The additional attestation data.
+    /// @param attester The attesting account.
+    ///
+    /// @return The UUID of the new attestation.
+    function _attest(
+        address recipient,
+        uint256 ao,
+        uint256 expirationTime,
+        bytes32 refUUID,
+        bytes calldata data,
+        address attester
+    ) private returns (bytes32) {
+        require(expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
+
+        uint256 id;
+        bytes memory schema;
+        IAOVerifier verifier;
+        (id, schema, verifier) = aoRegistry.getAO(ao);
+
+        require(id > 0, "ERR_INVALID_AO");
+        require(
+            address(verifier) == address(0x0) ||
+                verifier.verify(recipient, schema, data, expirationTime, attester, msg.value),
+            "ERR_INVALID_ATTESTATION_DATA"
+        );
+
+        Attestation memory attestation = Attestation({
+            uuid: EMPTY_UUID,
+            ao: ao,
+            to: recipient,
+            from: attester,
+            time: block.timestamp,
+            expirationTime: expirationTime,
+            revocationTime: 0,
+            refUUID: refUUID,
+            data: data
+        });
+
+        bytes32 uuid = _getUUID(attestation);
+        attestation.uuid = uuid;
+
+        _receivedAttestations[recipient][ao].push(uuid);
+        _sentAttestations[attester][ao].push(uuid);
+
+        _db[uuid] = attestation;
+        attestationsCount++;
+
+        if (refUUID != 0) {
+            require(isAttestationValid(refUUID), "ERR_NO_ATTESTATION");
+            _relatedAttestations[refUUID].push(uuid);
+        }
+
+        emit Attested(recipient, attester, uuid, ao);
+
+        return uuid;
+    }
+
+    /// @dev Revokes an existing attestation to a specific AO.
+    ///
+    /// @param uuid The UUID of the attestation to revoke.
+    /// @param attester The attesting account.
+    function _revoke(bytes32 uuid, address attester) public {
+        Attestation storage attestation = _db[uuid];
+        require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
+        require(attestation.from == attester, "ERR_ACCESS_DENIED");
+        require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
+
+        attestation.revocationTime = block.timestamp;
+
+        emit Revoked(attestation.to, attester, uuid, attestation.ao);
     }
 
     /// @dev Calculates a UUID for a given attestation.

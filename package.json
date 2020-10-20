@@ -44,6 +44,7 @@
     "eslint-plugin-react": "^7.21.3",
     "eslint-plugin-standard": "^4.0.1",
     "ethereumjs-util": "^7.0.5",
+    "ethers": "^5.0.18",
     "ganache-core": "^2.12.1",
     "lodash": "^4.17.20",
     "mocha-lcov-reporter": "^1.3.0",
