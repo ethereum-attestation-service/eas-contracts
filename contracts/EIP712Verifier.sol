@@ -68,8 +68,8 @@ contract EIP712Verifier {
                 keccak256(abi.encode(ATTEST_TYPEHASH, recipient, ao, expirationTime, refUUID, data, nonces[attester]++))
             )
         );
-        address recoveredAddress = ecrecover(digest, v, r, s);
 
+        address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
     }
 
@@ -94,6 +94,7 @@ contract EIP712Verifier {
                 keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonces[attester]++))
             )
         );
+
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
     }
