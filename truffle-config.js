@@ -12,7 +12,7 @@ const ganache = require('ganache-core');
 /* eslint-enable import/no-extraneous-dependencies */
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
-
+const accounts = require('./test/accounts.json');
 const { RINKEBY_MNEMONIC, RINKEBY_INFURA_URL } = process.env;
 
 module.exports = {
@@ -20,8 +20,9 @@ module.exports = {
     development: {
       network_id: '*',
       provider: ganache.provider({
-        total_accounts: 100,
-        default_balance_ether: 1000
+        accounts: Object.values(accounts.privateKeys).map((privateKey) => {
+          return { secretKey: Buffer.from(privateKey, 'hex'), balance: 1000 ** 18 };
+        })
       })
     },
     ganache: {
