@@ -72,6 +72,7 @@ contract EAS {
     /// @param recipient The recipient the attestation.
     /// @param ao The ID of the AO.
     /// @param expirationTime The expiration time of the attestation.
+    /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
     ///
     /// @return The UUID of the new attestation.
@@ -216,7 +217,7 @@ contract EAS {
 
     /// @dev Returns all sent attestation UUIDs.
     ///
-    /// @param attester The recipient the attestation.
+    /// @param attester The attesting account.
     /// @param ao The ID of the AO.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
