@@ -1,5 +1,4 @@
 const { isEmpty } = require('lodash');
-const { ecsign } = require('ethereumjs-util');
 const { utils } = require('ethers');
 
 const BaseContract = require('./baseContract');
@@ -17,6 +16,7 @@ class EAS extends BaseContract {
 
   static async new(aoRegistry, eip712Verifier) {
     const eas = new EAS(aoRegistry, eip712Verifier);
+
     await eas.deploy();
 
     return eas;
@@ -112,16 +112,15 @@ class EAS extends BaseContract {
     }
 
     const nonce = await this.eip712Verifier.getNonce(attester);
-    const digest = await this.eip712Verifier.getAttestDigest(
+    const request = await this.eip712Verifier.getAttestationRequest(
       EAS.getAddress(recipient),
       ao,
       expirationTime,
       EAS.toBytes32(refUUID),
       encodedData,
-      nonce
+      nonce,
+      privateKey
     );
-
-    const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
 
     if (!isEmpty(options)) {
       return this.contract.testAttestByProxy(
@@ -131,9 +130,9 @@ class EAS extends BaseContract {
         EAS.toBytes32(refUUID),
         encodedData,
         EAS.getAddress(attester),
-        v,
-        hexlify(r),
-        hexlify(s),
+        request.v,
+        hexlify(request.r),
+        hexlify(request.s),
         options
       );
     }
@@ -145,9 +144,9 @@ class EAS extends BaseContract {
       EAS.toBytes32(refUUID),
       encodedData,
       EAS.getAddress(attester),
-      v,
-      hexlify(r),
-      hexlify(s)
+      request.v,
+      hexlify(request.r),
+      hexlify(request.s)
     );
   }
 
@@ -161,22 +160,26 @@ class EAS extends BaseContract {
 
   async revokeByProxy(uuid, attester, privateKey, options = {}) {
     const nonce = await this.eip712Verifier.getNonce(attester);
-    const digest = await this.eip712Verifier.getRevokeDigest(EAS.toBytes32(uuid), nonce);
-
-    const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey, 'hex'));
+    const request = await this.eip712Verifier.getRevocationRequest(EAS.toBytes32(uuid), nonce, privateKey);
 
     if (!isEmpty(options)) {
       return this.contract.revokeByProxy(
         EAS.toBytes32(uuid),
         EAS.getAddress(attester),
-        v,
-        hexlify(r),
-        hexlify(s),
+        request.v,
+        hexlify(request.r),
+        hexlify(request.s),
         options
       );
     }
 
-    return this.contract.revokeByProxy(EAS.toBytes32(uuid), EAS.getAddress(attester), v, hexlify(r), hexlify(s));
+    return this.contract.revokeByProxy(
+      EAS.toBytes32(uuid),
+      EAS.getAddress(attester),
+      request.v,
+      hexlify(request.r),
+      hexlify(request.s)
+    );
   }
 }
 

@@ -27,6 +27,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@ethereum-attestation-service/sdk": "ethereum-attestation-service/sdk.git",
     "@openzeppelin/contracts": "3.2.0",
     "@openzeppelin/test-helpers": "^0.5.6",
     "bn.js": "^5.1.3",
