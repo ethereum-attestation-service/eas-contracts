@@ -1,10 +1,10 @@
 {
-  "name": "@ethereum-attestation-service/eas",
+  "name": "@ethereum-attestation-service/contracts",
   "version": "0.0.1",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ethereum-attestation-service/eas"
+    "url": "git+https://github.com/ethereum-attestation-service/contracts"
   },
   "author": "Leonid Beder",
   "license": "MIT",
