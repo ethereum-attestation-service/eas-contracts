@@ -55,8 +55,8 @@
     strip-json-comments "^3.1.1"
 
 "@ethereum-attestation-service/sdk@ethereum-attestation-service/sdk.git":
-  version "0.2.0"
-  resolved "git+ssh://git@github.com/ethereum-attestation-service/sdk.git#26c099a6a6bc828d8aaa26297de75f36d29f3466"
+  version "0.7.0"
+  resolved "git+ssh://git@github.com/ethereum-attestation-service/sdk.git#a18c5dff816f84996a9396b804df3ee7df88b4b8"
   dependencies:
     ethers "^5.0.18"
 

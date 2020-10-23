@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { utils } = require('ethers');
-const { Proxy, ATTEST_TYPE, REVOKE_TYPE } = require('@ethereum-attestation-service/sdk');
+const { Proxy, ATTEST_TYPED_SIGNATURE, REVOKE_TYPED_SIGNATURE } = require('@ethereum-attestation-service/sdk');
 
 const { keccak256, toUtf8Bytes } = utils;
 
@@ -23,10 +23,10 @@ contract('EIP712Verifier', () => {
   });
 
   it('should return the attest type hash', async () => {
-    expect(await verifier.getAttestTypeHash()).to.eql(keccak256(toUtf8Bytes(ATTEST_TYPE)));
+    expect(await verifier.getAttestTypeHash()).to.eql(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
   });
 
   it('should return the revoke type hash', async () => {
-    expect(await verifier.getRevokeTypeHash()).to.eql(keccak256(toUtf8Bytes(REVOKE_TYPE)));
+    expect(await verifier.getRevokeTypeHash()).to.eql(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
   });
 });
