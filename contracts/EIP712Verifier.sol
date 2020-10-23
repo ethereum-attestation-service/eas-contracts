@@ -14,8 +14,8 @@ contract EIP712Verifier {
     bytes32 public constant ATTEST_TYPEHASH = 0x65c1f6a23cba082e11808f5810768554fa9dfba7aa5f718980214483e87e1031;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(byte32 uuid,uint256 nonce)").
-    bytes32 public constant REVOKE_TYPEHASH = 0x75d496468bcca1c327d9bccd1482359dcf755ab9af99c9a010c7a787c747c385;
+    // keccak256("Revoke(bytes32 uuid,uint256 nonce)").
+    bytes32 public constant REVOKE_TYPEHASH = 0xbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab;
 
     // Replay protection nonces.
     mapping(address => uint256) public nonces;
@@ -65,7 +65,17 @@ contract EIP712Verifier {
             abi.encodePacked(
                 "\x19\x01",
                 DOMAIN_SEPARATOR,
-                keccak256(abi.encode(ATTEST_TYPEHASH, recipient, ao, expirationTime, refUUID, data, nonces[attester]++))
+                keccak256(
+                    abi.encode(
+                        ATTEST_TYPEHASH,
+                        recipient,
+                        ao,
+                        expirationTime,
+                        refUUID,
+                        keccak256(data),
+                        nonces[attester]++
+                    )
+                )
             )
         );
 
