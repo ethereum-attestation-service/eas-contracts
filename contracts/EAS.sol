@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.7.4;
 
 import "./AORegistry.sol";
 import "./EIP712Verifier.sol";
@@ -66,7 +66,7 @@ contract EAS {
     ///
     /// @param registry The address of the global AO registry.
     /// @param verifier The address of the EIP712 verifier.
-    constructor(AORegistry registry, EIP712Verifier verifier) public {
+    constructor(AORegistry registry, EIP712Verifier verifier) {
         require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
         require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
 
