@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.7.4;
 
 /// @title EIP712 typed signatures verifier for EAS delegated attestations.
 contract EIP712Verifier {
@@ -21,7 +21,7 @@ contract EIP712Verifier {
     mapping(address => uint256) public nonces;
 
     /// @dev Creates a new EIP712Verifier instance.
-    constructor() public {
+    constructor() {
         uint256 chainId;
         // solhint-disable-next-line no-inline-assembly
         assembly {

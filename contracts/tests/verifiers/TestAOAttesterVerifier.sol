@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.7.4;
 
 import "../../IAOVerifier.sol";
 
@@ -8,7 +8,7 @@ import "../../IAOVerifier.sol";
 contract TestAOAttesterVerifier is IAOVerifier {
     address public _targetAttester;
 
-    constructor(address targetAttester) public {
+    constructor(address targetAttester) {
         _targetAttester = targetAttester;
     }
 
@@ -19,7 +19,7 @@ contract TestAOAttesterVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address msgSender,
         uint256 /* msgValue */
-    ) public virtual override view returns (bool) {
+    ) public view virtual override returns (bool) {
         return msgSender == _targetAttester;
     }
 }

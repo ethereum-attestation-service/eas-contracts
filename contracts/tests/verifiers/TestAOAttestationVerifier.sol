@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.7.4;
 
 import "../../IAOVerifier.sol";
 import "../../EAS.sol";
@@ -9,7 +9,7 @@ import "../../EAS.sol";
 contract TestAOAttestationVerifier is IAOVerifier {
     EAS public _eas;
 
-    constructor(EAS eas) public {
+    constructor(EAS eas) {
         _eas = eas;
     }
 
@@ -20,7 +20,7 @@ contract TestAOAttestationVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address, /* msgSender */
         uint256 /* msgValue */
-    ) public virtual override view returns (bool) {
+    ) public view virtual override returns (bool) {
         return _eas.isAttestationValid(toBytes32(data, 0));
     }
 

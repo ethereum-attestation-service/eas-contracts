@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.7.4;
 
 import "../EAS.sol";
 
 contract TestEAS is EAS {
     bytes32 public lastUUID;
 
-    constructor(AORegistry aoRegistry, EIP712Verifier eip712Verifier) public EAS(aoRegistry, eip712Verifier) {}
+    constructor(AORegistry aoRegistry, EIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
 
     function testAttest(
         address recipient,
