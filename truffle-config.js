@@ -9,6 +9,7 @@ require('chai')
   .expect();
 
 const ganache = require('ganache-core');
+const memdown = require('memdown');
 /* eslint-enable import/no-extraneous-dependencies */
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
@@ -20,6 +21,7 @@ module.exports = {
     development: {
       network_id: '*',
       provider: ganache.provider({
+        db: memdown(),
         accounts: Object.values(accounts.privateKeys).map((privateKey) => {
           return { secretKey: Buffer.from(privateKey, 'hex'), balance: 1000 ** 18 };
         })
