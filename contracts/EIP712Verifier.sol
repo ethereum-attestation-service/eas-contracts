@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.4;
+pragma solidity 0.7.5;
 
 /// @title EIP712 typed signatures verifier for EAS delegated attestations.
 contract EIP712Verifier {
