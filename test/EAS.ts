@@ -8,7 +8,7 @@ import Contracts from 'components/Contracts';
 import { AORegistry, EIP712Verifier, TestEAS } from 'typechain';
 
 import { latest, duration } from 'test/helpers/Time';
-import { EIP712Verifier as EIP712VerifierHelper } from 'test/helpers/EIP712Verifier';
+import { EIP712Utils } from 'test/helpers/EIP712Utils';
 
 import * as testAccounts from 'test/accounts.json';
 
@@ -29,7 +29,7 @@ let recipient2: SignerWithAddress;
 let registry: AORegistry;
 let verifier: EIP712Verifier;
 let eas: TestEAS;
-let verifierHelper: EIP712VerifierHelper;
+let eip712Utils: EIP712Utils;
 
 describe('EAS', () => {
   const getAttestation = async (lastUUID: string) => {
@@ -57,7 +57,7 @@ describe('EAS', () => {
   beforeEach(async () => {
     registry = await Contracts.AORegistry.deploy();
     verifier = await Contracts.EIP712Verifier.deploy();
-    verifierHelper = new EIP712VerifierHelper(verifier.address);
+    eip712Utils = new EIP712Utils(verifier.address);
 
     eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
   });
@@ -120,7 +120,7 @@ describe('EAS', () => {
               .connect(txSender)
               .attest(recipient, ao, expirationTime, refUUID, data, { value: options?.value });
           } else {
-            const request = await verifierHelper.getAttestationRequest(
+            const request = await eip712Utils.getAttestationRequest(
               recipient,
               ao,
               expirationTime,
@@ -220,7 +220,7 @@ describe('EAS', () => {
               err
             );
           } else {
-            const request = await verifierHelper.getAttestationRequest(
+            const request = await eip712Utils.getAttestationRequest(
               recipient,
               ao,
               expirationTime,
@@ -570,7 +570,7 @@ describe('EAS', () => {
         if (!delegation) {
           res = await eas.connect(txSender).revoke(uuid);
         } else {
-          const request = await verifierHelper.getRevocationRequest(
+          const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
             (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
@@ -593,7 +593,7 @@ describe('EAS', () => {
         if (!delegation) {
           await expect(eas.connect(txSender).revoke(uuid)).to.be.revertedWith(err);
         } else {
-          const request = await verifierHelper.getRevocationRequest(
+          const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
             (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
