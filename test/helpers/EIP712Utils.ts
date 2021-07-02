@@ -5,11 +5,9 @@ import { utils } from 'ethers';
 import { Delegation } from '@ethereum-attestation-service/eas-sdk';
 import { ecsign } from 'ethereumjs-util';
 
-const { formatBytes32String } = utils;
-
 const HARDHAT_CHAIN_ID = 31337;
 
-export class EIP712Verifier {
+export class EIP712Utils {
   delegation: Delegation;
 
   constructor(contract: string | SignerWithAddress) {
