@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 
@@ -13,7 +13,7 @@ contract TestAODataVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address, /* msgSender */
         uint256 /* msgValue */
-    ) public view virtual override returns (bool) {
+    ) external view virtual override returns (bool) {
         // Verifies that the data is either 0 or 1.
         return data.length == 1 && (data[0] == "\x00" || data[0] == "\x01");
     }

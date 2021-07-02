@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
+
+import "./IEIP712Verifier.sol";
 
 /// @title EIP712 typed signatures verifier for EAS delegated attestations.
-contract EIP712Verifier {
-    string public constant VERSION = "0.1";
+contract EIP712Verifier is IEIP712Verifier {
+    string public constant VERSION = "0.2";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
@@ -18,7 +20,7 @@ contract EIP712Verifier {
     bytes32 public constant REVOKE_TYPEHASH = 0xbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab;
 
     // Replay protection nonces.
-    mapping(address => uint256) public nonces;
+    mapping(address => uint256) private _nonces;
 
     /// @dev Creates a new EIP712Verifier instance.
     constructor() {
@@ -37,6 +39,15 @@ contract EIP712Verifier {
                 address(this)
             )
         );
+    }
+
+    /// @dev Returns the current nonce per-account.
+    ///
+    /// @param account The requested accunt.
+    //
+    /// @return The current nonce.
+    function getNonce(address account) external view override returns (uint256) {
+        return _nonces[account];
     }
 
     /// @dev Verifies signed attestation.
@@ -60,24 +71,25 @@ contract EIP712Verifier {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(
-                    abi.encode(
-                        ATTEST_TYPEHASH,
-                        recipient,
-                        ao,
-                        expirationTime,
-                        refUUID,
-                        keccak256(data),
-                        nonces[attester]++
+    ) external override {
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR,
+                    keccak256(
+                        abi.encode(
+                            ATTEST_TYPEHASH,
+                            recipient,
+                            ao,
+                            expirationTime,
+                            refUUID,
+                            keccak256(data),
+                            _nonces[attester]++
+                        )
                     )
                 )
-            )
-        );
+            );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
@@ -96,14 +108,15 @@ contract EIP712Verifier {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonces[attester]++))
-            )
-        );
+    ) external override {
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR,
+                    keccak256(abi.encode(REVOKE_TYPEHASH, uuid, _nonces[attester]++))
+                )
+            );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");

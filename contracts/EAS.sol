@@ -1,35 +1,21 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
-import "./AORegistry.sol";
-import "./EIP712Verifier.sol";
+import "./IEAS.sol";
 
 /// @title EAS - Ethereum Attestation Service
-contract EAS {
+contract EAS is IEAS {
     string public constant VERSION = "0.2";
 
     bytes32 private constant EMPTY_UUID = 0;
     string private constant HASH_SEPARATOR = "@";
 
-    // A data struct representing a single attestation.
-    struct Attestation {
-        bytes32 uuid;
-        uint256 ao;
-        address to;
-        address from;
-        uint256 time;
-        uint256 expirationTime;
-        uint256 revocationTime;
-        bytes32 refUUID;
-        bytes data;
-    }
-
     // The AO global registry.
-    AORegistry public aoRegistry;
+    IAORegistry private immutable _aoRegistry;
 
     // The EIP712 verifier used to verify signed attestations.
-    EIP712Verifier public eip712Verifier;
+    IEIP712Verifier private immutable _eip712Verifier;
 
     // A mapping between attestations and their corresponding attestations.
     mapping(bytes32 => bytes32[]) private _relatedAttestations;
@@ -40,38 +26,43 @@ contract EAS {
     // A mapping between an account and its sent attestations.
     mapping(address => mapping(uint256 => bytes32[])) private _sentAttestations;
 
-    // A global mapping between attestations and their UUIDs.
+    // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
 
-    // A global counter for the total number of attestations.
-    uint256 public attestationsCount;
-
-    /// @dev Triggered when an attestation has been made.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param attester The attesting account.
-    /// @param uuid The UUID the revoked attestation.
-    /// @param ao The ID of the AO.
-    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, uint256 ao);
-
-    /// @dev Triggered when an attestation has been revoked.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param attester The attesting account.
-    /// @param ao The ID of the AO.
-    /// @param uuid The UUID the revoked attestation.
-    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, uint256 ao);
+    // The global counter for the total number of attestations.
+    uint256 private _attestationsCount;
 
     /// @dev Creates a new EAS instance.
     ///
     /// @param registry The address of the global AO registry.
     /// @param verifier The address of the EIP712 verifier.
-    constructor(AORegistry registry, EIP712Verifier verifier) {
+    constructor(IAORegistry registry, IEIP712Verifier verifier) {
         require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
         require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
 
-        aoRegistry = registry;
-        eip712Verifier = verifier;
+        _aoRegistry = registry;
+        _eip712Verifier = verifier;
+    }
+
+    /// @dev Returns the address of the AO global registry.
+    ///
+    /// @return The address of the AO global registry.
+    function getAORegistry() external view override returns (IAORegistry) {
+        return _aoRegistry;
+    }
+
+    /// @dev Returns the address of the EIP712 verifier used to verify signed attestations.
+    ///
+    /// @return The address of the EIP712 verifier used to verify signed attestations.
+    function getEIP712Verifier() external view override returns (IEIP712Verifier) {
+        return _eip712Verifier;
+    }
+
+    /// @dev Returns the global counter for the total number of attestations.
+    ///
+    /// @return The global counter for the total number of attestations.
+    function getAttestationsCount() external view override returns (uint256) {
+        return _attestationsCount;
     }
 
     /// @dev Attests to a specific AO.
@@ -89,7 +80,7 @@ contract EAS {
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
-    ) public payable returns (bytes32) {
+    ) public payable virtual override returns (bytes32) {
         return _attest(recipient, ao, expirationTime, refUUID, data, msg.sender);
     }
 
@@ -106,7 +97,7 @@ contract EAS {
     /// @param s The signature data.
     ///
     /// @return The UUID of the new attestation.
-    function attestByProxy(
+    function attestByDelegation(
         address recipient,
         uint256 ao,
         uint256 expirationTime,
@@ -116,8 +107,8 @@ contract EAS {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable returns (bytes32) {
-        eip712Verifier.attest(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
+    ) public payable virtual override returns (bytes32) {
+        _eip712Verifier.attest(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
 
         return _attest(recipient, ao, expirationTime, refUUID, data, attester);
     }
@@ -125,7 +116,7 @@ contract EAS {
     /// @dev Revokes an existing attestation to a specific AO.
     ///
     /// @param uuid The UUID of the attestation to revoke.
-    function revoke(bytes32 uuid) public {
+    function revoke(bytes32 uuid) external virtual override {
         return _revoke(uuid, msg.sender);
     }
 
@@ -136,14 +127,14 @@ contract EAS {
     /// @param v The recovery ID.
     /// @param r The x-coordinate of the nonce R.
     /// @param s The signature data.
-    function revokeByProxy(
+    function revokeByDelegation(
         bytes32 uuid,
         address attester,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public {
-        eip712Verifier.revoke(uuid, attester, v, r, s);
+    ) external virtual override {
+        _eip712Verifier.revoke(uuid, attester, v, r, s);
 
         _revoke(uuid, attester);
     }
@@ -154,8 +145,9 @@ contract EAS {
     ///
     /// @return The attestation data members.
     function getAttestation(bytes32 uuid)
-        public
+        external
         view
+        override
         returns (
             bytes32,
             uint256,
@@ -188,7 +180,7 @@ contract EAS {
     /// @param uuid The UUID of the attestation to retrieve.
     ///
     /// @return Whether an attestation exists.
-    function isAttestationValid(bytes32 uuid) public view returns (bool) {
+    function isAttestationValid(bytes32 uuid) public view override returns (bool) {
         return _db[uuid].uuid != 0;
     }
 
@@ -207,7 +199,7 @@ contract EAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) public view returns (bytes32[] memory) {
+    ) external view override returns (bytes32[] memory) {
         return _sliceUUIDs(_receivedAttestations[recipient][ao], start, length, reverseOrder);
     }
 
@@ -217,7 +209,7 @@ contract EAS {
     /// @param ao The ID of the AO.
     ///
     /// @return The number of attestations.
-    function getReceivedAttestationUUIDsCount(address recipient, uint256 ao) public view returns (uint256) {
+    function getReceivedAttestationUUIDsCount(address recipient, uint256 ao) external view override returns (uint256) {
         return _receivedAttestations[recipient][ao].length;
     }
 
@@ -236,7 +228,7 @@ contract EAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) public view returns (bytes32[] memory) {
+    ) external view override returns (bytes32[] memory) {
         return _sliceUUIDs(_sentAttestations[attester][ao], start, length, reverseOrder);
     }
 
@@ -246,7 +238,7 @@ contract EAS {
     /// @param ao The ID of the AO.
     ///
     /// @return The number of attestations.
-    function getSentAttestationUUIDsCount(address recipient, uint256 ao) public view returns (uint256) {
+    function getSentAttestationUUIDsCount(address recipient, uint256 ao) external view override returns (uint256) {
         return _sentAttestations[recipient][ao].length;
     }
 
@@ -263,7 +255,7 @@ contract EAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) public view returns (bytes32[] memory) {
+    ) external view override returns (bytes32[] memory) {
         return _sliceUUIDs(_relatedAttestations[uuid], start, length, reverseOrder);
     }
 
@@ -272,7 +264,7 @@ contract EAS {
     /// @param uuid The UUID of the attestation to retrieve.
     ///
     /// @return The number of related attestations.
-    function getRelatedAttestationUUIDsCount(bytes32 uuid) public view returns (uint256) {
+    function getRelatedAttestationUUIDsCount(bytes32 uuid) external view override returns (uint256) {
         return _relatedAttestations[uuid].length;
     }
 
@@ -299,7 +291,7 @@ contract EAS {
         uint256 id;
         bytes memory schema;
         IAOVerifier verifier;
-        (id, schema, verifier) = aoRegistry.getAO(ao);
+        (id, schema, verifier) = _aoRegistry.getAO(ao);
 
         require(id > 0, "ERR_INVALID_AO");
         require(
@@ -327,7 +319,7 @@ contract EAS {
         _sentAttestations[attester][ao].push(uuid);
 
         _db[uuid] = attestation;
-        attestationsCount++;
+        _attestationsCount++;
 
         if (refUUID != 0) {
             require(isAttestationValid(refUUID), "ERR_NO_ATTESTATION");
@@ -373,7 +365,7 @@ contract EAS {
                     HASH_SEPARATOR,
                     attestation.data,
                     HASH_SEPARATOR,
-                    attestationsCount,
+                    _attestationsCount,
                     HASH_SEPARATOR
                 )
             );
