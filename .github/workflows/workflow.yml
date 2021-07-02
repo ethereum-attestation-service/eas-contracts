@@ -1,24 +1,33 @@
 name: Test
 
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - master
-    pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: '14'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-            - name: Install Dependencies
-              run: yarn install
+      - name: Setup SSH Keys and known_hosts
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.ACCESS_KEY }}"
 
-            - name: Test
-              run: yarn test
+      - name: Install Dependencies
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: yarn install
+
+      - name: Test
+        run: yarn test
