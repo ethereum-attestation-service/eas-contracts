@@ -1,27 +1,31 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 import "../EAS.sol";
 
 contract TestEAS is EAS {
-    bytes32 public lastUUID;
+    bytes32 private _lastUUID;
 
-    constructor(AORegistry aoRegistry, EIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
+    constructor(IAORegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
 
-    function testAttest(
+    function getLastUUID() external view returns (bytes32) {
+        return _lastUUID;
+    }
+
+    function attest(
         address recipient,
         uint256 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
-    ) public payable returns (bytes32) {
-        lastUUID = super.attest(recipient, ao, expirationTime, refUUID, data);
+    ) public payable override returns (bytes32) {
+        _lastUUID = super.attest(recipient, ao, expirationTime, refUUID, data);
 
-        return lastUUID;
+        return _lastUUID;
     }
 
-    function testAttestByProxy(
+    function attestByDelegation(
         address recipient,
         uint256 ao,
         uint256 expirationTime,
@@ -31,9 +35,9 @@ contract TestEAS is EAS {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable returns (bytes32) {
-        lastUUID = super.attestByProxy(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
+    ) public payable override returns (bytes32) {
+        _lastUUID = super.attestByDelegation(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
 
-        return lastUUID;
+        return _lastUUID;
     }
 }

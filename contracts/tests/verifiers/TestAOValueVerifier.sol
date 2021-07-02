@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 
 /// @title A sample AO verifier that checks whether a specific amount of ETH was sent with an attestation.
 contract TestAOValueVerifier is IAOVerifier {
-    uint256 public _targetValue;
+    uint256 private immutable _targetValue;
 
     constructor(uint256 targetValue) {
         _targetValue = targetValue;
@@ -19,7 +19,7 @@ contract TestAOValueVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address, /* msgSender */
         uint256 msgValue
-    ) public view virtual override returns (bool) {
+    ) external view virtual override returns (bool) {
         return msgValue == _targetValue;
     }
 }

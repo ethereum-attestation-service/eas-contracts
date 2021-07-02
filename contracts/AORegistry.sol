@@ -1,40 +1,26 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
+import "./IAORegistry.sol";
 import "./IAOVerifier.sol";
 
 /// @title The global AO registry.
-contract AORegistry {
-    string public constant VERSION = "0.1";
+contract AORegistry is IAORegistry {
+    string public constant VERSION = "0.2";
 
-    // A data struct representing a record for a submitted AO (Attestation Object).
-    struct AORecord {
-        uint256 id;
-        bytes schema;
-        IAOVerifier verifier;
-    }
-
-    // A global mapping between AO records and their IDs.
+    // The global mapping between AO records and their IDs.
     mapping(uint256 => AORecord) private _registry;
 
-    // A global counter for the total number of attestations.
-    uint256 public aoCount;
-
-    /// @dev Triggered when a new AO has been registered.
-    ///
-    /// @param id The AO id.
-    /// @param schema The AO schema.
-    /// @param verifier An optional AO schema verifier.
-    /// @param from The address of the account used to register the AO.
-    event Registered(uint256 indexed id, bytes schema, IAOVerifier indexed verifier, address indexed from);
+    // The global counter for the total number of attestations.
+    uint256 private _aoCount;
 
     /// @dev Submits and reserve a new AO.
     ///
     /// @param schema The AO data schema.
     /// @param verifier An optional AO schema verifier.
-    function register(bytes calldata schema, IAOVerifier verifier) public {
-        uint256 id = ++aoCount;
+    function register(bytes calldata schema, IAOVerifier verifier) external override {
+        uint256 id = ++_aoCount;
 
         _registry[id] = AORecord({id: id, schema: schema, verifier: verifier});
 
@@ -47,8 +33,9 @@ contract AORegistry {
     ///
     /// @return The AO data members.
     function getAO(uint256 id)
-        public
+        external
         view
+        override
         returns (
             uint256,
             bytes memory,
@@ -58,5 +45,12 @@ contract AORegistry {
         AORecord memory ao = _registry[id];
 
         return (ao.id, ao.schema, ao.verifier);
+    }
+
+    /// @dev Returns the global counter for the total number of attestations.
+    ///
+    /// @return The global counter for the total number of attestations.
+    function getAOCount() external view override returns (uint256) {
+        return _aoCount;
     }
 }

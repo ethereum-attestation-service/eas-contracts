@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 /// @title The interface of an optional AO verifier, submitted via the global AO registry.
 interface IAOVerifier {

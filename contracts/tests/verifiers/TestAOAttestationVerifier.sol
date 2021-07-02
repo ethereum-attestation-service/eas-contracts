@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 import "../../EAS.sol";
 
 /// @title A sample AO verifier that checks whether an attestations attest to an existing attestation.
 contract TestAOAttestationVerifier is IAOVerifier {
-    EAS public _eas;
+    EAS private immutable _eas;
 
     constructor(EAS eas) {
         _eas = eas;
@@ -20,11 +20,11 @@ contract TestAOAttestationVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address, /* msgSender */
         uint256 /* msgValue */
-    ) public view virtual override returns (bool) {
-        return _eas.isAttestationValid(toBytes32(data, 0));
+    ) external view virtual override returns (bool) {
+        return _eas.isAttestationValid(_toBytes32(data, 0));
     }
 
-    function toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {
+    function _toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {
         require(start + 32 >= start, "ERR_OVERFLOW");
         require(data.length >= start + 32, "ERR_OUT_OF_BOUNDS");
         bytes32 tempBytes32;

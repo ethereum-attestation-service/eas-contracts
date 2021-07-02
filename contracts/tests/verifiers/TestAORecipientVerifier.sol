@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 
 /// @title A sample AO verifier that checks whether the attestation is to a specific recipient.
 contract TestAORecipientVerifier is IAOVerifier {
-    address public _targetRecipient;
+    address private immutable _targetRecipient;
 
     constructor(address targetRecipient) {
         _targetRecipient = targetRecipient;
@@ -19,7 +19,7 @@ contract TestAORecipientVerifier is IAOVerifier {
         uint256, /* expirationTime */
         address, /* msgSender */
         uint256 /* msgValue */
-    ) public view virtual override returns (bool) {
+    ) external view virtual override returns (bool) {
         return recipient == _targetRecipient;
     }
 }
