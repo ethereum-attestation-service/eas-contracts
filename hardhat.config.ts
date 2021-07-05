@@ -5,7 +5,6 @@ import 'tsconfig-paths/register';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
-import 'hardhat-deploy';
 
 import 'solidity-coverage';
 import '@nomiclabs/hardhat-etherscan';
