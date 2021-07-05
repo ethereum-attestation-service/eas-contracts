@@ -1,3 +1,3 @@
 module.exports = {
-  skipFiles: ['contracts/helpers']
+  skipFiles: ['contracts/tests']
 };
