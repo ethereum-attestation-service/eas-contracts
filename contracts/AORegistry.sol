@@ -19,12 +19,16 @@ contract AORegistry is IAORegistry {
     ///
     /// @param schema The AO data schema.
     /// @param verifier An optional AO schema verifier.
-    function register(bytes calldata schema, IAOVerifier verifier) external override {
+    ///
+    /// @return The ID of the new AO.
+    function register(bytes calldata schema, IAOVerifier verifier) external override returns (uint256) {
         uint256 id = ++_aoCount;
 
         _registry[id] = AORecord({id: id, schema: schema, verifier: verifier});
 
         emit Registered(id, schema, verifier, msg.sender);
+
+        return id;
     }
 
     /// @dev Returns an existing AO by ID.
