@@ -45,7 +45,9 @@ describe('AORegistry', () => {
       const id = prevAOCount.add(BigNumber.from(1));
 
       const verifierAddress = typeof verifier === 'string' ? verifier : verifier.address;
+      const retId = await registry.callStatic.register(schema, verifierAddress);
       const res = await registry.register(schema, verifierAddress);
+      expect(retId).to.equal(id);
       await expect(res).to.emit(registry, 'Registered').withArgs(id, schema, verifierAddress, sender.address);
 
       expect(await registry.getAOCount()).to.equal(id);

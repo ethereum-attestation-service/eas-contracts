@@ -25,7 +25,9 @@ interface IAORegistry {
     ///
     /// @param schema The AO data schema.
     /// @param verifier An optional AO schema verifier.
-    function register(bytes calldata schema, IAOVerifier verifier) external;
+    //
+    /// @return The ID of the new AO.
+    function register(bytes calldata schema, IAOVerifier verifier) external returns (uint256);
 
     /// @dev Returns an existing AO by ID.
     ///
