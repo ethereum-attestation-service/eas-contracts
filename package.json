@@ -22,6 +22,8 @@
     "verify": "hardhat verify",
     "coverage": "hardhat coverage",
     "flatten": "hardhat flatten",
+    "dev": "hardhat node",
+    "deploy": "hardhat run scripts/deploy.ts",
     "lint": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "format": "prettier --check --write contracts/**/*.sol test/**/*.js --config .prettierrc",
     "clean": "rm -rf artifacts cache data coverage typechain"
