@@ -6,7 +6,7 @@ import "./IEIP712Verifier.sol";
 
 /// @title EIP712 typed signatures verifier for EAS delegated attestations.
 contract EIP712Verifier is IEIP712Verifier {
-    string public constant VERSION = "0.2";
+    string public constant VERSION = "0.3";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
@@ -53,7 +53,7 @@ contract EIP712Verifier is IEIP712Verifier {
     /// @dev Verifies signed attestation.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -63,7 +63,7 @@ contract EIP712Verifier is IEIP712Verifier {
     /// @param s The signature data.
     function attest(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,

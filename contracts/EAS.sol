@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
+import "./Types.sol";
 import "./IEAS.sol";
+import "./IAORegistry.sol";
 
 /// @title EAS - Ethereum Attestation Service
 contract EAS is IEAS {
-    string public constant VERSION = "0.2";
+    string public constant VERSION = "0.3";
 
-    bytes32 private constant EMPTY_UUID = 0;
-    string private constant HASH_SEPARATOR = "@";
+    // A terminator used when concatenating and hashing multiple fields.
+    string private constant HASH_TERMINATOR = "@";
 
     // The AO global registry.
     IAORegistry private immutable _aoRegistry;
@@ -21,10 +24,10 @@ contract EAS is IEAS {
     mapping(bytes32 => bytes32[]) private _relatedAttestations;
 
     // A mapping between an account and its received attestations.
-    mapping(address => mapping(uint256 => bytes32[])) private _receivedAttestations;
+    mapping(address => mapping(bytes32 => bytes32[])) private _receivedAttestations;
 
     // A mapping between an account and its sent attestations.
-    mapping(address => mapping(uint256 => bytes32[])) private _sentAttestations;
+    mapping(address => mapping(bytes32 => bytes32[])) private _sentAttestations;
 
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
@@ -68,7 +71,7 @@ contract EAS is IEAS {
     /// @dev Attests to a specific AO.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -76,7 +79,7 @@ contract EAS is IEAS {
     /// @return The UUID of the new attestation.
     function attest(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
@@ -87,7 +90,7 @@ contract EAS is IEAS {
     /// @dev Attests to a specific AO using a provided EIP712 signature.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -99,7 +102,7 @@ contract EAS is IEAS {
     /// @return The UUID of the new attestation.
     function attestByDelegation(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -144,35 +147,8 @@ contract EAS is IEAS {
     /// @param uuid The UUID of the attestation to retrieve.
     ///
     /// @return The attestation data members.
-    function getAttestation(bytes32 uuid)
-        external
-        view
-        override
-        returns (
-            bytes32,
-            uint256,
-            address,
-            address,
-            uint256,
-            uint256,
-            uint256,
-            bytes32,
-            bytes memory
-        )
-    {
-        Attestation memory attestation = _db[uuid];
-
-        return (
-            attestation.uuid,
-            attestation.ao,
-            attestation.to,
-            attestation.from,
-            attestation.time,
-            attestation.expirationTime,
-            attestation.revocationTime,
-            attestation.refUUID,
-            attestation.data
-        );
+    function getAttestation(bytes32 uuid) external view override returns (Attestation memory) {
+        return _db[uuid];
     }
 
     /// @dev Checks whether an attestation exists.
@@ -187,7 +163,7 @@ contract EAS is IEAS {
     /// @dev Returns all received attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -195,7 +171,7 @@ contract EAS is IEAS {
     /// @return An array of attestation UUIDs.
     function getReceivedAttestationUUIDs(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -206,17 +182,17 @@ contract EAS is IEAS {
     /// @dev Returns the number of received attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     ///
     /// @return The number of attestations.
-    function getReceivedAttestationUUIDsCount(address recipient, uint256 ao) external view override returns (uint256) {
+    function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _receivedAttestations[recipient][ao].length;
     }
 
     /// @dev Returns all sent attestation UUIDs.
     ///
     /// @param attester The attesting account.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -224,7 +200,7 @@ contract EAS is IEAS {
     /// @return An array of attestation UUIDs.
     function getSentAttestationUUIDs(
         address attester,
-        uint256 ao,
+        bytes32 ao,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -235,10 +211,10 @@ contract EAS is IEAS {
     /// @dev Returns the number of sent attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     ///
     /// @return The number of attestations.
-    function getSentAttestationUUIDsCount(address recipient, uint256 ao) external view override returns (uint256) {
+    function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _sentAttestations[recipient][ao].length;
     }
 
@@ -271,7 +247,7 @@ contract EAS is IEAS {
     /// @dev Attests to a specific AO.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -280,7 +256,7 @@ contract EAS is IEAS {
     /// @return The UUID of the new attestation.
     function _attest(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -288,15 +264,11 @@ contract EAS is IEAS {
     ) private returns (bytes32) {
         require(expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        uint256 id;
-        bytes memory schema;
-        IAOVerifier verifier;
-        (id, schema, verifier) = _aoRegistry.getAO(ao);
-
-        require(id > 0, "ERR_INVALID_AO");
+        AORecord memory aoRecord = _aoRegistry.getAO(ao);
+        require(aoRecord.uuid != EMPTY_UUID, "ERR_INVALID_AO");
         require(
-            address(verifier) == address(0x0) ||
-                verifier.verify(recipient, schema, data, expirationTime, attester, msg.value),
+            address(aoRecord.verifier) == address(0x0) ||
+                aoRecord.verifier.verify(recipient, aoRecord.schema, data, expirationTime, attester, msg.value),
             "ERR_INVALID_ATTESTATION_DATA"
         );
 
@@ -349,24 +321,20 @@ contract EAS is IEAS {
     /// @dev Calculates a UUID for a given attestation.
     ///
     /// @param attestation The input attestation.
+    ///
+    /// @return Attestation UUID.
     function _getUUID(Attestation memory attestation) private view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
                     attestation.ao,
-                    HASH_SEPARATOR,
                     attestation.to,
-                    HASH_SEPARATOR,
                     attestation.from,
-                    HASH_SEPARATOR,
                     attestation.time,
-                    HASH_SEPARATOR,
                     attestation.expirationTime,
-                    HASH_SEPARATOR,
                     attestation.data,
-                    HASH_SEPARATOR,
-                    _attestationsCount,
-                    HASH_SEPARATOR
+                    HASH_TERMINATOR,
+                    _attestationsCount
                 )
             );
     }
