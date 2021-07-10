@@ -72,24 +72,23 @@ contract EIP712Verifier is IEIP712Verifier {
         bytes32 r,
         bytes32 s
     ) external override {
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(
-                        abi.encode(
-                            ATTEST_TYPEHASH,
-                            recipient,
-                            ao,
-                            expirationTime,
-                            refUUID,
-                            keccak256(data),
-                            _nonces[attester]++
-                        )
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                DOMAIN_SEPARATOR,
+                keccak256(
+                    abi.encode(
+                        ATTEST_TYPEHASH,
+                        recipient,
+                        ao,
+                        expirationTime,
+                        refUUID,
+                        keccak256(data),
+                        _nonces[attester]++
                     )
                 )
-            );
+            )
+        );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
@@ -109,14 +108,13 @@ contract EIP712Verifier is IEIP712Verifier {
         bytes32 r,
         bytes32 s
     ) external override {
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(abi.encode(REVOKE_TYPEHASH, uuid, _nonces[attester]++))
-                )
-            );
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                DOMAIN_SEPARATOR,
+                keccak256(abi.encode(REVOKE_TYPEHASH, uuid, _nonces[attester]++))
+            )
+        );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
