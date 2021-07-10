@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { ContractFactory, Overrides } from '@ethersproject/contracts';
+import { ContractFactory } from '@ethersproject/contracts';
 import { Signer } from '@ethersproject/abstract-signer';
 
 import {
@@ -42,19 +42,17 @@ const attachOnly = <F extends ContractFactory>(contractName: string) => {
   };
 };
 
-const getContracts = () => {
-  return {
-    AORegistry: deployOrAttach<AORegistry__factory>('AORegistry'),
-    EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
-    EAS: deployOrAttach<EAS__factory>('EAS'),
-    TestAOAttestationVerifier: deployOrAttach<TestAOAttestationVerifier__factory>('TestAOAttestationVerifier'),
-    TestAOAttesterVerifier: deployOrAttach<TestAOAttesterVerifier__factory>('TestAOAttesterVerifier'),
-    TestAODataVerifier: deployOrAttach<TestAODataVerifier__factory>('TestAODataVerifier'),
-    TestAOExpirationTimeVerifier: deployOrAttach<TestAOExpirationTimeVerifier__factory>('TestAOExpirationTimeVerifier'),
-    TestAORecipientVerifier: deployOrAttach<TestAORecipientVerifier__factory>('TestAORecipientVerifier'),
-    TestAOValueVerifier: deployOrAttach<TestAOValueVerifier__factory>('TestAOValueVerifier'),
-    TestEAS: deployOrAttach<TestEAS__factory>('TestEAS')
-  };
-};
+const getContracts = () => ({
+  AORegistry: deployOrAttach<AORegistry__factory>('AORegistry'),
+  EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
+  EAS: deployOrAttach<EAS__factory>('EAS'),
+  TestAOAttestationVerifier: deployOrAttach<TestAOAttestationVerifier__factory>('TestAOAttestationVerifier'),
+  TestAOAttesterVerifier: deployOrAttach<TestAOAttesterVerifier__factory>('TestAOAttesterVerifier'),
+  TestAODataVerifier: deployOrAttach<TestAODataVerifier__factory>('TestAODataVerifier'),
+  TestAOExpirationTimeVerifier: deployOrAttach<TestAOExpirationTimeVerifier__factory>('TestAOExpirationTimeVerifier'),
+  TestAORecipientVerifier: deployOrAttach<TestAORecipientVerifier__factory>('TestAORecipientVerifier'),
+  TestAOValueVerifier: deployOrAttach<TestAOValueVerifier__factory>('TestAOValueVerifier'),
+  TestEAS: deployOrAttach<TestEAS__factory>('TestEAS')
+});
 
 export default getContracts();
