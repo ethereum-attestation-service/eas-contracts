@@ -15,14 +15,14 @@ export class EIP712Utils {
 
     this.delegation = new Delegation({
       address: contractAddress,
-      version: '0.2',
+      version: '0.3',
       chainId: HARDHAT_CHAIN_ID
     });
   }
 
   async getAttestationRequest(
     recipient: string | SignerWithAddress,
-    ao: BigNumber,
+    ao: string,
     expirationTime: BigNumber,
     refUUID: string,
     data: string,

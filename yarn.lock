@@ -40,8 +40,8 @@
   integrity sha512-bvaTH34PMCbv6anRa9I/0zjLJgY4EuznbEMgbV77JBCQ9KNC46rzi0avuxpOfu+xDjPEtSFGqVEOr5GlUSGudA==
 
 "@ethereum-attestation-service/eas-sdk@ethereum-attestation-service/eas-sdk.git":
-  version "0.9.0"
-  resolved "git+ssh://git@github.com/ethereum-attestation-service/eas-sdk.git#3fe5e447a64d0dca4bbd9d99dccf9f9a03821dad"
+  version "0.10.0"
+  resolved "git+ssh://git@github.com/ethereum-attestation-service/eas-sdk.git#6066e2f1fce34d3a425908bc61b8c411cee7bf9f"
   dependencies:
     ethers "^5.4.0"
 
