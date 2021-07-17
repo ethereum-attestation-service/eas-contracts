@@ -41,26 +41,12 @@ contract EIP712Verifier is IEIP712Verifier {
         );
     }
 
-    /// @dev Returns the current nonce per-account.
-    ///
-    /// @param account The requested accunt.
-    //
-    /// @return The current nonce.
+    /// @inheritdoc IEIP712Verifier
     function getNonce(address account) external view override returns (uint256) {
         return _nonces[account];
     }
 
-    /// @dev Verifies signed attestation.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    /// @param expirationTime The expiration time of the attestation.
-    /// @param refUUID An optional related attestation's UUID.
-    /// @param data The additional attestation data.
-    /// @param attester The attesting account.
-    /// @param v The recovery ID.
-    /// @param r The x-coordinate of the nonce R.
-    /// @param s The signature data.
+    /// @inheritdoc IEIP712Verifier
     function attest(
         address recipient,
         bytes32 ao,
@@ -94,13 +80,7 @@ contract EIP712Verifier is IEIP712Verifier {
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
     }
 
-    /// @dev Verifies signed revocations.
-    ///
-    /// @param uuid The UUID of the attestation to revoke.
-    /// @param attester The attesting account.
-    /// @param v The recovery ID.
-    /// @param r The x-coordinate of the nonce R.
-    /// @param s The signature data.
+    /// @inheritdoc IEIP712Verifier
     function revoke(
         bytes32 uuid,
         address attester,

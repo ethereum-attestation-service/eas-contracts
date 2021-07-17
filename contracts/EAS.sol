@@ -47,36 +47,22 @@ contract EAS is IEAS {
         _eip712Verifier = verifier;
     }
 
-    /// @dev Returns the address of the AO global registry.
-    ///
-    /// @return The address of the AO global registry.
+    /// @inheritdoc IEAS
     function getAORegistry() external view override returns (IAORegistry) {
         return _aoRegistry;
     }
 
-    /// @dev Returns the address of the EIP712 verifier used to verify signed attestations.
-    ///
-    /// @return The address of the EIP712 verifier used to verify signed attestations.
+    /// @inheritdoc IEAS
     function getEIP712Verifier() external view override returns (IEIP712Verifier) {
         return _eip712Verifier;
     }
 
-    /// @dev Returns the global counter for the total number of attestations.
-    ///
-    /// @return The global counter for the total number of attestations.
+    /// @inheritdoc IEAS
     function getAttestationsCount() external view override returns (uint256) {
         return _attestationsCount;
     }
 
-    /// @dev Attests to a specific AO.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    /// @param expirationTime The expiration time of the attestation.
-    /// @param refUUID An optional related attestation's UUID.
-    /// @param data The additional attestation data.
-    ///
-    /// @return The UUID of the new attestation.
+    /// @inheritdoc IEAS
     function attest(
         address recipient,
         bytes32 ao,
@@ -87,19 +73,7 @@ contract EAS is IEAS {
         return _attest(recipient, ao, expirationTime, refUUID, data, msg.sender);
     }
 
-    /// @dev Attests to a specific AO using a provided EIP712 signature.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    /// @param expirationTime The expiration time of the attestation.
-    /// @param refUUID An optional related attestation's UUID.
-    /// @param data The additional attestation data.
-    /// @param attester The attesting account.
-    /// @param v The recovery ID.
-    /// @param r The x-coordinate of the nonce R.
-    /// @param s The signature data.
-    ///
-    /// @return The UUID of the new attestation.
+    /// @inheritdoc IEAS
     function attestByDelegation(
         address recipient,
         bytes32 ao,
@@ -116,20 +90,12 @@ contract EAS is IEAS {
         return _attest(recipient, ao, expirationTime, refUUID, data, attester);
     }
 
-    /// @dev Revokes an existing attestation to a specific AO.
-    ///
-    /// @param uuid The UUID of the attestation to revoke.
+    /// @inheritdoc IEAS
     function revoke(bytes32 uuid) external virtual override {
         return _revoke(uuid, msg.sender);
     }
 
-    /// @dev Attests to a specific AO using a provided EIP712 signature.
-    ///
-    /// @param uuid The UUID of the attestation to revoke.
-    /// @param attester The attesting account.
-    /// @param v The recovery ID.
-    /// @param r The x-coordinate of the nonce R.
-    /// @param s The signature data.
+    /// @inheritdoc IEAS
     function revokeByDelegation(
         bytes32 uuid,
         address attester,
@@ -142,33 +108,17 @@ contract EAS is IEAS {
         _revoke(uuid, attester);
     }
 
-    /// @dev Returns an existing attestation by UUID.
-    ///
-    /// @param uuid The UUID of the attestation to retrieve.
-    ///
-    /// @return The attestation data members.
+    /// @inheritdoc IEAS
     function getAttestation(bytes32 uuid) external view override returns (Attestation memory) {
         return _db[uuid];
     }
 
-    /// @dev Checks whether an attestation exists.
-    ///
-    /// @param uuid The UUID of the attestation to retrieve.
-    ///
-    /// @return Whether an attestation exists.
+    /// @inheritdoc IEAS
     function isAttestationValid(bytes32 uuid) public view override returns (bool) {
         return _db[uuid].uuid != 0;
     }
 
-    /// @dev Returns all received attestation UUIDs.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    /// @param start The offset to start from.
-    /// @param length The number of total members to retrieve.
-    /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
-    ///
-    /// @return An array of attestation UUIDs.
+    /// @inheritdoc IEAS
     function getReceivedAttestationUUIDs(
         address recipient,
         bytes32 ao,
@@ -179,25 +129,12 @@ contract EAS is IEAS {
         return _sliceUUIDs(_receivedAttestations[recipient][ao], start, length, reverseOrder);
     }
 
-    /// @dev Returns the number of received attestation UUIDs.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    ///
-    /// @return The number of attestations.
+    /// @inheritdoc IEAS
     function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _receivedAttestations[recipient][ao].length;
     }
 
-    /// @dev Returns all sent attestation UUIDs.
-    ///
-    /// @param attester The attesting account.
-    /// @param ao The UIID of the AO.
-    /// @param start The offset to start from.
-    /// @param length The number of total members to retrieve.
-    /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
-    ///
-    /// @return An array of attestation UUIDs.
+    /// @inheritdoc IEAS
     function getSentAttestationUUIDs(
         address attester,
         bytes32 ao,
@@ -208,24 +145,12 @@ contract EAS is IEAS {
         return _sliceUUIDs(_sentAttestations[attester][ao], start, length, reverseOrder);
     }
 
-    /// @dev Returns the number of sent attestation UUIDs.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    ///
-    /// @return The number of attestations.
+    /// @inheritdoc IEAS
     function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _sentAttestations[recipient][ao].length;
     }
 
-    /// @dev Returns all attestations related to a specific attestation.
-    ///
-    /// @param uuid The UUID of the attestation to retrieve.
-    /// @param start The offset to start from.
-    /// @param length The number of total members to retrieve.
-    /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
-    ///
-    /// @return An array of attestation UUIDs.
+    /// @inheritdoc IEAS
     function getRelatedAttestationUUIDs(
         bytes32 uuid,
         uint256 start,
@@ -235,11 +160,7 @@ contract EAS is IEAS {
         return _sliceUUIDs(_relatedAttestations[uuid], start, length, reverseOrder);
     }
 
-    /// @dev Returns the number of related attestation UUIDs.
-    ///
-    /// @param uuid The UUID of the attestation to retrieve.
-    ///
-    /// @return The number of related attestations.
+    /// @inheritdoc IEAS
     function getRelatedAttestationUUIDsCount(bytes32 uuid) external view override returns (uint256) {
         return _relatedAttestations[uuid].length;
     }

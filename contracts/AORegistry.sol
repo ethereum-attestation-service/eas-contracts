@@ -17,12 +17,7 @@ contract AORegistry is IAORegistry {
     // The global counter for the total number of attestations.
     uint256 private _aoCount;
 
-    /// @dev Submits and reserve a new AO.
-    ///
-    /// @param schema The AO data schema.
-    /// @param verifier An optional AO schema verifier.
-    //
-    /// @return The UUID of the new AO.
+    /// @inheritdoc IAORegistry
     function register(bytes calldata schema, IAOVerifier verifier) external override returns (bytes32) {
         uint256 index = ++_aoCount;
 
@@ -39,18 +34,12 @@ contract AORegistry is IAORegistry {
         return uuid;
     }
 
-    /// @dev Returns an existing AO by UUID.
-    ///
-    /// @param uuid The UUID of the AO to retrieve.
-    ///
-    /// @return The AO data members.
+    /// @inheritdoc IAORegistry
     function getAO(bytes32 uuid) external view override returns (AORecord memory) {
         return _registry[uuid];
     }
 
-    /// @dev Returns the global counter for the total number of attestations.
-    ///
-    /// @return The global counter for the total number of attestations.
+    /// @inheritdoc IAORegistry
     function getAOCount() external view override returns (uint256) {
         return _aoCount;
     }
