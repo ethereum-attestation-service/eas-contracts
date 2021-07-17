@@ -20,6 +20,10 @@ describe('EIP712Verifier', () => {
     verifier = await Contracts.EIP712Verifier.deploy();
   });
 
+  it('should report a version', async () => {
+    expect(await verifier.VERSION()).to.equal('0.3');
+  });
+
   it('should return the correct domain separator', async () => {
     const delegation = new Delegation({
       address: verifier.address,

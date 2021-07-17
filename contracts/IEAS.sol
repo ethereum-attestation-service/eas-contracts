@@ -1,40 +1,41 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 import "./IAORegistry.sol";
 import "./IEIP712Verifier.sol";
 
+// A data struct representing a single attestation.
+struct Attestation {
+    bytes32 uuid;
+    bytes32 ao;
+    address to;
+    address from;
+    uint256 time;
+    uint256 expirationTime;
+    uint256 revocationTime;
+    bytes32 refUUID;
+    bytes data;
+}
+
 /// @title EAS - Ethereum Attestation Service interface
 interface IEAS {
-    // A data struct representing a single attestation.
-    struct Attestation {
-        bytes32 uuid;
-        uint256 ao;
-        address to;
-        address from;
-        uint256 time;
-        uint256 expirationTime;
-        uint256 revocationTime;
-        bytes32 refUUID;
-        bytes data;
-    }
-
     /// @dev Triggered when an attestation has been made.
     ///
     /// @param recipient The recipient the attestation.
     /// @param attester The attesting account.
     /// @param uuid The UUID the revoked attestation.
-    /// @param ao The ID of the AO.
-    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, uint256 ao);
+    /// @param ao The UIID of the AO.
+    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
 
     /// @dev Triggered when an attestation has been revoked.
     ///
     /// @param recipient The recipient the attestation.
     /// @param attester The attesting account.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param uuid The UUID the revoked attestation.
-    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, uint256 ao);
+    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
 
     /// @dev Returns the address of the AO global registry.
     ///
@@ -54,7 +55,7 @@ interface IEAS {
     /// @dev Attests to a specific AO.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -62,7 +63,7 @@ interface IEAS {
     /// @return The UUID of the new attestation.
     function attest(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
@@ -71,7 +72,7 @@ interface IEAS {
     /// @dev Attests to a specific AO using a provided EIP712 signature.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param expirationTime The expiration time of the attestation.
     /// @param refUUID An optional related attestation's UUID.
     /// @param data The additional attestation data.
@@ -83,7 +84,7 @@ interface IEAS {
     /// @return The UUID of the new attestation.
     function attestByDelegation(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -118,20 +119,7 @@ interface IEAS {
     /// @param uuid The UUID of the attestation to retrieve.
     ///
     /// @return The attestation data members.
-    function getAttestation(bytes32 uuid)
-        external
-        view
-        returns (
-            bytes32,
-            uint256,
-            address,
-            address,
-            uint256,
-            uint256,
-            uint256,
-            bytes32,
-            bytes memory
-        );
+    function getAttestation(bytes32 uuid) external view returns (Attestation memory);
 
     /// @dev Checks whether an attestation exists.
     ///
@@ -143,7 +131,7 @@ interface IEAS {
     /// @dev Returns all received attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UUID of the AO.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -151,7 +139,7 @@ interface IEAS {
     /// @return An array of attestation UUIDs.
     function getReceivedAttestationUUIDs(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -160,15 +148,15 @@ interface IEAS {
     /// @dev Returns the number of received attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     ///
     /// @return The number of attestations.
-    function getReceivedAttestationUUIDsCount(address recipient, uint256 ao) external view returns (uint256);
+    function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view returns (uint256);
 
     /// @dev Returns all sent attestation UUIDs.
     ///
     /// @param attester The attesting account.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -176,7 +164,7 @@ interface IEAS {
     /// @return An array of attestation UUIDs.
     function getSentAttestationUUIDs(
         address attester,
-        uint256 ao,
+        bytes32 ao,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -185,10 +173,10 @@ interface IEAS {
     /// @dev Returns the number of sent attestation UUIDs.
     ///
     /// @param recipient The recipient the attestation.
-    /// @param ao The ID of the AO.
+    /// @param ao The UIID of the AO.
     ///
     /// @return The number of attestations.
-    function getSentAttestationUUIDsCount(address recipient, uint256 ao) external view returns (uint256);
+    function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view returns (uint256);
 
     /// @dev Returns all attestations related to a specific attestation.
     ///
