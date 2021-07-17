@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 import "../EAS.sol";
 
@@ -15,7 +16,7 @@ contract TestEAS is EAS {
 
     function attest(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
@@ -27,7 +28,7 @@ contract TestEAS is EAS {
 
     function attestByDelegation(
         address recipient,
-        uint256 ao,
+        bytes32 ao,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,

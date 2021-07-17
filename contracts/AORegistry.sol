@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
+import "./Types.sol";
 import "./IAORegistry.sol";
 import "./IAOVerifier.sol";
 
 /// @title The global AO registry.
 contract AORegistry is IAORegistry {
-    string public constant VERSION = "0.2";
+    string public constant VERSION = "0.3";
 
     // The global mapping between AO records and their IDs.
-    mapping(uint256 => AORecord) private _registry;
+    mapping(bytes32 => AORecord) private _registry;
 
     // The global counter for the total number of attestations.
     uint256 private _aoCount;
@@ -19,36 +21,31 @@ contract AORegistry is IAORegistry {
     ///
     /// @param schema The AO data schema.
     /// @param verifier An optional AO schema verifier.
-    ///
-    /// @return The ID of the new AO.
-    function register(bytes calldata schema, IAOVerifier verifier) external override returns (uint256) {
-        uint256 id = ++_aoCount;
+    //
+    /// @return The UUID of the new AO.
+    function register(bytes calldata schema, IAOVerifier verifier) external override returns (bytes32) {
+        uint256 index = ++_aoCount;
 
-        _registry[id] = AORecord({id: id, schema: schema, verifier: verifier});
+        AORecord memory ao = AORecord({uuid: EMPTY_UUID, index: index, schema: schema, verifier: verifier});
 
-        emit Registered(id, schema, verifier, msg.sender);
+        bytes32 uuid = _getUUID(ao);
+        require(_registry[uuid].uuid == EMPTY_UUID, "ERR_ALREADY_EXISTS");
 
-        return id;
+        ao.uuid = uuid;
+        _registry[uuid] = ao;
+
+        emit Registered(uuid, index, schema, verifier, msg.sender);
+
+        return uuid;
     }
 
-    /// @dev Returns an existing AO by ID.
+    /// @dev Returns an existing AO by UUID.
     ///
-    /// @param id The ID of the AO to retrieve.
+    /// @param uuid The UUID of the AO to retrieve.
     ///
     /// @return The AO data members.
-    function getAO(uint256 id)
-        external
-        view
-        override
-        returns (
-            uint256,
-            bytes memory,
-            IAOVerifier
-        )
-    {
-        AORecord memory ao = _registry[id];
-
-        return (ao.id, ao.schema, ao.verifier);
+    function getAO(bytes32 uuid) external view override returns (AORecord memory) {
+        return _registry[uuid];
     }
 
     /// @dev Returns the global counter for the total number of attestations.
@@ -56,5 +53,14 @@ contract AORegistry is IAORegistry {
     /// @return The global counter for the total number of attestations.
     function getAOCount() external view override returns (uint256) {
         return _aoCount;
+    }
+
+    /// @dev Calculates a UUID for a given AO.
+    ///
+    /// @param ao The input AO.
+    ///
+    /// @return AO UUID.
+    function _getUUID(AORecord memory ao) private pure returns (bytes32) {
+        return keccak256(abi.encodePacked(ao.schema, ao.verifier));
     }
 }
