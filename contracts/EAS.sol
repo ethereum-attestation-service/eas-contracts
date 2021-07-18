@@ -91,7 +91,7 @@ contract EAS is IEAS {
     }
 
     /// @inheritdoc IEAS
-    function revoke(bytes32 uuid) external virtual override {
+    function revoke(bytes32 uuid) public virtual override {
         return _revoke(uuid, msg.sender);
     }
 
@@ -102,7 +102,7 @@ contract EAS is IEAS {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external virtual override {
+    ) public virtual override {
         _eip712Verifier.revoke(uuid, attester, v, r, s);
 
         _revoke(uuid, attester);
