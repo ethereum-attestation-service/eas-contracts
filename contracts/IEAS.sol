@@ -28,19 +28,19 @@ interface IEAS {
     /**
      * @dev Triggered when an attestation has been made.
      *
-     * @param recipient The recipient the attestation.
+     * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
      * @param uuid The UUID the revoked attestation.
-     * @param ao The UIID of the AO.
+     * @param ao The UUID of the AO.
      */
     event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
 
     /**
      * @dev Triggered when an attestation has been revoked.
      *
-     * @param recipient The recipient the attestation.
+     * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
-     * @param ao The UIID of the AO.
+     * @param ao The UUID of the AO.
      * @param uuid The UUID the revoked attestation.
      */
     event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
@@ -69,11 +69,11 @@ interface IEAS {
     /**
      * @dev Attests to a specific AO.
      *
-     * @param recipient The recipient the attestation.
-     * @param ao The UIID of the AO.
+     * @param recipient The recipient of the attestation.
+     * @param ao The UUID of the AO.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
-     * @param data The additional attestation data.
+     * @param data Additional custom data.
      *
      * @return The UUID of the new attestation.
      */
@@ -88,11 +88,11 @@ interface IEAS {
     /**
      * @dev Attests to a specific AO using a provided EIP712 signature.
      *
-     * @param recipient The recipient the attestation.
-     * @param ao The UIID of the AO.
+     * @param recipient The recipient of the attestation.
+     * @param ao The UUID of the AO.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
-     * @param data The additional attestation data.
+     * @param data Additional custom data.
      * @param attester The attesting account.
      * @param v The recovery ID.
      * @param r The x-coordinate of the nonce R.
@@ -157,7 +157,7 @@ interface IEAS {
     /**
      * @dev Returns all received attestation UUIDs.
      *
-     * @param recipient The recipient the attestation.
+     * @param recipient The recipient of the attestation.
      * @param ao The UUID of the AO.
      * @param start The offset to start from.
      * @param length The number of total members to retrieve.
@@ -176,8 +176,8 @@ interface IEAS {
     /**
      * @dev Returns the number of received attestation UUIDs.
      *
-     * @param recipient The recipient the attestation.
-     * @param ao The UIID of the AO.
+     * @param recipient The recipient of the attestation.
+     * @param ao The UUID of the AO.
      *
      * @return The number of attestations.
      */
@@ -187,7 +187,7 @@ interface IEAS {
      * @dev Returns all sent attestation UUIDs.
      *
      * @param attester The attesting account.
-     * @param ao The UIID of the AO.
+     * @param ao The UUID of the AO.
      * @param start The offset to start from.
      * @param length The number of total members to retrieve.
      * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -205,8 +205,8 @@ interface IEAS {
     /**
      * @dev Returns the number of sent attestation UUIDs.
      *
-     * @param recipient The recipient the attestation.
-     * @param ao The UIID of the AO.
+     * @param recipient The recipient of the attestation.
+     * @param ao The UUID of the AO.
      *
      * @return The number of attestations.
      */

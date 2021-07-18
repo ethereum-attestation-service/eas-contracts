@@ -9,7 +9,7 @@ interface IAOVerifier {
     /**
      * @dev Verifies whether the specified attestation data conforms to the spec.
      *
-     * @param recipient The recipient the attestation.
+     * @param recipient The recipient of the attestation.
      * @param schema The AO data schema.
      * @param data The actual attestation data.
      * @param expirationTime The expiration time of the attestation.

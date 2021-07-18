@@ -18,11 +18,11 @@ interface IEIP712Verifier {
     /**
      * @dev Verifies signed attestation.
      *
-     * @param recipient The recipient the attestation.
-     * @param ao The UIID of the AO.
+     * @param recipient The recipient of the attestation.
+     * @param ao The UUID of the AO.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
-     * @param data The additional attestation data.
+     * @param data Additional custom data.
      * @param attester The attesting account.
      * @param v The recovery ID.
      * @param r The x-coordinate of the nonce R.
