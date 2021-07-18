@@ -20,8 +20,7 @@ struct AORecord {
  */
 interface IAORegistry {
     /**
-     * @dev Triggered when a new AO has been registered.
-     *
+     * @dev Triggered when a new AO has been registered
      * @param uuid The AO UUID.
      * @param index The AO index.
      * @param schema The AO schema.
@@ -31,27 +30,22 @@ interface IAORegistry {
     event Registered(bytes32 indexed uuid, uint256 indexed index, bytes schema, IAOVerifier verifier, address from);
 
     /**
-     * @dev Submits and reserve a new AO.
-     *
+     * @dev Submits and reserve a new AO
      * @param schema The AO data schema.
      * @param verifier An optional AO schema verifier.
-     *
      * @return The UUID of the new AO.
      */
     function register(bytes calldata schema, IAOVerifier verifier) external returns (bytes32);
 
     /**
-     * @dev Returns an existing AO by UUID.
-     *
+     * @dev Returns an existing AO by UUID
      * @param uuid The UUID of the AO to retrieve.
-     *
      * @return The AO data members.
      */
     function getAO(bytes32 uuid) external view returns (AORecord memory);
 
     /**
-     * @dev Returns the global counter for the total number of attestations.
-     *
+     * @dev Returns the global counter for the total number of attestations
      * @return The global counter for the total number of attestations.
      */
     function getAOCount() external view returns (uint256);
