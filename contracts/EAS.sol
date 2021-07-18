@@ -228,7 +228,7 @@ contract EAS is IEAS {
     ///
     /// @param uuid The UUID of the attestation to revoke.
     /// @param attester The attesting account.
-    function _revoke(bytes32 uuid, address attester) public {
+    function _revoke(bytes32 uuid, address attester) private {
         Attestation storage attestation = _db[uuid];
         require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
         require(attestation.from == attester, "ERR_ACCESS_DENIED");
