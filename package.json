@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "compile": "hardhat compile",
+    "recompile": "yarn clean && yarn compile",
     "test": "hardhat test",
     "profile": "PROFILE=1 yarn test",
     "size": "hardhat size-contracts",
