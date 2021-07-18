@@ -4,7 +4,9 @@ pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 
-/// @title A sample AO verifier that checks whether a specific amount of ETH was sent with an attestation.
+/**
+ * @title A sample AO verifier that checks whether a specific amount of ETH was sent with an attestation.
+ */
 contract TestAOValueVerifier is IAOVerifier {
     uint256 private immutable _targetValue;
 

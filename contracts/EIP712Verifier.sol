@@ -4,7 +4,9 @@ pragma solidity 0.7.6;
 
 import "./IEIP712Verifier.sol";
 
-/// @title EIP712 typed signatures verifier for EAS delegated attestations.
+/**
+ * @title EIP712 typed signatures verifier for EAS delegated attestations.
+ */
 contract EIP712Verifier is IEIP712Verifier {
     string public constant VERSION = "0.3";
 
@@ -22,7 +24,9 @@ contract EIP712Verifier is IEIP712Verifier {
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
 
-    /// @dev Creates a new EIP712Verifier instance.
+    /**
+     * @dev Creates a new EIP712Verifier instance.
+     */
     constructor() {
         uint256 chainId;
         // solhint-disable-next-line no-inline-assembly
@@ -41,12 +45,16 @@ contract EIP712Verifier is IEIP712Verifier {
         );
     }
 
-    /// @inheritdoc IEIP712Verifier
+    /**
+     * @inheritdoc IEIP712Verifier
+     */
     function getNonce(address account) external view override returns (uint256) {
         return _nonces[account];
     }
 
-    /// @inheritdoc IEIP712Verifier
+    /**
+     * @inheritdoc IEIP712Verifier
+     */
     function attest(
         address recipient,
         bytes32 ao,
@@ -80,7 +88,9 @@ contract EIP712Verifier is IEIP712Verifier {
         require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
     }
 
-    /// @inheritdoc IEIP712Verifier
+    /**
+     * @inheritdoc IEIP712Verifier
+     */
     function revoke(
         bytes32 uuid,
         address attester,

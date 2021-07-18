@@ -4,7 +4,9 @@ pragma solidity 0.7.6;
 
 import "../../IAOVerifier.sol";
 
-/// @title A sample AO verifier that checks whether an attestation data is either \x00 or \x01.
+/**
+ * @title A sample AO verifier that checks whether an attestation data is either \x00 or \x01.
+ */
 contract TestAODataVerifier is IAOVerifier {
     function verify(
         address, /* recipient */

@@ -7,7 +7,9 @@ import "./Types.sol";
 import "./IEAS.sol";
 import "./IAORegistry.sol";
 
-/// @title EAS - Ethereum Attestation Service
+/**
+ * @title EAS - Ethereum Attestation Service
+ */
 contract EAS is IEAS {
     string public constant VERSION = "0.3";
 
@@ -35,10 +37,12 @@ contract EAS is IEAS {
     // The global counter for the total number of attestations.
     uint256 private _attestationsCount;
 
-    /// @dev Creates a new EAS instance.
-    ///
-    /// @param registry The address of the global AO registry.
-    /// @param verifier The address of the EIP712 verifier.
+    /**
+     * @dev Creates a new EAS instance.
+     *
+     * @param registry The address of the global AO registry.
+     * @param verifier The address of the EIP712 verifier.
+     */
     constructor(IAORegistry registry, IEIP712Verifier verifier) {
         require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
         require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
@@ -47,22 +51,30 @@ contract EAS is IEAS {
         _eip712Verifier = verifier;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getAORegistry() external view override returns (IAORegistry) {
         return _aoRegistry;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getEIP712Verifier() external view override returns (IEIP712Verifier) {
         return _eip712Verifier;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getAttestationsCount() external view override returns (uint256) {
         return _attestationsCount;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function attest(
         address recipient,
         bytes32 ao,
@@ -73,7 +85,9 @@ contract EAS is IEAS {
         return _attest(recipient, ao, expirationTime, refUUID, data, msg.sender);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function attestByDelegation(
         address recipient,
         bytes32 ao,
@@ -90,12 +104,16 @@ contract EAS is IEAS {
         return _attest(recipient, ao, expirationTime, refUUID, data, attester);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function revoke(bytes32 uuid) public virtual override {
         return _revoke(uuid, msg.sender);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function revokeByDelegation(
         bytes32 uuid,
         address attester,
@@ -108,17 +126,23 @@ contract EAS is IEAS {
         _revoke(uuid, attester);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getAttestation(bytes32 uuid) external view override returns (Attestation memory) {
         return _db[uuid];
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function isAttestationValid(bytes32 uuid) public view override returns (bool) {
         return _db[uuid].uuid != 0;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getReceivedAttestationUUIDs(
         address recipient,
         bytes32 ao,
@@ -129,12 +153,16 @@ contract EAS is IEAS {
         return _sliceUUIDs(_receivedAttestations[recipient][ao], start, length, reverseOrder);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _receivedAttestations[recipient][ao].length;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getSentAttestationUUIDs(
         address attester,
         bytes32 ao,
@@ -145,12 +173,16 @@ contract EAS is IEAS {
         return _sliceUUIDs(_sentAttestations[attester][ao], start, length, reverseOrder);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
         return _sentAttestations[recipient][ao].length;
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getRelatedAttestationUUIDs(
         bytes32 uuid,
         uint256 start,
@@ -160,21 +192,25 @@ contract EAS is IEAS {
         return _sliceUUIDs(_relatedAttestations[uuid], start, length, reverseOrder);
     }
 
-    /// @inheritdoc IEAS
+    /**
+     * @inheritdoc IEAS
+     */
     function getRelatedAttestationUUIDsCount(bytes32 uuid) external view override returns (uint256) {
         return _relatedAttestations[uuid].length;
     }
 
-    /// @dev Attests to a specific AO.
-    ///
-    /// @param recipient The recipient the attestation.
-    /// @param ao The UIID of the AO.
-    /// @param expirationTime The expiration time of the attestation.
-    /// @param refUUID An optional related attestation's UUID.
-    /// @param data The additional attestation data.
-    /// @param attester The attesting account.
-    ///
-    /// @return The UUID of the new attestation.
+    /**
+     * @dev Attests to a specific AO.
+     *
+     * @param recipient The recipient the attestation.
+     * @param ao The UIID of the AO.
+     * @param expirationTime The expiration time of the attestation.
+     * @param refUUID An optional related attestation's UUID.
+     * @param data The additional attestation data.
+     * @param attester The attesting account.
+     *
+     * @return The UUID of the new attestation.
+     */
     function _attest(
         address recipient,
         bytes32 ao,
@@ -224,10 +260,12 @@ contract EAS is IEAS {
         return uuid;
     }
 
-    /// @dev Revokes an existing attestation to a specific AO.
-    ///
-    /// @param uuid The UUID of the attestation to revoke.
-    /// @param attester The attesting account.
+    /**
+     * @dev Revokes an existing attestation to a specific AO.
+     *
+     * @param uuid The UUID of the attestation to revoke.
+     * @param attester The attesting account.
+     */
     function _revoke(bytes32 uuid, address attester) private {
         Attestation storage attestation = _db[uuid];
         require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
@@ -239,11 +277,13 @@ contract EAS is IEAS {
         emit Revoked(attestation.to, attester, uuid, attestation.ao);
     }
 
-    /// @dev Calculates a UUID for a given attestation.
-    ///
-    /// @param attestation The input attestation.
-    ///
-    /// @return Attestation UUID.
+    /**
+     * @dev Calculates a UUID for a given attestation.
+     *
+     * @param attestation The input attestation.
+     *
+     * @return Attestation UUID.
+     */
     function _getUUID(Attestation memory attestation) private view returns (bytes32) {
         return
             keccak256(
@@ -260,14 +300,16 @@ contract EAS is IEAS {
             );
     }
 
-    /// @dev Returns a slice in an array of attestation UUIDs.
-    ///
-    /// @param uuids The array of attestation UUIDs.
-    /// @param start The offset to start from.
-    /// @param length The number of total members to retrieve.
-    /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
-    ///
-    /// @return An array of attestation UUIDs.
+    /**
+     * @dev Returns a slice in an array of attestation UUIDs.
+     *
+     * @param uuids The array of attestation UUIDs.
+     * @param start The offset to start from.
+     * @param length The number of total members to retrieve.
+     * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
+     *
+     * @return An array of attestation UUIDs.
+     */
     function _sliceUUIDs(
         bytes32[] memory uuids,
         uint256 start,

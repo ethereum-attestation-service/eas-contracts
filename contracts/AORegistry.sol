@@ -7,7 +7,9 @@ import "./Types.sol";
 import "./IAORegistry.sol";
 import "./IAOVerifier.sol";
 
-/// @title The global AO registry.
+/**
+ * @title The global AO registry.
+ */
 contract AORegistry is IAORegistry {
     string public constant VERSION = "0.3";
 
@@ -17,7 +19,9 @@ contract AORegistry is IAORegistry {
     // The global counter for the total number of attestations.
     uint256 private _aoCount;
 
-    /// @inheritdoc IAORegistry
+    /**
+     * @inheritdoc IAORegistry
+     */
     function register(bytes calldata schema, IAOVerifier verifier) external override returns (bytes32) {
         uint256 index = ++_aoCount;
 
@@ -34,21 +38,27 @@ contract AORegistry is IAORegistry {
         return uuid;
     }
 
-    /// @inheritdoc IAORegistry
+    /**
+     * @inheritdoc IAORegistry
+     */
     function getAO(bytes32 uuid) external view override returns (AORecord memory) {
         return _registry[uuid];
     }
 
-    /// @inheritdoc IAORegistry
+    /**
+     * @inheritdoc IAORegistry
+     */
     function getAOCount() external view override returns (uint256) {
         return _aoCount;
     }
 
-    /// @dev Calculates a UUID for a given AO.
-    ///
-    /// @param ao The input AO.
-    ///
-    /// @return AO UUID.
+    /**
+     * @dev Calculates a UUID for a given AO.
+     *
+     * @param ao The input AO.
+     *
+     * @return AO UUID.
+     */
     function _getUUID(AORecord memory ao) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(ao.schema, ao.verifier));
     }
