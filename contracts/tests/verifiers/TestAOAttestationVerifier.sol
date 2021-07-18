@@ -5,7 +5,9 @@ pragma solidity 0.7.6;
 import "../../IAOVerifier.sol";
 import "../../EAS.sol";
 
-/// @title A sample AO verifier that checks whether an attestations attest to an existing attestation.
+/**
+ * @title A sample AO verifier that checks whether an attestations attest to an existing attestation.
+ */
 contract TestAOAttestationVerifier is IAOVerifier {
     EAS private immutable _eas;
 
