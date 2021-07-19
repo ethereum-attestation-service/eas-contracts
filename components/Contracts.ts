@@ -25,7 +25,7 @@ type Contract<F extends ContractFactory> = AsyncReturnType<F['deploy']>;
 
 const deployOrAttach = <F extends ContractFactory>(contractName: string) => {
   return {
-    deploy: async (...args: Parameters<any>): Promise<Contract<F>> => {
+    deploy: async (...args: Parameters<F['deploy']>): Promise<Contract<F>> => {
       let defaultSigner = (await ethers.getSigners())[0];
       return (await ethers.getContractFactory(contractName, defaultSigner)).deploy(...args) as Contract<F>;
     },
