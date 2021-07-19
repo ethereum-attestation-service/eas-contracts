@@ -7,17 +7,26 @@ import "./IAORegistry.sol";
 import "./IEIP712Verifier.sol";
 
 /**
- * @dev A data struct representing a single attestation.
+ * @dev A struct representing a single attestation.
  */
 struct Attestation {
+    // A unique identifier of the attestation.
     bytes32 uuid;
+    // A unique identifier of the AO.
     bytes32 ao;
-    address to;
-    address from;
+    // The recipient of the attestation.
+    address recipient;
+    // The attester/sender of the attestation.
+    address attester;
+    // The time when the attestation was created (Unix timestamp).
     uint256 time;
+    // The time when the attestation expires (Unix timestamp).
     uint256 expirationTime;
+    // The time when the attestation was revoked (Unix timestamp).
     uint256 revocationTime;
+    // The UUID of the related attestation.
     bytes32 refUUID;
+    // Custom attestation data.
     bytes data;
 }
 

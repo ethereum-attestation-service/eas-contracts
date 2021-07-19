@@ -32,22 +32,6 @@ let eas: TestEAS;
 let eip712Utils: EIP712Utils;
 
 describe('EAS', () => {
-  const getAttestation = async (lastUUID: string) => {
-    const data = await eas.getAttestation(lastUUID);
-
-    return {
-      uuid: data[0],
-      ao: data[1],
-      to: data[2],
-      from: data[3],
-      time: data[4],
-      expirationTime: data[5],
-      revocationTime: data[6],
-      refUUID: data[7],
-      data: data[8]
-    };
-  };
-
   before(async () => {
     accounts = await ethers.getSigners();
 
@@ -154,11 +138,11 @@ describe('EAS', () => {
 
           expect(await eas.getAttestationsCount()).to.equal(prevAttestationsCount.add(BigNumber.from(1)));
 
-          const attestation = await getAttestation(lastUUID);
+          const attestation = await eas.getAttestation(lastUUID);
           expect(attestation.uuid).to.equal(lastUUID);
           expect(attestation.ao).to.equal(ao);
-          expect(attestation.to).to.equal(recipient);
-          expect(attestation.from).to.equal(txSender.address);
+          expect(attestation.recipient).to.equal(recipient);
+          expect(attestation.attester).to.equal(txSender.address);
           expect(attestation.time).to.equal(await latest());
           expect(attestation.expirationTime).to.equal(expirationTime);
           expect(attestation.revocationTime).to.equal(BigNumber.from(0));
@@ -591,7 +575,7 @@ describe('EAS', () => {
 
         await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, id1);
 
-        const attestation = await getAttestation(uuid);
+        const attestation = await eas.getAttestation(uuid);
         expect(attestation.revocationTime).to.equal(await latest());
       };
 

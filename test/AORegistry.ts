@@ -57,10 +57,10 @@ describe('AORegistry', () => {
       expect(await registry.getAOCount()).to.equal(index);
 
       const ao = await registry.getAO(uuid);
-      expect(ao[0]).to.equal(uuid);
-      expect(ao[1]).to.equal(index);
-      expect(ao[2]).to.equal(schema);
-      expect(ao[3]).to.equal(verifierAddress);
+      expect(ao.uuid).to.equal(uuid);
+      expect(ao.index).to.equal(index);
+      expect(ao.schema).to.equal(schema);
+      expect(ao.verifier).to.equal(verifierAddress);
     };
 
     it('should allow to register an AO without a schema', async () => {
@@ -90,18 +90,18 @@ describe('AORegistry', () => {
 
       const uuid = getUUID(schema, verifier.address);
       const ao = await registry.getAO(uuid);
-      expect(ao[0]).to.equal(uuid);
-      expect(ao[1]).to.equal(BigNumber.from(1));
-      expect(ao[2]).to.equal(schema);
-      expect(ao[3]).to.equal(verifier.address);
+      expect(ao.uuid).to.equal(uuid);
+      expect(ao.index).to.equal(BigNumber.from(1));
+      expect(ao.schema).to.equal(schema);
+      expect(ao.verifier).to.equal(verifier.address);
     });
 
     it('should return an empty AO given non-existing id', async () => {
       const ao = await registry.getAO(formatBytes32String('BAD'));
-      expect(ao[0]).to.equal(ZERO_BYTES32);
-      expect(ao[1]).to.equal(BigNumber.from(0));
-      expect(ao[2]).to.equal(ZERO_BYTES);
-      expect(ao[3]).to.equal(AddressZero);
+      expect(ao.uuid).to.equal(ZERO_BYTES32);
+      expect(ao.index).to.equal(BigNumber.from(0));
+      expect(ao.schema).to.equal(ZERO_BYTES);
+      expect(ao.verifier).to.equal(AddressZero);
     });
   });
 });
