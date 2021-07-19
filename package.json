@@ -18,16 +18,17 @@
     "compile": "hardhat compile",
     "recompile": "yarn clean && yarn compile",
     "test": "hardhat test",
-    "profile": "PROFILE=1 yarn test",
-    "size": "hardhat size-contracts",
-    "verify": "hardhat verify",
     "coverage": "hardhat coverage",
-    "flatten": "hardhat flatten",
+    "clean": "rm -rf artifacts cache data coverage typechain",
     "dev": "hardhat node",
     "deploy": "hardhat run scripts/deploy.ts",
     "lint": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "format": "prettier --check --write contracts/**/*.sol test/**/*.js --config .prettierrc",
-    "clean": "rm -rf artifacts cache data coverage typechain"
+    "profile": "PROFILE=1 yarn test",
+    "size": "hardhat size-contracts",
+    "verify": "hardhat verify",
+    "flatten": "hardhat flatten",
+    "docgen": "hardhat docgen"
   },
   "dependencies": {
     "hardhat": "2.4.3"
@@ -53,6 +54,7 @@
     "ethers": "^5.4.1",
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-contract-sizer": "^2.0.3",
+    "hardhat-docgen": "^1.1.1",
     "hardhat-gas-reporter": "^1.0.4",
     "mocha": "^9.0.2",
     "prettier": "^2.3.2",
