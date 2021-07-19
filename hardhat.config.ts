@@ -11,6 +11,7 @@ import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-contract-sizer';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
+import 'hardhat-docgen';
 
 import * as testAccounts from 'test/accounts.json';
 
