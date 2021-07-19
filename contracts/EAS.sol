@@ -232,8 +232,8 @@ contract EAS is IEAS {
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
             ao: ao,
-            to: recipient,
-            from: attester,
+            recipient: recipient,
+            attester: attester,
             time: block.timestamp,
             expirationTime: expirationTime,
             revocationTime: 0,
@@ -269,12 +269,12 @@ contract EAS is IEAS {
     function _revoke(bytes32 uuid, address attester) private {
         Attestation storage attestation = _db[uuid];
         require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
-        require(attestation.from == attester, "ERR_ACCESS_DENIED");
+        require(attestation.attester == attester, "ERR_ACCESS_DENIED");
         require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
 
         attestation.revocationTime = block.timestamp;
 
-        emit Revoked(attestation.to, attester, uuid, attestation.ao);
+        emit Revoked(attestation.recipient, attester, uuid, attestation.ao);
     }
 
     /**
@@ -289,8 +289,8 @@ contract EAS is IEAS {
             keccak256(
                 abi.encodePacked(
                     attestation.ao,
-                    attestation.to,
-                    attestation.from,
+                    attestation.recipient,
+                    attestation.attester,
                     attestation.time,
                     attestation.expirationTime,
                     attestation.data,

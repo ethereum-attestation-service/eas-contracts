@@ -6,13 +6,17 @@ pragma abicoder v2;
 import "./IAOVerifier.sol";
 
 /**
- * @title A data struct representing a record for a submitted AO (Attestation Object).
+ * @title A struct representing a record for a submitted AO (Attestation Object).
  */
 struct AORecord {
+    // A unique identifier of the AO.
     bytes32 uuid;
-    uint256 index;
-    bytes schema;
+    // Optional schema verifier.
     IAOVerifier verifier;
+    // Auto-incrementing index for reference, assigned by the registry itself.
+    uint256 index;
+    // Custom specification of the AO (e.g., an ABI).
+    bytes schema;
 }
 
 /**
@@ -25,9 +29,9 @@ interface IAORegistry {
      * @param index The AO index.
      * @param schema The AO schema.
      * @param verifier An optional AO schema verifier.
-     * @param from The address of the account used to register the AO.
+     * @param attester The address of the account used to register the AO.
      */
-    event Registered(bytes32 indexed uuid, uint256 indexed index, bytes schema, IAOVerifier verifier, address from);
+    event Registered(bytes32 indexed uuid, uint256 indexed index, bytes schema, IAOVerifier verifier, address attester);
 
     /**
      * @dev Submits and reserve a new AO
