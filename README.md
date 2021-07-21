@@ -11,6 +11,16 @@ Much like Ethereum is the base layer for Dapps and smart contracts, EAS is the b
 
 EAS is made up of two very simple smart contracts. The base EAS contract which allows anyone in the world to make and record an attestation, as well as an attestation object (aka attestation type) registry contract that allows anyone to register a new attestation object (type).
 
+## Deployments
+
+### Rinkeby
+
+#### v0.3
+
+- **EAS**: <https://rinkeby.etherscan.io/address/0xEA503f92Fde402692D2476fb43CB3E79FeBD54e6>
+- **AORegistry**: <https://rinkeby.etherscan.io/address/0x6465Bb9895297AfC4f197876326e1570C5e1907d>
+- **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xAFE21DEAd60B70dB83d43248340787994DDf51F5>
+
 ## Installation
 
 ```console
