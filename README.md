@@ -1,6 +1,6 @@
 # Ethereum Attestation Service
 
-[![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://eas-1.gitbook.io/)
+[![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://eas.eth.link)
 [![Test](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/workflow.yml/badge.svg)](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/workflow.yml)
 
 ## Introduction
