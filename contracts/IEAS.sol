@@ -3,7 +3,7 @@
 pragma solidity 0.7.6;
 pragma abicoder v2;
 
-import "./IAORegistry.sol";
+import "./IASRegistry.sol";
 import "./IEIP712Verifier.sol";
 
 /**
@@ -12,8 +12,8 @@ import "./IEIP712Verifier.sol";
 struct Attestation {
     // A unique identifier of the attestation.
     bytes32 uuid;
-    // A unique identifier of the AO.
-    bytes32 ao;
+    // A unique identifier of the AS.
+    bytes32 schema;
     // The recipient of the attestation.
     address recipient;
     // The attester/sender of the attestation.
@@ -40,26 +40,26 @@ interface IEAS {
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
      * @param uuid The UUID the revoked attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      */
-    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
+    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
 
     /**
      * @dev Triggered when an attestation has been revoked.
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param uuid The UUID the revoked attestation.
      */
-    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 ao);
+    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
 
     /**
-     * @dev Returns the address of the AO global registry.
+     * @dev Returns the address of the AS global registry.
      *
-     * @return The address of the AO global registry.
+     * @return The address of the AS global registry.
      */
-    function getAORegistry() external view returns (IAORegistry);
+    function getASRegistry() external view returns (IASRegistry);
 
     /**
      * @dev Returns the address of the EIP712 verifier used to verify signed attestations.
@@ -76,10 +76,10 @@ interface IEAS {
     function getAttestationsCount() external view returns (uint256);
 
     /**
-     * @dev Attests to a specific AO.
+     * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -88,17 +88,17 @@ interface IEAS {
      */
     function attest(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
     ) external payable returns (bytes32);
 
     /**
-     * @dev Attests to a specific AO using a provided EIP712 signature.
+     * @dev Attests to a specific AS using a provided EIP712 signature.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -111,7 +111,7 @@ interface IEAS {
      */
     function attestByDelegation(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -122,14 +122,14 @@ interface IEAS {
     ) external payable returns (bytes32);
 
     /**
-     * @dev Revokes an existing attestation to a specific AO.
+     * @dev Revokes an existing attestation to a specific AS.
      *
      * @param uuid The UUID of the attestation to revoke.
      */
     function revoke(bytes32 uuid) external;
 
     /**
-     * @dev Attests to a specific AO using a provided EIP712 signature.
+     * @dev Attests to a specific AS using a provided EIP712 signature.
      *
      * @param uuid The UUID of the attestation to revoke.
      * @param attester The attesting account.
@@ -167,7 +167,7 @@ interface IEAS {
      * @dev Returns all received attestation UUIDs.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param start The offset to start from.
      * @param length The number of total members to retrieve.
      * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -176,7 +176,7 @@ interface IEAS {
      */
     function getReceivedAttestationUUIDs(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -186,17 +186,17 @@ interface IEAS {
      * @dev Returns the number of received attestation UUIDs.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      *
      * @return The number of attestations.
      */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view returns (uint256);
+    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256);
 
     /**
      * @dev Returns all sent attestation UUIDs.
      *
      * @param attester The attesting account.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param start The offset to start from.
      * @param length The number of total members to retrieve.
      * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
@@ -205,7 +205,7 @@ interface IEAS {
      */
     function getSentAttestationUUIDs(
         address attester,
-        bytes32 ao,
+        bytes32 schema,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -215,11 +215,11 @@ interface IEAS {
      * @dev Returns the number of sent attestation UUIDs.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      *
      * @return The number of attestations.
      */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view returns (uint256);
+    function getSentAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256);
 
     /**
      * @dev Returns all attestations related to a specific attestation.

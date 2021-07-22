@@ -2,12 +2,12 @@
 
 pragma solidity 0.7.6;
 
-import "../../IAOVerifier.sol";
+import "../../IASVerifier.sol";
 
 /**
- * @title A sample AO verifier that checks whether a specific amount of ETH was sent with an attestation.
+ * @title A sample AS verifier that checks whether a specific amount of ETH was sent with an attestation.
  */
-contract TestAOValueVerifier is IAOVerifier {
+contract TestASValueVerifier is IASVerifier {
     uint256 private immutable _targetValue;
 
     constructor(uint256 targetValue) {

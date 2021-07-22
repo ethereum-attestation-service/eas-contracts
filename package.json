@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/contracts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
     "hardhat": "2.5.0"
   },
   "devDependencies": {
-    "@ethereum-attestation-service/sdk": "ethereum-attestation-service/sdk.git",
+    "@ethereum-attestation-service/sdk": "^0.11.1",
     "@ethersproject/hardware-wallets": "^5.4.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.4",

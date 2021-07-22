@@ -8,7 +8,7 @@ import "../EAS.sol";
 contract TestEAS is EAS {
     bytes32 private _lastUUID;
 
-    constructor(IAORegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
+    constructor(IASRegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
 
     function getLastUUID() external view returns (bytes32) {
         return _lastUUID;
@@ -16,19 +16,19 @@ contract TestEAS is EAS {
 
     function attest(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
     ) public payable override returns (bytes32) {
-        _lastUUID = super.attest(recipient, ao, expirationTime, refUUID, data);
+        _lastUUID = super.attest(recipient, schema, expirationTime, refUUID, data);
 
         return _lastUUID;
     }
 
     function attestByDelegation(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -37,7 +37,7 @@ contract TestEAS is EAS {
         bytes32 r,
         bytes32 s
     ) public payable override returns (bytes32) {
-        _lastUUID = super.attestByDelegation(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
+        _lastUUID = super.attestByDelegation(recipient, schema, expirationTime, refUUID, data, attester, v, r, s);
 
         return _lastUUID;
     }

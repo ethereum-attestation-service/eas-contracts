@@ -2,12 +2,12 @@
 
 pragma solidity 0.7.6;
 
-import "../../IAOVerifier.sol";
+import "../../IASVerifier.sol";
 
 /**
- * @title A sample AO verifier that checks whether the expiration time is later than a specific timestamp.
+ * @title A sample AS verifier that checks whether the expiration time is later than a specific timestamp.
  */
-contract TestAOExpirationTimeVerifier is IAOVerifier {
+contract TestASExpirationTimeVerifier is IASVerifier {
     uint256 private immutable _validAfter;
 
     constructor(uint256 validAfter) {

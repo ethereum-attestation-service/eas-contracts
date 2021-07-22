@@ -3,15 +3,15 @@ import { ContractFactory } from '@ethersproject/contracts';
 import { Signer } from '@ethersproject/abstract-signer';
 
 import {
-  AORegistry__factory,
+  ASRegistry__factory,
   EIP712Verifier__factory,
   EAS__factory,
-  TestAOAttestationVerifier__factory,
-  TestAOAttesterVerifier__factory,
-  TestAODataVerifier__factory,
-  TestAOExpirationTimeVerifier__factory,
-  TestAORecipientVerifier__factory,
-  TestAOValueVerifier__factory,
+  TestASAttestationVerifier__factory,
+  TestASAttesterVerifier__factory,
+  TestASDataVerifier__factory,
+  TestASExpirationTimeVerifier__factory,
+  TestASRecipientVerifier__factory,
+  TestASValueVerifier__factory,
   TestEAS__factory
 } from 'typechain';
 
@@ -43,15 +43,15 @@ const attachOnly = <F extends ContractFactory>(contractName: string) => {
 };
 
 const getContracts = () => ({
-  AORegistry: deployOrAttach<AORegistry__factory>('AORegistry'),
+  ASRegistry: deployOrAttach<ASRegistry__factory>('ASRegistry'),
   EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
   EAS: deployOrAttach<EAS__factory>('EAS'),
-  TestAOAttestationVerifier: deployOrAttach<TestAOAttestationVerifier__factory>('TestAOAttestationVerifier'),
-  TestAOAttesterVerifier: deployOrAttach<TestAOAttesterVerifier__factory>('TestAOAttesterVerifier'),
-  TestAODataVerifier: deployOrAttach<TestAODataVerifier__factory>('TestAODataVerifier'),
-  TestAOExpirationTimeVerifier: deployOrAttach<TestAOExpirationTimeVerifier__factory>('TestAOExpirationTimeVerifier'),
-  TestAORecipientVerifier: deployOrAttach<TestAORecipientVerifier__factory>('TestAORecipientVerifier'),
-  TestAOValueVerifier: deployOrAttach<TestAOValueVerifier__factory>('TestAOValueVerifier'),
+  TestASAttestationVerifier: deployOrAttach<TestASAttestationVerifier__factory>('TestASAttestationVerifier'),
+  TestASAttesterVerifier: deployOrAttach<TestASAttesterVerifier__factory>('TestASAttesterVerifier'),
+  TestASDataVerifier: deployOrAttach<TestASDataVerifier__factory>('TestASDataVerifier'),
+  TestASExpirationTimeVerifier: deployOrAttach<TestASExpirationTimeVerifier__factory>('TestASExpirationTimeVerifier'),
+  TestASRecipientVerifier: deployOrAttach<TestASRecipientVerifier__factory>('TestASRecipientVerifier'),
+  TestASValueVerifier: deployOrAttach<TestASValueVerifier__factory>('TestASValueVerifier'),
   TestEAS: deployOrAttach<TestEAS__factory>('TestEAS')
 });
 

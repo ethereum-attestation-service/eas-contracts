@@ -5,19 +5,19 @@ pragma abicoder v2;
 
 import "./Types.sol";
 import "./IEAS.sol";
-import "./IAORegistry.sol";
+import "./IASRegistry.sol";
 
 /**
  * @title EAS - Ethereum Attestation Service
  */
 contract EAS is IEAS {
-    string public constant VERSION = "0.3";
+    string public constant VERSION = "0.4";
 
     // A terminator used when concatenating and hashing multiple fields.
     string private constant HASH_TERMINATOR = "@";
 
-    // The AO global registry.
-    IAORegistry private immutable _aoRegistry;
+    // The AS global registry.
+    IASRegistry private immutable _asRegistry;
 
     // The EIP712 verifier used to verify signed attestations.
     IEIP712Verifier private immutable _eip712Verifier;
@@ -40,22 +40,22 @@ contract EAS is IEAS {
     /**
      * @dev Creates a new EAS instance.
      *
-     * @param registry The address of the global AO registry.
+     * @param registry The address of the global AS registry.
      * @param verifier The address of the EIP712 verifier.
      */
-    constructor(IAORegistry registry, IEIP712Verifier verifier) {
+    constructor(IASRegistry registry, IEIP712Verifier verifier) {
         require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
         require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
 
-        _aoRegistry = registry;
+        _asRegistry = registry;
         _eip712Verifier = verifier;
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getAORegistry() external view override returns (IAORegistry) {
-        return _aoRegistry;
+    function getASRegistry() external view override returns (IASRegistry) {
+        return _asRegistry;
     }
 
     /**
@@ -77,12 +77,12 @@ contract EAS is IEAS {
      */
     function attest(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
     ) public payable virtual override returns (bytes32) {
-        return _attest(recipient, ao, expirationTime, refUUID, data, msg.sender);
+        return _attest(recipient, schema, expirationTime, refUUID, data, msg.sender);
     }
 
     /**
@@ -90,7 +90,7 @@ contract EAS is IEAS {
      */
     function attestByDelegation(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -99,9 +99,9 @@ contract EAS is IEAS {
         bytes32 r,
         bytes32 s
     ) public payable virtual override returns (bytes32) {
-        _eip712Verifier.attest(recipient, ao, expirationTime, refUUID, data, attester, v, r, s);
+        _eip712Verifier.attest(recipient, schema, expirationTime, refUUID, data, attester, v, r, s);
 
-        return _attest(recipient, ao, expirationTime, refUUID, data, attester);
+        return _attest(recipient, schema, expirationTime, refUUID, data, attester);
     }
 
     /**
@@ -145,19 +145,24 @@ contract EAS is IEAS {
      */
     function getReceivedAttestationUUIDs(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 start,
         uint256 length,
         bool reverseOrder
     ) external view override returns (bytes32[] memory) {
-        return _sliceUUIDs(_receivedAttestations[recipient][ao], start, length, reverseOrder);
+        return _sliceUUIDs(_receivedAttestations[recipient][schema], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
-        return _receivedAttestations[recipient][ao].length;
+    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema)
+        external
+        view
+        override
+        returns (uint256)
+    {
+        return _receivedAttestations[recipient][schema].length;
     }
 
     /**
@@ -165,19 +170,19 @@ contract EAS is IEAS {
      */
     function getSentAttestationUUIDs(
         address attester,
-        bytes32 ao,
+        bytes32 schema,
         uint256 start,
         uint256 length,
         bool reverseOrder
     ) external view override returns (bytes32[] memory) {
-        return _sliceUUIDs(_sentAttestations[attester][ao], start, length, reverseOrder);
+        return _sliceUUIDs(_sentAttestations[attester][schema], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 ao) external view override returns (uint256) {
-        return _sentAttestations[recipient][ao].length;
+    function getSentAttestationUUIDsCount(address recipient, bytes32 schema) external view override returns (uint256) {
+        return _sentAttestations[recipient][schema].length;
     }
 
     /**
@@ -200,10 +205,10 @@ contract EAS is IEAS {
     }
 
     /**
-     * @dev Attests to a specific AO.
+     * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -213,7 +218,7 @@ contract EAS is IEAS {
      */
     function _attest(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
@@ -221,17 +226,17 @@ contract EAS is IEAS {
     ) private returns (bytes32) {
         require(expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
 
-        AORecord memory aoRecord = _aoRegistry.getAO(ao);
-        require(aoRecord.uuid != EMPTY_UUID, "ERR_INVALID_AO");
+        ASRecord memory asRecord = _asRegistry.getAS(schema);
+        require(asRecord.uuid != EMPTY_UUID, "ERR_INVALID_AS");
         require(
-            address(aoRecord.verifier) == address(0x0) ||
-                aoRecord.verifier.verify(recipient, aoRecord.schema, data, expirationTime, attester, msg.value),
+            address(asRecord.verifier) == address(0x0) ||
+                asRecord.verifier.verify(recipient, asRecord.schema, data, expirationTime, attester, msg.value),
             "ERR_INVALID_ATTESTATION_DATA"
         );
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
-            ao: ao,
+            schema: schema,
             recipient: recipient,
             attester: attester,
             time: block.timestamp,
@@ -244,8 +249,8 @@ contract EAS is IEAS {
         bytes32 uuid = _getUUID(attestation);
         attestation.uuid = uuid;
 
-        _receivedAttestations[recipient][ao].push(uuid);
-        _sentAttestations[attester][ao].push(uuid);
+        _receivedAttestations[recipient][schema].push(uuid);
+        _sentAttestations[attester][schema].push(uuid);
 
         _db[uuid] = attestation;
         _attestationsCount++;
@@ -255,13 +260,13 @@ contract EAS is IEAS {
             _relatedAttestations[refUUID].push(uuid);
         }
 
-        emit Attested(recipient, attester, uuid, ao);
+        emit Attested(recipient, attester, uuid, schema);
 
         return uuid;
     }
 
     /**
-     * @dev Revokes an existing attestation to a specific AO.
+     * @dev Revokes an existing attestation to a specific AS.
      *
      * @param uuid The UUID of the attestation to revoke.
      * @param attester The attesting account.
@@ -274,7 +279,7 @@ contract EAS is IEAS {
 
         attestation.revocationTime = block.timestamp;
 
-        emit Revoked(attestation.recipient, attester, uuid, attestation.ao);
+        emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }
 
     /**
@@ -288,7 +293,7 @@ contract EAS is IEAS {
         return
             keccak256(
                 abi.encodePacked(
-                    attestation.ao,
+                    attestation.schema,
                     attestation.recipient,
                     attestation.attester,
                     attestation.time,
