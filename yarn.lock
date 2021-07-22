@@ -39,9 +39,10 @@
   resolved "https://registry.yarnpkg.com/@ensdomains/resolver/-/resolver-0.2.4.tgz#c10fe28bf5efbf49bff4666d909aed0265efbc89"
   integrity sha512-bvaTH34PMCbv6anRa9I/0zjLJgY4EuznbEMgbV77JBCQ9KNC46rzi0avuxpOfu+xDjPEtSFGqVEOr5GlUSGudA==
 
-"@ethereum-attestation-service/sdk@ethereum-attestation-service/sdk.git":
-  version "0.10.0"
-  resolved "https://codeload.github.com/ethereum-attestation-service/sdk/tar.gz/8d333a41e60210b19df4b75fd573d64fd164f735"
+"@ethereum-attestation-service/sdk@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/sdk/-/sdk-0.11.1.tgz#062b1632289988004eb9c1f1fd7f729adf13d2b9"
+  integrity sha512-B5xaYSMKxpnaYOEB31XQKZ2ONRHafyP8e/cfPkIWcWXTN574mqK3waEuAefQl1RJ3/UqjlpmONlSbAznKXqkXQ==
   dependencies:
     ethers "^5.4.1"
 

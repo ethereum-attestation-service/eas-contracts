@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import Contracts from 'components/Contracts';
-import { AORegistry } from 'typechain';
+import { ASRegistry } from 'typechain';
 
 const {
   constants: { AddressZero },
@@ -18,9 +18,9 @@ const ZERO_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 let accounts: SignerWithAddress[];
 let sender: SignerWithAddress;
 
-let registry: AORegistry;
+let registry: ASRegistry;
 
-describe('AORegistry', () => {
+describe('ASRegistry', () => {
   before(async () => {
     accounts = await ethers.getSigners();
 
@@ -28,18 +28,18 @@ describe('AORegistry', () => {
   });
 
   beforeEach(async () => {
-    registry = await Contracts.AORegistry.deploy();
+    registry = await Contracts.ASRegistry.deploy();
   });
 
   const getUUID = (schema: string, verifier: string) => solidityKeccak256(['bytes', 'address'], [schema, verifier]);
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.3');
+      expect(await registry.VERSION()).to.equal('0.4');
     });
 
-    it('should initialize without any AOs', async () => {
-      expect(await registry.getAOCount()).to.equal(BigNumber.from(0));
+    it('should initialize without any Ss', async () => {
+      expect(await registry.getASCount()).to.equal(BigNumber.from(0));
     });
   });
 
@@ -48,30 +48,30 @@ describe('AORegistry', () => {
       const verifierAddress = typeof verifier === 'string' ? verifier : verifier.address;
 
       const uuid = getUUID(schema, verifierAddress);
-      const index = (await registry.getAOCount()).add(BigNumber.from(1));
+      const index = (await registry.getASCount()).add(BigNumber.from(1));
 
       const retUUID = await registry.callStatic.register(schema, verifierAddress);
       const res = await registry.register(schema, verifierAddress);
       expect(retUUID).to.equal(uuid);
       await expect(res).to.emit(registry, 'Registered').withArgs(uuid, index, schema, verifierAddress, sender.address);
-      expect(await registry.getAOCount()).to.equal(index);
+      expect(await registry.getASCount()).to.equal(index);
 
-      const ao = await registry.getAO(uuid);
-      expect(ao.uuid).to.equal(uuid);
-      expect(ao.index).to.equal(index);
-      expect(ao.schema).to.equal(schema);
-      expect(ao.verifier).to.equal(verifierAddress);
+      const asRecord = await registry.getAS(uuid);
+      expect(asRecord.uuid).to.equal(uuid);
+      expect(asRecord.index).to.equal(index);
+      expect(asRecord.schema).to.equal(schema);
+      expect(asRecord.verifier).to.equal(verifierAddress);
     };
 
-    it('should allow to register an AO without a schema', async () => {
+    it('should allow to register an AS without a schema', async () => {
       await testRegister(ZERO_BYTES, accounts[3]);
     });
 
-    it('should allow to register an AO without a verifier', async () => {
+    it('should allow to register an AS without a verifier', async () => {
       await testRegister('0x1234', AddressZero);
     });
 
-    it('should allow to register an AO without neither a schema or a verifier', async () => {
+    it('should allow to register an AS without neither a schema or a verifier', async () => {
       await testRegister(ZERO_BYTES, AddressZero);
     });
 
@@ -81,27 +81,27 @@ describe('AORegistry', () => {
     });
   });
 
-  describe('AO querying', async () => {
-    it('should return an AO', async () => {
+  describe('AS querying', async () => {
+    it('should return an AS', async () => {
       const schema = '0x1234';
       const verifier = accounts[5];
 
       await registry.register(schema, verifier.address);
 
       const uuid = getUUID(schema, verifier.address);
-      const ao = await registry.getAO(uuid);
-      expect(ao.uuid).to.equal(uuid);
-      expect(ao.index).to.equal(BigNumber.from(1));
-      expect(ao.schema).to.equal(schema);
-      expect(ao.verifier).to.equal(verifier.address);
+      const asRecord = await registry.getAS(uuid);
+      expect(asRecord.uuid).to.equal(uuid);
+      expect(asRecord.index).to.equal(BigNumber.from(1));
+      expect(asRecord.schema).to.equal(schema);
+      expect(asRecord.verifier).to.equal(verifier.address);
     });
 
-    it('should return an empty AO given non-existing id', async () => {
-      const ao = await registry.getAO(formatBytes32String('BAD'));
-      expect(ao.uuid).to.equal(ZERO_BYTES32);
-      expect(ao.index).to.equal(BigNumber.from(0));
-      expect(ao.schema).to.equal(ZERO_BYTES);
-      expect(ao.verifier).to.equal(AddressZero);
+    it('should return an empty AS given non-existing id', async () => {
+      const asRecord = await registry.getAS(formatBytes32String('BAD'));
+      expect(asRecord.uuid).to.equal(ZERO_BYTES32);
+      expect(asRecord.index).to.equal(BigNumber.from(0));
+      expect(asRecord.schema).to.equal(ZERO_BYTES);
+      expect(asRecord.verifier).to.equal(AddressZero);
     });
   });
 });

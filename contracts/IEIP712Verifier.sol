@@ -19,7 +19,7 @@ interface IEIP712Verifier {
      * @dev Verifies signed attestation.
      *
      * @param recipient The recipient of the attestation.
-     * @param ao The UUID of the AO.
+     * @param schema The UUID of the AS.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -30,7 +30,7 @@ interface IEIP712Verifier {
      */
     function attest(
         address recipient,
-        bytes32 ao,
+        bytes32 schema,
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data,

@@ -2,12 +2,12 @@
 
 pragma solidity 0.7.6;
 
-import "../../IAOVerifier.sol";
+import "../../IASVerifier.sol";
 
 /**
- * @title A sample AO verifier that checks whether the attestation is to a specific recipient.
+ * @title A sample AS verifier that checks whether the attestation is to a specific recipient.
  */
-contract TestAORecipientVerifier is IAOVerifier {
+contract TestASRecipientVerifier is IASVerifier {
     address private immutable _targetRecipient;
 
     constructor(address targetRecipient) {

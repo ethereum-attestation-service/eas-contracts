@@ -3,14 +3,14 @@
 pragma solidity 0.7.6;
 
 /**
- * @title The interface of an optional AO verifier, submitted via the global AO registry.
+ * @title The interface of an optional AS verifier, submitted via the global AS registry.
  */
-interface IAOVerifier {
+interface IASVerifier {
     /**
      * @dev Verifies whether the specified attestation data conforms to the spec.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The AO data schema.
+     * @param schema The AS data schema.
      * @param data The actual attestation data.
      * @param expirationTime The expiration time of the attestation.
      * @param msgSender The sender of the original attestation message.
