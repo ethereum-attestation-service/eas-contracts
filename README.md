@@ -16,11 +16,11 @@ EAS is made up of two very simple smart contracts. The base EAS contract which a
 
 ### Rinkeby
 
-#### v0.3
+#### v0.4
 
-- **EAS**: <https://rinkeby.etherscan.io/address/0xEA503f92Fde402692D2476fb43CB3E79FeBD54e6>
-- **ASRegistry**: <https://rinkeby.etherscan.io/address/0x6465Bb9895297AfC4f197876326e1570C5e1907d>
-- **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xAFE21DEAd60B70dB83d43248340787994DDf51F5>
+- **EAS**: <https://rinkeby.etherscan.io/address/0xEA50419ABE0EE0021B4e6147bEdB8cB8D262CC00>
+- **ASRegistry**: <https://rinkeby.etherscan.io/address/0x19Db734420DC973A078561F4310415a5F86d1641>
+- **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xdfC2d8F81cac977C0C8DF8C3b2b74030A8143599>
 
 ## Installation
 
