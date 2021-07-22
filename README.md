@@ -1,7 +1,8 @@
 # Ethereum Attestation Service
 
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://eas.eth.link)
-[![Test](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/workflow.yml/badge.svg)](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/workflow.yml)
+[![NPM Package](https://img.shields.io/npm/v/@ethereum-attestation-service/contracts.svg)](https://www.npmjs.org/package/@ethereum-attestation-service/contracts)
+[![Test](https://github.com/ethereum-attestation-service/contracts/actions/workflows/workflow.yml/badge.svg)](https://github.com/ethereum-attestation-service/contracts/actions/workflows/workflow.yml)
 
 ## Introduction
 
