@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { utils } from 'ethers';
-import { Delegation } from '@ethereum-attestation-service/eas-sdk';
+import { Delegation } from '@ethereum-attestation-service/sdk';
 import { ecsign } from 'ethereumjs-util';
 
 const HARDHAT_CHAIN_ID = 31337;

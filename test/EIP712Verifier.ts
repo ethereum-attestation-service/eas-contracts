@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
-import { Delegation, ATTEST_TYPED_SIGNATURE, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/eas-sdk';
+import { Delegation, ATTEST_TYPED_SIGNATURE, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
 
 import Contracts from 'components/Contracts';
 
