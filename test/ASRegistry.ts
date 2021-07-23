@@ -31,7 +31,7 @@ describe('ASRegistry', () => {
     registry = await Contracts.ASRegistry.deploy();
   });
 
-  const getUUID = (schema: string, verifier: string) => solidityKeccak256(['bytes', 'address'], [schema, verifier]);
+  const getUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
 
   describe('construction', async () => {
     it('should report a version', async () => {
@@ -44,38 +44,38 @@ describe('ASRegistry', () => {
   });
 
   describe('registration', async () => {
-    const testRegister = async (schema: string, verifier: string | SignerWithAddress) => {
-      const verifierAddress = typeof verifier === 'string' ? verifier : verifier.address;
+    const testRegister = async (schema: string, resolver: string | SignerWithAddress) => {
+      const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
 
-      const uuid = getUUID(schema, verifierAddress);
+      const uuid = getUUID(schema, resolverAddress);
       const index = (await registry.getASCount()).add(BigNumber.from(1));
 
-      const retUUID = await registry.callStatic.register(schema, verifierAddress);
-      const res = await registry.register(schema, verifierAddress);
+      const retUUID = await registry.callStatic.register(schema, resolverAddress);
+      const res = await registry.register(schema, resolverAddress);
       expect(retUUID).to.equal(uuid);
-      await expect(res).to.emit(registry, 'Registered').withArgs(uuid, index, schema, verifierAddress, sender.address);
+      await expect(res).to.emit(registry, 'Registered').withArgs(uuid, index, schema, resolverAddress, sender.address);
       expect(await registry.getASCount()).to.equal(index);
 
       const asRecord = await registry.getAS(uuid);
       expect(asRecord.uuid).to.equal(uuid);
       expect(asRecord.index).to.equal(index);
       expect(asRecord.schema).to.equal(schema);
-      expect(asRecord.verifier).to.equal(verifierAddress);
+      expect(asRecord.resolver).to.equal(resolverAddress);
     };
 
     it('should allow to register an AS without a schema', async () => {
       await testRegister(ZERO_BYTES, accounts[3]);
     });
 
-    it('should allow to register an AS without a verifier', async () => {
+    it('should allow to register an AS without a resolver', async () => {
       await testRegister('0x1234', AddressZero);
     });
 
-    it('should allow to register an AS without neither a schema or a verifier', async () => {
+    it('should allow to register an AS without neither a schema or a resolver', async () => {
       await testRegister(ZERO_BYTES, AddressZero);
     });
 
-    it('should not allow to register the same schema and verifier twice', async () => {
+    it('should not allow to register the same schema and resolver twice', async () => {
       await testRegister('0x1234', AddressZero);
       await expect(testRegister('0x1234', AddressZero)).to.be.revertedWith('ERR_ALREADY_EXISTS');
     });
@@ -84,16 +84,16 @@ describe('ASRegistry', () => {
   describe('AS querying', async () => {
     it('should return an AS', async () => {
       const schema = '0x1234';
-      const verifier = accounts[5];
+      const resolver = accounts[5];
 
-      await registry.register(schema, verifier.address);
+      await registry.register(schema, resolver.address);
 
-      const uuid = getUUID(schema, verifier.address);
+      const uuid = getUUID(schema, resolver.address);
       const asRecord = await registry.getAS(uuid);
       expect(asRecord.uuid).to.equal(uuid);
       expect(asRecord.index).to.equal(BigNumber.from(1));
       expect(asRecord.schema).to.equal(schema);
-      expect(asRecord.verifier).to.equal(verifier.address);
+      expect(asRecord.resolver).to.equal(resolver.address);
     });
 
     it('should return an empty AS given non-existing id', async () => {
@@ -101,7 +101,7 @@ describe('ASRegistry', () => {
       expect(asRecord.uuid).to.equal(ZERO_BYTES32);
       expect(asRecord.index).to.equal(BigNumber.from(0));
       expect(asRecord.schema).to.equal(ZERO_BYTES);
-      expect(asRecord.verifier).to.equal(AddressZero);
+      expect(asRecord.resolver).to.equal(AddressZero);
     });
   });
 });
