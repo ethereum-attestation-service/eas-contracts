@@ -71,7 +71,7 @@ describe('EAS', () => {
     value?: BigNumber;
   }
 
-  const getASUUID = (schema: string, verifier: string) => solidityKeccak256(['bytes', 'address'], [schema, verifier]);
+  const getASUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
 
   describe('attesting', async () => {
     let expirationTime: BigNumber;
@@ -192,7 +192,7 @@ describe('EAS', () => {
 
         const testFailedAttestation = async (
           recipient: string,
-          ao: string,
+          as: string,
           expirationTime: BigNumber,
           refUUID: string,
           data: any,
@@ -202,13 +202,13 @@ describe('EAS', () => {
           const txSender = options?.from || sender;
 
           if (!delegation) {
-            await expect(eas.connect(txSender).attest(recipient, ao, expirationTime, refUUID, data)).to.be.revertedWith(
-              err
-            );
+            await expect(
+              eas.connect(txSender).attest(recipient, as, expirationTime, refUUID, data, { value: options?.value })
+            ).to.be.revertedWith(err);
           } else {
             const request = await eip712Utils.getAttestationRequest(
               recipient,
-              ao,
+              as,
               expirationTime,
               refUUID,
               data,
@@ -221,14 +221,15 @@ describe('EAS', () => {
                 .connect(txSender)
                 .attestByDelegation(
                   recipient,
-                  ao,
+                  as,
                   expirationTime,
                   refUUID,
                   data,
                   txSender.address,
                   request.v,
                   hexlify(request.r),
-                  hexlify(request.s)
+                  hexlify(request.s),
+                  { value: options?.value }
                 )
             ).to.be.revertedWith(err);
           }
@@ -316,7 +317,29 @@ describe('EAS', () => {
             );
           });
 
-          context('with recipient verifier', async () => {
+          it('should revert when sending ETH to a non-payable resolver', async () => {
+            const svid4 = formatBytes32String('AS4');
+            let vid4: string;
+            const targetRecipient = accounts[5];
+
+            const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
+            expect(await resolver.isPayable()).to.be.false;
+
+            await registry.register(svid4, resolver.address);
+            vid4 = getASUUID(svid4, resolver.address);
+
+            await testFailedAttestation(
+              recipient.address,
+              vid4,
+              expirationTime,
+              ZERO_BYTES32,
+              data,
+              'ERR_ETH_TRANSFER_UNSUPPORTED',
+              { value: BigNumber.from(1) }
+            );
+          });
+
+          context('with recipient resolver', async () => {
             const svid4 = formatBytes32String('AS4');
             let vid4: string;
             let targetRecipient: SignerWithAddress;
@@ -324,10 +347,11 @@ describe('EAS', () => {
             beforeEach(async () => {
               targetRecipient = accounts[5];
 
-              const verifier = await Contracts.TestASRecipientVerifier.deploy(targetRecipient.address);
+              const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
+              expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting to a wrong recipient', async () => {
@@ -346,15 +370,16 @@ describe('EAS', () => {
             });
           });
 
-          context('with data verifier', async () => {
+          context('with data resolver', async () => {
             const svid4 = formatBytes32String('VID4');
             let vid4: string;
 
             beforeEach(async () => {
-              const verifier = await Contracts.TestASDataVerifier.deploy();
+              const resolver = await Contracts.TestASDataResolver.deploy();
+              expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting with wrong data', async () => {
@@ -383,17 +408,18 @@ describe('EAS', () => {
             });
           });
 
-          context('with expiration time verifier', async () => {
+          context('with expiration time resolver', async () => {
             const svid4 = formatBytes32String('VID4');
             let vid4: string;
             let validAfter: BigNumber;
 
             beforeEach(async () => {
               validAfter = (await latest()).add(duration.years(1));
-              const verifier = await Contracts.TestASExpirationTimeVerifier.deploy(validAfter);
+              const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
+              expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting with a wrong expiration time', async () => {
@@ -412,7 +438,7 @@ describe('EAS', () => {
             });
           });
 
-          context('with msg.sender verifier', async () => {
+          context('with msg.sender resolver', async () => {
             const svid4 = formatBytes32String('VID4');
             let vid4: string;
             let targetSender: SignerWithAddress;
@@ -420,10 +446,11 @@ describe('EAS', () => {
             beforeEach(async () => {
               targetSender = accounts[8];
 
-              const verifier = await Contracts.TestASAttesterVerifier.deploy(targetSender.address);
+              const resolver = await Contracts.TestASAttesterResolver.deploy(targetSender.address);
+              expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting to the wrong msg.sender', async () => {
@@ -447,16 +474,17 @@ describe('EAS', () => {
             });
           });
 
-          context('with msg.value verifier', async () => {
+          context('with msg.value resolver', async () => {
             const svid4 = formatBytes32String('VID4');
             let vid4: string;
             const targetValue = BigNumber.from(7862432);
 
             beforeEach(async () => {
-              const verifier = await Contracts.TestASValueVerifier.deploy(targetValue);
+              const resolver = await Contracts.TestASValueResolver.deploy(targetValue);
+              expect(await resolver.isPayable()).to.be.true;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting with wrong msg.value', async () => {
@@ -488,7 +516,7 @@ describe('EAS', () => {
             });
           });
 
-          context('with attestation verifier', async () => {
+          context('with attestation resolver', async () => {
             const svid4 = formatBytes32String('VID4');
             let vid4: string;
             let uuid: string;
@@ -497,10 +525,11 @@ describe('EAS', () => {
               await eas.attest(recipient.address, id1, expirationTime, ZERO_BYTES32, data);
               uuid = await eas.getLastUUID();
 
-              const verifier = await Contracts.TestASAttestationVerifier.deploy(eas.address);
+              const resolver = await Contracts.TestASAttestationResolver.deploy(eas.address);
+              expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, verifier.address);
-              vid4 = getASUUID(svid4, verifier.address);
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
             });
 
             it('should revert when attesting to a non-existing attestation', async () => {
