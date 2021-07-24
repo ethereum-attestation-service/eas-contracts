@@ -1,10 +1,7 @@
+import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
-
-import { Delegation, ATTEST_TYPED_SIGNATURE, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
-
 import Contracts from 'components/Contracts';
-
+import { ethers } from 'hardhat';
 import { EIP712Verifier } from 'typechain';
 
 const {

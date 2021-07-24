@@ -1,6 +1,5 @@
 import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
-
 import Contracts from '../components/Contracts';
 
 const main = async () => {
