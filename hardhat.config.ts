@@ -8,8 +8,8 @@ import 'hardhat-docgen';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
 import 'solidity-coverage';
-import * as testAccounts from 'test/accounts.json';
 import 'tsconfig-paths/register';
+import * as testAccounts from './test/accounts.json';
 
 const loadENVKey = <T>(envKeyName: string) => {
   return process.env[envKeyName] as unknown as T;
