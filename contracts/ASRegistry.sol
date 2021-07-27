@@ -5,7 +5,7 @@ pragma abicoder v2;
 
 import "./Types.sol";
 import "./IASRegistry.sol";
-import "./IASVerifier.sol";
+import "./IASResolver.sol";
 
 /**
  * @title The global AS registry.
@@ -22,10 +22,10 @@ contract ASRegistry is IASRegistry {
     /**
      * @inheritdoc IASRegistry
      */
-    function register(bytes calldata schema, IASVerifier verifier) external override returns (bytes32) {
+    function register(bytes calldata schema, IASResolver resolver) external override returns (bytes32) {
         uint256 index = ++_asCount;
 
-        ASRecord memory asRecord = ASRecord({uuid: EMPTY_UUID, index: index, schema: schema, verifier: verifier});
+        ASRecord memory asRecord = ASRecord({uuid: EMPTY_UUID, index: index, schema: schema, resolver: resolver});
 
         bytes32 uuid = _getUUID(asRecord);
         require(_registry[uuid].uuid == EMPTY_UUID, "ERR_ALREADY_EXISTS");
@@ -33,7 +33,7 @@ contract ASRegistry is IASRegistry {
         asRecord.uuid = uuid;
         _registry[uuid] = asRecord;
 
-        emit Registered(uuid, index, schema, verifier, msg.sender);
+        emit Registered(uuid, index, schema, resolver, msg.sender);
 
         return uuid;
     }
@@ -60,6 +60,6 @@ contract ASRegistry is IASRegistry {
      * @return AS UUID.
      */
     function _getUUID(ASRecord memory asRecord) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(asRecord.schema, asRecord.verifier));
+        return keccak256(abi.encodePacked(asRecord.schema, asRecord.resolver));
     }
 }

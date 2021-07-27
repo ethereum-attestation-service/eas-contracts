@@ -3,7 +3,7 @@
 pragma solidity 0.7.6;
 pragma abicoder v2;
 
-import "./IASVerifier.sol";
+import "./IASResolver.sol";
 
 /**
  * @title A struct representing a record for a submitted AS (Attestation Object).
@@ -11,8 +11,8 @@ import "./IASVerifier.sol";
 struct ASRecord {
     // A unique identifier of the AS.
     bytes32 uuid;
-    // Optional schema verifier.
-    IASVerifier verifier;
+    // Optional schema resolver.
+    IASResolver resolver;
     // Auto-incrementing index for reference, assigned by the registry itself.
     uint256 index;
     // Custom specification of the AS (e.g., an ABI).
@@ -29,20 +29,20 @@ interface IASRegistry {
      * @param uuid The AS UUID.
      * @param index The AS index.
      * @param schema The AS schema.
-     * @param verifier An optional AS schema verifier.
+     * @param resolver An optional AS schema resolver.
      * @param attester The address of the account used to register the AS.
      */
-    event Registered(bytes32 indexed uuid, uint256 indexed index, bytes schema, IASVerifier verifier, address attester);
+    event Registered(bytes32 indexed uuid, uint256 indexed index, bytes schema, IASResolver resolver, address attester);
 
     /**
      * @dev Submits and reserve a new AS
      *
      * @param schema The AS data schema.
-     * @param verifier An optional AS schema verifier.
+     * @param resolver An optional AS schema resolver.
      *
      * @return The UUID of the new AS.
      */
-    function register(bytes calldata schema, IASVerifier verifier) external returns (bytes32);
+    function register(bytes calldata schema, IASResolver resolver) external returns (bytes32);
 
     /**
      * @dev Returns an existing AS by UUID

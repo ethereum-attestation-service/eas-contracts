@@ -228,11 +228,15 @@ contract EAS is IEAS {
 
         ASRecord memory asRecord = _asRegistry.getAS(schema);
         require(asRecord.uuid != EMPTY_UUID, "ERR_INVALID_AS");
-        require(
-            address(asRecord.verifier) == address(0x0) ||
-                asRecord.verifier.verify(recipient, asRecord.schema, data, expirationTime, attester, msg.value),
-            "ERR_INVALID_ATTESTATION_DATA"
-        );
+
+        IASResolver resolver = asRecord.resolver;
+        if (address(resolver) != address(0x0)) {
+            require(msg.value == 0 || resolver.isPayable(), "ERR_ETH_TRANSFER_UNSUPPORTED");
+            require(
+                resolver.resolve{value: msg.value}(recipient, asRecord.schema, data, expirationTime, attester),
+                "ERR_INVALID_ATTESTATION_DATA"
+            );
+        }
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,

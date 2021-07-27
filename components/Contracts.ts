@@ -6,12 +6,12 @@ import {
   ASRegistry__factory,
   EIP712Verifier__factory,
   EAS__factory,
-  TestASAttestationVerifier__factory,
-  TestASAttesterVerifier__factory,
-  TestASDataVerifier__factory,
-  TestASExpirationTimeVerifier__factory,
-  TestASRecipientVerifier__factory,
-  TestASValueVerifier__factory,
+  TestASAttestationResolver__factory,
+  TestASAttesterResolver__factory,
+  TestASDataResolver__factory,
+  TestASExpirationTimeResolver__factory,
+  TestASRecipientResolver__factory,
+  TestASValueResolver__factory,
   TestEAS__factory
 } from 'typechain';
 
@@ -46,12 +46,12 @@ const getContracts = () => ({
   ASRegistry: deployOrAttach<ASRegistry__factory>('ASRegistry'),
   EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
   EAS: deployOrAttach<EAS__factory>('EAS'),
-  TestASAttestationVerifier: deployOrAttach<TestASAttestationVerifier__factory>('TestASAttestationVerifier'),
-  TestASAttesterVerifier: deployOrAttach<TestASAttesterVerifier__factory>('TestASAttesterVerifier'),
-  TestASDataVerifier: deployOrAttach<TestASDataVerifier__factory>('TestASDataVerifier'),
-  TestASExpirationTimeVerifier: deployOrAttach<TestASExpirationTimeVerifier__factory>('TestASExpirationTimeVerifier'),
-  TestASRecipientVerifier: deployOrAttach<TestASRecipientVerifier__factory>('TestASRecipientVerifier'),
-  TestASValueVerifier: deployOrAttach<TestASValueVerifier__factory>('TestASValueVerifier'),
+  TestASAttestationResolver: deployOrAttach<TestASAttestationResolver__factory>('TestASAttestationResolver'),
+  TestASAttesterResolver: deployOrAttach<TestASAttesterResolver__factory>('TestASAttesterResolver'),
+  TestASDataResolver: deployOrAttach<TestASDataResolver__factory>('TestASDataResolver'),
+  TestASExpirationTimeResolver: deployOrAttach<TestASExpirationTimeResolver__factory>('TestASExpirationTimeResolver'),
+  TestASRecipientResolver: deployOrAttach<TestASRecipientResolver__factory>('TestASRecipientResolver'),
+  TestASValueResolver: deployOrAttach<TestASValueResolver__factory>('TestASValueResolver'),
   TestEAS: deployOrAttach<TestEAS__factory>('TestEAS')
 });
 

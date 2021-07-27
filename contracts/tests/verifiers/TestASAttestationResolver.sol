@@ -2,27 +2,30 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASVerifier.sol";
+import "../../IASResolver.sol";
 import "../../EAS.sol";
 
 /**
- * @title A sample AS verifier that checks whether an attestations attest to an existing attestation.
+ * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.
  */
-contract TestASAttestationVerifier is IASVerifier {
+contract TestASAttestationResolver is IASResolver {
     EAS private immutable _eas;
 
     constructor(EAS eas) {
         _eas = eas;
     }
 
-    function verify(
+    function isPayable() external pure override returns (bool) {
+        return false;
+    }
+
+    function resolve(
         address, /* recipient */
         bytes calldata, /* schema */
         bytes calldata data,
         uint256, /* expirationTime */
-        address, /* msgSender */
-        uint256 /* msgValue */
-    ) external view virtual override returns (bool) {
+        address /* msgSender */
+    ) external payable virtual override returns (bool) {
         return _eas.isAttestationValid(_toBytes32(data, 0));
     }
 
