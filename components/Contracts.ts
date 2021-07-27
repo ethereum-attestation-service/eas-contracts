@@ -10,8 +10,10 @@ import {
   TestASDataResolver__factory,
   TestASExpirationTimeResolver__factory,
   TestASRecipientResolver__factory,
+  TestASTokenResolver__factory,
   TestASValueResolver__factory,
-  TestEAS__factory
+  TestEAS__factory,
+  TestERC20Token__factory
 } from 'typechain';
 
 type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any) => Promise<infer U>
@@ -50,8 +52,10 @@ const getContracts = () => ({
   TestASDataResolver: deployOrAttach<TestASDataResolver__factory>('TestASDataResolver'),
   TestASExpirationTimeResolver: deployOrAttach<TestASExpirationTimeResolver__factory>('TestASExpirationTimeResolver'),
   TestASRecipientResolver: deployOrAttach<TestASRecipientResolver__factory>('TestASRecipientResolver'),
+  TestASTokenResolver: deployOrAttach<TestASTokenResolver__factory>('TestASTokenResolver'),
   TestASValueResolver: deployOrAttach<TestASValueResolver__factory>('TestASValueResolver'),
-  TestEAS: deployOrAttach<TestEAS__factory>('TestEAS')
+  TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
+  TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token')
 });
 
 export default getContracts();

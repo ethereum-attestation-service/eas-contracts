@@ -6,7 +6,7 @@ import { ethers } from 'hardhat';
 import * as testAccounts from 'test/accounts.json';
 import { EIP712Utils } from 'test/helpers/EIP712Utils';
 import { duration, latest } from 'test/helpers/Time';
-import { ASRegistry, EIP712Verifier, TestEAS } from 'typechain';
+import { ASRegistry, EIP712Verifier, TestASTokenResolver, TestEAS, TestERC20Token } from 'typechain';
 
 const {
   constants: { AddressZero, MaxUint256 },
@@ -26,6 +26,7 @@ let registry: ASRegistry;
 let verifier: EIP712Verifier;
 let eas: TestEAS;
 let eip712Utils: EIP712Utils;
+let token: TestERC20Token;
 
 describe('EAS', () => {
   before(async () => {
@@ -509,6 +510,49 @@ describe('EAS', () => {
               await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, data, {
                 value: targetValue
               });
+            });
+          });
+
+          context('with token resolver', async () => {
+            const svid4 = formatBytes32String('VID4');
+            let vid4: string;
+            const targetAmount = BigNumber.from(22334);
+            let resolver: TestASTokenResolver;
+
+            beforeEach(async () => {
+              token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', BigNumber.from(9999999999));
+
+              resolver = await Contracts.TestASTokenResolver.deploy(token.address, targetAmount);
+              expect(await resolver.isPayable()).to.be.false;
+
+              await registry.register(svid4, resolver.address);
+              vid4 = getASUUID(svid4, resolver.address);
+            });
+
+            it('should revert when attesting with wrong token amount', async () => {
+              await testFailedAttestation(
+                recipient.address,
+                vid4,
+                expirationTime,
+                ZERO_BYTES32,
+                data,
+                'ERC20: transfer amount exceeds allowance'
+              );
+
+              await token.approve(resolver.address, targetAmount.sub(BigNumber.from(1)));
+              await testFailedAttestation(
+                recipient.address,
+                vid4,
+                expirationTime,
+                ZERO_BYTES32,
+                data,
+                'ERC20: transfer amount exceeds allowance'
+              );
+            });
+
+            it('should allow attesting with correct token amount', async () => {
+              await token.approve(resolver.address, targetAmount);
+              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, data);
             });
           });
 
