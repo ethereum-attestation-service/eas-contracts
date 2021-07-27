@@ -1,19 +1,15 @@
-import { HardhatUserConfig } from 'hardhat/config';
-
-import 'tsconfig-paths/register';
-
-import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
-import '@typechain/hardhat';
-
-import 'solidity-coverage';
 import '@nomiclabs/hardhat-etherscan';
-import 'hardhat-contract-sizer';
+import '@nomiclabs/hardhat-waffle';
+import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
-import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
 import 'hardhat-docgen';
-
-import * as testAccounts from 'test/accounts.json';
+import 'hardhat-gas-reporter';
+import { HardhatUserConfig } from 'hardhat/config';
+import 'solidity-coverage';
+import 'tsconfig-paths/register';
+import * as testAccounts from './test/accounts.json';
 
 const loadENVKey = <T>(envKeyName: string) => {
   return process.env[envKeyName] as unknown as T;

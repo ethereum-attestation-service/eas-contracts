@@ -1,11 +1,10 @@
-import { ethers } from 'hardhat';
-import { ContractFactory } from '@ethersproject/contracts';
 import { Signer } from '@ethersproject/abstract-signer';
-
+import { ContractFactory } from '@ethersproject/contracts';
+import { ethers } from 'hardhat';
 import {
   ASRegistry__factory,
-  EIP712Verifier__factory,
   EAS__factory,
+  EIP712Verifier__factory,
   TestASAttestationResolver__factory,
   TestASAttesterResolver__factory,
   TestASDataResolver__factory,
