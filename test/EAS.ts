@@ -45,7 +45,7 @@ describe('EAS', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await eas.VERSION()).to.equal('0.4');
+      expect(await eas.VERSION()).to.equal('0.5');
     });
 
     it('should initialize without any attestations categories or attestations', async () => {

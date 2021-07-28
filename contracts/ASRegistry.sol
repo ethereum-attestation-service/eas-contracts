@@ -11,7 +11,7 @@ import "./IASResolver.sol";
  * @title The global AS registry.
  */
 contract ASRegistry is IASRegistry {
-    string public constant VERSION = "0.4";
+    string public constant VERSION = "0.5";
 
     // The global mapping between AS records and their IDs.
     mapping(bytes32 => ASRecord) private _registry;
