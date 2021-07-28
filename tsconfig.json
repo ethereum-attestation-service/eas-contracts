@@ -12,6 +12,5 @@
     "baseUrl": "./"
   },
   "include": ["./test", "./components"],
-  "files": ["./hardhat.config.ts"],
-  "paths": {}
+  "files": ["./hardhat.config.ts"]
 }
