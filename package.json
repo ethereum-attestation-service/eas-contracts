@@ -23,7 +23,7 @@
     "dev": "hardhat node",
     "deploy": "hardhat run scripts/deploy.ts",
     "lint": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
-    "format": "prettier --check --write contracts/**/*.sol test/**/*.js --config .prettierrc",
+    "format": "prettier --check --write contracts/**/*.sol *.ts test/**/*.ts --config .prettierrc",
     "profile": "PROFILE=1 yarn test",
     "size": "hardhat size-contracts",
     "verify": "hardhat verify",
