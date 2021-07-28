@@ -11,7 +11,7 @@ import "./IASRegistry.sol";
  * @title EAS - Ethereum Attestation Service
  */
 contract EAS is IEAS {
-    string public constant VERSION = "0.4";
+    string public constant VERSION = "0.5";
 
     // A terminator used when concatenating and hashing multiple fields.
     string private constant HASH_TERMINATOR = "@";

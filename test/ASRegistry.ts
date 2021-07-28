@@ -33,7 +33,7 @@ describe('ASRegistry', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.4');
+      expect(await registry.VERSION()).to.equal('0.5');
     });
 
     it('should initialize without any Ss', async () => {
