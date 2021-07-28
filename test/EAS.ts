@@ -1,12 +1,12 @@
 import Contracts from '../components/Contracts';
-import * as testAccounts from './/accounts.json';
+import { ASRegistry, EIP712Verifier, TestASTokenResolver, TestEAS, TestERC20Token } from '../typechain';
+import * as testAccounts from './accounts.json';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
-import { ASRegistry, EIP712Verifier, TestASTokenResolver, TestEAS, TestERC20Token } from 'typechain';
 
 const {
   constants: { AddressZero, MaxUint256 },
