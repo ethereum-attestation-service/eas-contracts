@@ -1,8 +1,8 @@
 import Contracts from '../components/Contracts';
+import { EIP712Verifier } from '../typechain';
 import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { EIP712Verifier } from 'typechain';
 
 const {
   utils: { keccak256, toUtf8Bytes }
