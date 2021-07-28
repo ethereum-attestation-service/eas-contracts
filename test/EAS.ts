@@ -1,11 +1,11 @@
+import Contracts from '../components/Contracts';
+import * as testAccounts from './/accounts.json';
+import { EIP712Utils } from './helpers/EIP712Utils';
+import { duration, latest } from './helpers/Time';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import Contracts from 'components/Contracts';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
-import * as testAccounts from 'test/accounts.json';
-import { EIP712Utils } from 'test/helpers/EIP712Utils';
-import { duration, latest } from 'test/helpers/Time';
 import { ASRegistry, EIP712Verifier, TestASTokenResolver, TestEAS, TestERC20Token } from 'typechain';
 
 const {
@@ -110,7 +110,7 @@ describe('EAS', () => {
               refUUID,
               data,
               await verifier.getNonce(txSender.address),
-              (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
+              (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
             );
 
             res = await eas
@@ -210,7 +210,7 @@ describe('EAS', () => {
               refUUID,
               data,
               await verifier.getNonce(txSender.address),
-              (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
+              (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
             );
 
             await expect(
@@ -634,7 +634,7 @@ describe('EAS', () => {
           const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
-            (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
+            (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
           );
 
           res = await eas
@@ -657,7 +657,7 @@ describe('EAS', () => {
           const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
-            (<any>testAccounts.privateKeys)[txSender.address.toLowerCase()]
+            (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
           );
 
           await expect(
