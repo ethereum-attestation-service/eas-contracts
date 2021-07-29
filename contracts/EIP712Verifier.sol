@@ -8,14 +8,14 @@ import "./IEIP712Verifier.sol";
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
  */
 contract EIP712Verifier is IEIP712Verifier {
-    string public constant VERSION = "0.4";
+    string public constant VERSION = "0.5";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(address recipient,uint256 schema,uint256 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 public constant ATTEST_TYPEHASH = 0x531428c5a0280af75a716171c6425f003876d506658954796652160838d6dbb9;
+    // keccak256("Attest(address recipient,bytes32 schema,uint256 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
+    bytes32 public constant ATTEST_TYPEHASH = 0x39c0608dd995a3a25bfecb0fffe6801a81bae611d94438af988caa522d9d1476;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
     // keccak256("Revoke(bytes32 uuid,uint256 nonce)").
