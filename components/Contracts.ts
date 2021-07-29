@@ -1,6 +1,3 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { ContractFactory } from '@ethersproject/contracts';
-import { ethers } from 'hardhat';
 import {
   ASRegistry__factory,
   EAS__factory,
@@ -14,7 +11,10 @@ import {
   TestASValueResolver__factory,
   TestEAS__factory,
   TestERC20Token__factory
-} from 'typechain';
+} from '../typechain';
+import { Signer } from '@ethersproject/abstract-signer';
+import { ContractFactory } from '@ethersproject/contracts';
+import { ethers } from 'hardhat';
 
 type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any) => Promise<infer U>
   ? U

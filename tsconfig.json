@@ -8,10 +8,8 @@
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "baseUrl": "./"
+    "resolveJsonModule": true
   },
   "include": ["./test", "./components"],
-  "files": ["./hardhat.config.ts"],
-  "paths": {}
+  "files": ["./hardhat.config.ts"]
 }

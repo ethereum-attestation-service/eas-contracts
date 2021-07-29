@@ -1,9 +1,9 @@
+import Contracts from '../components/Contracts';
+import { ASRegistry } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import Contracts from 'components/Contracts';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
-import { ASRegistry } from 'typechain';
 
 const {
   constants: { AddressZero },
@@ -33,7 +33,7 @@ describe('ASRegistry', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.4');
+      expect(await registry.VERSION()).to.equal('0.5');
     });
 
     it('should initialize without any Ss', async () => {
