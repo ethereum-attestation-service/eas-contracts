@@ -22,7 +22,7 @@ contract EAS is IEAS {
     // The EIP712 verifier used to verify signed attestations.
     IEIP712Verifier private immutable _eip712Verifier;
 
-    // A mapping between attestations and their corresponding attestations.
+    // A mapping between attestations and their related attestations.
     mapping(bytes32 => bytes32[]) private _relatedAttestations;
 
     // A mapping between an account and its received attestations.
@@ -30,6 +30,9 @@ contract EAS is IEAS {
 
     // A mapping between an account and its sent attestations.
     mapping(address => mapping(bytes32 => bytes32[])) private _sentAttestations;
+
+    // A mapping between a schema and its attestations.
+    mapping(bytes32 => bytes32[]) private _schemaAttestations;
 
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
@@ -205,6 +208,25 @@ contract EAS is IEAS {
     }
 
     /**
+     * @inheritdoc IEAS
+     */
+    function getSchemaAttestationUUIDs(
+        bytes32 schema,
+        uint256 start,
+        uint256 length,
+        bool reverseOrder
+    ) external view override returns (bytes32[] memory) {
+        return _sliceUUIDs(_schemaAttestations[schema], start, length, reverseOrder);
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function getSchemaAttestationUUIDsCount(bytes32 schema) external view override returns (uint256) {
+        return _schemaAttestations[schema].length;
+    }
+
+    /**
      * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
@@ -255,6 +277,7 @@ contract EAS is IEAS {
 
         _receivedAttestations[recipient][schema].push(uuid);
         _sentAttestations[attester][schema].push(uuid);
+        _schemaAttestations[schema].push(uuid);
 
         _db[uuid] = attestation;
         _attestationsCount++;
