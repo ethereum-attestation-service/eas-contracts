@@ -42,7 +42,7 @@ interface IEAS {
      * @param uuid The UUID the revoked attestation.
      * @param schema The UUID of the AS.
      */
-    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
+    event Attested(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
      * @dev Triggered when an attestation has been revoked.
@@ -52,7 +52,7 @@ interface IEAS {
      * @param schema The UUID of the AS.
      * @param uuid The UUID the revoked attestation.
      */
-    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
+    event Revoked(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
      * @dev Returns the address of the AS global registry.
