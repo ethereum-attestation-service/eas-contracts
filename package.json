@@ -31,6 +31,7 @@
     "docgen": "hardhat docgen"
   },
   "dependencies": {
+    "dotenv": "^10.0.0",
     "hardhat": "2.5.0"
   },
   "devDependencies": {
