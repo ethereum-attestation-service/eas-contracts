@@ -8,7 +8,7 @@ import "./IEIP712Verifier.sol";
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
  */
 contract EIP712Verifier is IEIP712Verifier {
-    string public constant VERSION = "0.5";
+    string public constant VERSION = "0.6";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
