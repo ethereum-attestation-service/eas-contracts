@@ -30,7 +30,10 @@ const config: HardhatUserConfig = {
 
     rinkeby: {
       url: loadENVKey<string>('RINKEBY_PROVIDER_URL') || 'http://127.0.0.1:8545',
-      accounts: [loadENVKey<string>('RINKEBY_PRIVATE_KEY')]
+      accounts: [
+        loadENVKey<string>('RINKEBY_PRIVATE_KEY') ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000'
+      ]
     }
   },
 
