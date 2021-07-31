@@ -22,7 +22,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       gasPrice: 20000000000,
       gas: 9500000,
-      accounts: Object.values(<any>testAccounts.privateKeys).map((privateKey: any) => ({
+      accounts: Object.values(testAccounts.privateKeys).map((privateKey: any) => ({
         privateKey,
         balance: '10000000000000000000000000000'
       }))
