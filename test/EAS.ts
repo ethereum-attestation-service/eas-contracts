@@ -45,7 +45,7 @@ describe('EAS', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await eas.VERSION()).to.equal('0.5');
+      expect(await eas.VERSION()).to.equal('0.6');
     });
 
     it('should initialize without any attestations categories or attestations', async () => {
@@ -94,6 +94,7 @@ describe('EAS', () => {
           const prevAttestationsCount = await eas.getAttestationsCount();
           const prevReceivedAttestationsUUIDsCount = await eas.getReceivedAttestationUUIDsCount(recipient, schema);
           const prevSentAttestationsUUIDsCount = await eas.getSentAttestationUUIDsCount(txSender.address, schema);
+          const prevSchemaAttestationsUUIDsCount = await eas.getSchemaAttestationUUIDsCount(schema);
           const prevRelatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
 
           let res;
@@ -170,6 +171,17 @@ describe('EAS', () => {
           expect(sentAttestationsUUIDs).to.have.lengthOf(sentAttestationsUUIDsCount.toNumber());
           expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
 
+          const schemaAttestationsUUIDsCount = await eas.getSchemaAttestationUUIDsCount(schema);
+          expect(schemaAttestationsUUIDsCount).to.equal(prevSchemaAttestationsUUIDsCount.add(BigNumber.from(1)));
+          const schemaAttestationsUUIDs = await eas.getSchemaAttestationUUIDs(
+            schema,
+            0,
+            schemaAttestationsUUIDsCount,
+            false
+          );
+          expect(schemaAttestationsUUIDs).to.have.lengthOf(schemaAttestationsUUIDsCount.toNumber());
+          expect(schemaAttestationsUUIDs[schemaAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
+
           if (refUUID !== ZERO_BYTES32) {
             const relatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
             expect(relatedAttestationsUUIDsCount).to.equal(prevRelatedAttestationsUUIDsCount.add(BigNumber.from(1)));
@@ -232,7 +244,7 @@ describe('EAS', () => {
           }
         };
 
-        it('should revert when attesting to an unregistered AS', async () => {
+        it('should revert when attesting to an unregistered schema', async () => {
           await testFailedAttestation(
             recipient.address,
             formatBytes32String('BAD'),
@@ -243,25 +255,25 @@ describe('EAS', () => {
           );
         });
 
-        context('with registered ASs', async () => {
-          const sid1 = formatBytes32String('AS1');
-          const sid2 = formatBytes32String('AS2');
-          const sid3 = formatBytes32String('AS3');
-          const id1 = getASUUID(sid1, AddressZero);
-          const id2 = getASUUID(sid2, AddressZero);
-          const id3 = getASUUID(sid3, AddressZero);
+        context('with registered schemas', async () => {
+          const schema1 = formatBytes32String('AS1');
+          const schema2 = formatBytes32String('AS2');
+          const schema3 = formatBytes32String('AS3');
+          const schema1Id = getASUUID(schema1, AddressZero);
+          const schema2Id = getASUUID(schema2, AddressZero);
+          const schema3Id = getASUUID(schema3, AddressZero);
 
           beforeEach(async () => {
-            await registry.register(sid1, AddressZero);
-            await registry.register(sid2, AddressZero);
-            await registry.register(sid3, AddressZero);
+            await registry.register(schema1, AddressZero);
+            await registry.register(schema2, AddressZero);
+            await registry.register(schema3, AddressZero);
           });
 
           it('should revert when attesting with passed expiration time', async () => {
             const expired = (await latest()).sub(duration.days(1));
             await testFailedAttestation(
               recipient.address,
-              id1,
+              schema1Id,
               expired,
               ZERO_BYTES32,
               data,
@@ -270,43 +282,43 @@ describe('EAS', () => {
           });
 
           it('should allow attestation to an empty recipient', async () => {
-            await testAttestation(AddressZero, id1, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(AddressZero, schema1Id, expirationTime, ZERO_BYTES32, data);
           });
 
           it('should allow self attestations', async () => {
-            await testAttestation(sender.address, id2, expirationTime, ZERO_BYTES32, data, { from: sender });
+            await testAttestation(sender.address, schema2Id, expirationTime, ZERO_BYTES32, data, { from: sender });
           });
 
           it('should allow multiple attestations', async () => {
-            await testAttestation(recipient.address, id1, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient2.address, id1, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(recipient2.address, schema1Id, expirationTime, ZERO_BYTES32, data);
           });
 
-          it('should allow multiple attestations to the same AS', async () => {
-            await testAttestation(recipient.address, id3, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient.address, id3, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient.address, id3, expirationTime, ZERO_BYTES32, data);
+          it('should allow multiple attestations to the same schema', async () => {
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
           });
 
           it('should allow attestation without expiration time', async () => {
-            await testAttestation(recipient.address, id1, MaxUint256, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema1Id, MaxUint256, ZERO_BYTES32, data);
           });
 
           it('should allow attestation without any data', async () => {
-            await testAttestation(recipient.address, id3, expirationTime, ZERO_BYTES32, ZERO_BYTES);
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, ZERO_BYTES);
           });
 
           it('should store referenced attestation', async () => {
-            await eas.attest(recipient.address, id1, expirationTime, ZERO_BYTES32, data);
+            await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
             const uuid = await eas.getLastUUID();
 
-            await testAttestation(recipient.address, id3, expirationTime, uuid, data);
+            await testAttestation(recipient.address, schema3Id, expirationTime, uuid, data);
           });
 
           it('should revert when attesting to a non-existing attestation', async () => {
             await testFailedAttestation(
               recipient.address,
-              id3,
+              schema3Id,
               expirationTime,
               formatBytes32String('INVALID'),
               data,
@@ -315,19 +327,19 @@ describe('EAS', () => {
           });
 
           it('should revert when sending ETH to a non-payable resolver', async () => {
-            const svid4 = formatBytes32String('AS4');
-            let vid4: string;
+            const schema4 = formatBytes32String('AS4');
+            let schema4Id: string;
             const targetRecipient = accounts[5];
 
             const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
             expect(await resolver.isPayable()).to.be.false;
 
-            await registry.register(svid4, resolver.address);
-            vid4 = getASUUID(svid4, resolver.address);
+            await registry.register(schema4, resolver.address);
+            schema4Id = getASUUID(schema4, resolver.address);
 
             await testFailedAttestation(
               recipient.address,
-              vid4,
+              schema4Id,
               expirationTime,
               ZERO_BYTES32,
               data,
@@ -337,8 +349,8 @@ describe('EAS', () => {
           });
 
           context('with recipient resolver', async () => {
-            const svid4 = formatBytes32String('AS4');
-            let vid4: string;
+            const schema4 = formatBytes32String('AS4');
+            let schema4Id: string;
             let targetRecipient: SignerWithAddress;
 
             beforeEach(async () => {
@@ -347,14 +359,14 @@ describe('EAS', () => {
               const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to a wrong recipient', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -363,26 +375,26 @@ describe('EAS', () => {
             });
 
             it('should allow attesting to the correct recipient', async () => {
-              await testAttestation(targetRecipient.address, vid4, expirationTime, ZERO_BYTES32, data);
+              await testAttestation(targetRecipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
             });
           });
 
           context('with data resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
 
             beforeEach(async () => {
               const resolver = await Contracts.TestASDataResolver.deploy();
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong data', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 '0x1234',
@@ -391,7 +403,7 @@ describe('EAS', () => {
 
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 '0x02',
@@ -400,14 +412,14 @@ describe('EAS', () => {
             });
 
             it('should allow attesting with correct data', async () => {
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, '0x00');
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, '0x01');
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, '0x00');
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, '0x01');
             });
           });
 
           context('with expiration time resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
             let validAfter: BigNumber;
 
             beforeEach(async () => {
@@ -415,14 +427,14 @@ describe('EAS', () => {
               const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with a wrong expiration time', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 validAfter.sub(duration.days(1)),
                 ZERO_BYTES32,
                 data,
@@ -431,13 +443,19 @@ describe('EAS', () => {
             });
 
             it('should allow attesting with the correct expiration time', async () => {
-              await testAttestation(recipient.address, vid4, validAfter.add(duration.seconds(1)), ZERO_BYTES32, data);
+              await testAttestation(
+                recipient.address,
+                schema4Id,
+                validAfter.add(duration.seconds(1)),
+                ZERO_BYTES32,
+                data
+              );
             });
           });
 
           context('with msg.sender resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
             let targetSender: SignerWithAddress;
 
             beforeEach(async () => {
@@ -446,14 +464,14 @@ describe('EAS', () => {
               const resolver = await Contracts.TestASAttesterResolver.deploy(targetSender.address);
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to the wrong msg.sender', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -465,29 +483,29 @@ describe('EAS', () => {
             });
 
             it('should allow attesting to the correct msg.sender', async () => {
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, data, {
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data, {
                 from: targetSender
               });
             });
           });
 
           context('with msg.value resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
             const targetValue = BigNumber.from(7862432);
 
             beforeEach(async () => {
               const resolver = await Contracts.TestASValueResolver.deploy(targetValue);
               expect(await resolver.isPayable()).to.be.true;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong msg.value', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -495,7 +513,7 @@ describe('EAS', () => {
               );
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -507,15 +525,15 @@ describe('EAS', () => {
             });
 
             it('should allow attesting with correct msg.value', async () => {
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, data, {
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data, {
                 value: targetValue
               });
             });
           });
 
           context('with token resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
             const targetAmount = BigNumber.from(22334);
             let resolver: TestASTokenResolver;
 
@@ -525,14 +543,14 @@ describe('EAS', () => {
               resolver = await Contracts.TestASTokenResolver.deploy(token.address, targetAmount);
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong token amount', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -542,7 +560,7 @@ describe('EAS', () => {
               await token.approve(resolver.address, targetAmount.sub(BigNumber.from(1)));
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 data,
@@ -552,30 +570,30 @@ describe('EAS', () => {
 
             it('should allow attesting with correct token amount', async () => {
               await token.approve(resolver.address, targetAmount);
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, data);
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
             });
           });
 
           context('with attestation resolver', async () => {
-            const svid4 = formatBytes32String('VID4');
-            let vid4: string;
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
             let uuid: string;
 
             beforeEach(async () => {
-              await eas.attest(recipient.address, id1, expirationTime, ZERO_BYTES32, data);
+              await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
               uuid = await eas.getLastUUID();
 
               const resolver = await Contracts.TestASAttestationResolver.deploy(eas.address);
               expect(await resolver.isPayable()).to.be.false;
 
-              await registry.register(svid4, resolver.address);
-              vid4 = getASUUID(svid4, resolver.address);
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to a non-existing attestation', async () => {
               await testFailedAttestation(
                 recipient.address,
-                vid4,
+                schema4Id,
                 expirationTime,
                 ZERO_BYTES32,
                 ZERO_BYTES32,
@@ -584,7 +602,7 @@ describe('EAS', () => {
             });
 
             it('should allow attesting to an existing attestation', async () => {
-              await testAttestation(recipient.address, vid4, expirationTime, ZERO_BYTES32, uuid);
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, uuid);
             });
           });
         });
@@ -609,15 +627,15 @@ describe('EAS', () => {
   });
 
   describe('revocation', async () => {
-    const sid1 = formatBytes32String('AS1');
-    const id1 = getASUUID(sid1, AddressZero);
+    const schema1 = formatBytes32String('AS1');
+    const schema1Id = getASUUID(schema1, AddressZero);
     let uuid: string;
 
     let expirationTime: BigNumber;
     const data = '0x1234';
 
     beforeEach(async () => {
-      await registry.register(sid1, AddressZero);
+      await registry.register(schema1, AddressZero);
 
       const now = await latest();
       expirationTime = now.add(duration.days(30));
@@ -642,7 +660,7 @@ describe('EAS', () => {
             .revokeByDelegation(uuid, txSender.address, request.v, hexlify(request.r), hexlify(request.s));
         }
 
-        await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, id1);
+        await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, schema1Id);
 
         const attestation = await eas.getAttestation(uuid);
         expect(attestation.revocationTime).to.equal(await latest());
@@ -668,7 +686,7 @@ describe('EAS', () => {
 
       context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, async () => {
         beforeEach(async () => {
-          await eas.attest(recipient.address, id1, expirationTime, ZERO_BYTES32, data);
+          await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
           uuid = await eas.getLastUUID();
         });
 
@@ -710,12 +728,15 @@ describe('EAS', () => {
 
     const sentAttestations: { [key: string]: string[] } = {};
     const receivedAttestations: { [key: string]: string[] } = {};
+    const schemaAttestations: { [key: string]: string[] } = {};
     const relatedAttestations: { [key: string]: string[] } = {};
 
-    const sid1 = formatBytes32String('AS1');
-    const sid2 = formatBytes32String('AS2');
-    const id1 = getASUUID(sid1, AddressZero);
-    const id2 = getASUUID(sid2, AddressZero);
+    const schema1 = formatBytes32String('AS1');
+    const schema2 = formatBytes32String('AS2');
+    const schema3 = formatBytes32String('AS3');
+    const schema1Id = getASUUID(schema1, AddressZero);
+    const schema2Id = getASUUID(schema2, AddressZero);
+    const schema3Id = getASUUID(schema3, AddressZero);
 
     before(async () => {
       registry = await Contracts.ASRegistry.deploy();
@@ -723,22 +744,25 @@ describe('EAS', () => {
 
       eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
 
-      await registry.register(sid1, AddressZero);
-      await registry.register(sid2, AddressZero);
+      await registry.register(schema1, AddressZero);
+      await registry.register(schema2, AddressZero);
+      await registry.register(schema3, AddressZero);
 
-      await eas.connect(sender2).attest(recipient2.address, id2, MaxUint256, ZERO_BYTES32, data);
+      await eas.connect(sender2).attest(recipient2.address, schema2Id, MaxUint256, ZERO_BYTES32, data);
       refUUID = await eas.getLastUUID();
 
       sentAttestations[sender.address] = [];
       receivedAttestations[recipient.address] = [];
+      schemaAttestations[schema1Id] = [];
       relatedAttestations[refUUID] = [];
 
       for (let i = 0; i < attestationsCount; ++i) {
-        await eas.connect(sender).attest(recipient.address, id1, MaxUint256, refUUID, data);
+        await eas.connect(sender).attest(recipient.address, schema1Id, MaxUint256, refUUID, data);
 
         const uuid = await eas.getLastUUID();
         sentAttestations[sender.address].push(uuid);
         receivedAttestations[recipient.address].push(uuid);
+        schemaAttestations[schema1Id].push(uuid);
         relatedAttestations[refUUID].push(uuid);
       }
     });
@@ -757,13 +781,18 @@ describe('EAS', () => {
         const [start, length] = slice;
 
         it('should return an empty array of received attestations', async () => {
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id2, start, length, false)).to.be.empty;
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id2, start, length, true)).to.be.empty;
+          expect(await eas.getReceivedAttestationUUIDs(recipient.address, schema2Id, start, length, false)).to.be.empty;
+          expect(await eas.getReceivedAttestationUUIDs(recipient.address, schema2Id, start, length, true)).to.be.empty;
         });
 
         it('should return an empty array of sent attestations', async () => {
-          expect(await eas.getSentAttestationUUIDs(sender.address, id2, start, length, false)).to.be.empty;
-          expect(await eas.getSentAttestationUUIDs(sender.address, id2, start, length, true)).to.be.empty;
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema2Id, start, length, false)).to.be.empty;
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema2Id, start, length, true)).to.be.empty;
+        });
+
+        it('should return an empty array of schema attestations', async () => {
+          expect(await eas.getSchemaAttestationUUIDs(schema3Id, start, length, false)).to.be.empty;
+          expect(await eas.getSchemaAttestationUUIDs(schema3Id, start, length, true)).to.be.empty;
         });
 
         it('should return an empty array of related attestations', async () => {
@@ -787,10 +816,12 @@ describe('EAS', () => {
         const [start, length] = slice;
 
         it('should return received attestations', async () => {
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, false)).to.have.members(
-            receivedAttestations[recipient.address].slice(start, start + length)
-          );
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, true)).to.have.members(
+          expect(
+            await eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, false)
+          ).to.have.members(receivedAttestations[recipient.address].slice(start, start + length));
+          expect(
+            await eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, true)
+          ).to.have.members(
             receivedAttestations[recipient.address]
               .slice()
               .reverse()
@@ -799,11 +830,23 @@ describe('EAS', () => {
         });
 
         it('should return sent attestations', async () => {
-          expect(await eas.getSentAttestationUUIDs(sender.address, id1, start, length, false)).to.have.members(
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, false)).to.have.members(
             sentAttestations[sender.address].slice(start, start + length)
           );
-          expect(await eas.getSentAttestationUUIDs(sender.address, id1, start, length, true)).to.have.members(
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, true)).to.have.members(
             sentAttestations[sender.address]
+              .slice()
+              .reverse()
+              .slice(start, start + length)
+          );
+        });
+
+        it('should return schema attestations', async () => {
+          expect(await eas.getSchemaAttestationUUIDs(schema1Id, start, length, false)).to.have.members(
+            schemaAttestations[schema1Id].slice(start, start + length)
+          );
+          expect(await eas.getSchemaAttestationUUIDs(schema1Id, start, length, true)).to.have.members(
+            schemaAttestations[schema1Id]
               .slice()
               .reverse()
               .slice(start, start + length)
@@ -834,18 +877,27 @@ describe('EAS', () => {
 
         it('should revert on received attestations', async () => {
           await expect(
-            eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, false)
+            eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, false)
           ).to.be.revertedWith('ERR_INVALID_OFFSET');
-          await expect(eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, true)).to.be.revertedWith(
+          await expect(
+            eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, true)
+          ).to.be.revertedWith('ERR_INVALID_OFFSET');
+        });
+
+        it('should revert on sent attestations', async () => {
+          await expect(eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, false)).to.be.revertedWith(
+            'ERR_INVALID_OFFSET'
+          );
+          await expect(eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, true)).to.be.revertedWith(
             'ERR_INVALID_OFFSET'
           );
         });
 
-        it('should revert on sent attestations', async () => {
-          await expect(eas.getSentAttestationUUIDs(sender.address, id1, start, length, false)).to.be.revertedWith(
+        it('should revert on schema attestations', async () => {
+          await expect(eas.getSchemaAttestationUUIDs(schema1Id, start, length, false)).to.be.revertedWith(
             'ERR_INVALID_OFFSET'
           );
-          await expect(eas.getSentAttestationUUIDs(sender.address, id1, start, length, true)).to.be.revertedWith(
+          await expect(eas.getSchemaAttestationUUIDs(schema1Id, start, length, true)).to.be.revertedWith(
             'ERR_INVALID_OFFSET'
           );
         });
@@ -871,20 +923,29 @@ describe('EAS', () => {
         const [start, length] = slice;
 
         it('should trim the length of the received attestations', async () => {
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, false)).to.have.members(
-            receivedAttestations[recipient.address].slice(start, attestationsCount)
+          expect(
+            await eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, false)
+          ).to.have.members(receivedAttestations[recipient.address].slice(start, attestationsCount));
+          expect(
+            await eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, true)
+          ).to.have.members(receivedAttestations[recipient.address].slice().reverse().slice(start, attestationsCount));
+        });
+
+        it('should trim the length of the  sent attestations', async () => {
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, false)).to.have.members(
+            sentAttestations[sender.address].slice(start, attestationsCount)
           );
-          expect(await eas.getReceivedAttestationUUIDs(recipient.address, id1, start, length, true)).to.have.members(
-            receivedAttestations[recipient.address].slice().reverse().slice(start, attestationsCount)
+          expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, true)).to.have.members(
+            sentAttestations[sender.address].slice().reverse().slice(start, attestationsCount)
           );
         });
 
         it('should trim the length of the  sent attestations', async () => {
-          expect(await eas.getSentAttestationUUIDs(sender.address, id1, start, length, false)).to.have.members(
-            sentAttestations[sender.address].slice(start, attestationsCount)
+          expect(await eas.getSchemaAttestationUUIDs(schema1Id, start, length, false)).to.have.members(
+            schemaAttestations[schema1Id].slice(start, attestationsCount)
           );
-          expect(await eas.getSentAttestationUUIDs(sender.address, id1, start, length, true)).to.have.members(
-            sentAttestations[sender.address].slice().reverse().slice(start, attestationsCount)
+          expect(await eas.getSchemaAttestationUUIDs(schema1Id, start, length, true)).to.have.members(
+            schemaAttestations[schema1Id].slice().reverse().slice(start, attestationsCount)
           );
         });
 

@@ -42,7 +42,7 @@ interface IEAS {
      * @param uuid The UUID the revoked attestation.
      * @param schema The UUID of the AS.
      */
-    event Attested(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
+    event Attested(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
      * @dev Triggered when an attestation has been revoked.
@@ -52,7 +52,7 @@ interface IEAS {
      * @param schema The UUID of the AS.
      * @param uuid The UUID the revoked attestation.
      */
-    event Revoked(address indexed recipient, address indexed attester, bytes32 indexed uuid, bytes32 schema);
+    event Revoked(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
      * @dev Returns the address of the AS global registry.
@@ -246,4 +246,30 @@ interface IEAS {
      * @return The number of related attestations.
      */
     function getRelatedAttestationUUIDsCount(bytes32 uuid) external view returns (uint256);
+
+    /**
+     * @dev Returns all per-schema attestation UUIDs.
+     *
+     * @param schema The UUID of the AS.
+     * @param start The offset to start from.
+     * @param length The number of total members to retrieve.
+     * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
+     *
+     * @return An array of attestation UUIDs.
+     */
+    function getSchemaAttestationUUIDs(
+        bytes32 schema,
+        uint256 start,
+        uint256 length,
+        bool reverseOrder
+    ) external view returns (bytes32[] memory);
+
+    /**
+     * @dev Returns the number of per-schema  attestation UUIDs.
+     *
+     * @param schema The UUID of the AS.
+     *
+     * @return The number of attestations.
+     */
+    function getSchemaAttestationUUIDsCount(bytes32 schema) external view returns (uint256);
 }
