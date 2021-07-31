@@ -45,7 +45,7 @@ const config: HardhatUserConfig = {
   },
 
   etherscan: {
-    apiKey: loadENVKey('ETHERSCAN_API')
+    apiKey: loadENVKey<string>('ETHERSCAN_API_KEY')
   },
 
   contractSizer: {
