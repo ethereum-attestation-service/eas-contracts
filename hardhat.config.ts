@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
     },
 
     rinkeby: {
-      url: loadENVKey('RINKEBY_INFURA_URL') || 'http://127.0.0.1:8545',
+      url: loadENVKey('RINKEBY_PROVIDER_URL') || 'http://127.0.0.1:8545',
       accounts: {
         mnemonic: loadENVKey('RINKEBY_MNEMONIC') || ''
       }
