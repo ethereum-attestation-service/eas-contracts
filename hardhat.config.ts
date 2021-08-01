@@ -1,14 +1,17 @@
+import * as testAccounts from './test/accounts.json';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
+import dotenv from 'dotenv';
 import 'hardhat-abi-exporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-docgen';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
 import 'solidity-coverage';
-import * as testAccounts from './test/accounts.json';
+
+dotenv.config();
 
 const loadENVKey = <T>(envKeyName: string) => {
   return process.env[envKeyName] as unknown as T;
@@ -19,17 +22,18 @@ const config: HardhatUserConfig = {
     hardhat: {
       gasPrice: 20000000000,
       gas: 9500000,
-      accounts: Object.values(<any>testAccounts.privateKeys).map((privateKey: any) => ({
+      accounts: Object.values(testAccounts.privateKeys).map((privateKey: any) => ({
         privateKey,
         balance: '10000000000000000000000000000'
       }))
     },
 
     rinkeby: {
-      url: loadENVKey('RINKEBY_INFURA_URL') || 'http://127.0.0.1:8545',
-      accounts: {
-        mnemonic: loadENVKey('RINKEBY_MNEMONIC') || ''
-      }
+      url: loadENVKey<string>('RINKEBY_PROVIDER_URL') || 'http://127.0.0.1:8545',
+      accounts: [
+        loadENVKey<string>('RINKEBY_PRIVATE_KEY') ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000'
+      ]
     }
   },
 
@@ -47,7 +51,7 @@ const config: HardhatUserConfig = {
   },
 
   etherscan: {
-    apiKey: loadENVKey('ETHERSCAN_API')
+    apiKey: loadENVKey<string>('ETHERSCAN_API_KEY')
   },
 
   contractSizer: {
