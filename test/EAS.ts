@@ -1,5 +1,12 @@
 import Contracts from '../components/Contracts';
-import { ASRegistry, EIP712Verifier, TestASTokenResolver, TestEAS, TestERC20Token } from '../typechain';
+import {
+  ASRegistry,
+  EIP712Verifier,
+  TestASPayingResolver,
+  TestASTokenResolver,
+  TestEAS,
+  TestERC20Token
+} from '../typechain';
 import * as testAccounts from './accounts.json';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
@@ -7,6 +14,10 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
+
+const {
+  provider: { getBalance }
+} = ethers;
 
 const {
   constants: { AddressZero, MaxUint256 },
@@ -331,6 +342,9 @@ describe('EAS', () => {
 
             const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
             expect(await resolver.isPayable()).to.be.false;
+            await expect(sender.sendTransaction({ to: resolver.address, value: BigNumber.from(1) })).to.be.revertedWith(
+              'ERR_NOT_PAYABLE'
+            );
 
             await registry.register(schema4, resolver.address);
             schema4Id = getASUUID(schema4, resolver.address);
@@ -601,6 +615,33 @@ describe('EAS', () => {
 
             it('should allow attesting to an existing attestation', async () => {
               await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, uuid);
+            });
+          });
+
+          context('with paying resolver', async () => {
+            const schema4 = formatBytes32String('schema4Id');
+            let schema4Id: string;
+            const incentive = BigNumber.from(1000);
+            let resolver: TestASPayingResolver;
+
+            beforeEach(async () => {
+              resolver = await Contracts.TestASPayingResolver.deploy(incentive);
+              expect(await resolver.isPayable()).to.be.true;
+
+              await sender.sendTransaction({ to: resolver.address, value: incentive.mul(BigNumber.from(2)) });
+
+              await registry.register(schema4, resolver.address);
+              schema4Id = getASUUID(schema4, resolver.address);
+            });
+
+            it('should incentivize attesters', async () => {
+              const prevResolverBalance = await getBalance(resolver.address);
+              const prevRecipient2Balance = await getBalance(recipient.address);
+
+              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
+
+              expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.sub(incentive));
+              expect(await getBalance(recipient.address)).to.equal(prevRecipient2Balance.add(incentive));
             });
           });
         });
