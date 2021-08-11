@@ -2,20 +2,16 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether the attestation is from a specific attester.
  */
-contract TestASAttesterResolver is IASResolver {
+contract TestASAttesterResolver is ASResolver {
     address private immutable _targetAttester;
 
     constructor(address targetAttester) {
         _targetAttester = targetAttester;
-    }
-
-    function isPayable() external pure override returns (bool) {
-        return false;
     }
 
     function resolve(
