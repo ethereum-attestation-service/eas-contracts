@@ -2,20 +2,16 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether the attestation is to a specific recipient.
  */
-contract TestASRecipientResolver is IASResolver {
+contract TestASRecipientResolver is ASResolver {
     address private immutable _targetRecipient;
 
     constructor(address targetRecipient) {
         _targetRecipient = targetRecipient;
-    }
-
-    function isPayable() external pure override returns (bool) {
-        return false;
     }
 
     function resolve(

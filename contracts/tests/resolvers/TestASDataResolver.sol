@@ -2,16 +2,12 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether an attestation data is either \x00 or \x01.
  */
-contract TestASDataResolver is IASResolver {
-    function isPayable() external pure override returns (bool) {
-        return false;
-    }
-
+contract TestASDataResolver is ASResolver {
     function resolve(
         address, /* recipient */
         bytes calldata, /* schema */

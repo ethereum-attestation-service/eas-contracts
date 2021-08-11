@@ -5,12 +5,12 @@ pragma solidity 0.7.6;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether a specific amount of tokens was approved to be included in an attestation.
  */
-contract TestASTokenResolver is IASResolver {
+contract TestASTokenResolver is ASResolver {
     using SafeERC20 for IERC20;
 
     IERC20 private immutable _targetToken;
@@ -19,10 +19,6 @@ contract TestASTokenResolver is IASResolver {
     constructor(IERC20 targetToken, uint256 targetAmount) {
         _targetToken = targetToken;
         _targetAmount = targetAmount;
-    }
-
-    function isPayable() external pure override returns (bool) {
-        return false;
     }
 
     function resolve(
