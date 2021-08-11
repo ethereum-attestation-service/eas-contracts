@@ -16,19 +16,19 @@ const {
 const ZERO_BYTES = '0x';
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-let accounts: SignerWithAddress[];
-let sender: SignerWithAddress;
-let sender2: SignerWithAddress;
-let recipient: SignerWithAddress;
-let recipient2: SignerWithAddress;
-
-let registry: ASRegistry;
-let verifier: EIP712Verifier;
-let eas: TestEAS;
-let eip712Utils: EIP712Utils;
-let token: TestERC20Token;
-
 describe('EAS', () => {
+  let accounts: SignerWithAddress[];
+  let sender: SignerWithAddress;
+  let sender2: SignerWithAddress;
+  let recipient: SignerWithAddress;
+  let recipient2: SignerWithAddress;
+
+  let registry: ASRegistry;
+  let verifier: EIP712Verifier;
+  let eas: TestEAS;
+  let eip712Utils: EIP712Utils;
+  let token: TestERC20Token;
+
   before(async () => {
     accounts = await ethers.getSigners();
 
@@ -195,8 +195,6 @@ describe('EAS', () => {
             expect(relatedAttestationsUUIDs).to.have.lengthOf(relatedAttestationsUUIDsCount.toNumber());
             expect(relatedAttestationsUUIDs[relatedAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
           }
-
-          return attestation.uuid;
         };
 
         const testFailedAttestation = async (
