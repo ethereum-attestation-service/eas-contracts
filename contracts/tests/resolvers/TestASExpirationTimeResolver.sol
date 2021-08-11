@@ -2,20 +2,16 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether the expiration time is later than a specific timestamp.
  */
-contract TestASExpirationTimeResolver is IASResolver {
+contract TestASExpirationTimeResolver is ASResolver {
     uint256 private immutable _validAfter;
 
     constructor(uint256 validAfter) {
         _validAfter = validAfter;
-    }
-
-    function isPayable() external pure override returns (bool) {
-        return false;
     }
 
     function resolve(

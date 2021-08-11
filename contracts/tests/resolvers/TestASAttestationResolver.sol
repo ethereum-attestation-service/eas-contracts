@@ -2,21 +2,17 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 import "../../EAS.sol";
 
 /**
  * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.
  */
-contract TestASAttestationResolver is IASResolver {
+contract TestASAttestationResolver is ASResolver {
     EAS private immutable _eas;
 
     constructor(EAS eas) {
         _eas = eas;
-    }
-
-    function isPayable() external pure override returns (bool) {
-        return false;
     }
 
     function resolve(

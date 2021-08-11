@@ -2,19 +2,19 @@
 
 pragma solidity 0.7.6;
 
-import "../../IASResolver.sol";
+import "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether a specific amount of ETH was sent with an attestation.
  */
-contract TestASValueResolver is IASResolver {
+contract TestASValueResolver is ASResolver {
     uint256 private immutable _targetValue;
 
     constructor(uint256 targetValue) {
         _targetValue = targetValue;
     }
 
-    function isPayable() external pure override returns (bool) {
+    function isPayable() public pure override returns (bool) {
         return true;
     }
 
