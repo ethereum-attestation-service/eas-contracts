@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 
 import "./IASResolver.sol";
 
@@ -8,11 +8,15 @@ import "./IASResolver.sol";
  * @title A base resolver contract
  */
 abstract contract ASResolver is IASResolver {
-    function isPayable() public pure virtual override returns (bool) {
+    error NotPayable();
+
+    function isPayable() public pure virtual returns (bool) {
         return false;
     }
 
     receive() external payable virtual {
-        require(isPayable(), "ERR_NOT_PAYABLE");
+        if (!isPayable()) {
+            revert NotPayable();
+        }
     }
 }
