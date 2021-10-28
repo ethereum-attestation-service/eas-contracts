@@ -6,7 +6,7 @@ import {
   TestASTokenResolver,
   TestEAS,
   TestERC20Token
-} from '../typechain';
+} from '../typechain-types';
 import * as testAccounts from './accounts.json';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
@@ -56,7 +56,7 @@ describe('EAS', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await eas.VERSION()).to.equal('0.6');
+      expect(await eas.VERSION()).to.equal('0.8');
     });
 
     it('should initialize without any attestations categories or attestations', async () => {
@@ -64,13 +64,11 @@ describe('EAS', () => {
     });
 
     it('should revert when initialized with an empty AS registry', async () => {
-      await expect(Contracts.EAS.deploy(AddressZero, verifier.address)).to.be.revertedWith('ERR_INVALID_REGISTRY');
+      await expect(Contracts.EAS.deploy(AddressZero, verifier.address)).to.be.revertedWith('InvalidRegistry');
     });
 
     it('should revert when initialized with an empty EIP712 verifier', async () => {
-      await expect(Contracts.EAS.deploy(registry.address, AddressZero)).to.be.revertedWith(
-        'ERR_INVALID_EIP712_VERIFIER'
-      );
+      await expect(Contracts.EAS.deploy(registry.address, AddressZero)).to.be.revertedWith('InvalidVerifier');
     });
   });
 
@@ -260,7 +258,7 @@ describe('EAS', () => {
             expirationTime,
             ZERO_BYTES32,
             data,
-            'ERR_INVALID_AS'
+            'InvalidSchema'
           );
         });
 
@@ -286,7 +284,7 @@ describe('EAS', () => {
               expired,
               ZERO_BYTES32,
               data,
-              'ERR_INVALID_EXPIRATION_TIME'
+              'InvalidExpirationTime'
             );
           });
 
@@ -331,7 +329,7 @@ describe('EAS', () => {
               expirationTime,
               formatBytes32String('INVALID'),
               data,
-              'ERR_NO_ATTESTATION'
+              'NotFound'
             );
           });
 
@@ -343,7 +341,7 @@ describe('EAS', () => {
             const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
             expect(await resolver.isPayable()).to.be.false;
             await expect(sender.sendTransaction({ to: resolver.address, value: BigNumber.from(1) })).to.be.revertedWith(
-              'ERR_NOT_PAYABLE'
+              'NotPayable'
             );
 
             await registry.register(schema4, resolver.address);
@@ -355,7 +353,7 @@ describe('EAS', () => {
               expirationTime,
               ZERO_BYTES32,
               data,
-              'ERR_ETH_TRANSFER_UNSUPPORTED',
+              'NotPayable',
               { value: BigNumber.from(1) }
             );
           });
@@ -382,7 +380,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
             });
 
@@ -410,7 +408,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 '0x1234',
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
 
               await testFailedAttestation(
@@ -419,7 +417,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 '0x02',
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
             });
 
@@ -450,7 +448,7 @@ describe('EAS', () => {
                 validAfter.sub(duration.days(1)),
                 ZERO_BYTES32,
                 data,
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
             });
 
@@ -487,7 +485,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERR_INVALID_ATTESTATION_DATA',
+                'InvalidAttestation',
                 {
                   from: sender
                 }
@@ -521,7 +519,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
               await testFailedAttestation(
                 recipient.address,
@@ -529,7 +527,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERR_INVALID_ATTESTATION_DATA',
+                'InvalidAttestation',
                 {
                   value: targetValue.sub(BigNumber.from(1))
                 }
@@ -609,7 +607,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 ZERO_BYTES32,
-                'ERR_INVALID_ATTESTATION_DATA'
+                'InvalidAttestation'
               );
             });
 
@@ -661,7 +659,7 @@ describe('EAS', () => {
           formatBytes32String('BAD'),
           formatBytes32String('BAD')
         )
-      ).to.be.revertedWith('ERR_INVALID_SIGNATURE');
+      ).to.be.revertedWith('InvalidSignature');
     });
   });
 
@@ -730,11 +728,11 @@ describe('EAS', () => {
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
-          await testFailedRevocation(formatBytes32String('BAD'), 'ERR_NO_ATTESTATION');
+          await testFailedRevocation(formatBytes32String('BAD'), 'NotFound');
         });
 
         it("should revert when revoking a someone's else attestation", async () => {
-          await testFailedRevocation(uuid, 'ERR_ACCESS_DENIED', { from: sender2 });
+          await testFailedRevocation(uuid, 'AccessDenied', { from: sender2 });
         });
 
         it('should allow to revoke an existing attestation', async () => {
@@ -743,7 +741,7 @@ describe('EAS', () => {
 
         it('should revert when revoking an already revoked attestation', async () => {
           await testRevocation(uuid);
-          await testFailedRevocation(uuid, 'ERR_ALREADY_REVOKED');
+          await testFailedRevocation(uuid, 'AlreadyRevoked');
         });
       });
     }
@@ -751,7 +749,7 @@ describe('EAS', () => {
     it('should revert when delegation revoking with a wrong signature', async () => {
       await expect(
         eas.revokeByDelegation(ZERO_BYTES32, sender.address, 28, formatBytes32String('BAD'), formatBytes32String('BAD'))
-      ).to.be.revertedWith('ERR_INVALID_SIGNATURE');
+      ).to.be.revertedWith('InvalidSignature');
     });
   });
 
@@ -917,36 +915,36 @@ describe('EAS', () => {
         it('should revert on received attestations', async () => {
           await expect(
             eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, false)
-          ).to.be.revertedWith('ERR_INVALID_OFFSET');
+          ).to.be.revertedWith('InvalidOffset');
           await expect(
             eas.getReceivedAttestationUUIDs(recipient.address, schema1Id, start, length, true)
-          ).to.be.revertedWith('ERR_INVALID_OFFSET');
+          ).to.be.revertedWith('InvalidOffset');
         });
 
         it('should revert on sent attestations', async () => {
           await expect(eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, false)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
           await expect(eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, true)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
         });
 
         it('should revert on schema attestations', async () => {
           await expect(eas.getSchemaAttestationUUIDs(schema1Id, start, length, false)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
           await expect(eas.getSchemaAttestationUUIDs(schema1Id, start, length, true)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
         });
 
         it('should revert on related attestations', async () => {
           await expect(eas.getRelatedAttestationUUIDs(refUUID, start, length, false)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
           await expect(eas.getRelatedAttestationUUIDs(refUUID, start, length, true)).to.be.revertedWith(
-            'ERR_INVALID_OFFSET'
+            'InvalidOffset'
           );
         });
       });

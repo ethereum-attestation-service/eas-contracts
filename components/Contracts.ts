@@ -12,9 +12,8 @@ import {
   TestASValueResolver__factory,
   TestEAS__factory,
   TestERC20Token__factory
-} from '../typechain';
-import { Signer } from '@ethersproject/abstract-signer';
-import { ContractFactory } from '@ethersproject/contracts';
+} from '../typechain-types';
+import { Signer, ContractFactory } from 'ethers';
 import { ethers } from 'hardhat';
 
 type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any) => Promise<infer U>
@@ -25,12 +24,10 @@ type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any)
 
 type Contract<F extends ContractFactory> = AsyncReturnType<F['deploy']>;
 
-
 export interface ContractBuilder<F extends ContractFactory> {
-  contractName: string;
   deploy(...args: Parameters<F['deploy']>): Promise<Contract<F>>;
   attach(address: string, passedSigner?: Signer): Promise<Contract<F>>;
-
+}
 
 const deployOrAttach = <F extends ContractFactory>(contractName: string): ContractBuilder<F> => {
   return {

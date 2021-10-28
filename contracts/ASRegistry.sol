@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 pragma abicoder v2;
 
 import "./Types.sol";
@@ -11,7 +11,9 @@ import "./IASResolver.sol";
  * @title The global AS registry.
  */
 contract ASRegistry is IASRegistry {
-    string public constant VERSION = "0.6";
+    error AlreadyExists();
+
+    string public constant VERSION = "0.8";
 
     // The global mapping between AS records and their IDs.
     mapping(bytes32 => ASRecord) private _registry;
@@ -22,13 +24,15 @@ contract ASRegistry is IASRegistry {
     /**
      * @inheritdoc IASRegistry
      */
-    function register(bytes calldata schema, IASResolver resolver) external override returns (bytes32) {
+    function register(bytes calldata schema, IASResolver resolver) external returns (bytes32) {
         uint256 index = ++_asCount;
 
         ASRecord memory asRecord = ASRecord({uuid: EMPTY_UUID, index: index, schema: schema, resolver: resolver});
 
         bytes32 uuid = _getUUID(asRecord);
-        require(_registry[uuid].uuid == EMPTY_UUID, "ERR_ALREADY_EXISTS");
+        if (_registry[uuid].uuid != EMPTY_UUID) {
+            revert AlreadyExists();
+        }
 
         asRecord.uuid = uuid;
         _registry[uuid] = asRecord;
@@ -41,14 +45,14 @@ contract ASRegistry is IASRegistry {
     /**
      * @inheritdoc IASRegistry
      */
-    function getAS(bytes32 uuid) external view override returns (ASRecord memory) {
+    function getAS(bytes32 uuid) external view returns (ASRecord memory) {
         return _registry[uuid];
     }
 
     /**
      * @inheritdoc IASRegistry
      */
-    function getASCount() external view override returns (uint256) {
+    function getASCount() external view returns (uint256) {
         return _asCount;
     }
 

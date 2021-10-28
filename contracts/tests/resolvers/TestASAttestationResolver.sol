@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 
 import "../../ASResolver.sol";
 import "../../EAS.sol";
@@ -9,6 +9,9 @@ import "../../EAS.sol";
  * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.
  */
 contract TestASAttestationResolver is ASResolver {
+    error Overflow();
+    error OutOfBounds();
+
     EAS private immutable _eas;
 
     constructor(EAS eas) {
@@ -26,8 +29,14 @@ contract TestASAttestationResolver is ASResolver {
     }
 
     function _toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {
-        require(start + 32 >= start, "ERR_OVERFLOW");
-        require(data.length >= start + 32, "ERR_OUT_OF_BOUNDS");
+        if (start + 32 < start) {
+            revert Overflow();
+        }
+
+        if (data.length < start + 32) {
+            revert OutOfBounds();
+        }
+
         bytes32 tempBytes32;
 
         // solhint-disable-next-line no-inline-assembly
