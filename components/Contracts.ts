@@ -25,7 +25,14 @@ type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any)
 
 type Contract<F extends ContractFactory> = AsyncReturnType<F['deploy']>;
 
-const deployOrAttach = <F extends ContractFactory>(contractName: string) => {
+
+export interface ContractBuilder<F extends ContractFactory> {
+  contractName: string;
+  deploy(...args: Parameters<F['deploy']>): Promise<Contract<F>>;
+  attach(address: string, passedSigner?: Signer): Promise<Contract<F>>;
+
+
+const deployOrAttach = <F extends ContractFactory>(contractName: string): ContractBuilder<F> => {
   return {
     deploy: async (...args: Parameters<F['deploy']>): Promise<Contract<F>> => {
       let defaultSigner = (await ethers.getSigners())[0];
