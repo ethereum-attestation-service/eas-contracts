@@ -9,7 +9,6 @@ yarn-error.log*
 cache
 artifacts
 data
-typechain
 typechain-types
 
 .coverage_artifacts

@@ -11,7 +11,7 @@
   "files": [
     "/contracts/**/*.sol",
     "/artifacts/contracts/**/*.json",
-    "/typechain/**/*.ts",
+    "/typechain-types/**/*.ts",
     "!/contracts/tests"
   ],
   "scripts": {
@@ -19,7 +19,7 @@
     "recompile": "yarn clean && yarn compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "clean": "rm -rf artifacts cache data coverage typechain",
+    "clean": "rm -rf artifacts cache data coverage typechain-types",
     "dev": "hardhat node",
     "deploy": "hardhat run scripts/deploy.ts",
     "lint": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
@@ -43,7 +43,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "4.3.2",
     "@trivago/prettier-plugin-sort-imports": "^2.0.4",
-    "@typechain/ethers-v5": "^8.0.0",
+    "@typechain/ethers-v5": "^7.1.2",
     "@typechain/hardhat": "^3.0.0",
     "@types/async-retry": "^1.4.3",
     "@types/chai": "^4.2.22",
@@ -68,7 +68,7 @@
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17",
     "ts-node": "^10.4.0",
-    "typechain": "^6.0.0",
+    "typechain": "^5.1.2",
     "typescript": "^4.4.4"
   }
 }

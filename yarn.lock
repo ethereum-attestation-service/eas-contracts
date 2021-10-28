@@ -1477,10 +1477,10 @@
   dependencies:
     ethers "^5.0.2"
 
-"@typechain/ethers-v5@^8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-8.0.0.tgz#1321a441d473b588826561daa9e57be889e67c93"
-  integrity sha512-i2H/G6YZs8fAxXwQ2jtkrsuH9mbZ6TqIzt0j208dX0rnDD66Dllk9lJcJpSuLYzTvf+o5tNe75si1dFLbjMmZQ==
+"@typechain/ethers-v5@^7.1.2":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-7.2.0.tgz#d559cffe0efe6bdbc20e644b817f6fa8add5e8f8"
+  integrity sha512-jfcmlTvaaJjng63QsT49MT6R1HFhtO/TBMWbyzPFSzMmVIqb2tL6prnKBs4ZJrSvmgIXWy+ttSjpaxCTq8D/Tw==
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
@@ -11049,10 +11049,10 @@ typechain@^3.0.0:
     ts-essentials "^6.0.3"
     ts-generator "^0.1.1"
 
-typechain@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/typechain/-/typechain-6.0.0.tgz#9d0549dd41073cd9b03f6434568f65c435aabaab"
-  integrity sha512-qKCgioqC4NywVe/lvOkZzG+UGAZc3kqyZ2WU7OUEJC7Wdo5l5zNrnUQPeXdWByN8M5/8ahQjidI3Ul1vUHSKJw==
+typechain@^5.1.2:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/typechain/-/typechain-5.2.0.tgz#10525a44773a34547eb2eed8978cb72c0a39a0f4"
+  integrity sha512-0INirvQ+P+MwJOeMct+WLkUE4zov06QxC96D+i3uGFEHoiSkZN70MKDQsaj8zkL86wQwByJReI2e7fOUwECFuw==
   dependencies:
     "@types/prettier" "^2.1.1"
     command-line-args "^4.0.7"
