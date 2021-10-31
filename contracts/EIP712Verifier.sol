@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 
 import "./IEIP712Verifier.sol";
 
@@ -8,7 +8,9 @@ import "./IEIP712Verifier.sol";
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
  */
 contract EIP712Verifier is IEIP712Verifier {
-    string public constant VERSION = "0.6";
+    error InvalidSignature();
+
+    string public constant VERSION = "0.8";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
@@ -48,7 +50,7 @@ contract EIP712Verifier is IEIP712Verifier {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function getNonce(address account) external view override returns (uint256) {
+    function getNonce(address account) external view returns (uint256) {
         return _nonces[account];
     }
 
@@ -65,7 +67,7 @@ contract EIP712Verifier is IEIP712Verifier {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external override {
+    ) external {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
@@ -85,7 +87,9 @@ contract EIP712Verifier is IEIP712Verifier {
         );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
+        if (recoveredAddress == address(0) || recoveredAddress != attester) {
+            revert InvalidSignature();
+        }
     }
 
     /**
@@ -97,7 +101,7 @@ contract EIP712Verifier is IEIP712Verifier {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external override {
+    ) external {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
@@ -107,6 +111,8 @@ contract EIP712Verifier is IEIP712Verifier {
         );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0) && recoveredAddress == attester, "ERR_INVALID_SIGNATURE");
+        if (recoveredAddress == address(0) || recoveredAddress != attester) {
+            revert InvalidSignature();
+        }
     }
 }

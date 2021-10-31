@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 pragma abicoder v2;
 
 import "./IASResolver.sol";
 
 /**
- * @title A struct representing a record for a submitted AS (Attestation Object).
+ * @title A struct representing a record for a submitted AS (Attestation Schema).
  */
 struct ASRecord {
     // A unique identifier of the AS.

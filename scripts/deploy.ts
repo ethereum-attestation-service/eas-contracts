@@ -4,13 +4,12 @@ import '@typechain/hardhat';
 import retry from 'async-retry';
 import { Contract } from 'ethers';
 import { network, run } from 'hardhat';
-import { NomicLabsHardhatPluginError } from 'hardhat/plugins';
 
 const TEST_NETWORKS = ['hardhat', 'localhost'];
 
 const verify = async (contract: Contract, ctorArgs: any[] = []) =>
   retry(
-    async (bail) => {
+    async () => {
       try {
         await run('verify:verify', {
           address: contract.address,
