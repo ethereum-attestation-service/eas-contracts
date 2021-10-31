@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.7.6;
+pragma solidity 0.8.9;
 pragma abicoder v2;
 
 import "./Types.sol";
@@ -11,7 +11,18 @@ import "./IASRegistry.sol";
  * @title EAS - Ethereum Attestation Service
  */
 contract EAS is IEAS {
-    string public constant VERSION = "0.6";
+    error AccessDenied();
+    error AlreadyRevoked();
+    error InvalidAttestation();
+    error InvalidExpirationTime();
+    error InvalidOffset();
+    error InvalidRegistry();
+    error InvalidSchema();
+    error InvalidVerifier();
+    error NotFound();
+    error NotPayable();
+
+    string public constant VERSION = "0.8";
 
     // A terminator used when concatenating and hashing multiple fields.
     string private constant HASH_TERMINATOR = "@";
@@ -47,8 +58,13 @@ contract EAS is IEAS {
      * @param verifier The address of the EIP712 verifier.
      */
     constructor(IASRegistry registry, IEIP712Verifier verifier) {
-        require(address(registry) != address(0x0), "ERR_INVALID_REGISTRY");
-        require(address(verifier) != address(0x0), "ERR_INVALID_EIP712_VERIFIER");
+        if (address(registry) == address(0x0)) {
+            revert InvalidRegistry();
+        }
+
+        if (address(verifier) == address(0x0)) {
+            revert InvalidVerifier();
+        }
 
         _asRegistry = registry;
         _eip712Verifier = verifier;
@@ -57,21 +73,21 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getASRegistry() external view override returns (IASRegistry) {
+    function getASRegistry() external view returns (IASRegistry) {
         return _asRegistry;
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getEIP712Verifier() external view override returns (IEIP712Verifier) {
+    function getEIP712Verifier() external view returns (IEIP712Verifier) {
         return _eip712Verifier;
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getAttestationsCount() external view override returns (uint256) {
+    function getAttestationsCount() external view returns (uint256) {
         return _attestationsCount;
     }
 
@@ -84,7 +100,7 @@ contract EAS is IEAS {
         uint256 expirationTime,
         bytes32 refUUID,
         bytes calldata data
-    ) public payable virtual override returns (bytes32) {
+    ) public payable virtual returns (bytes32) {
         return _attest(recipient, schema, expirationTime, refUUID, data, msg.sender);
     }
 
@@ -101,7 +117,7 @@ contract EAS is IEAS {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable virtual override returns (bytes32) {
+    ) public payable virtual returns (bytes32) {
         _eip712Verifier.attest(recipient, schema, expirationTime, refUUID, data, attester, v, r, s);
 
         return _attest(recipient, schema, expirationTime, refUUID, data, attester);
@@ -110,7 +126,7 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function revoke(bytes32 uuid) public virtual override {
+    function revoke(bytes32 uuid) public virtual {
         return _revoke(uuid, msg.sender);
     }
 
@@ -123,7 +139,7 @@ contract EAS is IEAS {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public virtual override {
+    ) public virtual {
         _eip712Verifier.revoke(uuid, attester, v, r, s);
 
         _revoke(uuid, attester);
@@ -132,14 +148,14 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getAttestation(bytes32 uuid) external view override returns (Attestation memory) {
+    function getAttestation(bytes32 uuid) external view returns (Attestation memory) {
         return _db[uuid];
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function isAttestationValid(bytes32 uuid) public view override returns (bool) {
+    function isAttestationValid(bytes32 uuid) public view returns (bool) {
         return _db[uuid].uuid != 0;
     }
 
@@ -152,19 +168,14 @@ contract EAS is IEAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) external view override returns (bytes32[] memory) {
+    ) external view returns (bytes32[] memory) {
         return _sliceUUIDs(_receivedAttestations[recipient][schema], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256) {
         return _receivedAttestations[recipient][schema].length;
     }
 
@@ -177,14 +188,14 @@ contract EAS is IEAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) external view override returns (bytes32[] memory) {
+    ) external view returns (bytes32[] memory) {
         return _sliceUUIDs(_sentAttestations[attester][schema], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 schema) external view override returns (uint256) {
+    function getSentAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256) {
         return _sentAttestations[recipient][schema].length;
     }
 
@@ -196,14 +207,14 @@ contract EAS is IEAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) external view override returns (bytes32[] memory) {
+    ) external view returns (bytes32[] memory) {
         return _sliceUUIDs(_relatedAttestations[uuid], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getRelatedAttestationUUIDsCount(bytes32 uuid) external view override returns (uint256) {
+    function getRelatedAttestationUUIDsCount(bytes32 uuid) external view returns (uint256) {
         return _relatedAttestations[uuid].length;
     }
 
@@ -215,14 +226,14 @@ contract EAS is IEAS {
         uint256 start,
         uint256 length,
         bool reverseOrder
-    ) external view override returns (bytes32[] memory) {
+    ) external view returns (bytes32[] memory) {
         return _sliceUUIDs(_schemaAttestations[schema], start, length, reverseOrder);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getSchemaAttestationUUIDsCount(bytes32 schema) external view override returns (uint256) {
+    function getSchemaAttestationUUIDsCount(bytes32 schema) external view returns (uint256) {
         return _schemaAttestations[schema].length;
     }
 
@@ -246,18 +257,24 @@ contract EAS is IEAS {
         bytes calldata data,
         address attester
     ) private returns (bytes32) {
-        require(expirationTime > block.timestamp, "ERR_INVALID_EXPIRATION_TIME");
+        if (expirationTime <= block.timestamp) {
+            revert InvalidExpirationTime();
+        }
 
         ASRecord memory asRecord = _asRegistry.getAS(schema);
-        require(asRecord.uuid != EMPTY_UUID, "ERR_INVALID_AS");
+        if (asRecord.uuid == EMPTY_UUID) {
+            revert InvalidSchema();
+        }
 
         IASResolver resolver = asRecord.resolver;
         if (address(resolver) != address(0x0)) {
-            require(msg.value == 0 || resolver.isPayable(), "ERR_ETH_TRANSFER_UNSUPPORTED");
-            require(
-                resolver.resolve{value: msg.value}(recipient, asRecord.schema, data, expirationTime, attester),
-                "ERR_INVALID_ATTESTATION_DATA"
-            );
+            if (msg.value != 0 && !resolver.isPayable()) {
+                revert NotPayable();
+            }
+
+            if (!resolver.resolve{value: msg.value}(recipient, asRecord.schema, data, expirationTime, attester)) {
+                revert InvalidAttestation();
+            }
         }
 
         Attestation memory attestation = Attestation({
@@ -283,7 +300,10 @@ contract EAS is IEAS {
         _attestationsCount++;
 
         if (refUUID != 0) {
-            require(isAttestationValid(refUUID), "ERR_NO_ATTESTATION");
+            if (!isAttestationValid(refUUID)) {
+                revert NotFound();
+            }
+
             _relatedAttestations[refUUID].push(uuid);
         }
 
@@ -300,9 +320,17 @@ contract EAS is IEAS {
      */
     function _revoke(bytes32 uuid, address attester) private {
         Attestation storage attestation = _db[uuid];
-        require(attestation.uuid != EMPTY_UUID, "ERR_NO_ATTESTATION");
-        require(attestation.attester == attester, "ERR_ACCESS_DENIED");
-        require(attestation.revocationTime == 0, "ERR_ALREADY_REVOKED");
+        if (attestation.uuid == EMPTY_UUID) {
+            revert NotFound();
+        }
+
+        if (attestation.attester != attester) {
+            revert AccessDenied();
+        }
+
+        if (attestation.revocationTime != 0) {
+            revert AlreadyRevoked();
+        }
 
         attestation.revocationTime = block.timestamp;
 
@@ -353,7 +381,9 @@ contract EAS is IEAS {
             return new bytes32[](0);
         }
 
-        require(start < attestationsLength, "ERR_INVALID_OFFSET");
+        if (start >= attestationsLength) {
+            revert InvalidOffset();
+        }
 
         uint256 len = length;
         if (attestationsLength < start + length) {

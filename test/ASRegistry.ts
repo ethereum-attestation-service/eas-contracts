@@ -1,5 +1,5 @@
 import Contracts from '../components/Contracts';
-import { ASRegistry } from '../typechain';
+import { ASRegistry } from '../typechain-types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
@@ -33,7 +33,7 @@ describe('ASRegistry', () => {
 
   describe('construction', async () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.6');
+      expect(await registry.VERSION()).to.equal('0.8');
     });
 
     it('should initialize without any Ss', async () => {
@@ -75,7 +75,7 @@ describe('ASRegistry', () => {
 
     it('should not allow to register the same schema and resolver twice', async () => {
       await testRegister('0x1234', AddressZero);
-      await expect(testRegister('0x1234', AddressZero)).to.be.revertedWith('ERR_ALREADY_EXISTS');
+      await expect(testRegister('0x1234', AddressZero)).to.be.revertedWith('AlreadyExists');
     });
   });
 

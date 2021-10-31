@@ -1,5 +1,5 @@
 import Contracts from '../components/Contracts';
-import { EIP712Verifier } from '../typechain';
+import { EIP712Verifier } from '../typechain-types';
 import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
@@ -18,7 +18,7 @@ describe('EIP712Verifier', () => {
   });
 
   it('should report a version', async () => {
-    expect(await verifier.VERSION()).to.equal('0.6');
+    expect(await verifier.VERSION()).to.equal('0.8');
   });
 
   it('should return the correct domain separator', async () => {
