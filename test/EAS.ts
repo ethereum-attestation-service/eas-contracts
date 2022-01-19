@@ -335,7 +335,6 @@ describe('EAS', () => {
 
           it('should revert when sending ETH to a non-payable resolver', async () => {
             const schema4 = formatBytes32String('AS4');
-            let schema4Id: string;
             const targetRecipient = accounts[5];
 
             const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
@@ -345,7 +344,7 @@ describe('EAS', () => {
             );
 
             await registry.register(schema4, resolver.address);
-            schema4Id = getASUUID(schema4, resolver.address);
+            const schema4Id = getASUUID(schema4, resolver.address);
 
             await testFailedAttestation(
               recipient.address,
