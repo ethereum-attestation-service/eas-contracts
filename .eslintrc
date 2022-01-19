@@ -1,0 +1,47 @@
+{
+  "extends": ["standard", "prettier", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "env": {
+    "mocha": true
+  },
+  "rules": {
+    "max-len": ["error", 150, 2],
+    "camelcase": [
+      "error",
+      {
+        "ignoreImports": true
+      }
+    ],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "semi": ["error", "always"],
+    "no-plusplus": "off",
+    "no-await-in-loop": "off",
+    "no-restricted-syntax": "off",
+    "no-continue": "off",
+    "arrow-body-style": "off",
+    "no-loop-func": "off",
+    "no-unused-expressions": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  },
+  "globals": {
+    "assert": true,
+    "expect": true,
+    "artifacts": true,
+    "contract": true,
+    "web3": true
+  },
+  "settings": {
+    "react": {
+      "version": "999.999.999"
+    }
+  }
+}
