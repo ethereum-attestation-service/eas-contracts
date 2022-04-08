@@ -7,12 +7,12 @@ import {
   TestEAS,
   TestERC20Token
 } from '../typechain-types';
-import * as testAccounts from './accounts.json';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
+import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumberish } from 'ethers';
+import { BigNumberish, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
@@ -29,8 +29,8 @@ const ZERO_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 
 describe('EAS', () => {
   let accounts: SignerWithAddress[];
-  let sender: SignerWithAddress;
-  let sender2: SignerWithAddress;
+  let sender: Wallet;
+  let sender2: Wallet;
   let recipient: SignerWithAddress;
   let recipient2: SignerWithAddress;
 
@@ -43,10 +43,13 @@ describe('EAS', () => {
   before(async () => {
     accounts = await ethers.getSigners();
 
-    [sender, sender2, recipient, recipient2] = accounts;
+    [recipient, recipient2] = accounts;
   });
 
   beforeEach(async () => {
+    sender = await createWallet();
+    sender2 = await createWallet();
+
     registry = await Contracts.ASRegistry.deploy();
     verifier = await Contracts.EIP712Verifier.deploy();
     eip712Utils = new EIP712Utils(verifier.address);
@@ -73,7 +76,7 @@ describe('EAS', () => {
   });
 
   interface Options {
-    from?: SignerWithAddress;
+    from?: Wallet;
     value?: BigNumberish;
   }
 
@@ -120,7 +123,7 @@ describe('EAS', () => {
               refUUID,
               data,
               await verifier.getNonce(txSender.address),
-              (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
+              Buffer.from(txSender.privateKey.slice(2), 'hex')
             );
 
             res = await eas
@@ -229,7 +232,7 @@ describe('EAS', () => {
               refUUID,
               data,
               await verifier.getNonce(txSender.address),
-              (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
+              Buffer.from(txSender.privateKey.slice(2), 'hex')
             );
 
             await expect(
@@ -457,10 +460,10 @@ describe('EAS', () => {
           context('with msg.sender resolver', async () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
-            let targetSender: SignerWithAddress;
+            let targetSender: Wallet;
 
             beforeEach(async () => {
-              targetSender = accounts[8];
+              targetSender = sender2;
 
               const resolver = await Contracts.TestASAttesterResolver.deploy(targetSender.address);
               expect(await resolver.isPayable()).to.be.false;
@@ -540,6 +543,7 @@ describe('EAS', () => {
 
             beforeEach(async () => {
               token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
+              await token.transfer(sender.address, targetAmount);
 
               resolver = await Contracts.TestASTokenResolver.deploy(token.address, targetAmount);
               expect(await resolver.isPayable()).to.be.false;
@@ -558,7 +562,7 @@ describe('EAS', () => {
                 'ERC20: insufficient allowance'
               );
 
-              await token.approve(resolver.address, targetAmount - 1);
+              await token.connect(sender).approve(resolver.address, targetAmount - 1);
               await testFailedAttestation(
                 recipient.address,
                 schema4Id,
@@ -570,7 +574,7 @@ describe('EAS', () => {
             });
 
             it('should allow attesting with correct token amount', async () => {
-              await token.approve(resolver.address, targetAmount);
+              await token.connect(sender).approve(resolver.address, targetAmount);
               await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
             });
           });
@@ -680,7 +684,7 @@ describe('EAS', () => {
           const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
-            (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
+            Buffer.from(txSender.privateKey.slice(2), 'hex')
           );
 
           res = await eas
@@ -703,7 +707,7 @@ describe('EAS', () => {
           const request = await eip712Utils.getRevocationRequest(
             uuid,
             await verifier.getNonce(txSender.address),
-            (testAccounts.privateKeys as any)[txSender.address.toLowerCase()]
+            Buffer.from(txSender.privateKey.slice(2), 'hex')
           );
 
           await expect(
@@ -714,7 +718,7 @@ describe('EAS', () => {
 
       context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, async () => {
         beforeEach(async () => {
-          await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+          await eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
           uuid = await eas.getLastUUID();
         });
 
@@ -766,7 +770,7 @@ describe('EAS', () => {
     const schema2Id = getASUUID(schema2, AddressZero);
     const schema3Id = getASUUID(schema3, AddressZero);
 
-    before(async () => {
+    beforeEach(async () => {
       registry = await Contracts.ASRegistry.deploy();
       verifier = await Contracts.EIP712Verifier.deploy();
 
@@ -861,6 +865,7 @@ describe('EAS', () => {
           expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, false)).to.have.members(
             sentAttestations[sender.address].slice(start, start + length)
           );
+
           expect(await eas.getSentAttestationUUIDs(sender.address, schema1Id, start, length, true)).to.have.members(
             sentAttestations[sender.address]
               .slice()
