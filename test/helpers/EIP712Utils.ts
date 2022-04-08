@@ -1,7 +1,7 @@
 import { Delegation } from '@ethereum-attestation-service/sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ecsign } from 'ethereumjs-util';
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 
 const HARDHAT_CHAIN_ID = 31337;
 
@@ -21,7 +21,7 @@ export class EIP712Utils {
   async getAttestationRequest(
     recipient: string | SignerWithAddress,
     schema: string,
-    expirationTime: BigNumber,
+    expirationTime: BigNumberish,
     refUUID: string,
     data: string,
     nonce: BigNumber,

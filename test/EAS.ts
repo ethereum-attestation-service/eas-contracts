@@ -12,7 +12,7 @@ import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
+import { BigNumberish } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
@@ -60,7 +60,7 @@ describe('EAS', () => {
     });
 
     it('should initialize without any attestations categories or attestations', async () => {
-      expect(await eas.getAttestationsCount()).to.equal(BigNumber.from(0));
+      expect(await eas.getAttestationsCount()).to.equal(0);
     });
 
     it('should revert when initialized with an empty AS registry', async () => {
@@ -74,18 +74,18 @@ describe('EAS', () => {
 
   interface Options {
     from?: SignerWithAddress;
-    value?: BigNumber;
+    value?: BigNumberish;
   }
 
   const getASUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
 
   describe('attesting', async () => {
-    let expirationTime: BigNumber;
+    let expirationTime: number;
     const data = '0x1234';
 
     beforeEach(async () => {
       const now = await latest();
-      expirationTime = now.add(duration.days(30));
+      expirationTime = now + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
@@ -93,7 +93,7 @@ describe('EAS', () => {
         const testAttestation = async (
           recipient: string,
           schema: string,
-          expirationTime: BigNumber,
+          expirationTime: BigNumberish,
           refUUID: string,
           data: any,
           options?: Options
@@ -143,7 +143,7 @@ describe('EAS', () => {
 
           await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, lastUUID, schema);
 
-          expect(await eas.getAttestationsCount()).to.equal(prevAttestationsCount.add(BigNumber.from(1)));
+          expect(await eas.getAttestationsCount()).to.equal(prevAttestationsCount.add(1));
 
           const attestation = await eas.getAttestation(lastUUID);
           expect(attestation.uuid).to.equal(lastUUID);
@@ -152,12 +152,12 @@ describe('EAS', () => {
           expect(attestation.attester).to.equal(txSender.address);
           expect(attestation.time).to.equal(await latest());
           expect(attestation.expirationTime).to.equal(expirationTime);
-          expect(attestation.revocationTime).to.equal(BigNumber.from(0));
+          expect(attestation.revocationTime).to.equal(0);
           expect(attestation.refUUID).to.equal(refUUID);
           expect(attestation.data).to.equal(data);
 
           const receivedAttestationsUUIDsCount = await eas.getReceivedAttestationUUIDsCount(recipient, schema);
-          expect(receivedAttestationsUUIDsCount).to.equal(prevReceivedAttestationsUUIDsCount.add(BigNumber.from(1)));
+          expect(receivedAttestationsUUIDsCount).to.equal(prevReceivedAttestationsUUIDsCount.add(1));
           const receivedAttestationsUUIDs = await eas.getReceivedAttestationUUIDs(
             recipient,
             schema,
@@ -169,7 +169,7 @@ describe('EAS', () => {
           expect(receivedAttestationsUUIDs[receivedAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
 
           const sentAttestationsUUIDsCount = await eas.getSentAttestationUUIDsCount(txSender.address, schema);
-          expect(sentAttestationsUUIDsCount).to.equal(prevSentAttestationsUUIDsCount.add(BigNumber.from(1)));
+          expect(sentAttestationsUUIDsCount).to.equal(prevSentAttestationsUUIDsCount.add(1));
           const sentAttestationsUUIDs = await eas.getSentAttestationUUIDs(
             txSender.address,
             schema,
@@ -181,7 +181,7 @@ describe('EAS', () => {
           expect(sentAttestationsUUIDs[sentAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
 
           const schemaAttestationsUUIDsCount = await eas.getSchemaAttestationUUIDsCount(schema);
-          expect(schemaAttestationsUUIDsCount).to.equal(prevSchemaAttestationsUUIDsCount.add(BigNumber.from(1)));
+          expect(schemaAttestationsUUIDsCount).to.equal(prevSchemaAttestationsUUIDsCount.add(1));
           const schemaAttestationsUUIDs = await eas.getSchemaAttestationUUIDs(
             schema,
             0,
@@ -193,7 +193,7 @@ describe('EAS', () => {
 
           if (refUUID !== ZERO_BYTES32) {
             const relatedAttestationsUUIDsCount = await eas.getRelatedAttestationUUIDsCount(refUUID);
-            expect(relatedAttestationsUUIDsCount).to.equal(prevRelatedAttestationsUUIDsCount.add(BigNumber.from(1)));
+            expect(relatedAttestationsUUIDsCount).to.equal(prevRelatedAttestationsUUIDsCount.add(1));
 
             const relatedAttestationsUUIDs = await eas.getRelatedAttestationUUIDs(
               refUUID,
@@ -209,7 +209,7 @@ describe('EAS', () => {
         const testFailedAttestation = async (
           recipient: string,
           as: string,
-          expirationTime: BigNumber,
+          expirationTime: number,
           refUUID: string,
           data: any,
           err: string,
@@ -277,7 +277,7 @@ describe('EAS', () => {
           });
 
           it('should revert when attesting with passed expiration time', async () => {
-            const expired = (await latest()).sub(duration.days(1));
+            const expired = (await latest()) - duration.days(1);
             await testFailedAttestation(
               recipient.address,
               schema1Id,
@@ -339,9 +339,7 @@ describe('EAS', () => {
 
             const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
             expect(await resolver.isPayable()).to.be.false;
-            await expect(sender.sendTransaction({ to: resolver.address, value: BigNumber.from(1) })).to.be.revertedWith(
-              'NotPayable'
-            );
+            await expect(sender.sendTransaction({ to: resolver.address, value: 1 })).to.be.revertedWith('NotPayable');
 
             await registry.register(schema4, resolver.address);
             const schema4Id = getASUUID(schema4, resolver.address);
@@ -353,7 +351,7 @@ describe('EAS', () => {
               ZERO_BYTES32,
               data,
               'NotPayable',
-              { value: BigNumber.from(1) }
+              { value: 1 }
             );
           });
 
@@ -429,10 +427,10 @@ describe('EAS', () => {
           context('with expiration time resolver', async () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
-            let validAfter: BigNumber;
+            let validAfter: number;
 
             beforeEach(async () => {
-              validAfter = (await latest()).add(duration.years(1));
+              validAfter = (await latest()) + duration.years(1);
               const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
               expect(await resolver.isPayable()).to.be.false;
 
@@ -444,7 +442,7 @@ describe('EAS', () => {
               await testFailedAttestation(
                 recipient.address,
                 schema4Id,
-                validAfter.sub(duration.days(1)),
+                validAfter - duration.days(1),
                 ZERO_BYTES32,
                 data,
                 'InvalidAttestation'
@@ -452,13 +450,7 @@ describe('EAS', () => {
             });
 
             it('should allow attesting with the correct expiration time', async () => {
-              await testAttestation(
-                recipient.address,
-                schema4Id,
-                validAfter.add(duration.seconds(1)),
-                ZERO_BYTES32,
-                data
-              );
+              await testAttestation(recipient.address, schema4Id, validAfter + duration.seconds(1), ZERO_BYTES32, data);
             });
           });
 
@@ -501,7 +493,7 @@ describe('EAS', () => {
           context('with msg.value resolver', async () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
-            const targetValue = BigNumber.from(7862432);
+            const targetValue = 862432;
 
             beforeEach(async () => {
               const resolver = await Contracts.TestASValueResolver.deploy(targetValue);
@@ -528,7 +520,7 @@ describe('EAS', () => {
                 data,
                 'InvalidAttestation',
                 {
-                  value: targetValue.sub(BigNumber.from(1))
+                  value: targetValue - 1
                 }
               );
             });
@@ -543,11 +535,11 @@ describe('EAS', () => {
           context('with token resolver', async () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
-            const targetAmount = BigNumber.from(22334);
+            const targetAmount = 22334;
             let resolver: TestASTokenResolver;
 
             beforeEach(async () => {
-              token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', BigNumber.from(9999999999));
+              token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
 
               resolver = await Contracts.TestASTokenResolver.deploy(token.address, targetAmount);
               expect(await resolver.isPayable()).to.be.false;
@@ -566,7 +558,7 @@ describe('EAS', () => {
                 'ERC20: insufficient allowance'
               );
 
-              await token.approve(resolver.address, targetAmount.sub(BigNumber.from(1)));
+              await token.approve(resolver.address, targetAmount - 1);
               await testFailedAttestation(
                 recipient.address,
                 schema4Id,
@@ -618,14 +610,14 @@ describe('EAS', () => {
           context('with paying resolver', async () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
-            const incentive = BigNumber.from(1000);
+            const incentive = 1000;
             let resolver: TestASPayingResolver;
 
             beforeEach(async () => {
               resolver = await Contracts.TestASPayingResolver.deploy(incentive);
               expect(await resolver.isPayable()).to.be.true;
 
-              await sender.sendTransaction({ to: resolver.address, value: incentive.mul(BigNumber.from(2)) });
+              await sender.sendTransaction({ to: resolver.address, value: incentive * 2 });
 
               await registry.register(schema4, resolver.address);
               schema4Id = getASUUID(schema4, resolver.address);
@@ -667,14 +659,14 @@ describe('EAS', () => {
     const schema1Id = getASUUID(schema1, AddressZero);
     let uuid: string;
 
-    let expirationTime: BigNumber;
+    let expirationTime: number;
     const data = '0x1234';
 
     beforeEach(async () => {
       await registry.register(schema1, AddressZero);
 
       const now = await latest();
-      expirationTime = now.add(duration.days(30));
+      expirationTime = now + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
