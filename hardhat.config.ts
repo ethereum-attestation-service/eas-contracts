@@ -4,7 +4,6 @@ import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import dotenv from 'dotenv';
-import 'hardhat-abi-exporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-docgen';
 import 'hardhat-gas-reporter';
@@ -58,11 +57,6 @@ const config: HardhatUserConfig = {
     alphaSort: true,
     runOnCompile: false,
     disambiguatePaths: false
-  },
-
-  abiExporter: {
-    path: './data/abi',
-    clear: true
   },
 
   gasReporter: {
