@@ -1,4 +1,3 @@
-import * as testAccounts from './test/accounts.json';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
@@ -21,10 +20,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       gasPrice: 20000000000,
       gas: 9500000,
-      accounts: Object.values(testAccounts.privateKeys).map((privateKey: any) => ({
-        privateKey,
-        balance: '10000000000000000000000000000'
-      }))
+      accounts: {
+        count: 10,
+        accountsBalance: '10000000000000000000000000000'
+      }
     },
 
     rinkeby: {

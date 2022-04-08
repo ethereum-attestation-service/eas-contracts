@@ -25,7 +25,7 @@ export class EIP712Utils {
     refUUID: string,
     data: string,
     nonce: BigNumber,
-    privateKey: string
+    privateKey: Buffer
   ) {
     return this.delegation.getAttestationRequest(
       {
@@ -37,20 +37,20 @@ export class EIP712Utils {
         nonce
       },
       async (message) => {
-        const { v, r, s } = ecsign(message, Buffer.from(privateKey, 'hex'));
+        const { v, r, s } = ecsign(message, privateKey);
         return { v, r, s };
       }
     );
   }
 
-  async getRevocationRequest(uuid: string, nonce: BigNumber, privateKey: string) {
+  async getRevocationRequest(uuid: string, nonce: BigNumber, privateKey: Buffer) {
     return this.delegation.getRevocationRequest(
       {
         uuid,
         nonce
       },
       async (message) => {
-        const { v, r, s } = ecsign(message, Buffer.from(privateKey, 'hex'));
+        const { v, r, s } = ecsign(message, privateKey);
         return { v, r, s };
       }
     );
