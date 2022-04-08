@@ -7,7 +7,7 @@ pragma solidity 0.8.13;
  */
 interface IASResolver {
     /**
-     * @dev Returns whether the resolver supports ETH transfers
+     * @dev Returns whether the resolver supports ETH transfers.
      */
     function isPayable() external pure returns (bool);
 

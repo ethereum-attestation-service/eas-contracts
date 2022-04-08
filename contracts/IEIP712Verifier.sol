@@ -9,7 +9,7 @@ interface IEIP712Verifier {
     /**
      * @dev Returns the current nonce per-account.
      *
-     * @param account The requested accunt.
+     * @param account The requested account.
      *
      * @return The current nonce.
      */
