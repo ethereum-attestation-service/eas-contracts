@@ -563,7 +563,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERC20: transfer amount exceeds allowance'
+                'ERC20: insufficient allowance'
               );
 
               await token.approve(resolver.address, targetAmount.sub(BigNumber.from(1)));
@@ -573,7 +573,7 @@ describe('EAS', () => {
                 expirationTime,
                 ZERO_BYTES32,
                 data,
-                'ERC20: transfer amount exceeds allowance'
+                'ERC20: insufficient allowance'
               );
             });
 
