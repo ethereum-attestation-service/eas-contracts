@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.13;
 
 /**
  * @title The interface of an optional AS resolver.
  */
 interface IASResolver {
     /**
-     * @dev Returns whether the resolver supports ETH transfers
+     * @dev Returns whether the resolver supports ETH transfers.
      */
     function isPayable() external pure returns (bool);
 
