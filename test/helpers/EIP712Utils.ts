@@ -1,7 +1,7 @@
 import { Delegation } from '@ethereum-attestation-service/sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ecsign } from 'ethereumjs-util';
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 
 const HARDHAT_CHAIN_ID = 31337;
 
@@ -21,11 +21,11 @@ export class EIP712Utils {
   async getAttestationRequest(
     recipient: string | SignerWithAddress,
     schema: string,
-    expirationTime: BigNumber,
+    expirationTime: BigNumberish,
     refUUID: string,
     data: string,
     nonce: BigNumber,
-    privateKey: string
+    privateKey: Buffer
   ) {
     return this.delegation.getAttestationRequest(
       {
@@ -37,20 +37,20 @@ export class EIP712Utils {
         nonce
       },
       async (message) => {
-        const { v, r, s } = ecsign(message, Buffer.from(privateKey, 'hex'));
+        const { v, r, s } = ecsign(message, privateKey);
         return { v, r, s };
       }
     );
   }
 
-  async getRevocationRequest(uuid: string, nonce: BigNumber, privateKey: string) {
+  async getRevocationRequest(uuid: string, nonce: BigNumber, privateKey: Buffer) {
     return this.delegation.getRevocationRequest(
       {
         uuid,
         nonce
       },
       async (message) => {
-        const { v, r, s } = ecsign(message, Buffer.from(privateKey, 'hex'));
+        const { v, r, s } = ecsign(message, privateKey);
         return { v, r, s };
       }
     );

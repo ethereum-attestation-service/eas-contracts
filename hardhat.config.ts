@@ -1,10 +1,8 @@
-import * as testAccounts from './test/accounts.json';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import dotenv from 'dotenv';
-import 'hardhat-abi-exporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-docgen';
 import 'hardhat-gas-reporter';
@@ -22,10 +20,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       gasPrice: 20000000000,
       gas: 9500000,
-      accounts: Object.values(testAccounts.privateKeys).map((privateKey: any) => ({
-        privateKey,
-        balance: '10000000000000000000000000000'
-      }))
+      accounts: {
+        count: 10,
+        accountsBalance: '10000000000000000000000000000'
+      }
     },
 
     rinkeby: {
@@ -38,7 +36,7 @@ const config: HardhatUserConfig = {
   },
 
   solidity: {
-    version: '0.8.11',
+    version: '0.8.13',
     settings: {
       optimizer: {
         enabled: true,
@@ -58,11 +56,6 @@ const config: HardhatUserConfig = {
     alphaSort: true,
     runOnCompile: false,
     disambiguatePaths: false
-  },
-
-  abiExporter: {
-    path: './data/abi',
-    clear: true
   },
 
   gasReporter: {

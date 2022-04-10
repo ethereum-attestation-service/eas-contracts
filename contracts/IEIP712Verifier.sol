@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.13;
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations interface.
@@ -9,7 +9,7 @@ interface IEIP712Verifier {
     /**
      * @dev Returns the current nonce per-account.
      *
-     * @param account The requested accunt.
+     * @param account The requested account.
      *
      * @return The current nonce.
      */

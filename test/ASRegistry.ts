@@ -2,7 +2,6 @@ import Contracts from '../components/Contracts';
 import { ASRegistry } from '../typechain-types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
@@ -37,7 +36,7 @@ describe('ASRegistry', () => {
     });
 
     it('should initialize without any Ss', async () => {
-      expect(await registry.getASCount()).to.equal(BigNumber.from(0));
+      expect(await registry.getASCount()).to.equal(0);
     });
   });
 
@@ -46,7 +45,7 @@ describe('ASRegistry', () => {
       const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
 
       const uuid = getUUID(schema, resolverAddress);
-      const index = (await registry.getASCount()).add(BigNumber.from(1));
+      const index = (await registry.getASCount()).add(1);
 
       const retUUID = await registry.callStatic.register(schema, resolverAddress);
       const res = await registry.register(schema, resolverAddress);
@@ -89,7 +88,7 @@ describe('ASRegistry', () => {
       const uuid = getUUID(schema, resolver.address);
       const asRecord = await registry.getAS(uuid);
       expect(asRecord.uuid).to.equal(uuid);
-      expect(asRecord.index).to.equal(BigNumber.from(1));
+      expect(asRecord.index).to.equal(1);
       expect(asRecord.schema).to.equal(schema);
       expect(asRecord.resolver).to.equal(resolver.address);
     });
@@ -97,7 +96,7 @@ describe('ASRegistry', () => {
     it('should return an empty AS given non-existing id', async () => {
       const asRecord = await registry.getAS(formatBytes32String('BAD'));
       expect(asRecord.uuid).to.equal(ZERO_BYTES32);
-      expect(asRecord.index).to.equal(BigNumber.from(0));
+      expect(asRecord.index).to.equal(0);
       expect(asRecord.schema).to.equal(ZERO_BYTES);
       expect(asRecord.resolver).to.equal(AddressZero);
     });
