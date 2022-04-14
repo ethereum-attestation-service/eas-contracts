@@ -7,11 +7,31 @@
 
 ## Introduction
 
-Why don’t we have any widely adopted identity, reputation, or voting systems on Ethereum? We have seen many proposed solutions to the above, but each has tried to build very specific ecosystems for their respective use cases. This approach creates fragmentation across all of these different platforms and smart contracts, and they do not take every possible use case into account. We propose a more fundamental base layer for all possible attestation-based interactions called the Ethereum Attestation Service. EAS solves the interoperability problem for all trust and identity services being built today and in the future.
+The Ethereum Attestation Service is a free and open protocol for on-chain attestations on EVM compatible blockchains.  It is a generalized service that allows anyone to register a schema for their particular use case, and then make attestations following their schema.
 
-Much like Ethereum is the base layer for Dapps and smart contracts, EAS is the base layer for attestations. What is an EAS attestation? An EAS attestation can be anyone or anything attesting to anything or anyone about anything. Whether it’s a person attesting to a positive experience they had at a restaurant, a KYC service attesting to someone’s identity, someone attesting a vote to a presidential candidate, or a cell phone verification company attesting to you having a unique cell phone number. Any possible service you imagine can be built, and all connect using EAS as the base layer.
+Schemas can be registered using the Schema.sol contract, and attestations are made using the EAS.sol contract.
 
-EAS is made up of two very simple smart contracts. The base EAS contract which allows anyone in the world to make and record an attestation, as well as an attestation schema registry contract that allows anyone to register a new attestation schema.
+In addition, we provide a resolver contract for advanced use cases, such as on-chain verification of attestation data, and also attaching payments to attestations (which makes a new suite of powerful web3 applications possible)
+
+We also provide an SDK for developers.
+
+On-chain attestations will enable a powerful new range of web3 applications, including:
+
+* Identity
+* Trust Scores
+* Goodness ScoresCredit Scores
+* Clout
+* Land Registries
+* Social Networks
+* Portable Trust Layers
+* Retroactive Public Goods Funding
+* KYC Services
+* Uncollateralized Lending / Borrowing
+* Voting
+* Oracles (who can be atomically paid for making attestations inside the protocol)
+* Likes/Dislikes
+* Content Filtering
+* And many more !
 
 ## Deployments
 
@@ -19,9 +39,9 @@ EAS is made up of two very simple smart contracts. The base EAS contract which a
 
 #### v0.6
 
-- **EAS**: <https://rinkeby.etherscan.io/address/0xBf49E19254DF70328C6696135958C94CD6cd0430>
-- **ASRegistry**: <https://rinkeby.etherscan.io/address/0xd8B7EC70d53b11e130fba78fBED97862eF2a13f0>
-- **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xa05e3Ca02C8437E99018E55cC3920FD79f4FD624>
+* **EAS**: <https://rinkeby.etherscan.io/address/0xBf49E19254DF70328C6696135958C94CD6cd0430>
+* **ASRegistry**: <https://rinkeby.etherscan.io/address/0xd8B7EC70d53b11e130fba78fBED97862eF2a13f0>
+* **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xa05e3Ca02C8437E99018E55cC3920FD79f4FD624>
 
 ## Installation
 
