@@ -42,6 +42,7 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 10000
       },
+      viaIR: true,
       metadata: {
         bytecodeHash: 'none'
       }
