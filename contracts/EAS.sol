@@ -23,9 +23,6 @@ contract EAS is IEAS {
 
     string public constant VERSION = "0.8";
 
-    // A terminator used when concatenating and hashing multiple fields.
-    string private constant HASH_TERMINATOR = "@";
-
     // The AS global registry.
     IASRegistry private immutable _asRegistry;
 
@@ -46,9 +43,6 @@ contract EAS is IEAS {
 
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
-
-    // The global counter for the total number of attestations.
-    uint256 private _attestationsCount;
 
     /**
      * @dev Creates a new EAS instance.
@@ -86,17 +80,10 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getAttestationsCount() external view returns (uint256) {
-        return _attestationsCount;
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
     function attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data
     ) public payable virtual returns (bytes32) {
@@ -109,7 +96,7 @@ contract EAS is IEAS {
     function attestByDelegation(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
@@ -241,7 +228,7 @@ contract EAS is IEAS {
      *
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the AS.
-     * @param expirationTime The expiration time of the attestation.
+     * @param expirationTime The expiration time of the attestation (0 represents no expiration).
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
      * @param attester The attesting account.
@@ -251,12 +238,12 @@ contract EAS is IEAS {
     function _attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester
     ) private returns (bytes32) {
-        if (expirationTime <= block.timestamp) {
+        if (expirationTime != 0 && expirationTime <= _time()) {
             revert InvalidExpirationTime();
         }
 
@@ -279,16 +266,28 @@ contract EAS is IEAS {
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
             schema: schema,
-            recipient: recipient,
-            attester: attester,
-            time: block.timestamp,
+            refUUID: refUUID,
+            time: _time(),
             expirationTime: expirationTime,
             revocationTime: 0,
-            refUUID: refUUID,
+            recipient: recipient,
+            attester: attester,
             data: data
         });
 
-        bytes32 uuid = _getUUID(attestation);
+        // Look for the first non-existing UUID (and use a bump seed/nonce in the rare case of a conflict).
+        bytes32 uuid;
+        uint32 bump = 0;
+        while (true) {
+            uuid = _getUUID(attestation, bump);
+            if (_db[uuid].uuid == EMPTY_UUID) {
+                break;
+            }
+
+            unchecked {
+                ++bump;
+            }
+        }
         attestation.uuid = uuid;
 
         _receivedAttestations[recipient][schema].push(uuid);
@@ -296,7 +295,6 @@ contract EAS is IEAS {
         _schemaAttestations[schema].push(uuid);
 
         _db[uuid] = attestation;
-        _attestationsCount++;
 
         if (refUUID != 0) {
             if (!isAttestationValid(refUUID)) {
@@ -331,7 +329,7 @@ contract EAS is IEAS {
             revert AlreadyRevoked();
         }
 
-        attestation.revocationTime = block.timestamp;
+        attestation.revocationTime = _time();
 
         emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }
@@ -340,10 +338,11 @@ contract EAS is IEAS {
      * @dev Calculates a UUID for a given attestation.
      *
      * @param attestation The input attestation.
+     * @param bump A bump value to use in case of a UUID conflict.
      *
      * @return Attestation UUID.
      */
-    function _getUUID(Attestation memory attestation) private view returns (bytes32) {
+    function _getUUID(Attestation memory attestation, uint32 bump) private pure returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
@@ -353,8 +352,7 @@ contract EAS is IEAS {
                     attestation.time,
                     attestation.expirationTime,
                     attestation.data,
-                    HASH_TERMINATOR,
-                    _attestationsCount
+                    bump
                 )
             );
     }
@@ -396,5 +394,12 @@ contract EAS is IEAS {
         }
 
         return res;
+    }
+
+    /**
+     * @dev Returns the current's block timestamp.
+     */
+    function _time() internal view virtual returns (uint32) {
+        return uint32(block.timestamp);
     }
 }
