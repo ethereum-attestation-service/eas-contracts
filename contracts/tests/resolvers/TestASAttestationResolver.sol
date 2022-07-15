@@ -22,7 +22,7 @@ contract TestASAttestationResolver is ASResolver {
         address, /* recipient */
         bytes calldata, /* schema */
         bytes calldata data,
-        uint256, /* expirationTime */
+        uint32, /* expirationTime */
         address /* msgSender */
     ) external payable virtual override returns (bool) {
         return _eas.isAttestationValid(_toBytes32(data, 0));

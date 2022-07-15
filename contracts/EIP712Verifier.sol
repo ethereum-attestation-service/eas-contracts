@@ -16,8 +16,8 @@ contract EIP712Verifier is IEIP712Verifier {
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(address recipient,bytes32 schema,uint256 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 public constant ATTEST_TYPEHASH = 0x39c0608dd995a3a25bfecb0fffe6801a81bae611d94438af988caa522d9d1476;
+    // keccak256("Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
+    bytes32 public constant ATTEST_TYPEHASH = 0xfd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf8236431150;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
     // keccak256("Revoke(bytes32 uuid,uint256 nonce)").
@@ -60,7 +60,7 @@ contract EIP712Verifier is IEIP712Verifier {
     function attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester,

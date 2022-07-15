@@ -20,7 +20,7 @@ const {
 } = ethers;
 
 const {
-  constants: { AddressZero, MaxUint256 },
+  constants: { AddressZero },
   utils: { formatBytes32String, hexlify, solidityKeccak256 }
 } = ethers;
 
@@ -55,15 +55,13 @@ describe('EAS', () => {
     eip712Utils = new EIP712Utils(verifier.address);
 
     eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+
+    await eas.setTime(await latest());
   });
 
   describe('construction', async () => {
     it('should report a version', async () => {
       expect(await eas.VERSION()).to.equal('0.8');
-    });
-
-    it('should initialize without any attestations categories or attestations', async () => {
-      expect(await eas.getAttestationsCount()).to.equal(0);
     });
 
     it('should revert when initialized with an empty AS registry', async () => {
@@ -78,17 +76,30 @@ describe('EAS', () => {
   interface Options {
     from?: Wallet;
     value?: BigNumberish;
+    bump?: number;
   }
 
   const getASUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
+  const getUUID = (
+    schema: string,
+    recipient: string,
+    attester: string,
+    time: number,
+    expirationTime: number,
+    data: string,
+    bump: number
+  ) =>
+    solidityKeccak256(
+      ['bytes', 'address', 'address', 'uint32', 'uint32', 'bytes', 'uint32'],
+      [schema, recipient, attester, time, expirationTime, data, bump]
+    );
 
   describe('attesting', async () => {
     let expirationTime: number;
     const data = '0x1234';
 
     beforeEach(async () => {
-      const now = await latest();
-      expirationTime = now + duration.days(30);
+      expirationTime = (await eas.currentTime()) + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
@@ -96,14 +107,13 @@ describe('EAS', () => {
         const testAttestation = async (
           recipient: string,
           schema: string,
-          expirationTime: BigNumberish,
+          expirationTime: number,
           refUUID: string,
           data: any,
           options?: Options
         ) => {
           const txSender = options?.from || sender;
 
-          const prevAttestationsCount = await eas.getAttestationsCount();
           const prevReceivedAttestationsUUIDsCount = await eas.getReceivedAttestationUUIDsCount(recipient, schema);
           const prevSentAttestationsUUIDsCount = await eas.getSentAttestationUUIDsCount(txSender.address, schema);
           const prevSchemaAttestationsUUIDsCount = await eas.getSchemaAttestationUUIDsCount(schema);
@@ -142,18 +152,24 @@ describe('EAS', () => {
               );
           }
 
-          const lastUUID = await eas.getLastUUID();
+          const uuid = getUUID(
+            schema,
+            recipient,
+            txSender.address,
+            await eas.currentTime(),
+            expirationTime,
+            data,
+            options?.bump ?? 0
+          );
 
-          await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, lastUUID, schema);
+          await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, uuid, schema);
 
-          expect(await eas.getAttestationsCount()).to.equal(prevAttestationsCount.add(1));
-
-          const attestation = await eas.getAttestation(lastUUID);
-          expect(attestation.uuid).to.equal(lastUUID);
+          const attestation = await eas.getAttestation(uuid);
+          expect(attestation.uuid).to.equal(uuid);
           expect(attestation.schema).to.equal(schema);
           expect(attestation.recipient).to.equal(recipient);
           expect(attestation.attester).to.equal(txSender.address);
-          expect(attestation.time).to.equal(await latest());
+          expect(attestation.time).to.equal(await eas.currentTime());
           expect(attestation.expirationTime).to.equal(expirationTime);
           expect(attestation.revocationTime).to.equal(0);
           expect(attestation.refUUID).to.equal(refUUID);
@@ -207,6 +223,8 @@ describe('EAS', () => {
             expect(relatedAttestationsUUIDs).to.have.lengthOf(relatedAttestationsUUIDsCount.toNumber());
             expect(relatedAttestationsUUIDs[relatedAttestationsUUIDs.length - 1]).to.equal(attestation.uuid);
           }
+
+          return uuid;
         };
 
         const testFailedAttestation = async (
@@ -280,7 +298,7 @@ describe('EAS', () => {
           });
 
           it('should revert when attesting with passed expiration time', async () => {
-            const expired = (await latest()) - duration.days(1);
+            const expired = (await eas.currentTime()) - duration.days(1);
             await testFailedAttestation(
               recipient.address,
               schema1Id,
@@ -305,13 +323,13 @@ describe('EAS', () => {
           });
 
           it('should allow multiple attestations to the same schema', async () => {
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 0 });
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 1 });
+            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 2 });
           });
 
           it('should allow attestation without expiration time', async () => {
-            await testAttestation(recipient.address, schema1Id, MaxUint256, ZERO_BYTES32, data);
+            await testAttestation(recipient.address, schema1Id, 0, ZERO_BYTES32, data);
           });
 
           it('should allow attestation without any data', async () => {
@@ -320,9 +338,31 @@ describe('EAS', () => {
 
           it('should store referenced attestation', async () => {
             await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-            const uuid = await eas.getLastUUID();
+            const uuid = getUUID(
+              schema1Id,
+              recipient.address,
+              recipient.address,
+              await eas.currentTime(),
+              expirationTime,
+              data,
+              0
+            );
 
             await testAttestation(recipient.address, schema3Id, expirationTime, uuid, data);
+          });
+
+          it('should generate unique UUIDs for similar attestations', async () => {
+            const uuid1 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+              bump: 0
+            });
+            const uuid2 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+              bump: 1
+            });
+            const uuid3 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+              bump: 2
+            });
+            expect(uuid1).not.to.equal(uuid2);
+            expect(uuid2).not.to.equal(uuid3);
           });
 
           it('should revert when attesting to a non-existing attestation', async () => {
@@ -433,7 +473,7 @@ describe('EAS', () => {
             let validAfter: number;
 
             beforeEach(async () => {
-              validAfter = (await latest()) + duration.years(1);
+              validAfter = (await eas.currentTime()) + duration.years(1);
               const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
               expect(await resolver.isPayable()).to.be.false;
 
@@ -586,7 +626,15 @@ describe('EAS', () => {
 
             beforeEach(async () => {
               await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-              uuid = await eas.getLastUUID();
+              uuid = getUUID(
+                schema1Id,
+                recipient.address,
+                recipient.address,
+                await eas.currentTime(),
+                expirationTime,
+                data,
+                0
+              );
 
               const resolver = await Contracts.TestASAttestationResolver.deploy(eas.address);
               expect(await resolver.isPayable()).to.be.false;
@@ -669,8 +717,7 @@ describe('EAS', () => {
     beforeEach(async () => {
       await registry.register(schema1, AddressZero);
 
-      const now = await latest();
-      expirationTime = now + duration.days(30);
+      expirationTime = (await eas.currentTime()) + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
@@ -695,7 +742,7 @@ describe('EAS', () => {
         await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, schema1Id);
 
         const attestation = await eas.getAttestation(uuid);
-        expect(attestation.revocationTime).to.equal(await latest());
+        expect(attestation.revocationTime).to.equal(await eas.currentTime());
       };
 
       const testFailedRevocation = async (uuid: string, err: string, options?: Options) => {
@@ -718,8 +765,19 @@ describe('EAS', () => {
 
       context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, async () => {
         beforeEach(async () => {
-          await eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-          uuid = await eas.getLastUUID();
+          const res = await eas
+            .connect(sender)
+            .attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+
+          uuid = getUUID(
+            schema1Id,
+            recipient.address,
+            sender.address,
+            await eas.currentTime(),
+            expirationTime,
+            data,
+            0
+          );
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
@@ -776,12 +834,14 @@ describe('EAS', () => {
 
       eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
 
+      await eas.setTime(await latest());
+
       await registry.register(schema1, AddressZero);
       await registry.register(schema2, AddressZero);
       await registry.register(schema3, AddressZero);
 
-      await eas.connect(sender2).attest(recipient2.address, schema2Id, MaxUint256, ZERO_BYTES32, data);
-      refUUID = await eas.getLastUUID();
+      await eas.connect(sender2).attest(recipient2.address, schema2Id, 0, ZERO_BYTES32, data);
+      refUUID = getUUID(schema2Id, recipient2.address, sender2.address, await eas.currentTime(), 0, data, 0);
 
       sentAttestations[sender.address] = [];
       receivedAttestations[recipient.address] = [];
@@ -789,13 +849,15 @@ describe('EAS', () => {
       relatedAttestations[refUUID] = [];
 
       for (let i = 0; i < attestationsCount; ++i) {
-        await eas.connect(sender).attest(recipient.address, schema1Id, MaxUint256, refUUID, data);
+        await eas.connect(sender).attest(recipient.address, schema1Id, 0, refUUID, data);
 
-        const uuid = await eas.getLastUUID();
+        const uuid = getUUID(schema1Id, recipient.address, sender.address, await eas.currentTime(), 0, data, 0);
         sentAttestations[sender.address].push(uuid);
         receivedAttestations[recipient.address].push(uuid);
         schemaAttestations[schema1Id].push(uuid);
         relatedAttestations[refUUID].push(uuid);
+
+        await eas.setTime((await eas.currentTime()) + 1);
       }
     });
 

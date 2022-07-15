@@ -31,7 +31,7 @@ interface IEIP712Verifier {
     function attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester,

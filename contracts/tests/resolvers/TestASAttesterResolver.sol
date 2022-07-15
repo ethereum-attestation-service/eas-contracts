@@ -18,7 +18,7 @@ contract TestASAttesterResolver is ASResolver {
         address, /* recipient */
         bytes calldata, /* schema */
         bytes calldata, /* data */
-        uint256, /* expirationTime */
+        uint32, /* expirationTime */
         address msgSender
     ) external payable virtual override returns (bool) {
         return msgSender == _targetAttester;
