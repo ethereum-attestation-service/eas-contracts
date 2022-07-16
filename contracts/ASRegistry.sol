@@ -12,7 +12,7 @@ import "./IASResolver.sol";
 contract ASRegistry is IASRegistry {
     error AlreadyExists();
 
-    string public constant VERSION = "0.8";
+    string public constant VERSION = "0.9";
 
     // The global mapping between AS records and their IDs.
     mapping(bytes32 => ASRecord) private _registry;
