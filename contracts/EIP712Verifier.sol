@@ -10,7 +10,7 @@ import "./IEIP712Verifier.sol";
 contract EIP712Verifier is IEIP712Verifier {
     error InvalidSignature();
 
-    string public constant VERSION = "0.8";
+    string public constant VERSION = "0.9";
 
     // EIP712 domain separator, making signatures from different domains incompatible.
     bytes32 public immutable DOMAIN_SEPARATOR; // solhint-disable-line var-name-mixedcase
