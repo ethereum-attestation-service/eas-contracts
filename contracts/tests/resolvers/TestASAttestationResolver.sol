@@ -29,12 +29,14 @@ contract TestASAttestationResolver is ASResolver {
     }
 
     function _toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {
-        if (start + 32 < start) {
-            revert Overflow();
-        }
+        unchecked {
+            if (start + 32 < start) {
+                revert Overflow();
+            }
 
-        if (data.length < start + 32) {
-            revert OutOfBounds();
+            if (data.length < start + 32) {
+                revert OutOfBounds();
+            }
         }
 
         bytes32 tempBytes32;

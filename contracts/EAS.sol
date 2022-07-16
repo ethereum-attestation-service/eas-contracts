@@ -382,18 +382,20 @@ contract EAS is IEAS {
             revert InvalidOffset();
         }
 
-        uint256 len = length;
-        if (attestationsLength < start + length) {
-            len = attestationsLength - start;
+        unchecked {
+            uint256 len = length;
+            if (attestationsLength < start + length) {
+                len = attestationsLength - start;
+            }
+
+            bytes32[] memory res = new bytes32[](len);
+
+            for (uint256 i = 0; i < len; ++i) {
+                res[i] = uuids[reverseOrder ? attestationsLength - (start + i + 1) : start + i];
+            }
+
+            return res;
         }
-
-        bytes32[] memory res = new bytes32[](len);
-
-        for (uint256 i = 0; i < len; ++i) {
-            res[i] = uuids[reverseOrder ? attestationsLength - (start + i + 1) : start + i];
-        }
-
-        return res;
     }
 
     /**
