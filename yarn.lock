@@ -262,12 +262,12 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@ethereum-attestation-service/sdk@^0.11.2":
-  version "0.11.2"
-  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/sdk/-/sdk-0.11.2.tgz#f512d62273b72db36fbc97e432cc8ee1795bd1ce"
-  integrity sha512-l4TjjBfID98oWJhY1yfkRhM5DIPxtuvFmWH4OQ+IgXL7F97NzMDJ6h2oB/cPh9xv4T7kVqKE2WToyiMmXCh8NQ==
+"@ethereum-attestation-service/sdk@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/sdk/-/sdk-0.12.0.tgz#52622ea79154176b10fe7b3172e7b523dfe6c6b0"
+  integrity sha512-qcCrO3ZH+Op13AhXlScaDMvnisijkvZH3Va5mwWQsKsHfHnU/MAsDSpdyFJofNPFy4gshOPrxXxNYPR1iagXeA==
   dependencies:
-    ethers "^5.4.2"
+    ethers "^5.6.9"
 
 "@ethereum-waffle/chai@^3.4.4":
   version "3.4.4"
@@ -1719,10 +1719,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.47.tgz#ca9237d51f2a2557419688511dab1c8daf475188"
   integrity sha512-BzcaRsnFuznzOItW1WpQrDHM7plAa7GIDMZ6b5pnMbkqEtM/6WCOhvZar39oeMQP79gwvFUWjjptE7/KGcNqFg==
 
-"@types/node@^18.0.4":
-  version "18.0.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.0.4.tgz#48aedbf35efb3af1248e4cd4d792c730290cd5d6"
-  integrity sha512-M0+G6V0Y4YV8cqzHssZpaNCqvYwlCiulmm0PwpNLF55r/+cT8Ol42CHRU1SEaYFH2rTwiiE1aYg/2g2rrtGdPA==
+"@types/node@^18.0.5":
+  version "18.0.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.0.5.tgz#96be8113b014e9e7f0c3609c4a25afadd85ff659"
+  integrity sha512-En7tneq+j0qAiVwysBD79y86MT3ModuoIJbe7JXp+sb5UAjInSShmK3nXXMioBzfF7rXC12hv12d4IyCVwN4dA==
 
 "@types/node@^8.0.0":
   version "8.10.66"
@@ -5428,7 +5428,7 @@ ethers@^4.0.32, ethers@^4.0.40:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^5.0.1, ethers@^5.0.2, ethers@^5.4.2, ethers@^5.5.2:
+ethers@^5.0.1, ethers@^5.0.2, ethers@^5.5.2:
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.2.tgz#e75bac7f038c5e0fdde667dba62fc223924143a2"
   integrity sha512-EzGCbns24/Yluu7+ToWnMca3SXJ1Jk1BvWB7CCmVNxyOeM4LLvw2OLuIHhlkhQk1dtOcj9UMsdkxUh8RiG1dxQ==
