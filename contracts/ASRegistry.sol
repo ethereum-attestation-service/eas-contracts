@@ -24,7 +24,10 @@ contract ASRegistry is IASRegistry {
      * @inheritdoc IASRegistry
      */
     function register(bytes calldata schema, IASResolver resolver) external returns (bytes32) {
-        uint256 index = ++_asCount;
+        uint256 index;
+        unchecked {
+            index = ++_asCount;
+        }
 
         ASRecord memory asRecord = ASRecord({uuid: EMPTY_UUID, index: index, schema: schema, resolver: resolver});
 

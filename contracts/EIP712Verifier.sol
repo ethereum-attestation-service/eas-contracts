@@ -68,20 +68,17 @@ contract EIP712Verifier is IEIP712Verifier {
         bytes32 r,
         bytes32 s
     ) external {
+        uint256 nonce;
+        unchecked {
+            nonce = _nonces[attester]++;
+        }
+
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
                 DOMAIN_SEPARATOR,
                 keccak256(
-                    abi.encode(
-                        ATTEST_TYPEHASH,
-                        recipient,
-                        schema,
-                        expirationTime,
-                        refUUID,
-                        keccak256(data),
-                        _nonces[attester]++
-                    )
+                    abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce)
                 )
             )
         );
@@ -102,12 +99,13 @@ contract EIP712Verifier is IEIP712Verifier {
         bytes32 r,
         bytes32 s
     ) external {
+        uint256 nonce;
+        unchecked {
+            nonce = _nonces[attester]++;
+        }
+
         bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(REVOKE_TYPEHASH, uuid, _nonces[attester]++))
-            )
+            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)))
         );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
