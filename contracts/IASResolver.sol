@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.13;
+pragma solidity 0.8.15;
 
 /**
  * @title The interface of an optional AS resolver.
@@ -26,7 +26,7 @@ interface IASResolver {
         address recipient,
         bytes calldata schema,
         bytes calldata data,
-        uint256 expirationTime,
+        uint32 expirationTime,
         address msgSender
     ) external payable returns (bool);
 }

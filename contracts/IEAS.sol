@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.13;
+pragma solidity 0.8.15;
 
 import "./IASRegistry.sol";
 import "./IEIP712Verifier.sol";
@@ -13,18 +13,18 @@ struct Attestation {
     bytes32 uuid;
     // A unique identifier of the AS.
     bytes32 schema;
+    // The UUID of the related attestation.
+    bytes32 refUUID;
+    // The time when the attestation was created (Unix timestamp).
+    uint32 time;
+    // The time when the attestation expires (Unix timestamp).
+    uint32 expirationTime;
+    // The time when the attestation was revoked (Unix timestamp).
+    uint32 revocationTime;
     // The recipient of the attestation.
     address recipient;
     // The attester/sender of the attestation.
     address attester;
-    // The time when the attestation was created (Unix timestamp).
-    uint256 time;
-    // The time when the attestation expires (Unix timestamp).
-    uint256 expirationTime;
-    // The time when the attestation was revoked (Unix timestamp).
-    uint256 revocationTime;
-    // The UUID of the related attestation.
-    bytes32 refUUID;
     // Custom attestation data.
     bytes data;
 }
@@ -68,13 +68,6 @@ interface IEAS {
     function getEIP712Verifier() external view returns (IEIP712Verifier);
 
     /**
-     * @dev Returns the global counter for the total number of attestations.
-     *
-     * @return The global counter for the total number of attestations.
-     */
-    function getAttestationsCount() external view returns (uint256);
-
-    /**
      * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
@@ -88,7 +81,7 @@ interface IEAS {
     function attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data
     ) external payable returns (bytes32);
@@ -111,7 +104,7 @@ interface IEAS {
     function attestByDelegation(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
