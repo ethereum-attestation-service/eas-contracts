@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.13;
+pragma solidity 0.8.15;
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations interface.
@@ -31,7 +31,7 @@ interface IEIP712Verifier {
     function attest(
         address recipient,
         bytes32 schema,
-        uint256 expirationTime,
+        uint32 expirationTime,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
