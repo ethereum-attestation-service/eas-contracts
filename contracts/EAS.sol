@@ -146,84 +146,6 @@ contract EAS is IEAS {
     }
 
     /**
-     * @inheritdoc IEAS
-     */
-    function getReceivedAttestationUUIDs(
-        address recipient,
-        bytes32 schema,
-        uint256 start,
-        uint256 length,
-        bool reverseOrder
-    ) external view returns (bytes32[] memory) {
-        return _sliceUUIDs(_receivedAttestations[recipient][schema], start, length, reverseOrder);
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256) {
-        return _receivedAttestations[recipient][schema].length;
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getSentAttestationUUIDs(
-        address attester,
-        bytes32 schema,
-        uint256 start,
-        uint256 length,
-        bool reverseOrder
-    ) external view returns (bytes32[] memory) {
-        return _sliceUUIDs(_sentAttestations[attester][schema], start, length, reverseOrder);
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 schema) external view returns (uint256) {
-        return _sentAttestations[recipient][schema].length;
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getRelatedAttestationUUIDs(
-        bytes32 uuid,
-        uint256 start,
-        uint256 length,
-        bool reverseOrder
-    ) external view returns (bytes32[] memory) {
-        return _sliceUUIDs(_relatedAttestations[uuid], start, length, reverseOrder);
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getRelatedAttestationUUIDsCount(bytes32 uuid) external view returns (uint256) {
-        return _relatedAttestations[uuid].length;
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getSchemaAttestationUUIDs(
-        bytes32 schema,
-        uint256 start,
-        uint256 length,
-        bool reverseOrder
-    ) external view returns (bytes32[] memory) {
-        return _sliceUUIDs(_schemaAttestations[schema], start, length, reverseOrder);
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getSchemaAttestationUUIDsCount(bytes32 schema) external view returns (uint256) {
-        return _schemaAttestations[schema].length;
-    }
-
-    /**
      * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
@@ -355,47 +277,6 @@ contract EAS is IEAS {
                     bump
                 )
             );
-    }
-
-    /**
-     * @dev Returns a slice in an array of attestation UUIDs.
-     *
-     * @param uuids The array of attestation UUIDs.
-     * @param start The offset to start from.
-     * @param length The number of total members to retrieve.
-     * @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
-     *
-     * @return An array of attestation UUIDs.
-     */
-    function _sliceUUIDs(
-        bytes32[] memory uuids,
-        uint256 start,
-        uint256 length,
-        bool reverseOrder
-    ) private pure returns (bytes32[] memory) {
-        uint256 attestationsLength = uuids.length;
-        if (attestationsLength == 0) {
-            return new bytes32[](0);
-        }
-
-        if (start >= attestationsLength) {
-            revert InvalidOffset();
-        }
-
-        unchecked {
-            uint256 len = length;
-            if (attestationsLength < start + length) {
-                len = attestationsLength - start;
-            }
-
-            bytes32[] memory res = new bytes32[](len);
-
-            for (uint256 i = 0; i < len; ++i) {
-                res[i] = uuids[reverseOrder ? attestationsLength - (start + i + 1) : start + i];
-            }
-
-            return res;
-        }
     }
 
     /**
