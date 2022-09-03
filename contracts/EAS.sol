@@ -29,18 +29,6 @@ contract EAS is IEAS {
     // The EIP712 verifier used to verify signed attestations.
     IEIP712Verifier private immutable _eip712Verifier;
 
-    // A mapping between attestations and their related attestations.
-    mapping(bytes32 => bytes32[]) private _relatedAttestations;
-
-    // A mapping between an account and its received attestations.
-    mapping(address => mapping(bytes32 => bytes32[])) private _receivedAttestations;
-
-    // A mapping between an account and its sent attestations.
-    mapping(address => mapping(bytes32 => bytes32[])) private _sentAttestations;
-
-    // A mapping between a schema and its attestations.
-    mapping(bytes32 => bytes32[]) private _schemaAttestations;
-
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
 
@@ -212,18 +200,12 @@ contract EAS is IEAS {
         }
         attestation.uuid = uuid;
 
-        _receivedAttestations[recipient][schema].push(uuid);
-        _sentAttestations[attester][schema].push(uuid);
-        _schemaAttestations[schema].push(uuid);
-
         _db[uuid] = attestation;
 
         if (refUUID != 0) {
             if (!isAttestationValid(refUUID)) {
                 revert NotFound();
             }
-
-            _relatedAttestations[refUUID].push(uuid);
         }
 
         emit Attested(recipient, attester, uuid, schema);
