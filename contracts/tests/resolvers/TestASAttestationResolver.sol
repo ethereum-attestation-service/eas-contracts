@@ -2,8 +2,9 @@
 
 pragma solidity 0.8.17;
 
-import "../../ASResolver.sol";
-import "../../EAS.sol";
+import { ASResolver } from "../../ASResolver.sol";
+
+import { EAS } from "../../EAS.sol";
 
 /**
  * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.

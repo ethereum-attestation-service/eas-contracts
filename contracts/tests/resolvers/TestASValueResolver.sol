@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import "../../ASResolver.sol";
+import { ASResolver } from "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether a specific amount of ETH was sent with an attestation.

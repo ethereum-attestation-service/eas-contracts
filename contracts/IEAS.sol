@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.17;
 
-import "./IASRegistry.sol";
-import "./IEIP712Verifier.sol";
+import { IASRegistry } from "./IASRegistry.sol";
+import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 
 /**
  * @dev A struct representing a single attestation.

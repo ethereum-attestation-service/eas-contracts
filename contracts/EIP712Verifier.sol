@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import "./IEIP712Verifier.sol";
+import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.

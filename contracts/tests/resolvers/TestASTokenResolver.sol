@@ -2,10 +2,10 @@
 
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "../../ASResolver.sol";
+import { ASResolver } from "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether a specific amount of tokens was approved to be included in an attestation.

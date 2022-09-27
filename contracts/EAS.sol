@@ -2,9 +2,11 @@
 
 pragma solidity 0.8.17;
 
-import "./Types.sol";
-import "./IEAS.sol";
-import "./IASRegistry.sol";
+import { EMPTY_UUID } from "./Types.sol";
+import { IEAS, Attestation } from "./IEAS.sol";
+import { IASRegistry, ASRecord } from "./IASRegistry.sol";
+import { IEIP712Verifier } from "./IEIP712Verifier.sol";
+import { IASResolver } from "./IASResolver.sol";
 
 /**
  * @title EAS - Ethereum Attestation Service
@@ -168,7 +170,7 @@ contract EAS is IEAS {
                 revert NotPayable();
             }
 
-            if (!resolver.resolve{value: msg.value}(recipient, asRecord.schema, data, expirationTime, attester)) {
+            if (!resolver.resolve{ value: msg.value }(recipient, asRecord.schema, data, expirationTime, attester)) {
                 revert InvalidAttestation();
             }
         }

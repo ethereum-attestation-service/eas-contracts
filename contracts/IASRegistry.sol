@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import "./IASResolver.sol";
+import { IASResolver } from "./IASResolver.sol";
 
 /**
  * @title A struct representing a record for a submitted AS (Attestation Schema).

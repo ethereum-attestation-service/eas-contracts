@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import "../../ASResolver.sol";
+import { ASResolver } from "../../ASResolver.sol";
 
 /**
  * @title A sample AS resolver that checks whether an attestation data is either \x00 or \x01.
