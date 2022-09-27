@@ -2,9 +2,9 @@
 
 pragma solidity 0.8.17;
 
-import "./Types.sol";
-import "./IASRegistry.sol";
-import "./IASResolver.sol";
+import { EMPTY_UUID } from "./Types.sol";
+import { IASRegistry, ASRecord } from "./IASRegistry.sol";
+import { IASResolver } from "./IASResolver.sol";
 
 /**
  * @title The global AS registry.
@@ -29,7 +29,7 @@ contract ASRegistry is IASRegistry {
             index = ++_asCount;
         }
 
-        ASRecord memory asRecord = ASRecord({uuid: EMPTY_UUID, index: index, schema: schema, resolver: resolver});
+        ASRecord memory asRecord = ASRecord({ uuid: EMPTY_UUID, index: index, schema: schema, resolver: resolver });
 
         bytes32 uuid = _getUUID(asRecord);
         if (_registry[uuid].uuid != EMPTY_UUID) {

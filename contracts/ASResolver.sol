@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import "./IASResolver.sol";
+import { IASResolver } from "./IASResolver.sol";
 
 /**
  * @title A base resolver contract

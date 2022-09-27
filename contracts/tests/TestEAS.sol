@@ -2,7 +2,10 @@
 
 pragma solidity 0.8.17;
 
-import "../EAS.sol";
+import { EAS } from "../EAS.sol";
+
+import { IASRegistry } from "../IASRegistry.sol";
+import { IEIP712Verifier } from "../IEIP712Verifier.sol";
 
 contract TestEAS is EAS {
     uint32 private _currentTime = 1;
