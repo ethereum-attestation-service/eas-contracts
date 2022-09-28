@@ -23,7 +23,7 @@ contract EAS is IEAS {
     error NotFound();
     error NotPayable();
 
-    string public constant VERSION = "0.9";
+    string public constant VERSION = "0.10";
 
     // The AS global registry.
     IASRegistry private immutable _asRegistry;
