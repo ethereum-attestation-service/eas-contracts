@@ -28,14 +28,14 @@ describe('EIP712Verifier', () => {
       chainId: HARDHAT_CHAIN_ID
     });
 
-    expect(await verifier.DOMAIN_SEPARATOR()).to.equal(delegation.getDomainSeparator());
+    expect(await verifier.getDomainSeparator()).to.equal(delegation.getDomainSeparator());
   });
 
   it('should return the attest type hash', async () => {
-    expect(await verifier.ATTEST_TYPEHASH()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
+    expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
   });
 
   it('should return the revoke type hash', async () => {
-    expect(await verifier.REVOKE_TYPEHASH()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
+    expect(await verifier.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
   });
 });
