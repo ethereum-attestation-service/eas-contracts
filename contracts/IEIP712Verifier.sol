@@ -7,6 +7,11 @@ pragma solidity 0.8.17;
  */
 interface IEIP712Verifier {
     /**
+     * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
+     */
+    function getDomainSeparator() external view returns (bytes32);
+
+    /**
      * @dev Returns the current nonce per-account.
      *
      * @param account The requested account.
