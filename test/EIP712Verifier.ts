@@ -18,7 +18,7 @@ describe('EIP712Verifier', () => {
   });
 
   it('should report a version', async () => {
-    expect(await verifier.VERSION()).to.equal('0.9');
+    expect(await verifier.VERSION()).to.equal('0.10');
   });
 
   it('should return the correct domain separator', async () => {
