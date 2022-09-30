@@ -7,11 +7,11 @@
 
 ## Introduction
 
-The Ethereum Attestation Service is a free and open protocol for on-chain attestations on EVM compatible blockchains.  It is a generalized service that allows anyone to register a schema for their particular use case, and then make attestations following their schema.
+The Ethereum Attestation Service is a free and open protocol for on-chain attestations on EVM compatible blockchains. It is a generalized service that allows anyone to register a schema for their particular use case, and then make attestations following their schema.
 
-Schemas can be registered using the Schema.sol contract, and attestations are made using the EAS.sol contract.
+Schemas can be registered using the `ASRegistry.sol` contract, and attestations are made using the `EAS.sol` contract.
 
-In addition, we provide a resolver contract for advanced use cases, such as on-chain verification of attestation data, and also attaching payments to attestations (which makes a new suite of powerful web3 applications possible)
+In addition, we provide a resolver contract for advanced use cases, such as on-chain verification of attestation data, and also attaching payments to attestations (which makes a new suite of powerful web3 applications possible).
 
 We also provide an SDK for developers.
 
@@ -19,7 +19,8 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 * Identity
 * Trust Scores
-* Goodness ScoresCredit Scores
+* Goodness Scores
+* Credit Scores
 * Clout
 * Land Registries
 * Social Networks
@@ -31,7 +32,7 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 * Oracles (who can be atomically paid for making attestations inside the protocol)
 * Likes/Dislikes
 * Content Filtering
-* And many more !
+* And many more!
 
 ## Deployments
 
