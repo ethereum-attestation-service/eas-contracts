@@ -3,6 +3,7 @@
 pragma solidity 0.8.17;
 
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 
@@ -81,8 +82,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
             keccak256(abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce))
         );
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        if (recoveredAddress == address(0) || recoveredAddress != attester) {
+        if (ECDSA.recover(digest, v, r, s) != attester) {
             revert InvalidSignature();
         }
     }
@@ -104,8 +104,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
 
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)));
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        if (recoveredAddress == address(0) || recoveredAddress != attester) {
+        if (ECDSA.recover(digest, v, r, s) != attester) {
             revert InvalidSignature();
         }
     }
