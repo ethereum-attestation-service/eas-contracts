@@ -45,8 +45,66 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Installation
 
-```console
+```sh
 yarn install @ethereum-attestation-service/contracts
+```
+
+## Testing
+
+Testing the protocol is possible via multiple approaches:
+
+### Unit Tests
+
+You can run the full test suite via:
+
+```sh
+yarn test
+```
+
+### Test Coverage
+
+#### Latest Test Coverage Report (2022-09-30)
+
+* 100% Statements 55/55
+* 100% Branches 34/34
+* 100% Functions 25/25
+* 100% Lines 87/87
+
+![Coverage Report](./docs/images/coverage.png)
+
+```sh
+----------------------|----------|----------|----------|----------|----------------|
+File                  |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+----------------------|----------|----------|----------|----------|----------------|
+ contracts/           |      100 |      100 |      100 |      100 |                |
+  ASRegistry.sol      |      100 |      100 |      100 |      100 |                |
+  ASResolver.sol      |      100 |      100 |      100 |      100 |                |
+  EAS.sol             |      100 |      100 |      100 |      100 |                |
+  EIP712Verifier.sol  |      100 |      100 |      100 |      100 |                |
+  IASRegistry.sol     |      100 |      100 |      100 |      100 |                |
+  IASResolver.sol     |      100 |      100 |      100 |      100 |                |
+  IEAS.sol            |      100 |      100 |      100 |      100 |                |
+  IEIP712Verifier.sol |      100 |      100 |      100 |      100 |                |
+  Types.sol           |      100 |      100 |      100 |      100 |                |
+----------------------|----------|----------|----------|----------|----------------|
+All files             |      100 |      100 |      100 |      100 |                |
+----------------------|----------|----------|----------|----------|----------------|
+```
+
+#### Instructions
+
+In order to audit the test coverage of the full test suite, run:
+
+```sh
+yarn test:coverage
+```
+
+## Profiling
+
+You can profile the gas costs of all of the user-focused flows (provisioning or removing liquidity, trading, participating in auto-compounding staking rewards, migrating v2.1 positions, taking a flash-loan, etc.) via:
+
+```sh
+yarn profile
 ```
 
 ## License
