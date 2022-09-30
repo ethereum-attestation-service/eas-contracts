@@ -56,12 +56,17 @@ describe('EAS', () => {
 
     eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
 
-    await eas.setTime(await latest());
+    const now = await latest();
+    expect(await eas.getTime()).to.equal(now);
+    await eas.setTime(now);
+    expect(await eas.getTime()).to.equal(now);
   });
 
   describe('construction', async () => {
-    it('should report a version', async () => {
+    it('should be properly initialized', async () => {
       expect(await eas.VERSION()).to.equal('0.10');
+      expect(await eas.getASRegistry()).to.equal(registry.address);
+      expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
 
     it('should revert when initialized with an empty AS registry', async () => {
@@ -99,7 +104,7 @@ describe('EAS', () => {
     const data = '0x1234';
 
     beforeEach(async () => {
-      expirationTime = (await eas.currentTime()) + duration.days(30);
+      expirationTime = (await eas.getTime()) + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
@@ -151,7 +156,7 @@ describe('EAS', () => {
             schema,
             recipient,
             txSender.address,
-            await eas.currentTime(),
+            await eas.getTime(),
             expirationTime,
             data,
             options?.bump ?? 0
@@ -164,7 +169,7 @@ describe('EAS', () => {
           expect(attestation.schema).to.equal(schema);
           expect(attestation.recipient).to.equal(recipient);
           expect(attestation.attester).to.equal(txSender.address);
-          expect(attestation.time).to.equal(await eas.currentTime());
+          expect(attestation.time).to.equal(await eas.getTime());
           expect(attestation.expirationTime).to.equal(expirationTime);
           expect(attestation.revocationTime).to.equal(0);
           expect(attestation.refUUID).to.equal(refUUID);
@@ -244,7 +249,7 @@ describe('EAS', () => {
           });
 
           it('should revert when attesting with passed expiration time', async () => {
-            const expired = (await eas.currentTime()) - duration.days(1);
+            const expired = (await eas.getTime()) - duration.days(1);
             await testFailedAttestation(
               recipient.address,
               schema1Id,
@@ -288,7 +293,7 @@ describe('EAS', () => {
               schema1Id,
               recipient.address,
               recipient.address,
-              await eas.currentTime(),
+              await eas.getTime(),
               expirationTime,
               data,
               0
@@ -419,7 +424,7 @@ describe('EAS', () => {
             let validAfter: number;
 
             beforeEach(async () => {
-              validAfter = (await eas.currentTime()) + duration.years(1);
+              validAfter = (await eas.getTime()) + duration.years(1);
               const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
               expect(await resolver.isPayable()).to.be.false;
 
@@ -576,7 +581,7 @@ describe('EAS', () => {
                 schema1Id,
                 recipient.address,
                 recipient.address,
-                await eas.currentTime(),
+                await eas.getTime(),
                 expirationTime,
                 data,
                 0
@@ -663,7 +668,7 @@ describe('EAS', () => {
     beforeEach(async () => {
       await registry.register(schema1, AddressZero);
 
-      expirationTime = (await eas.currentTime()) + duration.days(30);
+      expirationTime = (await eas.getTime()) + duration.days(30);
     });
 
     for (const delegation of [false, true]) {
@@ -688,7 +693,7 @@ describe('EAS', () => {
         await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, schema1Id);
 
         const attestation = await eas.getAttestation(uuid);
-        expect(attestation.revocationTime).to.equal(await eas.currentTime());
+        expect(attestation.revocationTime).to.equal(await eas.getTime());
       };
 
       const testFailedRevocation = async (uuid: string, err: string, options?: Options) => {
@@ -715,15 +720,7 @@ describe('EAS', () => {
             .connect(sender)
             .attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
 
-          uuid = getUUID(
-            schema1Id,
-            recipient.address,
-            sender.address,
-            await eas.currentTime(),
-            expirationTime,
-            data,
-            0
-          );
+          uuid = getUUID(schema1Id, recipient.address, sender.address, await eas.getTime(), expirationTime, data, 0);
         });
 
         it('should revert when revoking a non-existing attestation', async () => {

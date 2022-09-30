@@ -8,7 +8,9 @@ import { IASRegistry } from "../IASRegistry.sol";
 import { IEIP712Verifier } from "../IEIP712Verifier.sol";
 
 contract TestEAS is EAS {
-    uint32 private _currentTime = 1;
+    uint32 private INITIAL_TIME = 0;
+
+    uint32 private _currentTime = INITIAL_TIME;
 
     constructor(IASRegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
 
@@ -16,11 +18,11 @@ contract TestEAS is EAS {
         _currentTime = newTime;
     }
 
-    function currentTime() external view returns (uint32) {
-        return _currentTime;
+    function getTime() external view returns (uint32) {
+        return _time();
     }
 
     function _time() internal view virtual override returns (uint32) {
-        return _currentTime;
+        return _currentTime == INITIAL_TIME ? super._time() : _currentTime;
     }
 }
