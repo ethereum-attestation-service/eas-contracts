@@ -77,14 +77,8 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
             nonce = _nonces[attester]++;
         }
 
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                _domainSeparatorV4(),
-                keccak256(
-                    abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce)
-                )
-            )
+        bytes32 digest = _hashTypedDataV4(
+            keccak256(abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce))
         );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
@@ -108,9 +102,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
             nonce = _nonces[attester]++;
         }
 
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", _domainSeparatorV4(), keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)))
-        );
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)));
 
         address recoveredAddress = ecrecover(digest, v, r, s);
         if (recoveredAddress == address(0) || recoveredAddress != attester) {
