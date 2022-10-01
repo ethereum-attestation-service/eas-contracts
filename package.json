@@ -36,7 +36,7 @@
     "size": "hardhat size-contracts",
     "verify": "hardhat verify",
     "flatten": "hardhat flatten",
-    "clean": "rm -rf artifacts cache data coverage typechain-types",
+    "clean": "rm -rf artifacts cache dist coverage typechain-types",
     "prepare": "yarn clean && yarn compile && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
     "postinstall": "scripts/fix-github-hardhat-deploy.sh"
   },
