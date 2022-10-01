@@ -1,16 +1,13 @@
 import Contracts from '../components/Contracts';
 import { ASRegistry } from '../typechain-types';
+import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
 const {
-  constants: { AddressZero },
   utils: { solidityKeccak256, formatBytes32String }
 } = ethers;
-
-const ZERO_BYTES = '0x';
-const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 let accounts: SignerWithAddress[];
 let sender: SignerWithAddress;
@@ -65,16 +62,16 @@ describe('ASRegistry', () => {
     });
 
     it('should allow to register an AS without a resolver', async () => {
-      await testRegister('0x1234', AddressZero);
+      await testRegister('0x1234', ZERO_ADDRESS);
     });
 
     it('should allow to register an AS without neither a schema or a resolver', async () => {
-      await testRegister(ZERO_BYTES, AddressZero);
+      await testRegister(ZERO_BYTES, ZERO_ADDRESS);
     });
 
     it('should not allow to register the same schema and resolver twice', async () => {
-      await testRegister('0x1234', AddressZero);
-      await expect(testRegister('0x1234', AddressZero)).to.be.revertedWith('AlreadyExists');
+      await testRegister('0x1234', ZERO_ADDRESS);
+      await expect(testRegister('0x1234', ZERO_ADDRESS)).to.be.revertedWith('AlreadyExists');
     });
   });
 
@@ -98,7 +95,7 @@ describe('ASRegistry', () => {
       expect(asRecord.uuid).to.equal(ZERO_BYTES32);
       expect(asRecord.index).to.equal(0);
       expect(asRecord.schema).to.equal(ZERO_BYTES);
-      expect(asRecord.resolver).to.equal(AddressZero);
+      expect(asRecord.resolver).to.equal(ZERO_ADDRESS);
     });
   });
 });
