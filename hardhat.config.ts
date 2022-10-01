@@ -1,38 +1,114 @@
+import { NamedAccounts } from './data/NamedAccounts';
+import { DeploymentNetwork } from './utils/Constants';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
+import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-waffle';
+import '@tenderly/hardhat-tenderly';
 import '@typechain/hardhat';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import 'hardhat-contract-sizer';
-import 'hardhat-docgen';
+import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
+import { MochaOptions } from 'mocha';
 import 'solidity-coverage';
 
-dotenv.config();
+interface EnvOptions {
+  ETHEREUM_PROVIDER_URL?: string;
+  ETHEREUM_GOERLI_PROVIDER_URL?: string;
+  ETHERSCAN_API_KEY?: string;
+  GAS_PRICE?: number | 'auto';
+  PROFILE?: boolean;
+  TENDERLY_FORK_ID?: string;
+  TENDERLY_PROJECT?: string;
+  TENDERLY_TEST_PROJECT?: string;
+  TENDERLY_USERNAME?: string;
+}
 
-const loadENVKey = <T>(envKeyName: string) => {
-  return process.env[envKeyName] as unknown as T;
+const {
+  ETHEREUM_PROVIDER_URL = '',
+  ETHEREUM_GOERLI_PROVIDER_URL = '',
+  ETHERSCAN_API_KEY,
+  GAS_PRICE: gasPrice,
+  PROFILE: isProfiling,
+  TENDERLY_FORK_ID = '',
+  TENDERLY_PROJECT = '',
+  TENDERLY_TEST_PROJECT = '',
+  TENDERLY_USERNAME = ''
+}: EnvOptions = process.env as any as EnvOptions;
+
+const mochaOptions = (): MochaOptions => {
+  let timeout = 600000;
+  let grep;
+  let reporter;
+  let invert = false;
+
+  if (isProfiling) {
+    // if we're profiling, make sure to only run @profile tests without any timeout restriction, and silence most
+    // of test output
+    timeout = 0;
+    grep = '@profile';
+    reporter = 'mocha-silent-reporter';
+  } else {
+    // if we're running in dev, filter out profile tests
+    grep = '@profile';
+    invert = true;
+  }
+
+  return {
+    timeout,
+    color: true,
+    bail: true,
+    grep,
+    invert,
+    reporter
+  };
 };
 
 const config: HardhatUserConfig = {
   networks: {
-    hardhat: {
-      gasPrice: 20000000000,
-      gas: 9500000,
+    [DeploymentNetwork.Hardhat]: {
       accounts: {
-        count: 10,
-        accountsBalance: '10000000000000000000000000000'
-      }
+        count: 20,
+        accountsBalance: '10000000000000000000000000000000000000000000000'
+      },
+      allowUnlimitedContractSize: true,
+      saveDeployments: false,
+      live: false
+    },
+    [DeploymentNetwork.Mainnet]: {
+      chainId: 1,
+      url: ETHEREUM_PROVIDER_URL,
+      gasPrice: gasPrice || 'auto',
+      saveDeployments: true,
+      live: true
     },
 
-    rinkeby: {
-      url: loadENVKey<string>('RINKEBY_PROVIDER_URL') || 'http://127.0.0.1:8545',
-      accounts: [
-        loadENVKey<string>('RINKEBY_PRIVATE_KEY') ||
-          '0x0000000000000000000000000000000000000000000000000000000000000000'
-      ]
+    [DeploymentNetwork.Goerli]: {
+      chainId: 5,
+      url: ETHEREUM_GOERLI_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+
+    [DeploymentNetwork.Tenderly]: {
+      chainId: 1,
+      url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
+      autoImpersonate: true,
+      saveDeployments: true,
+      live: true
     }
+  },
+
+  paths: {
+    deploy: ['deploy/scripts']
+  },
+
+  tenderly: {
+    forkNetwork: '1',
+    project: TENDERLY_PROJECT || TENDERLY_TEST_PROJECT,
+    username: TENDERLY_USERNAME
   },
 
   solidity: {
@@ -51,8 +127,10 @@ const config: HardhatUserConfig = {
     }
   },
 
+  namedAccounts: NamedAccounts,
+
   etherscan: {
-    apiKey: loadENVKey<string>('ETHERSCAN_API_KEY')
+    apiKey: ETHERSCAN_API_KEY
   },
 
   contractSizer: {
@@ -63,14 +141,10 @@ const config: HardhatUserConfig = {
 
   gasReporter: {
     currency: 'USD',
-    enabled: loadENVKey('PROFILE')
+    enabled: isProfiling
   },
 
-  mocha: {
-    timeout: 600000,
-    color: true,
-    bail: true
-  }
+  mocha: mochaOptions()
 };
 
 export default config;
