@@ -44,7 +44,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install Dependencies
+      - name: Install Packages
+        run: sudo apt-get -y install pkg-config libusb-1.0
+
+      - name: Install NPM Dependencies
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         if: steps.yarn-cache.outputs.cache-hit != 'true'
