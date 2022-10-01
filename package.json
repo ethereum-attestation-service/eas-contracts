@@ -63,6 +63,7 @@
     "@typescript-eslint/parser": "^5.38.1",
     "chai": "^4.3.6",
     "chai-arrays": "^2.2.0",
+    "copyfiles": "^2.4.1",
     "decimal.js": "^10.4.1",
     "dotenv": "^16.0.3",
     "eslint": "^8.24.0",
