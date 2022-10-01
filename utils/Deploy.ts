@@ -20,10 +20,6 @@ const {
   run
 } = deployments;
 
-const { AbiCoder } = utils;
-
-const tenderlyNetwork = tenderly.network();
-
 interface EnvOptions {
   TEST_FORK?: boolean;
 }
@@ -321,7 +317,7 @@ const verifyTenderlyFork = async (deployment: Deployment) => {
   for (const contract of contracts) {
     Logger.log('  verifying on tenderly', contract.name, 'at', contract.address);
 
-    await tenderlyNetwork.verify(contract);
+    await tenderly.network().verify(contract);
   }
 };
 
