@@ -17,14 +17,14 @@
     "outDir": "./dist"
   },
   "include": [
-    "./hardhat.config.ts",
-    "./typechain-types",
     "./components",
-    "./utils",
-    "./test",
-    "./scripts",
     "./data",
     "./deploy",
-    "./deployments"
+    "./deployments",
+    "./hardhat.config.ts",
+    "./scripts",
+    "./test",
+    "./typechain-types",
+    "./utils"
   ]
 }
