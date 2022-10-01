@@ -7,6 +7,7 @@ import {
   TestEAS,
   TestERC20Token
 } from '../typechain-types';
+import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
@@ -20,12 +21,8 @@ const {
 } = ethers;
 
 const {
-  constants: { AddressZero },
   utils: { formatBytes32String, hexlify, solidityKeccak256 }
 } = ethers;
-
-const ZERO_BYTES = '0x';
-const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 describe('EAS', () => {
   let accounts: SignerWithAddress[];
@@ -70,11 +67,11 @@ describe('EAS', () => {
     });
 
     it('should revert when initialized with an empty AS registry', async () => {
-      await expect(Contracts.EAS.deploy(AddressZero, verifier.address)).to.be.revertedWith('InvalidRegistry');
+      await expect(Contracts.EAS.deploy(ZERO_ADDRESS, verifier.address)).to.be.revertedWith('InvalidRegistry');
     });
 
     it('should revert when initialized with an empty EIP712 verifier', async () => {
-      await expect(Contracts.EAS.deploy(registry.address, AddressZero)).to.be.revertedWith('InvalidVerifier');
+      await expect(Contracts.EAS.deploy(registry.address, ZERO_ADDRESS)).to.be.revertedWith('InvalidVerifier');
     });
   });
 
@@ -238,14 +235,14 @@ describe('EAS', () => {
           const schema1 = formatBytes32String('AS1');
           const schema2 = formatBytes32String('AS2');
           const schema3 = formatBytes32String('AS3');
-          const schema1Id = getASUUID(schema1, AddressZero);
-          const schema2Id = getASUUID(schema2, AddressZero);
-          const schema3Id = getASUUID(schema3, AddressZero);
+          const schema1Id = getASUUID(schema1, ZERO_ADDRESS);
+          const schema2Id = getASUUID(schema2, ZERO_ADDRESS);
+          const schema3Id = getASUUID(schema3, ZERO_ADDRESS);
 
           beforeEach(async () => {
-            await registry.register(schema1, AddressZero);
-            await registry.register(schema2, AddressZero);
-            await registry.register(schema3, AddressZero);
+            await registry.register(schema1, ZERO_ADDRESS);
+            await registry.register(schema2, ZERO_ADDRESS);
+            await registry.register(schema3, ZERO_ADDRESS);
           });
 
           it('should revert when attesting with passed expiration time', async () => {
@@ -261,7 +258,7 @@ describe('EAS', () => {
           });
 
           it('should allow attestation to an empty recipient', async () => {
-            await testAttestation(AddressZero, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await testAttestation(ZERO_ADDRESS, schema1Id, expirationTime, ZERO_BYTES32, data);
           });
 
           it('should allow self attestations', async () => {
@@ -659,14 +656,14 @@ describe('EAS', () => {
 
   describe('revocation', async () => {
     const schema1 = formatBytes32String('AS1');
-    const schema1Id = getASUUID(schema1, AddressZero);
+    const schema1Id = getASUUID(schema1, ZERO_ADDRESS);
     let uuid: string;
 
     let expirationTime: number;
     const data = '0x1234';
 
     beforeEach(async () => {
-      await registry.register(schema1, AddressZero);
+      await registry.register(schema1, ZERO_ADDRESS);
 
       expirationTime = (await eas.getTime()) + duration.days(30);
     });

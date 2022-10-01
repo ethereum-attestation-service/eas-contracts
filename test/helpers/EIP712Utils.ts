@@ -1,9 +1,8 @@
+import { HARDHAT_CHAIN_ID } from '../../utils/Constants';
 import { Delegation } from '@ethereum-attestation-service/sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ecsign } from 'ethereumjs-util';
 import { BigNumber, BigNumberish } from 'ethers';
-
-const HARDHAT_CHAIN_ID = 31337;
 
 export class EIP712Utils {
   delegation: Delegation;
