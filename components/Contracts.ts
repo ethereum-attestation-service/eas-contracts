@@ -13,8 +13,10 @@ import {
   TestEAS__factory,
   TestERC20Token__factory
 } from '../typechain-types';
-import { Signer, ContractFactory } from 'ethers';
+import { ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
+
+export * from '../typechain-types';
 
 type AsyncReturnType<T extends (...args: any) => any> = T extends (...args: any) => Promise<infer U>
   ? U
