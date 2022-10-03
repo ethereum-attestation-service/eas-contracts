@@ -40,9 +40,15 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 #### v0.10
 
-* **EAS**: <https://goerli.etherscan.io/address/TBD>
-* **ASRegistry**: <https://rinkeby.etherscan.io/address/TBD>
-* **EIP712Verifier**: <https://rinkeby.etherscan.io/address/TBD>
+* **EAS**:
+  * Contract: [0x8BAD0f3ba831aB34dd8110B641D29ecc221ac240](https://goerli.etherscan.io/address/0x8BAD0f3ba831aB34dd8110B641D29ecc221ac240)
+  * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
+* **ASRegistry**:
+  * Contract: [0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f](https://goerli.etherscan.io/address/0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f)
+  * Deployment and ABI: [ASRegistry.json](./deployments/goerli/ASRegistry.json)
+* **EIP712Verifier**:
+  * Contract: [0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84](https://goerli.etherscan.io/address/0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84)
+  * Deployment and ABI: [EIP712Verifier.json](./deployments/goerli/EIP712Verifier.json)
 
 ## Installation
 

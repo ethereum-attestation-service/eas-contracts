@@ -1,0 +1,283 @@
+{
+  "address": "0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidSignature",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VERSION",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "expirationTime",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "refUUID",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "attest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAttestTypeHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getDomainSeparator",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "getNonce",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getRevokeTypeHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xef0e6bdc07ccbe538de5bb7bdc27e28c44a46834663ff2d4c675dc417fcd5460",
+  "receipt": {
+    "to": null,
+    "from": "0x01a93612f26100B6E18a2e3dd57df5c3ccaFeca1",
+    "contractAddress": "0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84",
+    "transactionIndex": 2,
+    "gasUsed": "687091",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x8c945e868083a2db3cf85ed8a806194bc37207898d45e2aabc45bb08340ea03d",
+    "transactionHash": "0xef0e6bdc07ccbe538de5bb7bdc27e28c44a46834663ff2d4c675dc417fcd5460",
+    "logs": [],
+    "blockNumber": 7705598,
+    "cumulativeGasUsed": "775582",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "3d7214a23a94ba3c1d0721cea36f8c55",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidSignature\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"expirationTime\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"refUUID\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"attest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAttestTypeHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getDomainSeparator\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getNonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getRevokeTypeHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"revoke\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"attest(address,bytes32,uint32,bytes32,bytes,address,uint8,bytes32,bytes32)\":{\"details\":\"Verifies signed attestation.\",\"params\":{\"attester\":\"The attesting account.\",\"data\":\"Additional custom data.\",\"expirationTime\":\"The expiration time of the attestation.\",\"r\":\"The x-coordinate of the nonce R.\",\"recipient\":\"The recipient of the attestation.\",\"refUUID\":\"An optional related attestation's UUID.\",\"s\":\"The signature data.\",\"schema\":\"The UUID of the AS.\",\"v\":\"The recovery ID.\"}},\"constructor\":{\"details\":\"Creates a new EIP712Verifier instance.\"},\"getDomainSeparator()\":{\"details\":\"Returns the domain separator used in the encoding of the signatures for attest, and revoke.\"},\"getNonce(address)\":{\"details\":\"Returns the current nonce per-account.\",\"params\":{\"account\":\"The requested account.\"},\"returns\":{\"_0\":\"The current nonce.\"}},\"revoke(bytes32,address,uint8,bytes32,bytes32)\":{\"details\":\"Verifies signed revocations.\",\"params\":{\"attester\":\"The attesting account.\",\"r\":\"The x-coordinate of the nonce R.\",\"s\":\"The signature data.\",\"uuid\":\"The UUID of the attestation to revoke.\",\"v\":\"The recovery ID.\"}}},\"title\":\"EIP712 typed signatures verifier for EAS delegated attestations.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getAttestTypeHash()\":{\"notice\":\"Returns the EIP712 type hash for the attest function.\"},\"getRevokeTypeHash()\":{\"notice\":\"Returns the EIP712 type hash for the revoke function.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/EIP712Verifier.sol\":\"EIP712Verifier\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"none\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":100000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/Strings.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.7.0) (utils/Strings.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary Strings {\\n    bytes16 private constant _HEX_SYMBOLS = \\\"0123456789abcdef\\\";\\n    uint8 private constant _ADDRESS_LENGTH = 20;\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        // Inspired by OraclizeAPI's implementation - MIT licence\\n        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol\\n\\n        if (value == 0) {\\n            return \\\"0\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 digits;\\n        while (temp != 0) {\\n            digits++;\\n            temp /= 10;\\n        }\\n        bytes memory buffer = new bytes(digits);\\n        while (value != 0) {\\n            digits -= 1;\\n            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));\\n            value /= 10;\\n        }\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        if (value == 0) {\\n            return \\\"0x00\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 length = 0;\\n        while (temp != 0) {\\n            length++;\\n            temp >>= 8;\\n        }\\n        return toHexString(value, length);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = _HEX_SYMBOLS[value & 0xf];\\n            value >>= 4;\\n        }\\n        require(value == 0, \\\"Strings: hex length insufficient\\\");\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(address addr) internal pure returns (string memory) {\\n        return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);\\n    }\\n}\\n\",\"keccak256\":\"0xaf159a8b1923ad2a26d516089bceca9bdeaeacd04be50983ea00ba63070f08a3\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/cryptography/ECDSA.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.7.3) (utils/cryptography/ECDSA.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../Strings.sol\\\";\\n\\n/**\\n * @dev Elliptic Curve Digital Signature Algorithm (ECDSA) operations.\\n *\\n * These functions can be used to verify that a message was signed by the holder\\n * of the private keys of a given address.\\n */\\nlibrary ECDSA {\\n    enum RecoverError {\\n        NoError,\\n        InvalidSignature,\\n        InvalidSignatureLength,\\n        InvalidSignatureS,\\n        InvalidSignatureV\\n    }\\n\\n    function _throwError(RecoverError error) private pure {\\n        if (error == RecoverError.NoError) {\\n            return; // no error: do nothing\\n        } else if (error == RecoverError.InvalidSignature) {\\n            revert(\\\"ECDSA: invalid signature\\\");\\n        } else if (error == RecoverError.InvalidSignatureLength) {\\n            revert(\\\"ECDSA: invalid signature length\\\");\\n        } else if (error == RecoverError.InvalidSignatureS) {\\n            revert(\\\"ECDSA: invalid signature 's' value\\\");\\n        } else if (error == RecoverError.InvalidSignatureV) {\\n            revert(\\\"ECDSA: invalid signature 'v' value\\\");\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the address that signed a hashed message (`hash`) with\\n     * `signature` or error string. This address can then be used for verification purposes.\\n     *\\n     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:\\n     * this function rejects them by requiring the `s` value to be in the lower\\n     * half order, and the `v` value to be either 27 or 28.\\n     *\\n     * IMPORTANT: `hash` _must_ be the result of a hash operation for the\\n     * verification to be secure: it is possible to craft signatures that\\n     * recover to arbitrary addresses for non-hashed data. A safe way to ensure\\n     * this is by receiving a hash of the original message (which may otherwise\\n     * be too long), and then calling {toEthSignedMessageHash} on it.\\n     *\\n     * Documentation for signature generation:\\n     * - with https://web3js.readthedocs.io/en/v1.3.4/web3-eth-accounts.html#sign[Web3.js]\\n     * - with https://docs.ethers.io/v5/api/signer/#Signer-signMessage[ethers]\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError) {\\n        if (signature.length == 65) {\\n            bytes32 r;\\n            bytes32 s;\\n            uint8 v;\\n            // ecrecover takes the signature parameters, and the only way to get them\\n            // currently is to use assembly.\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                r := mload(add(signature, 0x20))\\n                s := mload(add(signature, 0x40))\\n                v := byte(0, mload(add(signature, 0x60)))\\n            }\\n            return tryRecover(hash, v, r, s);\\n        } else {\\n            return (address(0), RecoverError.InvalidSignatureLength);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the address that signed a hashed message (`hash`) with\\n     * `signature`. This address can then be used for verification purposes.\\n     *\\n     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:\\n     * this function rejects them by requiring the `s` value to be in the lower\\n     * half order, and the `v` value to be either 27 or 28.\\n     *\\n     * IMPORTANT: `hash` _must_ be the result of a hash operation for the\\n     * verification to be secure: it is possible to craft signatures that\\n     * recover to arbitrary addresses for non-hashed data. A safe way to ensure\\n     * this is by receiving a hash of the original message (which may otherwise\\n     * be too long), and then calling {toEthSignedMessageHash} on it.\\n     */\\n    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, signature);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-tryRecover} that receives the `r` and `vs` short-signature fields separately.\\n     *\\n     * See https://eips.ethereum.org/EIPS/eip-2098[EIP-2098 short signatures]\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(\\n        bytes32 hash,\\n        bytes32 r,\\n        bytes32 vs\\n    ) internal pure returns (address, RecoverError) {\\n        bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);\\n        uint8 v = uint8((uint256(vs) >> 255) + 27);\\n        return tryRecover(hash, v, r, s);\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.\\n     *\\n     * _Available since v4.2._\\n     */\\n    function recover(\\n        bytes32 hash,\\n        bytes32 r,\\n        bytes32 vs\\n    ) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, r, vs);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-tryRecover} that receives the `v`,\\n     * `r` and `s` signature fields separately.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(\\n        bytes32 hash,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) internal pure returns (address, RecoverError) {\\n        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature\\n        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines\\n        // the valid range for s in (301): 0 < s < secp256k1n \\u00f7 2 + 1, and for v in (302): v \\u2208 {27, 28}. Most\\n        // signatures from current libraries generate a unique signature with an s-value in the lower half order.\\n        //\\n        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value\\n        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or\\n        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept\\n        // these malleable signatures as well.\\n        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {\\n            return (address(0), RecoverError.InvalidSignatureS);\\n        }\\n        if (v != 27 && v != 28) {\\n            return (address(0), RecoverError.InvalidSignatureV);\\n        }\\n\\n        // If the signature is valid (and not malleable), return the signer address\\n        address signer = ecrecover(hash, v, r, s);\\n        if (signer == address(0)) {\\n            return (address(0), RecoverError.InvalidSignature);\\n        }\\n\\n        return (signer, RecoverError.NoError);\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-recover} that receives the `v`,\\n     * `r` and `s` signature fields separately.\\n     */\\n    function recover(\\n        bytes32 hash,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Message, created from a `hash`. This\\n     * produces hash corresponding to the one signed with the\\n     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]\\n     * JSON-RPC method as part of EIP-191.\\n     *\\n     * See {recover}.\\n     */\\n    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {\\n        // 32 is the length in bytes of hash,\\n        // enforced by the type signature above\\n        return keccak256(abi.encodePacked(\\\"\\\\x19Ethereum Signed Message:\\\\n32\\\", hash));\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Message, created from `s`. This\\n     * produces hash corresponding to the one signed with the\\n     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]\\n     * JSON-RPC method as part of EIP-191.\\n     *\\n     * See {recover}.\\n     */\\n    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {\\n        return keccak256(abi.encodePacked(\\\"\\\\x19Ethereum Signed Message:\\\\n\\\", Strings.toString(s.length), s));\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Typed Data, created from a\\n     * `domainSeparator` and a `structHash`. This produces hash corresponding\\n     * to the one signed with the\\n     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]\\n     * JSON-RPC method as part of EIP-712.\\n     *\\n     * See {recover}.\\n     */\\n    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {\\n        return keccak256(abi.encodePacked(\\\"\\\\x19\\\\x01\\\", domainSeparator, structHash));\\n    }\\n}\\n\",\"keccak256\":\"0xdb7f5c28fc61cda0bd8ab60ce288e206b791643bcd3ba464a70cbec18895a2f5\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (utils/cryptography/draft-EIP712.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./ECDSA.sol\\\";\\n\\n/**\\n * @dev https://eips.ethereum.org/EIPS/eip-712[EIP 712] is a standard for hashing and signing of typed structured data.\\n *\\n * The encoding specified in the EIP is very generic, and such a generic implementation in Solidity is not feasible,\\n * thus this contract does not implement the encoding itself. Protocols need to implement the type-specific encoding\\n * they need in their contracts using a combination of `abi.encode` and `keccak256`.\\n *\\n * This contract implements the EIP 712 domain separator ({_domainSeparatorV4}) that is used as part of the encoding\\n * scheme, and the final step of the encoding to obtain the message digest that is then signed via ECDSA\\n * ({_hashTypedDataV4}).\\n *\\n * The implementation of the domain separator was designed to be as efficient as possible while still properly updating\\n * the chain id to protect against replay attacks on an eventual fork of the chain.\\n *\\n * NOTE: This contract implements the version of the encoding known as \\\"v4\\\", as implemented by the JSON RPC method\\n * https://docs.metamask.io/guide/signing-data.html[`eth_signTypedDataV4` in MetaMask].\\n *\\n * _Available since v3.4._\\n */\\nabstract contract EIP712 {\\n    /* solhint-disable var-name-mixedcase */\\n    // Cache the domain separator as an immutable value, but also store the chain id that it corresponds to, in order to\\n    // invalidate the cached domain separator if the chain id changes.\\n    bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;\\n    uint256 private immutable _CACHED_CHAIN_ID;\\n    address private immutable _CACHED_THIS;\\n\\n    bytes32 private immutable _HASHED_NAME;\\n    bytes32 private immutable _HASHED_VERSION;\\n    bytes32 private immutable _TYPE_HASH;\\n\\n    /* solhint-enable var-name-mixedcase */\\n\\n    /**\\n     * @dev Initializes the domain separator and parameter caches.\\n     *\\n     * The meaning of `name` and `version` is specified in\\n     * https://eips.ethereum.org/EIPS/eip-712#definition-of-domainseparator[EIP 712]:\\n     *\\n     * - `name`: the user readable name of the signing domain, i.e. the name of the DApp or the protocol.\\n     * - `version`: the current major version of the signing domain.\\n     *\\n     * NOTE: These parameters cannot be changed except through a xref:learn::upgrading-smart-contracts.adoc[smart\\n     * contract upgrade].\\n     */\\n    constructor(string memory name, string memory version) {\\n        bytes32 hashedName = keccak256(bytes(name));\\n        bytes32 hashedVersion = keccak256(bytes(version));\\n        bytes32 typeHash = keccak256(\\n            \\\"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)\\\"\\n        );\\n        _HASHED_NAME = hashedName;\\n        _HASHED_VERSION = hashedVersion;\\n        _CACHED_CHAIN_ID = block.chainid;\\n        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(typeHash, hashedName, hashedVersion);\\n        _CACHED_THIS = address(this);\\n        _TYPE_HASH = typeHash;\\n    }\\n\\n    /**\\n     * @dev Returns the domain separator for the current chain.\\n     */\\n    function _domainSeparatorV4() internal view returns (bytes32) {\\n        if (address(this) == _CACHED_THIS && block.chainid == _CACHED_CHAIN_ID) {\\n            return _CACHED_DOMAIN_SEPARATOR;\\n        } else {\\n            return _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME, _HASHED_VERSION);\\n        }\\n    }\\n\\n    function _buildDomainSeparator(\\n        bytes32 typeHash,\\n        bytes32 nameHash,\\n        bytes32 versionHash\\n    ) private view returns (bytes32) {\\n        return keccak256(abi.encode(typeHash, nameHash, versionHash, block.chainid, address(this)));\\n    }\\n\\n    /**\\n     * @dev Given an already https://eips.ethereum.org/EIPS/eip-712#definition-of-hashstruct[hashed struct], this\\n     * function returns the hash of the fully encoded EIP712 message for this domain.\\n     *\\n     * This hash can be used together with {ECDSA-recover} to obtain the signer of a message. For example:\\n     *\\n     * ```solidity\\n     * bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(\\n     *     keccak256(\\\"Mail(address to,string contents)\\\"),\\n     *     mailTo,\\n     *     keccak256(bytes(mailContents))\\n     * )));\\n     * address signer = ECDSA.recover(digest, signature);\\n     * ```\\n     */\\n    function _hashTypedDataV4(bytes32 structHash) internal view virtual returns (bytes32) {\\n        return ECDSA.toTypedDataHash(_domainSeparatorV4(), structHash);\\n    }\\n}\\n\",\"keccak256\":\"0x6688fad58b9ec0286d40fa957152e575d5d8bd4c3aa80985efdb11b44f776ae7\",\"license\":\"MIT\"},\"contracts/EIP712Verifier.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.17;\\n\\nimport { EIP712 } from \\\"@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol\\\";\\nimport { ECDSA } from \\\"@openzeppelin/contracts/utils/cryptography/ECDSA.sol\\\";\\n\\nimport { IEIP712Verifier } from \\\"./IEIP712Verifier.sol\\\";\\n\\n/**\\n * @title EIP712 typed signatures verifier for EAS delegated attestations.\\n */\\ncontract EIP712Verifier is IEIP712Verifier, EIP712 {\\n    error InvalidSignature();\\n\\n    string public constant VERSION = \\\"0.10\\\";\\n\\n    // The hash of the data type used to relay calls to the attest function. It's the value of\\n    // keccak256(\\\"Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)\\\").\\n    bytes32 private constant ATTEST_TYPEHASH = 0xfd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf8236431150;\\n\\n    // The hash of the data type used to relay calls to the revoke function. It's the value of\\n    // keccak256(\\\"Revoke(bytes32 uuid,uint256 nonce)\\\").\\n    bytes32 private constant REVOKE_TYPEHASH = 0xbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab;\\n\\n    // Replay protection nonces.\\n    mapping(address => uint256) private _nonces;\\n\\n    /**\\n     * @dev Creates a new EIP712Verifier instance.\\n     */\\n    constructor() EIP712(\\\"EAS\\\", VERSION) {}\\n\\n    /**\\n     * @inheritdoc IEIP712Verifier\\n     */\\n    function getDomainSeparator() external view returns (bytes32) {\\n        return _domainSeparatorV4();\\n    }\\n\\n    /**\\n     * @inheritdoc IEIP712Verifier\\n     */\\n    function getNonce(address account) external view returns (uint256) {\\n        return _nonces[account];\\n    }\\n\\n    /**\\n     * Returns the EIP712 type hash for the attest function.\\n     */\\n    function getAttestTypeHash() external pure returns (bytes32) {\\n        return ATTEST_TYPEHASH;\\n    }\\n\\n    /**\\n     * Returns the EIP712 type hash for the revoke function.\\n     */\\n    function getRevokeTypeHash() external pure returns (bytes32) {\\n        return REVOKE_TYPEHASH;\\n    }\\n\\n    /**\\n     * @inheritdoc IEIP712Verifier\\n     */\\n    function attest(\\n        address recipient,\\n        bytes32 schema,\\n        uint32 expirationTime,\\n        bytes32 refUUID,\\n        bytes calldata data,\\n        address attester,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) external {\\n        uint256 nonce;\\n        unchecked {\\n            nonce = _nonces[attester]++;\\n        }\\n\\n        bytes32 digest = _hashTypedDataV4(\\n            keccak256(abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce))\\n        );\\n\\n        if (ECDSA.recover(digest, v, r, s) != attester) {\\n            revert InvalidSignature();\\n        }\\n    }\\n\\n    /**\\n     * @inheritdoc IEIP712Verifier\\n     */\\n    function revoke(\\n        bytes32 uuid,\\n        address attester,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) external {\\n        uint256 nonce;\\n        unchecked {\\n            nonce = _nonces[attester]++;\\n        }\\n\\n        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)));\\n\\n        if (ECDSA.recover(digest, v, r, s) != attester) {\\n            revert InvalidSignature();\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x0739bec23dfdeeaafcd3f384526cb86682ad7e084a9bbf46e6169e99d6989004\",\"license\":\"MIT\"},\"contracts/IEIP712Verifier.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.17;\\n\\n/**\\n * @title EIP712 typed signatures verifier for EAS delegated attestations interface.\\n */\\ninterface IEIP712Verifier {\\n    /**\\n     * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.\\n     */\\n    function getDomainSeparator() external view returns (bytes32);\\n\\n    /**\\n     * @dev Returns the current nonce per-account.\\n     *\\n     * @param account The requested account.\\n     *\\n     * @return The current nonce.\\n     */\\n    function getNonce(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Verifies signed attestation.\\n     *\\n     * @param recipient The recipient of the attestation.\\n     * @param schema The UUID of the AS.\\n     * @param expirationTime The expiration time of the attestation.\\n     * @param refUUID An optional related attestation's UUID.\\n     * @param data Additional custom data.\\n     * @param attester The attesting account.\\n     * @param v The recovery ID.\\n     * @param r The x-coordinate of the nonce R.\\n     * @param s The signature data.\\n     */\\n    function attest(\\n        address recipient,\\n        bytes32 schema,\\n        uint32 expirationTime,\\n        bytes32 refUUID,\\n        bytes calldata data,\\n        address attester,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) external;\\n\\n    /**\\n     * @dev Verifies signed revocations.\\n     *\\n     * @param uuid The UUID of the attestation to revoke.\\n     * @param attester The attesting account.\\n     * @param v The recovery ID.\\n     * @param r The x-coordinate of the nonce R.\\n     * @param s The signature data.\\n     */\\n    function revoke(\\n        bytes32 uuid,\\n        address attester,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) external;\\n}\\n\",\"keccak256\":\"0xa2c9da80cd672fca13f7bbe8940b494139001fa8e985802642c78b61130d9154\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x61014060405234801561001157600080fd5b50604080518082018252600381526245415360e81b6020808301918252835180850190945260048452630302e31360e41b908401528151902060e08190527f5904f7b1102a1c44462ac9bd4678b1ee7e1e3e825a021c532f5675cbabd2e3ea6101008190524660a0529192917f8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f6100ed8184846040805160208101859052908101839052606081018290524660808201523060a082015260009060c0016040516020818303038152906040528051906020012090509392505050565b6080523060c052610120525061010292505050565b60805160a05160c05160e0516101005161012051610b7a610151600039600061051f0152600061056e01526000610549015260006104a2015260006104cc015260006104f60152610b7a6000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c8063a182e38c1161005b578063a182e38c14610102578063b83010d314610115578063ed24911d1461013b578063ffa1ad741461014357600080fd5b806312b11a17146100825780631863f01d146100b75780632d0335ab146100cc575b600080fd5b7ffd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf82364311505b6040519081526020015b60405180910390f35b6100ca6100c536600461096a565b61018c565b005b6100a46100da3660046109b8565b73ffffffffffffffffffffffffffffffffffffffff1660009081526020819052604090205490565b6100ca6101103660046109da565b610292565b7fbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab6100a4565b6100a46103e2565b61017f6040518060400160405280600481526020017f302e31300000000000000000000000000000000000000000000000000000000081525081565b6040516100ae9190610ac2565b73ffffffffffffffffffffffffffffffffffffffff841660009081526020818152604080832080546001810190915581517fbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab93810193909352908201889052606082018190529190610217906080015b604051602081830303815290604052805190602001206103f1565b90508573ffffffffffffffffffffffffffffffffffffffff1661023c82878787610460565b73ffffffffffffffffffffffffffffffffffffffff1614610289576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b50505050505050565b73ffffffffffffffffffffffffffffffffffffffff84166000908152602081905260408082208054600181019091559051909190610362907ffd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf8236431150908e908e908e908e90610301908f908f90610b2e565b60408051918290038220602083019790975273ffffffffffffffffffffffffffffffffffffffff90951694810194909452606084019290925263ffffffff16608083015260a082015260c081019190915260e08101849052610100016101fc565b90508573ffffffffffffffffffffffffffffffffffffffff1661038782878787610460565b73ffffffffffffffffffffffffffffffffffffffff16146103d4576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505050505050505050505050565b60006103ec610488565b905090565b600061045a6103fe610488565b836040517f19010000000000000000000000000000000000000000000000000000000000006020820152602281018390526042810182905260009060620160405160208183030381529060405280519060200120905092915050565b92915050565b6000806000610471878787876105bc565b9150915061047e816106d4565b5095945050505050565b60003073ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000161480156104ee57507f000000000000000000000000000000000000000000000000000000000000000046145b1561051857507f000000000000000000000000000000000000000000000000000000000000000090565b50604080517f00000000000000000000000000000000000000000000000000000000000000006020808301919091527f0000000000000000000000000000000000000000000000000000000000000000828401527f000000000000000000000000000000000000000000000000000000000000000060608301524660808301523060a0808401919091528351808403909101815260c0909201909252805191012090565b6000807f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08311156105f357506000905060036106cb565b8460ff16601b1415801561060b57508460ff16601c14155b1561061c57506000905060046106cb565b6040805160008082526020820180845289905260ff881692820192909252606081018690526080810185905260019060a0016020604051602081039080840390855afa158015610670573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015191505073ffffffffffffffffffffffffffffffffffffffff81166106c4576000600192509250506106cb565b9150600090505b94509492505050565b60008160048111156106e8576106e8610b3e565b036106f05750565b600181600481111561070457610704610b3e565b03610770576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f45434453413a20696e76616c6964207369676e6174757265000000000000000060448201526064015b60405180910390fd5b600281600481111561078457610784610b3e565b036107eb576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601f60248201527f45434453413a20696e76616c6964207369676e6174757265206c656e677468006044820152606401610767565b60038160048111156107ff576107ff610b3e565b0361088c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202773272076616c60448201527f75650000000000000000000000000000000000000000000000000000000000006064820152608401610767565b60048160048111156108a0576108a0610b3e565b0361092d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202776272076616c60448201527f75650000000000000000000000000000000000000000000000000000000000006064820152608401610767565b50565b803573ffffffffffffffffffffffffffffffffffffffff8116811461095457600080fd5b919050565b803560ff8116811461095457600080fd5b600080600080600060a0868803121561098257600080fd5b8535945061099260208701610930565b93506109a060408701610959565b94979396509394606081013594506080013592915050565b6000602082840312156109ca57600080fd5b6109d382610930565b9392505050565b6000806000806000806000806000806101208b8d0312156109fa57600080fd5b610a038b610930565b995060208b0135985060408b013563ffffffff81168114610a2357600080fd5b975060608b0135965060808b013567ffffffffffffffff80821115610a4757600080fd5b818d0191508d601f830112610a5b57600080fd5b813581811115610a6a57600080fd5b8e6020828501011115610a7c57600080fd5b602083019850809750505050610a9460a08c01610930565b9350610aa260c08c01610959565b925060e08b013591506101008b013590509295989b9194979a5092959850565b600060208083528351808285015260005b81811015610aef57858101830151858201604001528201610ad3565b5060006040828601015260407fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f8301168501019250505092915050565b8183823760009101908152919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fdfea164736f6c6343000811000a",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c8063a182e38c1161005b578063a182e38c14610102578063b83010d314610115578063ed24911d1461013b578063ffa1ad741461014357600080fd5b806312b11a17146100825780631863f01d146100b75780632d0335ab146100cc575b600080fd5b7ffd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf82364311505b6040519081526020015b60405180910390f35b6100ca6100c536600461096a565b61018c565b005b6100a46100da3660046109b8565b73ffffffffffffffffffffffffffffffffffffffff1660009081526020819052604090205490565b6100ca6101103660046109da565b610292565b7fbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab6100a4565b6100a46103e2565b61017f6040518060400160405280600481526020017f302e31300000000000000000000000000000000000000000000000000000000081525081565b6040516100ae9190610ac2565b73ffffffffffffffffffffffffffffffffffffffff841660009081526020818152604080832080546001810190915581517fbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab93810193909352908201889052606082018190529190610217906080015b604051602081830303815290604052805190602001206103f1565b90508573ffffffffffffffffffffffffffffffffffffffff1661023c82878787610460565b73ffffffffffffffffffffffffffffffffffffffff1614610289576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b50505050505050565b73ffffffffffffffffffffffffffffffffffffffff84166000908152602081905260408082208054600181019091559051909190610362907ffd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf8236431150908e908e908e908e90610301908f908f90610b2e565b60408051918290038220602083019790975273ffffffffffffffffffffffffffffffffffffffff90951694810194909452606084019290925263ffffffff16608083015260a082015260c081019190915260e08101849052610100016101fc565b90508573ffffffffffffffffffffffffffffffffffffffff1661038782878787610460565b73ffffffffffffffffffffffffffffffffffffffff16146103d4576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505050505050505050505050565b60006103ec610488565b905090565b600061045a6103fe610488565b836040517f19010000000000000000000000000000000000000000000000000000000000006020820152602281018390526042810182905260009060620160405160208183030381529060405280519060200120905092915050565b92915050565b6000806000610471878787876105bc565b9150915061047e816106d4565b5095945050505050565b60003073ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000161480156104ee57507f000000000000000000000000000000000000000000000000000000000000000046145b1561051857507f000000000000000000000000000000000000000000000000000000000000000090565b50604080517f00000000000000000000000000000000000000000000000000000000000000006020808301919091527f0000000000000000000000000000000000000000000000000000000000000000828401527f000000000000000000000000000000000000000000000000000000000000000060608301524660808301523060a0808401919091528351808403909101815260c0909201909252805191012090565b6000807f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08311156105f357506000905060036106cb565b8460ff16601b1415801561060b57508460ff16601c14155b1561061c57506000905060046106cb565b6040805160008082526020820180845289905260ff881692820192909252606081018690526080810185905260019060a0016020604051602081039080840390855afa158015610670573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015191505073ffffffffffffffffffffffffffffffffffffffff81166106c4576000600192509250506106cb565b9150600090505b94509492505050565b60008160048111156106e8576106e8610b3e565b036106f05750565b600181600481111561070457610704610b3e565b03610770576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f45434453413a20696e76616c6964207369676e6174757265000000000000000060448201526064015b60405180910390fd5b600281600481111561078457610784610b3e565b036107eb576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601f60248201527f45434453413a20696e76616c6964207369676e6174757265206c656e677468006044820152606401610767565b60038160048111156107ff576107ff610b3e565b0361088c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202773272076616c60448201527f75650000000000000000000000000000000000000000000000000000000000006064820152608401610767565b60048160048111156108a0576108a0610b3e565b0361092d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202776272076616c60448201527f75650000000000000000000000000000000000000000000000000000000000006064820152608401610767565b50565b803573ffffffffffffffffffffffffffffffffffffffff8116811461095457600080fd5b919050565b803560ff8116811461095457600080fd5b600080600080600060a0868803121561098257600080fd5b8535945061099260208701610930565b93506109a060408701610959565b94979396509394606081013594506080013592915050565b6000602082840312156109ca57600080fd5b6109d382610930565b9392505050565b6000806000806000806000806000806101208b8d0312156109fa57600080fd5b610a038b610930565b995060208b0135985060408b013563ffffffff81168114610a2357600080fd5b975060608b0135965060808b013567ffffffffffffffff80821115610a4757600080fd5b818d0191508d601f830112610a5b57600080fd5b813581811115610a6a57600080fd5b8e6020828501011115610a7c57600080fd5b602083019850809750505050610a9460a08c01610930565b9350610aa260c08c01610959565b925060e08b013591506101008b013590509295989b9194979a5092959850565b600060208083528351808285015260005b81811015610aef57858101830151858201604001528201610ad3565b5060006040828601015260407fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f8301168501019250505092915050565b8183823760009101908152919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fdfea164736f6c6343000811000a",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "attest(address,bytes32,uint32,bytes32,bytes,address,uint8,bytes32,bytes32)": {
+        "details": "Verifies signed attestation.",
+        "params": {
+          "attester": "The attesting account.",
+          "data": "Additional custom data.",
+          "expirationTime": "The expiration time of the attestation.",
+          "r": "The x-coordinate of the nonce R.",
+          "recipient": "The recipient of the attestation.",
+          "refUUID": "An optional related attestation's UUID.",
+          "s": "The signature data.",
+          "schema": "The UUID of the AS.",
+          "v": "The recovery ID."
+        }
+      },
+      "constructor": {
+        "details": "Creates a new EIP712Verifier instance."
+      },
+      "getDomainSeparator()": {
+        "details": "Returns the domain separator used in the encoding of the signatures for attest, and revoke."
+      },
+      "getNonce(address)": {
+        "details": "Returns the current nonce per-account.",
+        "params": {
+          "account": "The requested account."
+        },
+        "returns": {
+          "_0": "The current nonce."
+        }
+      },
+      "revoke(bytes32,address,uint8,bytes32,bytes32)": {
+        "details": "Verifies signed revocations.",
+        "params": {
+          "attester": "The attesting account.",
+          "r": "The x-coordinate of the nonce R.",
+          "s": "The signature data.",
+          "uuid": "The UUID of the attestation to revoke.",
+          "v": "The recovery ID."
+        }
+      }
+    },
+    "title": "EIP712 typed signatures verifier for EAS delegated attestations.",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getAttestTypeHash()": {
+        "notice": "Returns the EIP712 type hash for the attest function."
+      },
+      "getRevokeTypeHash()": {
+        "notice": "Returns the EIP712 type hash for the revoke function."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 2836,
+        "contract": "contracts/EIP712Verifier.sol:EIP712Verifier",
+        "label": "_nonces",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

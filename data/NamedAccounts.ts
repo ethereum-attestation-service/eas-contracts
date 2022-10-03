@@ -1,4 +1,12 @@
 import { DeploymentNetwork } from '../utils/Constants';
+import 'dotenv/config';
+
+interface EnvOptions {
+  DEPLOYER?: string;
+}
+
+const { DEPLOYER: deployer = 'ledger://0x0000000000000000000000000000000000000000' }: EnvOptions =
+  process.env as any as EnvOptions;
 
 const mainnet = (address: string) => ({
   [DeploymentNetwork.Mainnet]: address,
@@ -18,8 +26,8 @@ const TestNamedAccounts = {
 
 export const NamedAccounts = {
   deployer: {
-    ...mainnet('ledger://0x00000000219ab540356cbb839cbe05303d7705fa'),
-    ...goerli('ledger://0x00000000219ab540356cbb839cbe05303d7705fa')
+    ...mainnet(deployer),
+    ...goerli(deployer)
   },
 
   ...TestNamedAccounts
