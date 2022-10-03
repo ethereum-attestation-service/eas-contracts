@@ -6,16 +6,19 @@
 yarn-debug.log*
 yarn-error.log*
 
+dist
 cache
 artifacts
-data
 typechain-types
+
+deployments/mainnet/solcInputs/*
+deployments/hardhat/*
+deployments/tenderly/*
 
 .coverage_artifacts
 .coverage_contracts
-coverage
-coverageEnv
-coverage.json
+/coverage
+/coverage.json
 allFiredEvents
 scTopics
 

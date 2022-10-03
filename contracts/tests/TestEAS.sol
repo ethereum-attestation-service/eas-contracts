@@ -8,7 +8,7 @@ import { IASRegistry } from "../IASRegistry.sol";
 import { IEIP712Verifier } from "../IEIP712Verifier.sol";
 
 contract TestEAS is EAS {
-    uint32 private INITIAL_TIME = 0;
+    uint32 private constant INITIAL_TIME = 0;
 
     uint32 private _currentTime = INITIAL_TIME;
 
