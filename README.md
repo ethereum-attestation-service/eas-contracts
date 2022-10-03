@@ -2,7 +2,7 @@
 
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://eas.eth.link)
 [![NPM Package](https://img.shields.io/npm/v/@ethereum-attestation-service/contracts.svg)](https://www.npmjs.org/package/@ethereum-attestation-service/contracts)
-[![Test](https://github.com/ethereum-attestation-service/contracts/actions/workflows/workflow.yml/badge.svg)](https://github.com/ethereum-attestation-service/contracts/actions/workflows/workflow.yml)
+[![Test](https://github.com/ethereum-attestation-service/contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/ethereum-attestation-service/contracts/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/ethereum-attestation-service/eas-contracts?style=flat-square)](https://github.com/ethereum-attestation-service/eas-contracts/blob/master/LICENSE)
 
 ## Introduction
@@ -36,13 +36,13 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Deployments
 
-### Rinkeby
+### Goerli
 
-#### v0.6
+#### v0.10
 
-* **EAS**: <https://rinkeby.etherscan.io/address/0xBf49E19254DF70328C6696135958C94CD6cd0430>
-* **ASRegistry**: <https://rinkeby.etherscan.io/address/0xd8B7EC70d53b11e130fba78fBED97862eF2a13f0>
-* **EIP712Verifier**: <https://rinkeby.etherscan.io/address/0xa05e3Ca02C8437E99018E55cC3920FD79f4FD624>
+* **EAS**: <https://goerli.etherscan.io/address/TBD>
+* **ASRegistry**: <https://rinkeby.etherscan.io/address/TBD>
+* **EIP712Verifier**: <https://rinkeby.etherscan.io/address/TBD>
 
 ## Installation
 
@@ -61,6 +61,18 @@ You can run the full test suite via:
 ```sh
 yarn test
 ```
+
+### Deployment Tests
+
+You can test new deployments (and the health of the network) against a mainnet fork via:
+
+```sh
+yarn test:deploy
+```
+
+Please make sure to properly configure your Tenderly settings via `.env`.
+
+This will automatically be skipped on an already deployed and configured deployment scripts and will only test the additional changeset resulting by running any new/pending deployment scripts and perform an e2e test against the up to date state. This is especially useful to verify that any future deployments and upgrades, suggested by the DAO, work correctly and preserve the integrity of the system.
 
 ### Test Coverage
 
@@ -105,8 +117,24 @@ yarn test:coverage
 You can profile the gas costs of all of the user-focused flows (provisioning or removing liquidity, trading, participating in auto-compounding staking rewards, migrating v2.1 positions, taking a flash-loan, etc.) via:
 
 ```sh
-yarn profile
+yarn test:profile
 ```
+
+## Deploying
+
+The contracts have built-in support for deployments on different chains and mainnet forks. You can deploy the project by:
+
+```sh
+yarn deploy
+```
+
+There’s also a special deployment mode which deploys the protocol to a mainnet fork, with additional goodies. It can be run via:
+
+```sh
+yarn deploy:fork
+```
+
+The framework was inspired and adopted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).
 
 ## License
 
