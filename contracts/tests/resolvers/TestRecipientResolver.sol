@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether the attestation is to a specific recipient.
+ * @title A sample schema resolver that checks whether the attestation is to a specific recipient.
  */
-contract TestASRecipientResolver is ASResolver {
+contract TestRecipientResolver is SchemaResolver {
     address private immutable _targetRecipient;
 
     constructor(address targetRecipient) {

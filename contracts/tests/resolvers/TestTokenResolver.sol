@@ -5,12 +5,12 @@ pragma solidity 0.8.17;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether a specific amount of tokens was approved to be included in an attestation.
+ * @title A sample schema resolver that checks whether a specific amount of tokens was approved to be included in an attestation.
  */
-contract TestASTokenResolver is ASResolver {
+contract TestTokenResolver is SchemaResolver {
     using SafeERC20 for IERC20;
 
     IERC20 private immutable _targetToken;

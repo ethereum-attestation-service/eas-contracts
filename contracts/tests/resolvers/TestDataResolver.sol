@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether an attestation data is either \x00 or \x01.
+ * @title A sample schema resolver that checks whether an attestation data is either \x00 or \x01.
  */
-contract TestASDataResolver is ASResolver {
+contract TestDataResolver is SchemaResolver {
     function resolve(
         address, /* recipient */
         bytes calldata, /* schema */

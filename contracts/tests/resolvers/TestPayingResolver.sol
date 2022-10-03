@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that pays attesters
+ * @title A sample schema resolver that pays attesters
  */
-contract TestASPayingResolver is ASResolver {
+contract TestPayingResolver is SchemaResolver {
     uint256 private immutable _incentive;
 
     constructor(uint256 incentive) {

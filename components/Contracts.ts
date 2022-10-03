@@ -1,17 +1,17 @@
 import {
-  ASRegistry__factory,
   EAS__factory,
   EIP712Verifier__factory,
-  TestASAttestationResolver__factory,
-  TestASAttesterResolver__factory,
-  TestASDataResolver__factory,
-  TestASExpirationTimeResolver__factory,
-  TestASPayingResolver__factory,
-  TestASRecipientResolver__factory,
-  TestASTokenResolver__factory,
-  TestASValueResolver__factory,
+  SchemaRegistry__factory,
+  TestAttestationResolver__factory,
+  TestAttesterResolver__factory,
+  TestDataResolver__factory,
   TestEAS__factory,
-  TestERC20Token__factory
+  TestERC20Token__factory,
+  TestExpirationTimeResolver__factory,
+  TestPayingResolver__factory,
+  TestRecipientResolver__factory,
+  TestTokenResolver__factory,
+  TestValueResolver__factory
 } from '../typechain-types';
 import { ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
@@ -51,17 +51,17 @@ const attachOnly = <F extends ContractFactory>(contractName: string) => {
 };
 
 const getContracts = () => ({
-  ASRegistry: deployOrAttach<ASRegistry__factory>('ASRegistry'),
-  EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
   EAS: deployOrAttach<EAS__factory>('EAS'),
-  TestASAttestationResolver: deployOrAttach<TestASAttestationResolver__factory>('TestASAttestationResolver'),
-  TestASAttesterResolver: deployOrAttach<TestASAttesterResolver__factory>('TestASAttesterResolver'),
-  TestASDataResolver: deployOrAttach<TestASDataResolver__factory>('TestASDataResolver'),
-  TestASExpirationTimeResolver: deployOrAttach<TestASExpirationTimeResolver__factory>('TestASExpirationTimeResolver'),
-  TestASPayingResolver: deployOrAttach<TestASPayingResolver__factory>('TestASPayingResolver'),
-  TestASRecipientResolver: deployOrAttach<TestASRecipientResolver__factory>('TestASRecipientResolver'),
-  TestASTokenResolver: deployOrAttach<TestASTokenResolver__factory>('TestASTokenResolver'),
-  TestASValueResolver: deployOrAttach<TestASValueResolver__factory>('TestASValueResolver'),
+  EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
+  SchemaRegistry: deployOrAttach<SchemaRegistry__factory>('SchemaRegistry'),
+  TestAttestationResolver: deployOrAttach<TestAttestationResolver__factory>('TestAttestationResolver'),
+  TestAttesterResolver: deployOrAttach<TestAttesterResolver__factory>('TestAttesterResolver'),
+  TestDataResolver: deployOrAttach<TestDataResolver__factory>('TestDataResolver'),
+  TestExpirationTimeResolver: deployOrAttach<TestExpirationTimeResolver__factory>('TestExpirationTimeResolver'),
+  TestPayingResolver: deployOrAttach<TestPayingResolver__factory>('TestPayingResolver'),
+  TestRecipientResolver: deployOrAttach<TestRecipientResolver__factory>('TestRecipientResolver'),
+  TestTokenResolver: deployOrAttach<TestTokenResolver__factory>('TestTokenResolver'),
+  TestValueResolver: deployOrAttach<TestValueResolver__factory>('TestValueResolver'),
   TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
   TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token')
 });
