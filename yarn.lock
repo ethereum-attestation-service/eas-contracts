@@ -2608,7 +2608,7 @@ aes-js@3.0.0:
   resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-3.0.0.tgz#e21df10ad6c2053295bcbb8dab40b09dbea87e4d"
   integrity sha1-4h3xCtbCBTKVvLuNq0Cwnb6ofk0=
 
-aes-js@^3.1.1, aes-js@^3.1.2:
+aes-js@^3.1.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-3.1.2.tgz#db9aabde85d5caabbfc0d4f2a4446960f627146a"
   integrity sha512-e5pEa2kBnBOgR4Y/p20pskXI74UEz7de8ZGVo58asOtvSVG5YAbJeELPZxOmt+Bnz3rX753YKhfIn4X4l1PPRQ==
@@ -3844,6 +3844,13 @@ bufferutil@^4.0.1:
   dependencies:
     node-gyp-build "^4.3.0"
 
+builtins@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/builtins/-/builtins-5.0.1.tgz#87f6db9ab0458be728564fa81d876d8d74552fa9"
+  integrity sha512-qwVpFEHNfhYJIzNRBvd2C1kyo6jz3ZSMPyyuR47OPdiKWlbYnZNyDWuyR175qDnAJLiCo5fBBqPb3RiXgWlkOQ==
+  dependencies:
+    semver "^7.0.0"
+
 bytes@3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.2.tgz#8b0beeb98605adf1b128fa4386403c009e0221a5"
@@ -3974,11 +3981,6 @@ cbor@^5.0.2:
   dependencies:
     bignumber.js "^9.0.1"
     nofilter "^1.0.4"
-
-chai-arrays@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/chai-arrays/-/chai-arrays-2.2.0.tgz#571479cbc5eca81605ed4eed1e8a2a28552d2a25"
-  integrity sha512-4awrdGI2EH8owJ9I58PXwG4N56/FiM8bsn4CVSNEgr4GKAM6Kq5JPVApUbhUBjDakbZNuRvV7quRSC38PWq/tg==
 
 chai@^4.3.6:
   version "4.3.6"
@@ -5077,6 +5079,14 @@ eslint-plugin-es@^3.0.0:
     eslint-utils "^2.0.0"
     regexpp "^3.0.0"
 
+eslint-plugin-es@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-es/-/eslint-plugin-es-4.1.0.tgz#f0822f0c18a535a97c3e714e89f88586a7641ec9"
+  integrity sha512-GILhQTnjYE2WorX5Jyi5i4dz5ALWxBIdQECVQavL6s7cI76IZTDWleTHkxz/QT3kvcs2QlGHvKLYsSlPOlPXnQ==
+  dependencies:
+    eslint-utils "^2.0.0"
+    regexpp "^3.0.0"
+
 eslint-plugin-import@^2.26.0:
   version "2.26.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.26.0.tgz#f812dc47be4f2b72b478a021605a59fc6fe8b88b"
@@ -5095,6 +5105,20 @@ eslint-plugin-import@^2.26.0:
     object.values "^1.1.5"
     resolve "^1.22.0"
     tsconfig-paths "^3.14.1"
+
+eslint-plugin-n@^15.3.0:
+  version "15.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-15.3.0.tgz#3e1ad236a17dce7ecc0760621c46cc251ef99560"
+  integrity sha512-IyzPnEWHypCWasDpxeJnim60jhlumbmq0pubL6IOcnk8u2y53s5QfT8JnXy7skjHJ44yWHRb11PLtDHuu1kg/Q==
+  dependencies:
+    builtins "^5.0.1"
+    eslint-plugin-es "^4.1.0"
+    eslint-utils "^3.0.0"
+    ignore "^5.1.1"
+    is-core-module "^2.10.0"
+    minimatch "^3.1.2"
+    resolve "^1.22.1"
+    semver "^7.3.7"
 
 eslint-plugin-node@^11.1.0:
   version "11.1.0"
@@ -5452,16 +5476,6 @@ eth-sig-util@^1.4.2:
     ethereumjs-abi "git+https://github.com/ethereumjs/ethereumjs-abi.git"
     ethereumjs-util "^5.1.1"
 
-eth-sig-util@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/eth-sig-util/-/eth-sig-util-3.0.1.tgz#8753297c83a3f58346bd13547b59c4b2cd110c96"
-  integrity sha512-0Us50HiGGvZgjtWTyAI/+qTzYPMLy5Q451D0Xy68bxq1QMWdoOddDwGvsqcFT27uohKgalM9z/yxplyt+mY2iQ==
-  dependencies:
-    ethereumjs-abi "^0.6.8"
-    ethereumjs-util "^5.1.1"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.0"
-
 eth-tx-summary@^3.1.2:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/eth-tx-summary/-/eth-tx-summary-3.2.4.tgz#e10eb95eb57cdfe549bf29f97f1e4f1db679035c"
@@ -5689,7 +5703,7 @@ ethereumjs-util@^5.0.0, ethereumjs-util@^5.0.1, ethereumjs-util@^5.1.1, ethereum
     rlp "^2.0.0"
     safe-buffer "^5.1.1"
 
-ethereumjs-util@^7.0.2, ethereumjs-util@^7.1.0, ethereumjs-util@^7.1.2:
+ethereumjs-util@^7.0.2, ethereumjs-util@^7.1.0:
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-7.1.4.tgz#a6885bcdd92045b06f596c7626c3e89ab3312458"
   integrity sha512-p6KmuPCX4mZIqsQzXfmSx9Y0l2hqf+VkAiwSisW3UKUFdk8ZkAt+AYaor83z2nSi6CU2zSsXMlD80hAbNEGM0A==
@@ -5763,20 +5777,6 @@ ethereumjs-wallet@0.6.5:
     scryptsy "^1.2.1"
     utf8 "^3.0.0"
     uuid "^3.3.2"
-
-ethereumjs-wallet@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ethereumjs-wallet/-/ethereumjs-wallet-1.0.2.tgz#2c000504b4c71e8f3782dabe1113d192522e99b6"
-  integrity sha512-CCWV4RESJgRdHIvFciVQFnCHfqyhXWchTPlkfp28Qc53ufs+doi5I/cV2+xeK9+qEo25XCWfP9MiL+WEPAZfdA==
-  dependencies:
-    aes-js "^3.1.2"
-    bs58check "^2.1.2"
-    ethereum-cryptography "^0.1.3"
-    ethereumjs-util "^7.1.2"
-    randombytes "^2.1.0"
-    scrypt-js "^3.0.1"
-    utf8 "^3.0.0"
-    uuid "^8.3.2"
 
 ethers@^4.0.40:
   version "4.0.49"
@@ -6713,6 +6713,17 @@ glob@^7.0.5:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
+glob@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-8.0.3.tgz#415c6eb2deed9e502c68fa44a272e6da6eeca42e"
+  integrity sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^5.0.1"
+    once "^1.3.0"
+
 global-modules@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/global-modules/-/global-modules-2.0.0.tgz#997605ad2345f27f51539bea26574421215c7780"
@@ -7421,6 +7432,13 @@ is-ci@^2.0.0:
   integrity sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
   dependencies:
     ci-info "^2.0.0"
+
+is-core-module@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.10.0.tgz#9012ede0a91c69587e647514e1d5277019e728ed"
+  integrity sha512-Erxj2n/LDAZ7H8WNJXd9tw38GYM3dv8rk8Zcs+jJuxYTW7sozH+SS8NtrSjVL1/vpLvWi1hxy96IzjJ3EHTJJg==
+  dependencies:
+    has "^1.0.3"
 
 is-core-module@^2.8.1:
   version "2.8.1"
@@ -8540,6 +8558,13 @@ minimatch@5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.0.1.tgz#fb9022f7528125187c92bd9e9b6366be1cf3415b"
   integrity sha512-nLDxIFRyhDblz3qMuq+SoRZED4+miJ/G+tdDrjkkkRnjAsBexeGpgjLEQ0blJy7rHhR2b93rhQY4SvyWu9v03g==
+  dependencies:
+    brace-expansion "^2.0.1"
+
+minimatch@^5.0.1:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.0.tgz#1717b464f4971b144f6aabe8f2d0b8e4511e09c7"
+  integrity sha512-9TPBGGak4nHfGZsPBohm9AWg6NoT7QTCehS3BIJABslyZbzxfV78QM2Y6+i741OPZIafFAaiiEMh5OyIrJPgtg==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -10140,7 +10165,7 @@ resolve@^1.1.6, resolve@^1.10.0, resolve@^1.10.1, resolve@^1.20.0, resolve@^1.8.
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
-resolve@^1.22.0:
+resolve@^1.22.0, resolve@^1.22.1:
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.1.tgz#27cb2ebb53f91abb49470a928bba7558066ac177"
   integrity sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==
@@ -10343,17 +10368,17 @@ semver@^6.1.0, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
+semver@^7.0.0, semver@^7.3.7:
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.7.tgz#12c5b649afdbf9049707796e22a4028814ce523f"
+  integrity sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g==
+  dependencies:
+    lru-cache "^6.0.0"
+
 semver@^7.3.4, semver@^7.3.5:
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
   integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
-  dependencies:
-    lru-cache "^6.0.0"
-
-semver@^7.3.7:
-  version "7.3.7"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.7.tgz#12c5b649afdbf9049707796e22a4028814ce523f"
-  integrity sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g==
   dependencies:
     lru-cache "^6.0.0"
 
