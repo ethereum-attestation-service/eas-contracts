@@ -3,9 +3,9 @@
 pragma solidity 0.8.17;
 
 /**
- * @title The interface of an optional AS resolver.
+ * @title The interface of an optional schema resolver.
  */
-interface IASResolver {
+interface ISchemaResolver {
     /**
      * @dev Returns whether the resolver supports ETH transfers.
      */
@@ -15,7 +15,7 @@ interface IASResolver {
      * @dev Resolves an attestation and verifier whether its data conforms to the spec.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The AS data schema.
+     * @param schema The schema data schema.
      * @param data The actual attestation data.
      * @param expirationTime The expiration time of the attestation.
      * @param msgSender The sender of the original attestation message.

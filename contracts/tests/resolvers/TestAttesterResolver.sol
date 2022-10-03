@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether the attestation is from a specific attester.
+ * @title A sample schema resolver that checks whether the attestation is from a specific attester.
  */
-contract TestASAttesterResolver is ASResolver {
+contract TestAttesterResolver is SchemaResolver {
     address private immutable _targetAttester;
 
     constructor(address targetAttester) {
