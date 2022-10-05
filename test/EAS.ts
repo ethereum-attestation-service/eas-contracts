@@ -1,11 +1,11 @@
 import Contracts from '../components/Contracts';
 import {
-  ASRegistry,
   EIP712Verifier,
-  TestASPayingResolver,
-  TestASTokenResolver,
+  SchemaRegistry,
   TestEAS,
-  TestERC20Token
+  TestERC20Token,
+  TestPayingResolver,
+  TestTokenResolver
 } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { EIP712Utils } from './helpers/EIP712Utils';
@@ -31,7 +31,7 @@ describe('EAS', () => {
   let recipient: SignerWithAddress;
   let recipient2: SignerWithAddress;
 
-  let registry: ASRegistry;
+  let registry: SchemaRegistry;
   let verifier: EIP712Verifier;
   let eas: TestEAS;
   let eip712Utils: EIP712Utils;
@@ -47,7 +47,7 @@ describe('EAS', () => {
     sender = await createWallet();
     sender2 = await createWallet();
 
-    registry = await Contracts.ASRegistry.deploy();
+    registry = await Contracts.SchemaRegistry.deploy();
     verifier = await Contracts.EIP712Verifier.deploy();
     eip712Utils = new EIP712Utils(verifier.address);
 
@@ -62,11 +62,11 @@ describe('EAS', () => {
   describe('construction', async () => {
     it('should be properly initialized', async () => {
       expect(await eas.VERSION()).to.equal('0.10');
-      expect(await eas.getASRegistry()).to.equal(registry.address);
+      expect(await eas.getSchemaRegistry()).to.equal(registry.address);
       expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
 
-    it('should revert when initialized with an empty AS registry', async () => {
+    it('should revert when initialized with an empty schema registry', async () => {
       await expect(Contracts.EAS.deploy(ZERO_ADDRESS, verifier.address)).to.be.revertedWith('InvalidRegistry');
     });
 
@@ -81,7 +81,8 @@ describe('EAS', () => {
     bump?: number;
   }
 
-  const getASUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
+  const getSchemaUUID = (schema: string, resolver: string) =>
+    solidityKeccak256(['bytes', 'address'], [schema, resolver]);
   const getUUID = (
     schema: string,
     recipient: string,
@@ -235,9 +236,9 @@ describe('EAS', () => {
           const schema1 = formatBytes32String('AS1');
           const schema2 = formatBytes32String('AS2');
           const schema3 = formatBytes32String('AS3');
-          const schema1Id = getASUUID(schema1, ZERO_ADDRESS);
-          const schema2Id = getASUUID(schema2, ZERO_ADDRESS);
-          const schema3Id = getASUUID(schema3, ZERO_ADDRESS);
+          const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
+          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
+          const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS);
 
           beforeEach(async () => {
             await registry.register(schema1, ZERO_ADDRESS);
@@ -328,12 +329,12 @@ describe('EAS', () => {
             const schema4 = formatBytes32String('AS4');
             const targetRecipient = accounts[5];
 
-            const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
+            const resolver = await Contracts.TestRecipientResolver.deploy(targetRecipient.address);
             expect(await resolver.isPayable()).to.be.false;
             await expect(sender.sendTransaction({ to: resolver.address, value: 1 })).to.be.revertedWith('NotPayable');
 
             await registry.register(schema4, resolver.address);
-            const schema4Id = getASUUID(schema4, resolver.address);
+            const schema4Id = getSchemaUUID(schema4, resolver.address);
 
             await testFailedAttestation(
               recipient.address,
@@ -354,11 +355,11 @@ describe('EAS', () => {
             beforeEach(async () => {
               targetRecipient = accounts[5];
 
-              const resolver = await Contracts.TestASRecipientResolver.deploy(targetRecipient.address);
+              const resolver = await Contracts.TestRecipientResolver.deploy(targetRecipient.address);
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to a wrong recipient', async () => {
@@ -382,11 +383,11 @@ describe('EAS', () => {
             let schema4Id: string;
 
             beforeEach(async () => {
-              const resolver = await Contracts.TestASDataResolver.deploy();
+              const resolver = await Contracts.TestDataResolver.deploy();
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong data', async () => {
@@ -422,11 +423,11 @@ describe('EAS', () => {
 
             beforeEach(async () => {
               validAfter = (await eas.getTime()) + duration.years(1);
-              const resolver = await Contracts.TestASExpirationTimeResolver.deploy(validAfter);
+              const resolver = await Contracts.TestExpirationTimeResolver.deploy(validAfter);
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with a wrong expiration time', async () => {
@@ -453,11 +454,11 @@ describe('EAS', () => {
             beforeEach(async () => {
               targetSender = sender2;
 
-              const resolver = await Contracts.TestASAttesterResolver.deploy(targetSender.address);
+              const resolver = await Contracts.TestAttesterResolver.deploy(targetSender.address);
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to the wrong msg.sender', async () => {
@@ -487,11 +488,11 @@ describe('EAS', () => {
             const targetValue = 862432;
 
             beforeEach(async () => {
-              const resolver = await Contracts.TestASValueResolver.deploy(targetValue);
+              const resolver = await Contracts.TestValueResolver.deploy(targetValue);
               expect(await resolver.isPayable()).to.be.true;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong msg.value', async () => {
@@ -527,17 +528,17 @@ describe('EAS', () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
             const targetAmount = 22334;
-            let resolver: TestASTokenResolver;
+            let resolver: TestTokenResolver;
 
             beforeEach(async () => {
               token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
               await token.transfer(sender.address, targetAmount);
 
-              resolver = await Contracts.TestASTokenResolver.deploy(token.address, targetAmount);
+              resolver = await Contracts.TestTokenResolver.deploy(token.address, targetAmount);
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting with wrong token amount', async () => {
@@ -584,11 +585,11 @@ describe('EAS', () => {
                 0
               );
 
-              const resolver = await Contracts.TestASAttestationResolver.deploy(eas.address);
+              const resolver = await Contracts.TestAttestationResolver.deploy(eas.address);
               expect(await resolver.isPayable()).to.be.false;
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should revert when attesting to a non-existing attestation', async () => {
@@ -611,16 +612,16 @@ describe('EAS', () => {
             const schema4 = formatBytes32String('schema4Id');
             let schema4Id: string;
             const incentive = 1000;
-            let resolver: TestASPayingResolver;
+            let resolver: TestPayingResolver;
 
             beforeEach(async () => {
-              resolver = await Contracts.TestASPayingResolver.deploy(incentive);
+              resolver = await Contracts.TestPayingResolver.deploy(incentive);
               expect(await resolver.isPayable()).to.be.true;
 
               await sender.sendTransaction({ to: resolver.address, value: incentive * 2 });
 
               await registry.register(schema4, resolver.address);
-              schema4Id = getASUUID(schema4, resolver.address);
+              schema4Id = getSchemaUUID(schema4, resolver.address);
             });
 
             it('should incentivize attesters', async () => {
@@ -656,7 +657,7 @@ describe('EAS', () => {
 
   describe('revocation', async () => {
     const schema1 = formatBytes32String('AS1');
-    const schema1Id = getASUUID(schema1, ZERO_ADDRESS);
+    const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
     let uuid: string;
 
     let expirationTime: number;

@@ -24,7 +24,7 @@ interface IEIP712Verifier {
      * @dev Verifies signed attestation.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.

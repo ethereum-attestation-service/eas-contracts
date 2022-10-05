@@ -5,7 +5,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
 
-  await deploy({ name: InstanceName.ASRegistry, from: deployer });
+  await deploy({ name: InstanceName.SchemaRegistry, from: deployer });
 
   return true;
 };

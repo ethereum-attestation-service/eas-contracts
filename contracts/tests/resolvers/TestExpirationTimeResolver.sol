@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether the expiration time is later than a specific timestamp.
+ * @title A sample schema resolver that checks whether the expiration time is later than a specific timestamp.
  */
-contract TestASExpirationTimeResolver is ASResolver {
+contract TestExpirationTimeResolver is SchemaResolver {
     uint256 private immutable _validAfter;
 
     constructor(uint256 validAfter) {

@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 
 import { EAS } from "../EAS.sol";
 
-import { IASRegistry } from "../IASRegistry.sol";
+import { ISchemaRegistry } from "../ISchemaRegistry.sol";
 import { IEIP712Verifier } from "../IEIP712Verifier.sol";
 
 contract TestEAS is EAS {
@@ -12,7 +12,7 @@ contract TestEAS is EAS {
 
     uint32 private _currentTime = INITIAL_TIME;
 
-    constructor(IASRegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
+    constructor(ISchemaRegistry aoRegistry, IEIP712Verifier eip712Verifier) EAS(aoRegistry, eip712Verifier) {}
 
     function setTime(uint32 newTime) external {
         _currentTime = newTime;

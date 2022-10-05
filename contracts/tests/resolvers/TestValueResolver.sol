@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 /**
- * @title A sample AS resolver that checks whether a specific amount of ETH was sent with an attestation.
+ * @title A sample schema resolver that checks whether a specific amount of ETH was sent with an attestation.
  */
-contract TestASValueResolver is ASResolver {
+contract TestValueResolver is SchemaResolver {
     uint256 private immutable _targetValue;
 
     constructor(uint256 targetValue) {

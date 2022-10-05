@@ -1,4 +1,4 @@
-import { ASRegistry, EAS, EIP712Verifier } from '../components/Contracts';
+import { EAS, EIP712Verifier, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 import { toWei } from './Types';
@@ -28,7 +28,7 @@ const { TEST_FORK: isTestFork }: EnvOptions = process.env as any as EnvOptions;
 
 export enum NewInstanceName {
   EAS = 'EAS',
-  ASRegistry = 'ASRegistry',
+  SchemaRegistry = 'SchemaRegistry',
   EIP712Verifier = 'EIP712Verifier'
 }
 
@@ -44,7 +44,7 @@ const deployed = <F extends Contract>(name: InstanceName) => ({
 
 const DeployedNewContracts = {
   EAS: deployed<EAS>(InstanceName.EAS),
-  ASRegistry: deployed<ASRegistry>(InstanceName.ASRegistry),
+  SchemaRegistry: deployed<SchemaRegistry>(InstanceName.SchemaRegistry),
   EIP712Verifier: deployed<EIP712Verifier>(InstanceName.EIP712Verifier)
 };
 
