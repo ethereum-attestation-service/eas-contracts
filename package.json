@@ -29,7 +29,7 @@
     "deploy:fork": "yarn deploy:prepare:fork && HARDHAT_NETWORK=tenderly hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:goerli": "HARDHAT_NETWORK=goerli hardhat etherscan-verify --license MIT",
-    "lint": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+    "lint": "yarn lint:sol && yarn lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",
     "lint:ts": "yarn eslint components deploy test utils",
     "format": "prettier --check --write contracts/**/*.sol *.ts test/**/*.ts --config .prettierrc",
