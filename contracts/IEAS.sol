@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import { IASRegistry } from "./IASRegistry.sol";
+import { ISchemaRegistry } from "./ISchemaRegistry.sol";
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 
 /**
@@ -11,7 +11,7 @@ import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 struct Attestation {
     // A unique identifier of the attestation.
     bytes32 uuid;
-    // A unique identifier of the AS.
+    // A unique identifier of the schema.
     bytes32 schema;
     // The UUID of the related attestation.
     bytes32 refUUID;
@@ -39,7 +39,7 @@ interface IEAS {
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
      * @param uuid The UUID the revoked attestation.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      */
     event Attested(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
@@ -48,17 +48,17 @@ interface IEAS {
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      * @param uuid The UUID the revoked attestation.
      */
     event Revoked(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
-     * @dev Returns the address of the AS global registry.
+     * @dev Returns the address of the global schema registry.
      *
-     * @return The address of the AS global registry.
+     * @return The address of the global schema registry.
      */
-    function getASRegistry() external view returns (IASRegistry);
+    function getSchemaRegistry() external view returns (ISchemaRegistry);
 
     /**
      * @dev Returns the address of the EIP712 verifier used to verify signed attestations.
@@ -71,7 +71,7 @@ interface IEAS {
      * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -87,10 +87,10 @@ interface IEAS {
     ) external payable returns (bytes32);
 
     /**
-     * @dev Attests to a specific AS using a provided EIP712 signature.
+     * @dev Attests to a specific schema using the provided EIP712 signature.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -121,7 +121,7 @@ interface IEAS {
     function revoke(bytes32 uuid) external;
 
     /**
-     * @dev Attests to a specific AS using a provided EIP712 signature.
+     * @dev Attests to a specific schema the EIP712 signature.
      *
      * @param uuid The UUID of the attestation to revoke.
      * @param attester The attesting account.

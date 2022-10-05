@@ -2,14 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { ASResolver } from "../../ASResolver.sol";
+import { SchemaResolver } from "../../SchemaResolver.sol";
 
 import { EAS } from "../../EAS.sol";
 
 /**
- * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.
+ * @title A sample schema resolver that checks whether an attestations attest to an existing attestation.
  */
-contract TestASAttestationResolver is ASResolver {
+contract TestAttestationResolver is SchemaResolver {
     error Overflow();
     error OutOfBounds();
 

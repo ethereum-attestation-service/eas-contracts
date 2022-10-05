@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 
 import { EMPTY_UUID } from "./Types.sol";
 import { IEAS, Attestation } from "./IEAS.sol";
-import { IASRegistry, ASRecord } from "./IASRegistry.sol";
+import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
-import { IASResolver } from "./IASResolver.sol";
+import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /**
  * @title EAS - Ethereum Attestation Service
@@ -25,8 +25,8 @@ contract EAS is IEAS {
 
     string public constant VERSION = "0.10";
 
-    // The AS global registry.
-    IASRegistry private immutable _asRegistry;
+    // The global schema registry.
+    ISchemaRegistry private immutable _schemaRegistry;
 
     // The EIP712 verifier used to verify signed attestations.
     IEIP712Verifier private immutable _eip712Verifier;
@@ -37,10 +37,10 @@ contract EAS is IEAS {
     /**
      * @dev Creates a new EAS instance.
      *
-     * @param registry The address of the global AS registry.
+     * @param registry The address of the global schema registry.
      * @param verifier The address of the EIP712 verifier.
      */
-    constructor(IASRegistry registry, IEIP712Verifier verifier) {
+    constructor(ISchemaRegistry registry, IEIP712Verifier verifier) {
         if (address(registry) == address(0x0)) {
             revert InvalidRegistry();
         }
@@ -49,15 +49,15 @@ contract EAS is IEAS {
             revert InvalidVerifier();
         }
 
-        _asRegistry = registry;
+        _schemaRegistry = registry;
         _eip712Verifier = verifier;
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function getASRegistry() external view returns (IASRegistry) {
-        return _asRegistry;
+    function getSchemaRegistry() external view returns (ISchemaRegistry) {
+        return _schemaRegistry;
     }
 
     /**
@@ -139,7 +139,7 @@ contract EAS is IEAS {
      * @dev Attests to a specific AS.
      *
      * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the AS.
+     * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation (0 represents no expiration).
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
@@ -159,18 +159,18 @@ contract EAS is IEAS {
             revert InvalidExpirationTime();
         }
 
-        ASRecord memory asRecord = _asRegistry.getAS(schema);
-        if (asRecord.uuid == EMPTY_UUID) {
+        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
+        if (schemaRecord.uuid == EMPTY_UUID) {
             revert InvalidSchema();
         }
 
-        IASResolver resolver = asRecord.resolver;
+        ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) != address(0x0)) {
             if (msg.value != 0 && !resolver.isPayable()) {
                 revert NotPayable();
             }
 
-            if (!resolver.resolve{ value: msg.value }(recipient, asRecord.schema, data, expirationTime, attester)) {
+            if (!resolver.resolve{ value: msg.value }(recipient, schemaRecord.schema, data, expirationTime, attester)) {
                 revert InvalidAttestation();
             }
         }

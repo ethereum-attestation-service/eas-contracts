@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import { IASResolver } from "./IASResolver.sol";
+import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /**
  * @title A base resolver contract
  */
-abstract contract ASResolver is IASResolver {
+abstract contract SchemaResolver is ISchemaResolver {
     error NotPayable();
 
     function isPayable() public pure virtual returns (bool) {

@@ -9,7 +9,7 @@
 
 The Ethereum Attestation Service is a free and open protocol for on-chain attestations on EVM compatible blockchains. It is a generalized service that allows anyone to register a schema for their particular use case, and then make attestations following their schema.
 
-Schemas can be registered using the `ASRegistry.sol` contract, and attestations are made using the `EAS.sol` contract.
+Schemas can be registered using the `SchemaRegistry.sol` contract, and attestations are made using the `EAS.sol` contract.
 
 In addition, we provide a resolver contract for advanced use cases, such as on-chain verification of attestation data, and also attaching payments to attestations (which makes a new suite of powerful web3 applications possible).
 
@@ -40,9 +40,15 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 #### v0.10
 
-* **EAS**: <https://goerli.etherscan.io/address/TBD>
-* **ASRegistry**: <https://rinkeby.etherscan.io/address/TBD>
-* **EIP712Verifier**: <https://rinkeby.etherscan.io/address/TBD>
+* **EAS**:
+  * Contract: [0x709a967b00Cc7274281fe64f17Cd279a97A403F7](https://goerli.etherscan.io/address/0x709a967b00Cc7274281fe64f17Cd279a97A403F7)
+  * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xB1B5824B318eC213c6207256ec702B0bd7656EFb](https://goerli.etherscan.io/address/0xB1B5824B318eC213c6207256ec702B0bd7656EFb)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/goerli/SchemaRegistry.json)
+* **EIP712Verifier**:
+  * Contract: [0x9BC7A7040f65bEf8DE023c0afbC7FCeB6a97A6D9](https://goerli.etherscan.io/address/0x9BC7A7040f65bEf8DE023c0afbC7FCeB6a97A6D9)
+  * Deployment and ABI: [EIP712Verifier.json](./deployments/goerli/EIP712Verifier.json)
 
 ## Installation
 
@@ -90,14 +96,14 @@ This will automatically be skipped on an already deployed and configured deploym
 File                  |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
 ----------------------|----------|----------|----------|----------|----------------|
  contracts/           |      100 |      100 |      100 |      100 |                |
-  ASRegistry.sol      |      100 |      100 |      100 |      100 |                |
-  ASResolver.sol      |      100 |      100 |      100 |      100 |                |
   EAS.sol             |      100 |      100 |      100 |      100 |                |
   EIP712Verifier.sol  |      100 |      100 |      100 |      100 |                |
-  IASRegistry.sol     |      100 |      100 |      100 |      100 |                |
-  IASResolver.sol     |      100 |      100 |      100 |      100 |                |
+  ISchemaRegistry.sol |      100 |      100 |      100 |      100 |                |
+  ISchemaResolver.sol |      100 |      100 |      100 |      100 |                |
   IEAS.sol            |      100 |      100 |      100 |      100 |                |
   IEIP712Verifier.sol |      100 |      100 |      100 |      100 |                |
+  SchemaRegistry.sol  |      100 |      100 |      100 |      100 |                |
+  SchemaResolver.sol  |      100 |      100 |      100 |      100 |                |
   Types.sol           |      100 |      100 |      100 |      100 |                |
 ----------------------|----------|----------|----------|----------|----------------|
 All files             |      100 |      100 |      100 |      100 |                |
