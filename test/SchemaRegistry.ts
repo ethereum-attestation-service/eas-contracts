@@ -29,7 +29,7 @@ describe('SchemaRegistry', () => {
 
   describe('construction', () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.10');
+      expect(await registry.VERSION()).to.equal('0.11');
     });
 
     it('should initialize without any Ss', async () => {
