@@ -9,9 +9,9 @@ const {
   utils: { keccak256, toUtf8Bytes }
 } = ethers;
 
-let verifier: EIP712Verifier;
-
 describe('EIP712Verifier', () => {
+  let verifier: EIP712Verifier;
+
   beforeEach(async () => {
     verifier = await Contracts.EIP712Verifier.deploy();
   });

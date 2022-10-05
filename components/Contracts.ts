@@ -10,6 +10,7 @@ import {
   TestExpirationTimeResolver__factory,
   TestPayingResolver__factory,
   TestRecipientResolver__factory,
+  TestSchemaResolver__factory,
   TestTokenResolver__factory,
   TestValueResolver__factory
 } from '../typechain-types';
@@ -58,13 +59,14 @@ const getContracts = () => ({
   TestAttestationResolver: deployOrAttach<TestAttestationResolver__factory>('TestAttestationResolver'),
   TestAttesterResolver: deployOrAttach<TestAttesterResolver__factory>('TestAttesterResolver'),
   TestDataResolver: deployOrAttach<TestDataResolver__factory>('TestDataResolver'),
+  TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
+  TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token'),
   TestExpirationTimeResolver: deployOrAttach<TestExpirationTimeResolver__factory>('TestExpirationTimeResolver'),
   TestPayingResolver: deployOrAttach<TestPayingResolver__factory>('TestPayingResolver'),
   TestRecipientResolver: deployOrAttach<TestRecipientResolver__factory>('TestRecipientResolver'),
+  TestSchemaResolver: deployOrAttach<TestSchemaResolver__factory>('TestSchemaResolver'),
   TestTokenResolver: deployOrAttach<TestTokenResolver__factory>('TestTokenResolver'),
-  TestValueResolver: deployOrAttach<TestValueResolver__factory>('TestValueResolver'),
-  TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
-  TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token')
+  TestValueResolver: deployOrAttach<TestValueResolver__factory>('TestValueResolver')
 });
 /* eslint-enable camelcase */
 

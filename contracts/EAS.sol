@@ -171,7 +171,7 @@ contract EAS is IEAS {
                 revert NotPayable();
             }
 
-            if (!resolver.resolve{ value: msg.value }(recipient, schemaRecord.schema, data, expirationTime, attester)) {
+            if (!resolver.attest{ value: msg.value }(recipient, schemaRecord.schema, data, expirationTime, attester)) {
                 revert InvalidAttestation();
             }
         }
