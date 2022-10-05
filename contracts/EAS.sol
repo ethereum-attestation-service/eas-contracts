@@ -23,6 +23,7 @@ contract EAS is IEAS {
     error NotFound();
     error NotPayable();
 
+    // The version of the contract.
     string public constant VERSION = "0.10";
 
     // The global schema registry.
@@ -41,11 +42,11 @@ contract EAS is IEAS {
      * @param verifier The address of the EIP712 verifier.
      */
     constructor(ISchemaRegistry registry, IEIP712Verifier verifier) {
-        if (address(registry) == address(0x0)) {
+        if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }
 
-        if (address(verifier) == address(0x0)) {
+        if (address(verifier) == address(0)) {
             revert InvalidVerifier();
         }
 
@@ -165,7 +166,7 @@ contract EAS is IEAS {
         }
 
         ISchemaResolver resolver = schemaRecord.resolver;
-        if (address(resolver) != address(0x0)) {
+        if (address(resolver) != address(0)) {
             if (msg.value != 0 && !resolver.isPayable()) {
                 revert NotPayable();
             }
