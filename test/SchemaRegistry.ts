@@ -9,12 +9,12 @@ const {
   utils: { solidityKeccak256, formatBytes32String }
 } = ethers;
 
-let accounts: SignerWithAddress[];
-let sender: SignerWithAddress;
-
-let registry: SchemaRegistry;
-
 describe('SchemaRegistry', () => {
+  let accounts: SignerWithAddress[];
+  let sender: SignerWithAddress;
+
+  let registry: SchemaRegistry;
+
   before(async () => {
     accounts = await ethers.getSigners();
 
@@ -27,7 +27,7 @@ describe('SchemaRegistry', () => {
 
   const getUUID = (schema: string, resolver: string) => solidityKeccak256(['bytes', 'address'], [schema, resolver]);
 
-  describe('construction', async () => {
+  describe('construction', () => {
     it('should report a version', async () => {
       expect(await registry.VERSION()).to.equal('0.10');
     });
@@ -37,7 +37,7 @@ describe('SchemaRegistry', () => {
     });
   });
 
-  describe('registration', async () => {
+  describe('registration', () => {
     const testRegister = async (schema: string, resolver: string | SignerWithAddress) => {
       const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
 
@@ -75,7 +75,7 @@ describe('SchemaRegistry', () => {
     });
   });
 
-  describe('schema querying', async () => {
+  describe('schema querying', () => {
     it('should return a schema', async () => {
       const schema = '0x1234';
       const resolver = accounts[5];
