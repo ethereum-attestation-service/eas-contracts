@@ -34,7 +34,7 @@ export interface ContractBuilder<F extends ContractFactory> {
 const deployOrAttach = <F extends ContractFactory>(contractName: string): ContractBuilder<F> => {
   return {
     deploy: async (...args: Parameters<F['deploy']>): Promise<Contract<F>> => {
-      let defaultSigner = (await ethers.getSigners())[0];
+      const defaultSigner = (await ethers.getSigners())[0];
       return (await ethers.getContractFactory(contractName, defaultSigner)).deploy(...args) as Contract<F>;
     },
     attach: attachOnly<F>(contractName).attach
@@ -44,12 +44,13 @@ const deployOrAttach = <F extends ContractFactory>(contractName: string): Contra
 const attachOnly = <F extends ContractFactory>(contractName: string) => {
   return {
     attach: async (address: string, signer?: Signer): Promise<Contract<F>> => {
-      let defaultSigner = (await ethers.getSigners())[0];
-      return ethers.getContractAt(contractName, address, signer ? signer : defaultSigner) as Contract<F>;
+      const defaultSigner = (await ethers.getSigners())[0];
+      return ethers.getContractAt(contractName, address, signer ?? defaultSigner) as Contract<F>;
     }
   };
 };
 
+/* eslint-disable camelcase */
 const getContracts = () => ({
   EAS: deployOrAttach<EAS__factory>('EAS'),
   EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
@@ -65,5 +66,6 @@ const getContracts = () => ({
   TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
   TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token')
 });
+/* eslint-enable camelcase */
 
 export default getContracts();
