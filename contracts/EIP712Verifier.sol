@@ -13,6 +13,7 @@ import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 contract EIP712Verifier is IEIP712Verifier, EIP712 {
     error InvalidSignature();
 
+    // The version of the contract.
     string public constant VERSION = "0.10";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
