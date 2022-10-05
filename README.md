@@ -82,12 +82,12 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-09-30)
+#### Latest Test Coverage Report (2022-10-05)
 
-* 100% Statements 55/55
-* 100% Branches 34/34
-* 100% Functions 25/25
-* 100% Lines 87/87
+* 100% Statements 58/58
+* 100% Branches 38/38
+* 100% Functions 27/27
+* 100% Lines 93/93
 
 ![Coverage Report](./docs/images/coverage.png)
 
@@ -98,10 +98,10 @@ File                  |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lin
  contracts/           |      100 |      100 |      100 |      100 |                |
   EAS.sol             |      100 |      100 |      100 |      100 |                |
   EIP712Verifier.sol  |      100 |      100 |      100 |      100 |                |
-  ISchemaRegistry.sol |      100 |      100 |      100 |      100 |                |
-  ISchemaResolver.sol |      100 |      100 |      100 |      100 |                |
   IEAS.sol            |      100 |      100 |      100 |      100 |                |
   IEIP712Verifier.sol |      100 |      100 |      100 |      100 |                |
+  ISchemaRegistry.sol |      100 |      100 |      100 |      100 |                |
+  ISchemaResolver.sol |      100 |      100 |      100 |      100 |                |
   SchemaRegistry.sol  |      100 |      100 |      100 |      100 |                |
   SchemaResolver.sol  |      100 |      100 |      100 |      100 |                |
   Types.sol           |      100 |      100 |      100 |      100 |                |
