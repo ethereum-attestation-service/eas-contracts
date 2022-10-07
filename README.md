@@ -120,7 +120,7 @@ yarn test:coverage
 
 ## Profiling
 
-You can profile the gas costs of all of the user-focused flows (provisioning or removing liquidity, trading, participating in auto-compounding staking rewards, migrating v2.1 positions, taking a flash-loan, etc.) via:
+You can profile the gas costs of all of the user-focused flows via:
 
 ```sh
 yarn test:profile
