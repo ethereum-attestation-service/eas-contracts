@@ -12,7 +12,8 @@ import { ISchemaResolver } from "./ISchemaResolver.sol";
 contract SchemaRegistry is ISchemaRegistry {
     error AlreadyExists();
 
-    string public constant VERSION = "0.10";
+    // The version of the contract.
+    string public constant VERSION = "0.11";
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 => SchemaRecord) private _registry;

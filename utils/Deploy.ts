@@ -193,23 +193,6 @@ const logParams = async (params: FunctionParams) => {
   }
 };
 
-interface TypedParam {
-  name: string;
-  type: string;
-  value: any;
-}
-
-const logTypedParams = async (methodName: string, params: TypedParam[] = []) => {
-  Logger.log(`  ${methodName} params: ${params.length === 0 ? '[]' : ''}`);
-  if (params.length === 0) {
-    return;
-  }
-
-  for (const { name, type, value } of params) {
-    Logger.log(`    ${name} (${type}): ${value.toString()}`);
-  }
-};
-
 export const deploy = async (options: DeployOptions) => {
   const { name, contract, from, value, args, contractArtifactData } = options;
   const contractName = contract ?? name;
@@ -304,14 +287,13 @@ const verifyTenderlyFork = async (deployment: Deployment) => {
     return;
   }
 
-  const { name, contract, address, implementation } = deployment;
+  const { name, contract, address } = deployment;
 
   const contracts: ContractData[] = [];
-  let contractAddress = address;
 
   contracts.push({
     name: contract ?? name,
-    address: contractAddress
+    address
   });
 
   for (const contract of contracts) {

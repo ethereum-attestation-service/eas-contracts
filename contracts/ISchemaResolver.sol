@@ -12,21 +12,21 @@ interface ISchemaResolver {
     function isPayable() external pure returns (bool);
 
     /**
-     * @dev Resolves an attestation and verifier whether its data conforms to the spec.
+     * @dev Processes an attestation and verifies whether its data conforms to the spec.
      *
      * @param recipient The recipient of the attestation.
      * @param schema The schema data schema.
      * @param data The actual attestation data.
      * @param expirationTime The expiration time of the attestation.
-     * @param msgSender The sender of the original attestation message.
+     * @param attester The sender of the original attestation message.
      *
      * @return Whether the data is valid according to the scheme.
      */
-    function resolve(
+    function attest(
         address recipient,
         bytes calldata schema,
         bytes calldata data,
         uint32 expirationTime,
-        address msgSender
+        address attester
     ) external payable returns (bool);
 }
