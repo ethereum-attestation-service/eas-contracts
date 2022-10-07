@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 const {
-  constants: { AddressZero, MaxUint256 }
+  constants: { AddressZero }
 } = ethers;
 
 export enum DeploymentNetwork {

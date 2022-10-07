@@ -9,15 +9,15 @@ const {
   utils: { keccak256, toUtf8Bytes }
 } = ethers;
 
-let verifier: EIP712Verifier;
-
 describe('EIP712Verifier', () => {
+  let verifier: EIP712Verifier;
+
   beforeEach(async () => {
     verifier = await Contracts.EIP712Verifier.deploy();
   });
 
   it('should report a version', async () => {
-    expect(await verifier.VERSION()).to.equal('0.10');
+    expect(await verifier.VERSION()).to.equal('0.11');
   });
 
   it('should return the correct domain separator', async () => {

@@ -1,13 +1,7 @@
 import Contracts from '../components/Contracts';
-import {
-  EIP712Verifier,
-  SchemaRegistry,
-  TestEAS,
-  TestERC20Token,
-  TestPayingResolver,
-  TestTokenResolver
-} from '../typechain-types';
+import { EIP712Verifier, SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
+import { getSchemaUUID, getUUID } from './helpers/EAS';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
@@ -17,11 +11,7 @@ import { BigNumberish, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
-  provider: { getBalance }
-} = ethers;
-
-const {
-  utils: { formatBytes32String, hexlify, solidityKeccak256 }
+  utils: { formatBytes32String, hexlify }
 } = ethers;
 
 describe('EAS', () => {
@@ -35,7 +25,6 @@ describe('EAS', () => {
   let verifier: EIP712Verifier;
   let eas: TestEAS;
   let eip712Utils: EIP712Utils;
-  let token: TestERC20Token;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -59,19 +48,19 @@ describe('EAS', () => {
     expect(await eas.getTime()).to.equal(now);
   });
 
-  describe('construction', async () => {
-    it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.10');
-      expect(await eas.getSchemaRegistry()).to.equal(registry.address);
-      expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
-    });
-
+  describe('construction', () => {
     it('should revert when initialized with an empty schema registry', async () => {
       await expect(Contracts.EAS.deploy(ZERO_ADDRESS, verifier.address)).to.be.revertedWith('InvalidRegistry');
     });
 
     it('should revert when initialized with an empty EIP712 verifier', async () => {
       await expect(Contracts.EAS.deploy(registry.address, ZERO_ADDRESS)).to.be.revertedWith('InvalidVerifier');
+    });
+
+    it('should be properly initialized', async () => {
+      expect(await eas.VERSION()).to.equal('0.11');
+      expect(await eas.getSchemaRegistry()).to.equal(registry.address);
+      expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
   });
 
@@ -81,23 +70,7 @@ describe('EAS', () => {
     bump?: number;
   }
 
-  const getSchemaUUID = (schema: string, resolver: string) =>
-    solidityKeccak256(['bytes', 'address'], [schema, resolver]);
-  const getUUID = (
-    schema: string,
-    recipient: string,
-    attester: string,
-    time: number,
-    expirationTime: number,
-    data: string,
-    bump: number
-  ) =>
-    solidityKeccak256(
-      ['bytes', 'address', 'address', 'uint32', 'uint32', 'bytes', 'uint32'],
-      [schema, recipient, attester, time, expirationTime, data, bump]
-    );
-
-  describe('attesting', async () => {
+  describe('attesting', () => {
     let expirationTime: number;
     const data = '0x1234';
 
@@ -106,8 +79,8 @@ describe('EAS', () => {
     });
 
     for (const delegation of [false, true]) {
-      context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, async () => {
-        const testAttestation = async (
+      context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, () => {
+        const expectAttestation = async (
           recipient: string,
           schema: string,
           expirationTime: number,
@@ -176,7 +149,7 @@ describe('EAS', () => {
           return uuid;
         };
 
-        const testFailedAttestation = async (
+        const expectFailedAttestation = async (
           recipient: string,
           as: string,
           expirationTime: number,
@@ -222,7 +195,7 @@ describe('EAS', () => {
         };
 
         it('should revert when attesting to an unregistered schema', async () => {
-          await testFailedAttestation(
+          await expectFailedAttestation(
             recipient.address,
             formatBytes32String('BAD'),
             expirationTime,
@@ -232,7 +205,7 @@ describe('EAS', () => {
           );
         });
 
-        context('with registered schemas', async () => {
+        context('with registered schemas', () => {
           const schema1 = formatBytes32String('AS1');
           const schema2 = formatBytes32String('AS2');
           const schema3 = formatBytes32String('AS3');
@@ -248,7 +221,7 @@ describe('EAS', () => {
 
           it('should revert when attesting with passed expiration time', async () => {
             const expired = (await eas.getTime()) - duration.days(1);
-            await testFailedAttestation(
+            await expectFailedAttestation(
               recipient.address,
               schema1Id,
               expired,
@@ -259,30 +232,30 @@ describe('EAS', () => {
           });
 
           it('should allow attestation to an empty recipient', async () => {
-            await testAttestation(ZERO_ADDRESS, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await expectAttestation(ZERO_ADDRESS, schema1Id, expirationTime, ZERO_BYTES32, data);
           });
 
           it('should allow self attestations', async () => {
-            await testAttestation(sender.address, schema2Id, expirationTime, ZERO_BYTES32, data, { from: sender });
+            await expectAttestation(sender.address, schema2Id, expirationTime, ZERO_BYTES32, data, { from: sender });
           });
 
           it('should allow multiple attestations', async () => {
-            await testAttestation(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-            await testAttestation(recipient2.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await expectAttestation(recipient2.address, schema1Id, expirationTime, ZERO_BYTES32, data);
           });
 
           it('should allow multiple attestations to the same schema', async () => {
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 0 });
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 1 });
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 2 });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 0 });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 1 });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 2 });
           });
 
           it('should allow attestation without expiration time', async () => {
-            await testAttestation(recipient.address, schema1Id, 0, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, 0, ZERO_BYTES32, data);
           });
 
           it('should allow attestation without any data', async () => {
-            await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, ZERO_BYTES);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, ZERO_BYTES);
           });
 
           it('should store referenced attestation', async () => {
@@ -297,17 +270,17 @@ describe('EAS', () => {
               0
             );
 
-            await testAttestation(recipient.address, schema3Id, expirationTime, uuid, data);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, uuid, data);
           });
 
           it('should generate unique UUIDs for similar attestations', async () => {
-            const uuid1 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+            const uuid1 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
               bump: 0
             });
-            const uuid2 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+            const uuid2 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
               bump: 1
             });
-            const uuid3 = await testAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
+            const uuid3 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
               bump: 2
             });
             expect(uuid1).not.to.equal(uuid2);
@@ -315,7 +288,7 @@ describe('EAS', () => {
           });
 
           it('should revert when attesting to a non-existing attestation', async () => {
-            await testFailedAttestation(
+            await expectFailedAttestation(
               recipient.address,
               schema3Id,
               expirationTime,
@@ -323,316 +296,6 @@ describe('EAS', () => {
               data,
               'NotFound'
             );
-          });
-
-          it('should revert when sending ETH to a non-payable resolver', async () => {
-            const schema4 = formatBytes32String('AS4');
-            const targetRecipient = accounts[5];
-
-            const resolver = await Contracts.TestRecipientResolver.deploy(targetRecipient.address);
-            expect(await resolver.isPayable()).to.be.false;
-            await expect(sender.sendTransaction({ to: resolver.address, value: 1 })).to.be.revertedWith('NotPayable');
-
-            await registry.register(schema4, resolver.address);
-            const schema4Id = getSchemaUUID(schema4, resolver.address);
-
-            await testFailedAttestation(
-              recipient.address,
-              schema4Id,
-              expirationTime,
-              ZERO_BYTES32,
-              data,
-              'NotPayable',
-              { value: 1 }
-            );
-          });
-
-          context('with recipient resolver', async () => {
-            const schema4 = formatBytes32String('AS4');
-            let schema4Id: string;
-            let targetRecipient: SignerWithAddress;
-
-            beforeEach(async () => {
-              targetRecipient = accounts[5];
-
-              const resolver = await Contracts.TestRecipientResolver.deploy(targetRecipient.address);
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting to a wrong recipient', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'InvalidAttestation'
-              );
-            });
-
-            it('should allow attesting to the correct recipient', async () => {
-              await testAttestation(targetRecipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
-            });
-          });
-
-          context('with data resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-
-            beforeEach(async () => {
-              const resolver = await Contracts.TestDataResolver.deploy();
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting with wrong data', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                '0x1234',
-                'InvalidAttestation'
-              );
-
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                '0x02',
-                'InvalidAttestation'
-              );
-            });
-
-            it('should allow attesting with correct data', async () => {
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, '0x00');
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, '0x01');
-            });
-          });
-
-          context('with expiration time resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            let validAfter: number;
-
-            beforeEach(async () => {
-              validAfter = (await eas.getTime()) + duration.years(1);
-              const resolver = await Contracts.TestExpirationTimeResolver.deploy(validAfter);
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting with a wrong expiration time', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                validAfter - duration.days(1),
-                ZERO_BYTES32,
-                data,
-                'InvalidAttestation'
-              );
-            });
-
-            it('should allow attesting with the correct expiration time', async () => {
-              await testAttestation(recipient.address, schema4Id, validAfter + duration.seconds(1), ZERO_BYTES32, data);
-            });
-          });
-
-          context('with msg.sender resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            let targetSender: Wallet;
-
-            beforeEach(async () => {
-              targetSender = sender2;
-
-              const resolver = await Contracts.TestAttesterResolver.deploy(targetSender.address);
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting to the wrong msg.sender', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'InvalidAttestation',
-                {
-                  from: sender
-                }
-              );
-            });
-
-            it('should allow attesting to the correct msg.sender', async () => {
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data, {
-                from: targetSender
-              });
-            });
-          });
-
-          context('with msg.value resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            const targetValue = 862432;
-
-            beforeEach(async () => {
-              const resolver = await Contracts.TestValueResolver.deploy(targetValue);
-              expect(await resolver.isPayable()).to.be.true;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting with wrong msg.value', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'InvalidAttestation'
-              );
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'InvalidAttestation',
-                {
-                  value: targetValue - 1
-                }
-              );
-            });
-
-            it('should allow attesting with correct msg.value', async () => {
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data, {
-                value: targetValue
-              });
-            });
-          });
-
-          context('with token resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            const targetAmount = 22334;
-            let resolver: TestTokenResolver;
-
-            beforeEach(async () => {
-              token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
-              await token.transfer(sender.address, targetAmount);
-
-              resolver = await Contracts.TestTokenResolver.deploy(token.address, targetAmount);
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting with wrong token amount', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'ERC20: insufficient allowance'
-              );
-
-              await token.connect(sender).approve(resolver.address, targetAmount - 1);
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                data,
-                'ERC20: insufficient allowance'
-              );
-            });
-
-            it('should allow attesting with correct token amount', async () => {
-              await token.connect(sender).approve(resolver.address, targetAmount);
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
-            });
-          });
-
-          context('with attestation resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            let uuid: string;
-
-            beforeEach(async () => {
-              await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-              uuid = getUUID(
-                schema1Id,
-                recipient.address,
-                recipient.address,
-                await eas.getTime(),
-                expirationTime,
-                data,
-                0
-              );
-
-              const resolver = await Contracts.TestAttestationResolver.deploy(eas.address);
-              expect(await resolver.isPayable()).to.be.false;
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should revert when attesting to a non-existing attestation', async () => {
-              await testFailedAttestation(
-                recipient.address,
-                schema4Id,
-                expirationTime,
-                ZERO_BYTES32,
-                ZERO_BYTES32,
-                'InvalidAttestation'
-              );
-            });
-
-            it('should allow attesting to an existing attestation', async () => {
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, uuid);
-            });
-          });
-
-          context('with paying resolver', async () => {
-            const schema4 = formatBytes32String('schema4Id');
-            let schema4Id: string;
-            const incentive = 1000;
-            let resolver: TestPayingResolver;
-
-            beforeEach(async () => {
-              resolver = await Contracts.TestPayingResolver.deploy(incentive);
-              expect(await resolver.isPayable()).to.be.true;
-
-              await sender.sendTransaction({ to: resolver.address, value: incentive * 2 });
-
-              await registry.register(schema4, resolver.address);
-              schema4Id = getSchemaUUID(schema4, resolver.address);
-            });
-
-            it('should incentivize attesters', async () => {
-              const prevResolverBalance = await getBalance(resolver.address);
-              const prevRecipient2Balance = await getBalance(recipient.address);
-
-              await testAttestation(recipient.address, schema4Id, expirationTime, ZERO_BYTES32, data);
-
-              expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.sub(incentive));
-              expect(await getBalance(recipient.address)).to.equal(prevRecipient2Balance.add(incentive));
-            });
           });
         });
       });
@@ -655,7 +318,7 @@ describe('EAS', () => {
     });
   });
 
-  describe('revocation', async () => {
+  describe('revocation', () => {
     const schema1 = formatBytes32String('AS1');
     const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
     let uuid: string;
@@ -712,11 +375,9 @@ describe('EAS', () => {
         }
       };
 
-      context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, async () => {
+      context(`${delegation ? 'via an EIP712 delegation' : 'directly'}`, () => {
         beforeEach(async () => {
-          const res = await eas
-            .connect(sender)
-            .attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+          await eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
 
           uuid = getUUID(schema1Id, recipient.address, sender.address, await eas.getTime(), expirationTime, data, 0);
         });
