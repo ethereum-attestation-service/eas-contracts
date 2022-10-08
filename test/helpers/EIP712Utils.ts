@@ -12,7 +12,7 @@ export class EIP712Utils {
 
     this.delegation = new Delegation({
       address: contractAddress,
-      version: '0.11',
+      version: '0.12',
       chainId: HARDHAT_CHAIN_ID
     });
   }
