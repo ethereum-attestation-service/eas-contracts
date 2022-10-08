@@ -18,6 +18,7 @@ contract EAS is IEAS {
     error InvalidExpirationTime();
     error InvalidOffset();
     error InvalidRegistry();
+    error InvalidRevocation();
     error InvalidSchema();
     error InvalidVerifier();
     error NotFound();
@@ -165,17 +166,6 @@ contract EAS is IEAS {
             revert InvalidSchema();
         }
 
-        ISchemaResolver resolver = schemaRecord.resolver;
-        if (address(resolver) != address(0)) {
-            if (msg.value != 0 && !resolver.isPayable()) {
-                revert NotPayable();
-            }
-
-            if (!resolver.attest{ value: msg.value }(recipient, schemaRecord.schema, data, expirationTime, attester)) {
-                revert InvalidAttestation();
-            }
-        }
-
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
             schema: schema,
@@ -202,6 +192,8 @@ contract EAS is IEAS {
             }
         }
         attestation.uuid = uuid;
+
+        _resolveAttestation(schemaRecord, attestation, true);
 
         _db[uuid] = attestation;
 
@@ -238,6 +230,8 @@ contract EAS is IEAS {
 
         attestation.revocationTime = _time();
 
+        _resolveAttestation(_schemaRegistry.getSchema(attestation.schema), attestation, false);
+
         emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }
 
@@ -262,6 +256,40 @@ contract EAS is IEAS {
                     bump
                 )
             );
+    }
+
+    /**
+     * @dev Resolves a new attestation or a revocation of an existing revocation
+     *
+     * @param schemaRecord The schema of the attestation.
+     * @param attestation The data of attestation.
+     * @param newAttestation Whether to resolve an attestation or its revocation.
+     */
+    function _resolveAttestation(
+        SchemaRecord memory schemaRecord,
+        Attestation memory attestation,
+        bool newAttestation
+    ) private {
+        ISchemaResolver resolver = schemaRecord.resolver;
+        if (address(resolver) == address(0)) {
+            return;
+        }
+
+        if (msg.value != 0 && !resolver.isPayable()) {
+            revert NotPayable();
+        }
+
+        if (newAttestation) {
+            if (!resolver.attest{ value: msg.value }(attestation)) {
+                revert InvalidAttestation();
+            }
+
+            return;
+        }
+
+        if (!resolver.revoke{ value: msg.value }(attestation)) {
+            revert InvalidRevocation();
+        }
     }
 
     /**

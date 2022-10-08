@@ -10,6 +10,7 @@ import {
   TestExpirationTimeResolver__factory,
   TestPayingResolver__factory,
   TestRecipientResolver__factory,
+  TestRevocationResolver__factory,
   TestSchemaResolver__factory,
   TestTokenResolver__factory,
   TestValueResolver__factory
@@ -64,6 +65,7 @@ const getContracts = () => ({
   TestExpirationTimeResolver: deployOrAttach<TestExpirationTimeResolver__factory>('TestExpirationTimeResolver'),
   TestPayingResolver: deployOrAttach<TestPayingResolver__factory>('TestPayingResolver'),
   TestRecipientResolver: deployOrAttach<TestRecipientResolver__factory>('TestRecipientResolver'),
+  TestRevocationResolver: deployOrAttach<TestRevocationResolver__factory>('TestRevocationResolver'),
   TestSchemaResolver: deployOrAttach<TestSchemaResolver__factory>('TestSchemaResolver'),
   TestTokenResolver: deployOrAttach<TestTokenResolver__factory>('TestTokenResolver'),
   TestValueResolver: deployOrAttach<TestValueResolver__factory>('TestValueResolver')

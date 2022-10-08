@@ -3,8 +3,7 @@
 pragma solidity 0.8.17;
 
 import { SchemaResolver } from "../../SchemaResolver.sol";
-
-import { IEAS } from "../../IEAS.sol";
+import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether an attestations attest to an existing attestation.
@@ -15,14 +14,14 @@ contract TestAttestationResolver is SchemaResolver {
 
     constructor(IEAS eas) SchemaResolver(eas) {}
 
-    function onAttest(
-        address, /* recipient */
-        bytes calldata, /* schema */
-        bytes calldata data,
-        uint32, /* expirationTime */
-        address /* attester */
+    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+        return _eas.isAttestationValid(_toBytes32(attestation.data, 0));
+    }
+
+    function onRevoke(
+        Attestation calldata /*attestation*/
     ) internal virtual override returns (bool) {
-        return _eas.isAttestationValid(_toBytes32(data, 0));
+        return true;
     }
 
     function _toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {

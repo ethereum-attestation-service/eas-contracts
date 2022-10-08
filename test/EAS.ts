@@ -333,7 +333,7 @@ describe('EAS', () => {
     });
 
     for (const delegation of [false, true]) {
-      const testRevocation = async (uuid: string, options?: Options) => {
+      const expectRevocation = async (uuid: string, options?: Options) => {
         const txSender = options?.from || sender;
         let res;
 
@@ -357,7 +357,7 @@ describe('EAS', () => {
         expect(attestation.revocationTime).to.equal(await eas.getTime());
       };
 
-      const testFailedRevocation = async (uuid: string, err: string, options?: Options) => {
+      const expectFailedRevocation = async (uuid: string, err: string, options?: Options) => {
         const txSender = options?.from || sender;
 
         if (!delegation) {
@@ -383,20 +383,20 @@ describe('EAS', () => {
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
-          await testFailedRevocation(formatBytes32String('BAD'), 'NotFound');
+          await expectFailedRevocation(formatBytes32String('BAD'), 'NotFound');
         });
 
         it("should revert when revoking a someone's else attestation", async () => {
-          await testFailedRevocation(uuid, 'AccessDenied', { from: sender2 });
+          await expectFailedRevocation(uuid, 'AccessDenied', { from: sender2 });
         });
 
         it('should allow to revoke an existing attestation', async () => {
-          await testRevocation(uuid);
+          await expectRevocation(uuid);
         });
 
         it('should revert when revoking an already revoked attestation', async () => {
-          await testRevocation(uuid);
-          await testFailedRevocation(uuid, 'AlreadyRevoked');
+          await expectRevocation(uuid);
+          await expectFailedRevocation(uuid, 'AlreadyRevoked');
         });
       });
     }

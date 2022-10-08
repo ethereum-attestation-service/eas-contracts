@@ -3,7 +3,7 @@
 pragma solidity 0.8.17;
 
 import { SchemaResolver } from "../../SchemaResolver.sol";
-import { IEAS } from "../../IEAS.sol";
+import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that pays attesters
@@ -19,15 +19,15 @@ contract TestPayingResolver is SchemaResolver {
         return true;
     }
 
-    function onAttest(
-        address recipient,
-        bytes calldata, /* schema */
-        bytes calldata, /* data */
-        uint32, /* expirationTime */
-        address /* attester */
-    ) internal virtual override returns (bool) {
-        payable(recipient).transfer(_incentive);
+    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+        payable(attestation.recipient).transfer(_incentive);
 
+        return true;
+    }
+
+    function onRevoke(
+        Attestation calldata /*attestation*/
+    ) internal virtual override returns (bool) {
         return true;
     }
 }

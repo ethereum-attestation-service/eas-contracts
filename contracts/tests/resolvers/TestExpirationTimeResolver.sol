@@ -3,7 +3,7 @@
 pragma solidity 0.8.17;
 
 import { SchemaResolver } from "../../SchemaResolver.sol";
-import { IEAS } from "../../IEAS.sol";
+import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether the expiration time is later than a specific timestamp.
@@ -15,13 +15,13 @@ contract TestExpirationTimeResolver is SchemaResolver {
         _validAfter = validAfter;
     }
 
-    function onAttest(
-        address, /* recipient */
-        bytes calldata, /* schema */
-        bytes calldata, /* data */
-        uint32 expirationTime,
-        address /* attester */
+    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+        return attestation.expirationTime >= _validAfter;
+    }
+
+    function onRevoke(
+        Attestation calldata /*attestation*/
     ) internal virtual override returns (bool) {
-        return expirationTime >= _validAfter;
+        return true;
     }
 }

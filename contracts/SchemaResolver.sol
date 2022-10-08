@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import { IEAS } from "./IEAS.sol";
+import { IEAS, Attestation } from "./IEAS.sol";
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /**
@@ -33,6 +33,15 @@ abstract contract SchemaResolver is ISchemaResolver {
     }
 
     /**
+     * @dev Ensures that only the EAS contract can make this call.
+     */
+    modifier onlyEAS() {
+        _onlyEAS();
+
+        _;
+    }
+
+    /**
      * @inheritdoc ISchemaResolver
      */
     function isPayable() public pure virtual returns (bool) {
@@ -51,36 +60,45 @@ abstract contract SchemaResolver is ISchemaResolver {
     /**
      * @inheritdoc ISchemaResolver
      */
-    function attest(
-        address recipient,
-        bytes calldata schema,
-        bytes calldata data,
-        uint32 expirationTime,
-        address attester
-    ) external payable returns (bool) {
-        if (msg.sender != address(_eas)) {
-            revert AccessDenied();
-        }
+    function attest(Attestation calldata attestation) external payable onlyEAS returns (bool) {
+        return onAttest(attestation);
+    }
 
-        return onAttest(recipient, schema, data, expirationTime, attester);
+    /**
+     * @dev Processes an attestation revocation and verifies if it can be revoked.
+     *
+     * @param attestation The existing attestation to be revoked.
+     *
+     * @return Whether the attestation can be revoked.
+     */
+    function revoke(Attestation calldata attestation) external payable onlyEAS returns (bool) {
+        return onRevoke(attestation);
     }
 
     /**
      * @dev A resolver callback that should be implemented by child contracts.
      *
-     * @param recipient The recipient of the attestation.
-     * @param schema The schema data schema.
-     * @param data The actual attestation data.
-     * @param expirationTime The expiration time of the attestation.
-     * @param attester The sender of the original attestation message.
+     * @param attestation The new attestation.
      *
-     * @return Whether the data is valid according to the scheme.
+     * @return Whether the attestation is valid.
      */
-    function onAttest(
-        address recipient,
-        bytes calldata schema,
-        bytes calldata data,
-        uint32 expirationTime,
-        address attester
-    ) internal virtual returns (bool);
+    function onAttest(Attestation calldata attestation) internal virtual returns (bool);
+
+    /**
+     * @dev Processes an attestation revocation and verifies if it can be revoked.
+     *
+     * @param attestation The existing attestation to be revoked.
+     *
+     * @return Whether the attestation can be revoked.
+     */
+    function onRevoke(Attestation calldata attestation) internal virtual returns (bool);
+
+    /**
+     * @dev Ensures that only the EAS contract can make this call.
+     */
+    function _onlyEAS() private view {
+        if (msg.sender != address(_eas)) {
+            revert AccessDenied();
+        }
+    }
 }
