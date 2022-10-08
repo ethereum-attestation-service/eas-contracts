@@ -82,12 +82,12 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-10-05)
+#### Latest Test Coverage Report (2022-10-08)
 
-* 100% Statements 58/58
-* 100% Branches 38/38
-* 100% Functions 27/27
-* 100% Lines 93/93
+* 100% Statements 66/66
+* 100% Branches 46/46
+* 100% Functions 31/31
+* 100% Lines 103/103
 
 ![Coverage Report](./docs/images/coverage.png)
 
