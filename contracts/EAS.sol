@@ -193,7 +193,7 @@ contract EAS is IEAS {
         }
         attestation.uuid = uuid;
 
-        _resolveAttestation(schemaRecord, attestation, true);
+        _resolveAttestation(schemaRecord, attestation, false);
 
         _db[uuid] = attestation;
 
@@ -230,7 +230,7 @@ contract EAS is IEAS {
 
         attestation.revocationTime = _time();
 
-        _resolveAttestation(_schemaRegistry.getSchema(attestation.schema), attestation, false);
+        _resolveAttestation(_schemaRegistry.getSchema(attestation.schema), attestation, true);
 
         emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }
@@ -263,12 +263,12 @@ contract EAS is IEAS {
      *
      * @param schemaRecord The schema of the attestation.
      * @param attestation The data of attestation.
-     * @param newAttestation Whether to resolve an attestation or its revocation.
+     * @param isRevocation Whether to resolve an attestation or its revocation.
      */
     function _resolveAttestation(
         SchemaRecord memory schemaRecord,
         Attestation memory attestation,
-        bool newAttestation
+        bool isRevocation
     ) private {
         ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) == address(0)) {
@@ -279,16 +279,16 @@ contract EAS is IEAS {
             revert NotPayable();
         }
 
-        if (newAttestation) {
-            if (!resolver.attest{ value: msg.value }(attestation)) {
-                revert InvalidAttestation();
+        if (isRevocation) {
+            if (!resolver.revoke{ value: msg.value }(attestation)) {
+                revert InvalidRevocation();
             }
 
             return;
         }
 
-        if (!resolver.revoke{ value: msg.value }(attestation)) {
-            revert InvalidRevocation();
+        if (!resolver.attest{ value: msg.value }(attestation)) {
+            revert InvalidAttestation();
         }
     }
 
