@@ -3,7 +3,7 @@
 pragma solidity 0.8.17;
 
 import { SchemaResolver } from "../../SchemaResolver.sol";
-import { IEAS } from "../../IEAS.sol";
+import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether a specific amount of ETH was sent with an attestation.
@@ -20,12 +20,14 @@ contract TestValueResolver is SchemaResolver {
     }
 
     function onAttest(
-        address, /* recipient */
-        bytes calldata, /* schema */
-        bytes calldata, /* data */
-        uint32, /* expirationTime */
-        address /* attester */
+        Attestation calldata /*attestation*/
     ) internal virtual override returns (bool) {
         return msg.value == _targetValue;
+    }
+
+    function onRevoke(
+        Attestation calldata /*attestation*/
+    ) internal virtual override returns (bool) {
+        return true;
     }
 }
