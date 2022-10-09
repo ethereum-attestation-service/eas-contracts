@@ -1,6 +1,13 @@
 import Contracts from '../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../typechain-types';
-import { ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
+import {
+  EIP712Verifier,
+  SchemaRegistry,
+  SchemaResolver,
+  TestEAS,
+  TestERC20Token,
+  TestRevocationResolver
+} from '../typechain-types';
+import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUUID, getUUID } from './helpers/EAS';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
@@ -47,7 +54,7 @@ describe('SchemaResolver', () => {
     it('should be properly initialized', async () => {
       const resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
 
-      expect(await resolver.VERSION()).to.equal('0.11');
+      expect(await resolver.VERSION()).to.equal('0.12');
     });
   });
 
@@ -120,6 +127,23 @@ describe('SchemaResolver', () => {
       ).to.be.revertedWith(err);
     };
 
+    const expectRevocation = async (uuid: string, options?: Options) => {
+      const txSender = options?.from || sender;
+
+      const res = await eas.connect(txSender).revoke(uuid);
+
+      await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, schemaId);
+
+      const attestation = await eas.getAttestation(uuid);
+      expect(attestation.revocationTime).to.equal(await eas.getTime());
+    };
+
+    const expectFailedRevocation = async (uuid: string, err: string, options?: Options) => {
+      const txSender = options?.from || sender;
+
+      await expect(eas.connect(txSender).revoke(uuid)).to.be.revertedWith(err);
+    };
+
     const registerSchema = async (schema: string, resolver: SchemaResolver | string) => {
       const address = typeof resolver === 'string' ? resolver : resolver.address;
       await registry.register(schema, address);
@@ -133,9 +157,35 @@ describe('SchemaResolver', () => {
         schemaId = await registerSchema(schema, resolver);
       });
 
-      it('should revert when attestation callback is invoked directly', async () => {
+      it('should revert when the attestation callback is invoked directly', async () => {
         await expect(
-          resolver.attest(sender.address, schemaId, data, expirationTime, recipient.address)
+          resolver.attest({
+            uuid: ZERO_BYTES32,
+            schema: ZERO_BYTES32,
+            refUUID: ZERO_BYTES32,
+            time: await latest(),
+            expirationTime: 0,
+            revocationTime: 0,
+            recipient: recipient.address,
+            attester: sender.address,
+            data: ZERO_BYTES
+          })
+        ).to.be.revertedWith('AccessDenied');
+      });
+
+      it('should revert when the attestation revocation callback is invoked directly', async () => {
+        await expect(
+          resolver.revoke({
+            uuid: ZERO_BYTES32,
+            schema: ZERO_BYTES32,
+            refUUID: ZERO_BYTES32,
+            time: await latest(),
+            expirationTime: 0,
+            revocationTime: 0,
+            recipient: recipient.address,
+            attester: sender.address,
+            data: ZERO_BYTES
+          })
         ).to.be.revertedWith('AccessDenied');
       });
     });
@@ -292,8 +342,7 @@ describe('SchemaResolver', () => {
         resolver = await Contracts.TestTokenResolver.deploy(eas.address, token.address, targetAmount);
         expect(await resolver.isPayable()).to.be.false;
 
-        await registry.register(schema, resolver.address);
-        schemaId = getSchemaUUID(schema, resolver.address);
+        schemaId = await registerSchema(schema, resolver);
       });
 
       it('should revert when attesting with wrong token amount', async () => {
@@ -370,12 +419,47 @@ describe('SchemaResolver', () => {
 
       it('should incentivize attesters', async () => {
         const prevResolverBalance = await getBalance(resolver.address);
-        const prevRecipient2Balance = await getBalance(recipient.address);
+        const prevRecipientBalance = await getBalance(recipient.address);
 
         await expectAttestation(recipient.address, schemaId, expirationTime, ZERO_BYTES32, data);
 
         expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.sub(incentive));
-        expect(await getBalance(recipient.address)).to.equal(prevRecipient2Balance.add(incentive));
+        expect(await getBalance(recipient.address)).to.equal(prevRecipientBalance.add(incentive));
+      });
+    });
+
+    context('with an attestation revocation resolver', () => {
+      let resolver: TestRevocationResolver;
+      let uuid: string;
+
+      beforeEach(async () => {
+        resolver = await Contracts.TestRevocationResolver.deploy(eas.address);
+        expect(await resolver.isPayable()).to.be.false;
+
+        schemaId = await registerSchema(schema, resolver);
+
+        await eas.connect(sender).attest(recipient.address, schemaId, expirationTime, ZERO_BYTES32, data);
+        uuid = getUUID(schemaId, recipient.address, sender.address, await eas.getTime(), expirationTime, data, 0);
+      });
+
+      context('when revocations are allowed', () => {
+        beforeEach(async () => {
+          resolver.setRevocation(true);
+        });
+
+        it('should allow revoking an existing attestation', async () => {
+          await expectRevocation(uuid);
+        });
+      });
+
+      context('when revocations are not allowed', () => {
+        beforeEach(async () => {
+          resolver.setRevocation(false);
+        });
+
+        it('should revert when attempting to revoke an existing attestation', async () => {
+          await expectFailedRevocation(uuid, 'InvalidRevocation');
+        });
       });
     });
   });

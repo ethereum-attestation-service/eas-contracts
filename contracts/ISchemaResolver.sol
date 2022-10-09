@@ -2,6 +2,8 @@
 
 pragma solidity 0.8.17;
 
+import { Attestation } from "./IEAS.sol";
+
 /**
  * @title The interface of an optional schema resolver.
  */
@@ -12,21 +14,20 @@ interface ISchemaResolver {
     function isPayable() external pure returns (bool);
 
     /**
-     * @dev Processes an attestation and verifies whether its data conforms to the spec.
+     * @dev Processes an attestation and verifies whether it's valid.
      *
-     * @param recipient The recipient of the attestation.
-     * @param schema The schema data schema.
-     * @param data The actual attestation data.
-     * @param expirationTime The expiration time of the attestation.
-     * @param attester The sender of the original attestation message.
+     * @param attestation The new attestation.
      *
-     * @return Whether the data is valid according to the scheme.
+     * @return Whether the attestation is valid.
      */
-    function attest(
-        address recipient,
-        bytes calldata schema,
-        bytes calldata data,
-        uint32 expirationTime,
-        address attester
-    ) external payable returns (bool);
+    function attest(Attestation calldata attestation) external payable returns (bool);
+
+    /**
+     * @dev Processes an attestation revocation and verifies if it can be revoked.
+     *
+     * @param attestation The existing attestation to be revoked.
+     *
+     * @return Whether the attestation can be revoked.
+     */
+    function revoke(Attestation calldata attestation) external payable returns (bool);
 }

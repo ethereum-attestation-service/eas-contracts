@@ -6,13 +6,19 @@ import { SchemaResolver } from "../../SchemaResolver.sol";
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
- * @title A sample schema resolver
+ * @title A sample schema resolver that controls revocations.
  */
-contract TestSchemaResolver is SchemaResolver {
+contract TestRevocationResolver is SchemaResolver {
+    bool private _revocation;
+
     constructor(IEAS eas) SchemaResolver(eas) {}
 
+    function setRevocation(bool status) external {
+        _revocation = status;
+    }
+
     function onAttest(
-        Attestation calldata /*attestation*/
+        Attestation calldata /*attestation)*/
     ) internal virtual override returns (bool) {
         return true;
     }
@@ -20,6 +26,6 @@ contract TestSchemaResolver is SchemaResolver {
     function onRevoke(
         Attestation calldata /*attestation*/
     ) internal virtual override returns (bool) {
-        return true;
+        return _revocation;
     }
 }
