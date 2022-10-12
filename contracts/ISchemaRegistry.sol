@@ -26,18 +26,9 @@ interface ISchemaRegistry {
      * @dev Triggered when a new schema has been registered
      *
      * @param uuid The schema UUID.
-     * @param index The schema index.
-     * @param schema The schema schema.
-     * @param resolver An optional schema resolver.
-     * @param attester The address of the account used to register the schema.
+     * @param registerer The address of the account used to register the schema.
      */
-    event Registered(
-        bytes32 indexed uuid,
-        uint256 indexed index,
-        bytes schema,
-        ISchemaResolver resolver,
-        address attester
-    );
+    event Registered(bytes32 indexed uuid, address registerer);
 
     /**
      * @dev Submits and reserves a new schema
