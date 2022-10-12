@@ -11,7 +11,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy the schema registry', async () => {
-    expect(await registry.VERSION()).to.equal('0.12');
+    expect(await registry.VERSION()).to.equal('0.13');
 
     expect(await registry.getSchemaCount()).to.equal(0);
   });
