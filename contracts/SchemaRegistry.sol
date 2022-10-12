@@ -45,7 +45,7 @@ contract SchemaRegistry is ISchemaRegistry {
         schemaRecord.uuid = uuid;
         _registry[uuid] = schemaRecord;
 
-        emit Registered(uuid, index, schema, resolver, msg.sender);
+        emit Registered(uuid, msg.sender);
 
         return uuid;
     }
