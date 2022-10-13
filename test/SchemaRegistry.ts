@@ -29,7 +29,7 @@ describe('SchemaRegistry', () => {
 
   describe('construction', () => {
     it('should report a version', async () => {
-      expect(await registry.VERSION()).to.equal('0.12');
+      expect(await registry.VERSION()).to.equal('0.13');
     });
 
     it('should initialize without any Ss', async () => {
@@ -47,7 +47,7 @@ describe('SchemaRegistry', () => {
       const retUUID = await registry.callStatic.register(schema, resolverAddress);
       const res = await registry.register(schema, resolverAddress);
       expect(retUUID).to.equal(uuid);
-      await expect(res).to.emit(registry, 'Registered').withArgs(uuid, index, schema, resolverAddress, sender.address);
+      await expect(res).to.emit(registry, 'Registered').withArgs(uuid, sender.address);
       expect(await registry.getSchemaCount()).to.equal(index);
 
       const SchemaRecord = await registry.getSchema(uuid);
