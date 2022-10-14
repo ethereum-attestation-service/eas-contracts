@@ -18,24 +18,11 @@ contract SchemaRegistry is ISchemaRegistry {
     // The global mapping between schema records and their IDs.
     mapping(bytes32 => SchemaRecord) private _registry;
 
-    // The global counter for the total number of attestations.
-    uint256 private _schemaCount;
-
     /**
      * @inheritdoc ISchemaRegistry
      */
-    function register(bytes calldata schema, ISchemaResolver resolver) external returns (bytes32) {
-        uint256 index;
-        unchecked {
-            index = ++_schemaCount;
-        }
-
-        SchemaRecord memory schemaRecord = SchemaRecord({
-            uuid: EMPTY_UUID,
-            index: index,
-            schema: schema,
-            resolver: resolver
-        });
+    function register(string calldata schema, ISchemaResolver resolver) external returns (bytes32) {
+        SchemaRecord memory schemaRecord = SchemaRecord({ uuid: EMPTY_UUID, schema: schema, resolver: resolver });
 
         bytes32 uuid = _getUUID(schemaRecord);
         if (_registry[uuid].uuid != EMPTY_UUID) {
@@ -55,13 +42,6 @@ contract SchemaRegistry is ISchemaRegistry {
      */
     function getSchema(bytes32 uuid) external view returns (SchemaRecord memory) {
         return _registry[uuid];
-    }
-
-    /**
-     * @inheritdoc ISchemaRegistry
-     */
-    function getSchemaCount() external view returns (uint256) {
-        return _schemaCount;
     }
 
     /**
