@@ -5,7 +5,7 @@ const {
 } = ethers;
 
 export const getSchemaUUID = (schema: string, resolver: string) =>
-  solidityKeccak256(['bytes', 'address'], [schema, resolver]);
+  solidityKeccak256(['string', 'address'], [schema, resolver]);
 
 export const getUUID = (
   schema: string,
