@@ -45,9 +45,9 @@ contract SchemaRegistry is ISchemaRegistry {
     }
 
     /**
-     * @dev Calculates a UUID for a given AS.
+     * @dev Calculates a UUID for a given schema.
      *
-     * @param schemaRecord The input AS.
+     * @param schemaRecord The input schema.
      *
      * @return schema UUID.
      */
