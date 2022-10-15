@@ -58,7 +58,7 @@ describe('SchemaResolver', () => {
   });
 
   describe('resolution', () => {
-    const schema = 'AS';
+    const schema = 'S';
     let schemaId: string;
     const expirationTime = 0;
     const data = '0x1234';
@@ -372,7 +372,7 @@ describe('SchemaResolver', () => {
     });
 
     context('with an attestation resolver', () => {
-      const schema2 = 'AS2';
+      const schema2 = 'S2';
       const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
       let uuid: string;
 
