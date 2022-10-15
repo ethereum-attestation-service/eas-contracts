@@ -10,9 +10,15 @@ export const INITIAL_SCHEMAS = [
   'bytes32 eventId,uint8 ticketType,uint32 ticketNum',
   'bool isHuman',
   'bytes32 name',
-  'bytes message',
+  'string message',
   'bytes32 username',
-  'bool isFriend'
+  'bool isFriend',
+  'bool hasPhoneNumber, bytes32 phoneHash',
+  'uint256 eventId, voteIndex uint8',
+  'uint256 postId, bool like',
+  'bool hasPassedKYC',
+  'bool isAccreditedInvestor',
+  'bytes32 hashOfDocument, string note'
 ];
 
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
