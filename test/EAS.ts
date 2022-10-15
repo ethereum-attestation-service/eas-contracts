@@ -206,9 +206,9 @@ describe('EAS', () => {
         });
 
         context('with registered schemas', () => {
-          const schema1 = formatBytes32String('AS1');
-          const schema2 = formatBytes32String('AS2');
-          const schema3 = formatBytes32String('AS3');
+          const schema1 = 'S1';
+          const schema2 = 'S2';
+          const schema3 = 'S3';
           const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
           const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
           const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS);
@@ -319,7 +319,7 @@ describe('EAS', () => {
   });
 
   describe('revocation', () => {
-    const schema1 = formatBytes32String('AS1');
+    const schema1 = 'S1';
     const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
     let uuid: string;
 

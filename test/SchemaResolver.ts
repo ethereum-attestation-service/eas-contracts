@@ -17,8 +17,7 @@ import { BigNumberish, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
-  provider: { getBalance },
-  utils: { formatBytes32String }
+  provider: { getBalance }
 } = ethers;
 
 describe('SchemaResolver', () => {
@@ -59,7 +58,7 @@ describe('SchemaResolver', () => {
   });
 
   describe('resolution', () => {
-    const schema = formatBytes32String('AS');
+    const schema = 'S';
     let schemaId: string;
     const expirationTime = 0;
     const data = '0x1234';
@@ -373,7 +372,7 @@ describe('SchemaResolver', () => {
     });
 
     context('with an attestation resolver', () => {
-      const schema2 = formatBytes32String('AS2');
+      const schema2 = 'S2';
       const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
       let uuid: string;
 
