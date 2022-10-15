@@ -12,10 +12,8 @@ struct SchemaRecord {
     bytes32 uuid;
     // Optional schema resolver.
     ISchemaResolver resolver;
-    // Auto-incrementing index for reference, assigned by the registry itself.
-    uint256 index;
     // Custom specification of the schema (e.g., an ABI).
-    bytes schema;
+    string schema;
 }
 
 /**
@@ -36,9 +34,9 @@ interface ISchemaRegistry {
      * @param schema The schema data schema.
      * @param resolver An optional schema resolver.
      *
-     * @return The UUID of the new AS.
+     * @return The UUID of the new schema.
      */
-    function register(bytes calldata schema, ISchemaResolver resolver) external returns (bytes32);
+    function register(string calldata schema, ISchemaResolver resolver) external returns (bytes32);
 
     /**
      * @dev Returns an existing schema by UUID
@@ -48,11 +46,4 @@ interface ISchemaRegistry {
      * @return The schema data members.
      */
     function getSchema(bytes32 uuid) external view returns (SchemaRecord memory);
-
-    /**
-     * @dev Returns the global counter for the total number of schemas
-     *
-     * @return The global counter for the total number of schemas.
-     */
-    function getSchemaCount() external view returns (uint256);
 }

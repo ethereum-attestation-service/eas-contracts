@@ -68,7 +68,7 @@ interface IEAS {
     function getEIP712Verifier() external view returns (IEIP712Verifier);
 
     /**
-     * @dev Attests to a specific AS.
+     * @dev Attests to a specific schema.
      *
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
@@ -114,7 +114,7 @@ interface IEAS {
     ) external payable returns (bytes32);
 
     /**
-     * @dev Revokes an existing attestation to a specific AS.
+     * @dev Revokes an existing attestation to a specific schema.
      *
      * @param uuid The UUID of the attestation to revoke.
      */
