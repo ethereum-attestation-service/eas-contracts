@@ -138,7 +138,7 @@ contract EAS is IEAS {
     }
 
     /**
-     * @dev Attests to a specific AS.
+     * @dev Attests to a specific schema.
      *
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
@@ -209,7 +209,7 @@ contract EAS is IEAS {
     }
 
     /**
-     * @dev Revokes an existing attestation to a specific AS.
+     * @dev Revokes an existing attestation to a specific schema.
      *
      * @param uuid The UUID of the attestation to revoke.
      * @param attester The attesting account.

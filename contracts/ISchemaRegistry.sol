@@ -34,7 +34,7 @@ interface ISchemaRegistry {
      * @param schema The schema data schema.
      * @param resolver An optional schema resolver.
      *
-     * @return The UUID of the new AS.
+     * @return The UUID of the new schema.
      */
     function register(string calldata schema, ISchemaResolver resolver) external returns (bytes32);
 
