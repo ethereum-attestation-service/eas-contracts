@@ -38,16 +38,16 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ### Goerli
 
-#### v0.12
+#### v0.14
 
 * **EAS**:
-  * Contract: [0x4a9Db81755c2F5bC47DdcDC716f0CF5B38252538](https://goerli.etherscan.io/address/0x4a9Db81755c2F5bC47DdcDC716f0CF5B38252538)
+  * Contract: [0x6e195B51493e56d59768f8a87230ADe73BD4FC86](https://goerli.etherscan.io/address/0x6e195B51493e56d59768f8a87230ADe73BD4FC86)
   * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x2177e8D1D1ED5e044dEE53C5cEB3bC4a8f4B25A2](https://goerli.etherscan.io/address/0x2177e8D1D1ED5e044dEE53C5cEB3bC4a8f4B25A2)
+  * Contract: [0xB6652C033728658e1413F36cce9cA7f7eEbd5872](https://goerli.etherscan.io/address/0xB6652C033728658e1413F36cce9cA7f7eEbd5872)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/goerli/SchemaRegistry.json)
 * **EIP712Verifier**:
-  * Contract: [0x501b2AcD827240f109Bbc630Ab32E6b2702BbdCb](https://goerli.etherscan.io/address/0x501b2AcD827240f109Bbc630Ab32E6b2702BbdCb)
+  * Contract: [0xC8B0998Cf1e0541a108C0901099F4a9Deb8F84B1](https://goerli.etherscan.io/address/0xC8B0998Cf1e0541a108C0901099F4a9Deb8F84B1)
   * Deployment and ABI: [EIP712Verifier.json](./deployments/goerli/EIP712Verifier.json)
 
 ## Installation
@@ -84,10 +84,10 @@ This will automatically be skipped on an already deployed and configured deploym
 
 #### Latest Test Coverage Report (2022-10-08)
 
-* 100% Statements 66/66
+* 100% Statements 64/64
 * 100% Branches 46/46
-* 100% Functions 31/31
-* 100% Lines 103/103
+* 100% Functions 30/30
+* 100% Lines 99/99
 
 ![Coverage Report](./docs/images/coverage.png)
 

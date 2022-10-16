@@ -25,7 +25,7 @@ contract EAS is IEAS {
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.13";
+    string public constant VERSION = "0.14";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;

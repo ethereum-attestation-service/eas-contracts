@@ -19,7 +19,6 @@ import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   BaseContract,
   BigNumber,
-  BigNumberish,
   BytesLike,
   CallOverrides,
   ContractTransaction,
@@ -32,14 +31,12 @@ import type {
 export type SchemaRecordStruct = {
   uuid: PromiseOrValue<BytesLike>;
   resolver: PromiseOrValue<string>;
-  index: PromiseOrValue<BigNumberish>;
-  schema: PromiseOrValue<BytesLike>;
+  schema: PromiseOrValue<string>;
 };
 
-export type SchemaRecordStructOutput = [string, string, BigNumber, string] & {
+export type SchemaRecordStructOutput = [string, string, string] & {
   uuid: string;
   resolver: string;
-  index: BigNumber;
   schema: string;
 };
 
@@ -47,16 +44,11 @@ export interface SchemaRegistryInterface extends utils.Interface {
   functions: {
     "VERSION()": FunctionFragment;
     "getSchema(bytes32)": FunctionFragment;
-    "getSchemaCount()": FunctionFragment;
-    "register(bytes,address)": FunctionFragment;
+    "register(string,address)": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic:
-      | "VERSION"
-      | "getSchema"
-      | "getSchemaCount"
-      | "register"
+    nameOrSignatureOrTopic: "VERSION" | "getSchema" | "register"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -65,24 +57,16 @@ export interface SchemaRegistryInterface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
-    functionFragment: "getSchemaCount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "register",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getSchema", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getSchemaCount",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
 
   events: {
-    "Registered(bytes32,uint256,bytes,address,address)": EventFragment;
+    "Registered(bytes32,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Registered"): EventFragment;
@@ -90,13 +74,10 @@ export interface SchemaRegistryInterface extends utils.Interface {
 
 export interface RegisteredEventObject {
   uuid: string;
-  index: BigNumber;
-  schema: string;
-  resolver: string;
-  attester: string;
+  registerer: string;
 }
 export type RegisteredEvent = TypedEvent<
-  [string, BigNumber, string, string, string],
+  [string, string],
   RegisteredEventObject
 >;
 
@@ -136,10 +117,8 @@ export interface SchemaRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[SchemaRecordStructOutput]>;
 
-    getSchemaCount(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     register(
-      schema: PromiseOrValue<BytesLike>,
+      schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -152,10 +131,8 @@ export interface SchemaRegistry extends BaseContract {
     overrides?: CallOverrides
   ): Promise<SchemaRecordStructOutput>;
 
-  getSchemaCount(overrides?: CallOverrides): Promise<BigNumber>;
-
   register(
-    schema: PromiseOrValue<BytesLike>,
+    schema: PromiseOrValue<string>,
     resolver: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -168,29 +145,21 @@ export interface SchemaRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<SchemaRecordStructOutput>;
 
-    getSchemaCount(overrides?: CallOverrides): Promise<BigNumber>;
-
     register(
-      schema: PromiseOrValue<BytesLike>,
+      schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<string>;
   };
 
   filters: {
-    "Registered(bytes32,uint256,bytes,address,address)"(
+    "Registered(bytes32,address)"(
       uuid?: PromiseOrValue<BytesLike> | null,
-      index?: PromiseOrValue<BigNumberish> | null,
-      schema?: null,
-      resolver?: null,
-      attester?: null
+      registerer?: null
     ): RegisteredEventFilter;
     Registered(
       uuid?: PromiseOrValue<BytesLike> | null,
-      index?: PromiseOrValue<BigNumberish> | null,
-      schema?: null,
-      resolver?: null,
-      attester?: null
+      registerer?: null
     ): RegisteredEventFilter;
   };
 
@@ -202,10 +171,8 @@ export interface SchemaRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getSchemaCount(overrides?: CallOverrides): Promise<BigNumber>;
-
     register(
-      schema: PromiseOrValue<BytesLike>,
+      schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -219,10 +186,8 @@ export interface SchemaRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getSchemaCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     register(
-      schema: PromiseOrValue<BytesLike>,
+      schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
