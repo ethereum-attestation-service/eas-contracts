@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import { ISchemaResolver } from "./ISchemaResolver.sol";
+import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 /**
  * @title A struct representing a record for a submitted schema.

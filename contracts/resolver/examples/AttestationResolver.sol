@@ -2,13 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether an attestations attest to an existing attestation.
  */
-contract TestAttestationResolver is SchemaResolver {
+contract AttestationResolver is SchemaResolver {
     error Overflow();
     error OutOfBounds();
 

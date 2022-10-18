@@ -2,13 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that controls revocations.
  */
-contract TestRevocationResolver is SchemaResolver {
+contract RevocationResolver is SchemaResolver {
     bool private _revocation;
 
     constructor(IEAS eas) SchemaResolver(eas) {}

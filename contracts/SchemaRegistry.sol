@@ -4,7 +4,8 @@ pragma solidity 0.8.17;
 
 import { EMPTY_UUID } from "./Types.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-import { ISchemaResolver } from "./ISchemaResolver.sol";
+
+import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 /**
  * @title The global schema registry.
