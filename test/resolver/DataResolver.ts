@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectAttestation, expectFailedAttestation, registerSchema } from '../helpers/EAS';
+import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -68,7 +68,16 @@ describe('DataResolver', () => {
   });
 
   it('should allow attesting with correct data', async () => {
-    await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, '0x00', { from: sender });
-    await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, '0x01', { from: sender });
+    const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, '0x00', {
+      from: sender
+    });
+
+    await expectRevocation(eas, uuid, { from: sender });
+
+    const uuid2 = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, '0x01', {
+      from: sender
+    });
+
+    await expectRevocation(eas, uuid2, { from: sender });
   });
 });

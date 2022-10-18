@@ -1,7 +1,14 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
+import { AttestationResolver, EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
-import { expectAttestation, expectFailedAttestation, getSchemaUUID, getUUID, registerSchema } from '../helpers/EAS';
+import {
+  expectAttestation,
+  expectFailedAttestation,
+  expectRevocation,
+  getSchemaUUID,
+  getUUID,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -17,6 +24,7 @@ describe('AttestationResolver', () => {
   let registry: SchemaRegistry;
   let verifier: EIP712Verifier;
   let eas: TestEAS;
+  let resolver: AttestationResolver;
 
   const schema = 'S';
   let schemaId: string;
@@ -47,7 +55,7 @@ describe('AttestationResolver', () => {
     await eas.attest(recipient.address, schema2Id, expirationTime, ZERO_BYTES32, data);
     uuid = getUUID(schema2Id, recipient.address, recipient.address, await eas.getTime(), expirationTime, data, 0);
 
-    const resolver = await Contracts.AttestationResolver.deploy(eas.address);
+    resolver = await Contracts.AttestationResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver);
@@ -67,6 +75,14 @@ describe('AttestationResolver', () => {
   });
 
   it('should allow attesting to an existing attestation', async () => {
-    await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, uuid, { from: sender });
+    const uuid2 = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, uuid, {
+      from: sender
+    });
+
+    await expectRevocation(eas, uuid2, { from: sender });
+  });
+
+  it('should revert invalid input', async () => {
+    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWith('OutOfBounds');
   });
 });
