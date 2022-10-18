@@ -14,7 +14,7 @@ export const INITIAL_SCHEMAS = [
   'bytes32 username',
   'bool isFriend',
   'bool hasPhoneNumber, bytes32 phoneHash',
-  'uint256 eventId, voteIndex uint8',
+  'uint256 eventId, uint8 voteIndex',
   'uint256 postId, bool like',
   'bool hasPassedKYC',
   'bool isAccreditedInvestor',
