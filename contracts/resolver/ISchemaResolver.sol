@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import { Attestation } from "./IEAS.sol";
+import { Attestation } from "../IEAS.sol";
 
 /**
  * @title The interface of an optional schema resolver.

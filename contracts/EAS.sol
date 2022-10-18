@@ -6,7 +6,8 @@ import { EMPTY_UUID } from "./Types.sol";
 import { IEAS, Attestation } from "./IEAS.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
-import { ISchemaResolver } from "./ISchemaResolver.sol";
+
+import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 /**
  * @title EAS - Ethereum Attestation Service
