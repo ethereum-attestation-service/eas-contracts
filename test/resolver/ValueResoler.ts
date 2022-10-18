@@ -1,5 +1,5 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
+import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
-describe('TokenResolver', () => {
+describe('ValueResolver', () => {
   let accounts: SignerWithAddress[];
   let recipient: SignerWithAddress;
   let sender: Wallet;
@@ -17,15 +17,13 @@ describe('TokenResolver', () => {
   let registry: SchemaRegistry;
   let verifier: EIP712Verifier;
   let eas: TestEAS;
-  let resolver: SchemaResolver;
-
-  const targetAmount = 22334;
-  let token: TestERC20Token;
 
   const schema = 'S';
   let schemaId: string;
-  const data = '0x1234';
   const expirationTime = 0;
+  const data = '0x1234';
+
+  const targetValue = 12345;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -42,16 +40,13 @@ describe('TokenResolver', () => {
 
     await eas.setTime(await latest());
 
-    token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
-    await token.transfer(sender.address, targetAmount);
-
-    resolver = await Contracts.TokenResolver.deploy(eas.address, token.address, targetAmount);
-    expect(await resolver.isPayable()).to.be.false;
+    const resolver = await Contracts.ValueResolver.deploy(eas.address, targetValue);
+    expect(await resolver.isPayable()).to.be.true;
 
     schemaId = await registerSchema(schema, registry, resolver);
   });
 
-  it('should revert when attesting with wrong token amount', async () => {
+  it('should revert when attesting with the wrong value', async () => {
     await expectFailedAttestation(
       eas,
       recipient.address,
@@ -59,28 +54,15 @@ describe('TokenResolver', () => {
       expirationTime,
       ZERO_BYTES32,
       data,
-      'ERC20: insufficient allowance',
-      { from: sender }
-    );
-
-    await token.connect(sender).approve(resolver.address, targetAmount - 1);
-    await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      ZERO_BYTES32,
-      data,
-      'ERC20: insufficient allowance',
-      { from: sender }
+      'InvalidAttestation',
+      { from: sender, value: targetValue + 1 }
     );
   });
 
-  it('should allow attesting with correct token amount', async () => {
-    await token.connect(sender).approve(resolver.address, targetAmount);
-
+  it('should allow attesting with the correct value', async () => {
     const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
-      from: sender
+      from: sender,
+      value: targetValue
     });
 
     await expectRevocation(eas, uuid, { from: sender });

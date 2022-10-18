@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectAttestation, registerSchema } from '../helpers/EAS';
+import { expectAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -57,9 +57,13 @@ describe('PayingResolver', () => {
     const prevResolverBalance = await getBalance(resolver.address);
     const prevRecipientBalance = await getBalance(recipient.address);
 
-    await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, { from: sender });
+    const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
+      from: sender
+    });
 
     expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.sub(incentive));
     expect(await getBalance(recipient.address)).to.equal(prevRecipientBalance.add(incentive));
+
+    await expectRevocation(eas, uuid, { from: sender });
   });
 });

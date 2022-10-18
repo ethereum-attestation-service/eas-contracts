@@ -82,32 +82,41 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-10-08)
+#### Latest Test Coverage Report (2022-10-18)
 
-* 100% Statements 64/64
-* 100% Branches 46/46
-* 100% Functions 30/30
-* 100% Lines 99/99
-
-![Coverage Report](./docs/images/coverage.png)
+* 100% Statements 90/90
+* 100% Branches 50/50
+* 100% Functions 62/62
+* 100% Lines 136/136
 
 ```sh
-----------------------|----------|----------|----------|----------|----------------|
-File                  |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
-----------------------|----------|----------|----------|----------|----------------|
- contracts/           |      100 |      100 |      100 |      100 |                |
-  EAS.sol             |      100 |      100 |      100 |      100 |                |
-  EIP712Verifier.sol  |      100 |      100 |      100 |      100 |                |
-  IEAS.sol            |      100 |      100 |      100 |      100 |                |
-  IEIP712Verifier.sol |      100 |      100 |      100 |      100 |                |
-  ISchemaRegistry.sol |      100 |      100 |      100 |      100 |                |
-  ISchemaResolver.sol |      100 |      100 |      100 |      100 |                |
-  SchemaRegistry.sol  |      100 |      100 |      100 |      100 |                |
-  SchemaResolver.sol  |      100 |      100 |      100 |      100 |                |
-  Types.sol           |      100 |      100 |      100 |      100 |                |
-----------------------|----------|----------|----------|----------|----------------|
-All files             |      100 |      100 |      100 |      100 |                |
-----------------------|----------|----------|----------|----------|----------------|
+------------------------------|----------|----------|----------|----------|----------------|
+File                          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+------------------------------|----------|----------|----------|----------|----------------|
+ contracts/                   |      100 |      100 |      100 |      100 |                |
+  EAS.sol                     |      100 |      100 |      100 |      100 |                |
+  EIP712Verifier.sol          |      100 |      100 |      100 |      100 |                |
+  IEAS.sol                    |      100 |      100 |      100 |      100 |                |
+  IEIP712Verifier.sol         |      100 |      100 |      100 |      100 |                |
+  ISchemaRegistry.sol         |      100 |      100 |      100 |      100 |                |
+  SchemaRegistry.sol          |      100 |      100 |      100 |      100 |                |
+  Types.sol                   |      100 |      100 |      100 |      100 |                |
+ contracts/resolver/          |      100 |      100 |      100 |      100 |                |
+  ISchemaResolver.sol         |      100 |      100 |      100 |      100 |                |
+  SchemaResolver.sol          |      100 |      100 |      100 |      100 |                |
+ contracts/resolver/examples/ |      100 |      100 |      100 |      100 |                |
+  AttestationResolver.sol     |      100 |      100 |      100 |      100 |                |
+  AttesterResolver.sol        |      100 |      100 |      100 |      100 |                |
+  DataResolver.sol            |      100 |      100 |      100 |      100 |                |
+  ExpirationTimeResolver.sol  |      100 |      100 |      100 |      100 |                |
+  PayingResolver.sol          |      100 |      100 |      100 |      100 |                |
+  RecipientResolver.sol       |      100 |      100 |      100 |      100 |                |
+  RevocationResolver.sol      |      100 |      100 |      100 |      100 |                |
+  TokenResolver.sol           |      100 |      100 |      100 |      100 |                |
+  ValueResolver.sol           |      100 |      100 |      100 |      100 |                |
+------------------------------|----------|----------|----------|----------|----------------|
+All files                     |      100 |      100 |      100 |      100 |                |
+------------------------------|----------|----------|----------|----------|----------------|
 ```
 
 #### Instructions
