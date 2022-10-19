@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/contracts",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -9,6 +9,7 @@
   "author": "Leonid Beder",
   "license": "MIT",
   "files": [
+    "/scripts/fix-github-hardhat-deploy.sh",
     "/contracts/**/*.sol",
     "/artifacts",
     "/typechain-types",
@@ -41,7 +42,10 @@
     "postinstall": "scripts/fix-github-hardhat-deploy.sh"
   },
   "dependencies": {
-    "hardhat": "2.11.2"
+    "hardhat": "2.11.2",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.3",
+    "typechain": "^8.1.0"
   },
   "devDependencies": {
     "@anders-t/ethers-ledger": "^1.0.4",
@@ -54,8 +58,6 @@
     "@openzeppelin/contracts": "4.7.3",
     "@tenderly/hardhat-tenderly": "1.1.6",
     "@trivago/prettier-plugin-sort-imports": "^3.3.0",
-    "@typechain/ethers-v5": "^10.1.0",
-    "@typechain/hardhat": "^6.1.3",
     "@types/chai": "^4.3.3",
     "@types/mocha": "^10.0.0",
     "@types/node": "^18.8.2",
@@ -90,7 +92,6 @@
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.2",
     "ts-node": "^10.9.1",
-    "typechain": "^8.1.0",
     "typescript": "^4.8.4"
   },
   "resolutions": {
