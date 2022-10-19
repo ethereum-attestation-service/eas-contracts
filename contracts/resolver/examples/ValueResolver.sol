@@ -2,13 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether a specific amount of ETH was sent with an attestation.
  */
-contract TestValueResolver is SchemaResolver {
+contract ValueResolver is SchemaResolver {
     uint256 private immutable _targetValue;
 
     constructor(IEAS eas, uint256 targetValue) SchemaResolver(eas) {

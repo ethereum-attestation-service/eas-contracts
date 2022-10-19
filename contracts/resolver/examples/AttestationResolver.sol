@@ -2,14 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether an attestations attest to an existing attestation.
  */
-contract TestAttestationResolver is SchemaResolver {
-    error Overflow();
+contract AttestationResolver is SchemaResolver {
     error OutOfBounds();
 
     constructor(IEAS eas) SchemaResolver(eas) {}
@@ -24,12 +24,12 @@ contract TestAttestationResolver is SchemaResolver {
         return true;
     }
 
+    function toBytes32(bytes memory data, uint256 start) external pure returns (bytes32) {
+        return _toBytes32(data, start);
+    }
+
     function _toBytes32(bytes memory data, uint256 start) private pure returns (bytes32) {
         unchecked {
-            if (start + 32 < start) {
-                revert Overflow();
-            }
-
             if (data.length < start + 32) {
                 revert OutOfBounds();
             }

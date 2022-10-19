@@ -1,19 +1,19 @@
 import {
+  AttestationResolver__factory,
+  AttesterResolver__factory,
+  DataResolver__factory,
   EAS__factory,
   EIP712Verifier__factory,
+  ExpirationTimeResolver__factory,
+  PayingResolver__factory,
+  RecipientResolver__factory,
+  RevocationResolver__factory,
   SchemaRegistry__factory,
-  TestAttestationResolver__factory,
-  TestAttesterResolver__factory,
-  TestDataResolver__factory,
   TestEAS__factory,
   TestERC20Token__factory,
-  TestExpirationTimeResolver__factory,
-  TestPayingResolver__factory,
-  TestRecipientResolver__factory,
-  TestRevocationResolver__factory,
   TestSchemaResolver__factory,
-  TestTokenResolver__factory,
-  TestValueResolver__factory
+  TokenResolver__factory,
+  ValueResolver__factory
 } from '../typechain-types';
 import { ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
@@ -54,21 +54,21 @@ const attachOnly = <F extends ContractFactory>(contractName: string) => {
 
 /* eslint-disable camelcase */
 const getContracts = () => ({
+  AttestationResolver: deployOrAttach<AttestationResolver__factory>('AttestationResolver'),
+  AttesterResolver: deployOrAttach<AttesterResolver__factory>('AttesterResolver'),
+  DataResolver: deployOrAttach<DataResolver__factory>('DataResolver'),
   EAS: deployOrAttach<EAS__factory>('EAS'),
   EIP712Verifier: deployOrAttach<EIP712Verifier__factory>('EIP712Verifier'),
+  ExpirationTimeResolver: deployOrAttach<ExpirationTimeResolver__factory>('ExpirationTimeResolver'),
+  PayingResolver: deployOrAttach<PayingResolver__factory>('PayingResolver'),
+  RecipientResolver: deployOrAttach<RecipientResolver__factory>('RecipientResolver'),
+  RevocationResolver: deployOrAttach<RevocationResolver__factory>('RevocationResolver'),
   SchemaRegistry: deployOrAttach<SchemaRegistry__factory>('SchemaRegistry'),
-  TestAttestationResolver: deployOrAttach<TestAttestationResolver__factory>('TestAttestationResolver'),
-  TestAttesterResolver: deployOrAttach<TestAttesterResolver__factory>('TestAttesterResolver'),
-  TestDataResolver: deployOrAttach<TestDataResolver__factory>('TestDataResolver'),
   TestEAS: deployOrAttach<TestEAS__factory>('TestEAS'),
   TestERC20Token: deployOrAttach<TestERC20Token__factory>('TestERC20Token'),
-  TestExpirationTimeResolver: deployOrAttach<TestExpirationTimeResolver__factory>('TestExpirationTimeResolver'),
-  TestPayingResolver: deployOrAttach<TestPayingResolver__factory>('TestPayingResolver'),
-  TestRecipientResolver: deployOrAttach<TestRecipientResolver__factory>('TestRecipientResolver'),
-  TestRevocationResolver: deployOrAttach<TestRevocationResolver__factory>('TestRevocationResolver'),
   TestSchemaResolver: deployOrAttach<TestSchemaResolver__factory>('TestSchemaResolver'),
-  TestTokenResolver: deployOrAttach<TestTokenResolver__factory>('TestTokenResolver'),
-  TestValueResolver: deployOrAttach<TestValueResolver__factory>('TestValueResolver')
+  TokenResolver: deployOrAttach<TokenResolver__factory>('TokenResolver'),
+  ValueResolver: deployOrAttach<ValueResolver__factory>('ValueResolver')
 });
 /* eslint-enable camelcase */
 
