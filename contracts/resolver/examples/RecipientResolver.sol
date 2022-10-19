@@ -2,13 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that checks whether the attestation is to a specific recipient.
  */
-contract TestRecipientResolver is SchemaResolver {
+contract RecipientResolver is SchemaResolver {
     address private immutable _targetRecipient;
 
     constructor(IEAS eas, address targetRecipient) SchemaResolver(eas) {

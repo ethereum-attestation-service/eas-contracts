@@ -2,13 +2,14 @@
 
 pragma solidity 0.8.17;
 
-import { SchemaResolver } from "../../SchemaResolver.sol";
+import { SchemaResolver } from "../SchemaResolver.sol";
+
 import { IEAS, Attestation } from "../../IEAS.sol";
 
 /**
  * @title A sample schema resolver that pays attesters
  */
-contract TestPayingResolver is SchemaResolver {
+contract PayingResolver is SchemaResolver {
     uint256 private immutable _incentive;
 
     constructor(IEAS eas, uint256 incentive) SchemaResolver(eas) {
