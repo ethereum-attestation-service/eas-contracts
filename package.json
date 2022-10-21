@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/contracts",
-  "version": "0.14.3",
+  "version": "0.14.4",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -9,9 +9,13 @@
   "author": "Leonid Beder",
   "license": "MIT",
   "files": [
-    "/contracts/**/*.sol",
-    "/artifacts",
+    "**/*.sol",
+    "!/contracts/tests/**/*",
+    "/artifacts/contracts",
+    "!/artifacts/contracts/tests/**/*",
     "/typechain-types",
+    "!/typechain-types/contracts/tests/**/*",
+    "!/typechain-types/factories/contracts/tests/**/*",
     "/deployments/mainnet",
     "/deployments/goerli"
   ],
