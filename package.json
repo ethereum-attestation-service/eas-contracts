@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.14.7",
+  "version": "0.14.8",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -18,8 +18,8 @@
     "/dist/typechain-types",
     "!/dist//typechain-types/contracts/tests/**/*",
     "!/dist//typechain-types/factories/contracts/tests/**/*",
-    "/deployments/mainnet",
-    "/deployments/goerli"
+    "/deployments/mainnet/**/*",
+    "/deployments/goerli/**/*"
   ],
   "scripts": {
     "compile": "hardhat compile",
