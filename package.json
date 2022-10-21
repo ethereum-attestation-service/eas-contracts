@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/contracts",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -9,7 +9,6 @@
   "author": "Leonid Beder",
   "license": "MIT",
   "files": [
-    "/scripts/fix-github-hardhat-deploy.sh",
     "/contracts/**/*.sol",
     "/artifacts",
     "/typechain-types",
@@ -38,8 +37,8 @@
     "verify": "hardhat verify",
     "flatten": "hardhat flatten",
     "clean": "rm -rf artifacts cache dist coverage typechain-types",
-    "prepare": "yarn clean && yarn compile && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
-    "postinstall": "if [ -z \"$npm_config_production\" ]; then scripts/fix-github-hardhat-deploy.sh; fi"
+    "prepare": "yarn hardhat-deploy-fix && yarn clean && yarn compile && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
+    "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh"
   },
   "dependencies": {
     "hardhat": "2.11.2",
