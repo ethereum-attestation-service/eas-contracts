@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.14.4",
+  "version": "0.14.5",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -8,6 +8,8 @@
   },
   "author": "Leonid Beder",
   "license": "MIT",
+  "main": "dist/typechain-types/index.js",
+  "types": "dist/typechain-types/index.d.ts",
   "files": [
     "**/*.sol",
     "!/contracts/tests/**/*",
