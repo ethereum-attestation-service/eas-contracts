@@ -1,8 +1,8 @@
 # Ethereum Attestation Service
 
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://eas.eth.link)
-[![NPM Package](https://img.shields.io/npm/v/@ethereum-attestation-service/contracts.svg)](https://www.npmjs.org/package/@ethereum-attestation-service/contracts)
-[![Test](https://github.com/ethereum-attestation-service/contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/ethereum-attestation-service/contracts/actions/workflows/ci.yml)
+[![NPM Package](https://img.shields.io/npm/v/@ethereum-attestation-service/eas-contracts.svg)](https://www.npmjs.org/package/@ethereum-attestation-service/eas-contracts)
+[![Test](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/ethereum-attestation-service/eas-contracts/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/ethereum-attestation-service/eas-contracts?style=flat-square)](https://github.com/ethereum-attestation-service/eas-contracts/blob/master/LICENSE)
 
 ## Introduction
@@ -53,7 +53,7 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 ## Installation
 
 ```sh
-yarn install @ethereum-attestation-service/contracts
+yarn install @ethereum-attestation-service/eas-contracts
 ```
 
 ## Testing
