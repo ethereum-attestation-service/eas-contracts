@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.14.5",
+  "version": "0.14.6",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -44,7 +44,8 @@
     "flatten": "hardhat flatten",
     "clean": "rm -rf artifacts cache dist coverage typechain-types",
     "prepare": "yarn hardhat-deploy-fix && yarn clean && yarn compile && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
-    "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh"
+    "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh",
+    "release": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "hardhat": "2.12.0",
