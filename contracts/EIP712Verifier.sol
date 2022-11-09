@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.17;
 
-import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
