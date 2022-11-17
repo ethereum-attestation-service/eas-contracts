@@ -14,7 +14,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     error InvalidSignature();
 
     // The version of the contract.
-    string public constant VERSION = "0.14";
+    string public constant VERSION = "0.15";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
@@ -91,13 +91,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function revoke(
-        bytes32 uuid,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external {
+    function revoke(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) external {
         uint256 nonce;
         unchecked {
             nonce = _nonces[attester]++;

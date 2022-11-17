@@ -60,7 +60,7 @@ describe('ExpirationTimeResolver', () => {
   });
 
   it('should allow attesting with the correct expiration time', async () => {
-    const uuid = await expectAttestation(
+    const { uuid } = await expectAttestation(
       eas,
       recipient.address,
       schemaId,
