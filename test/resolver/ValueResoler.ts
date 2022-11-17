@@ -60,7 +60,7 @@ describe('ValueResolver', () => {
   });
 
   it('should allow attesting with the correct value', async () => {
-    const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
+    const { uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
       from: sender,
       value: targetValue
     });

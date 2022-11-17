@@ -26,7 +26,7 @@ contract EAS is IEAS {
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.14";
+    string public constant VERSION = "0.15";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -105,20 +105,14 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function revoke(bytes32 uuid) public virtual {
+    function revoke(bytes32 uuid) public payable virtual {
         return _revoke(uuid, msg.sender);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function revokeByDelegation(
-        bytes32 uuid,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public virtual {
+    function revokeByDelegation(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) public payable virtual {
         _eip712Verifier.revoke(uuid, attester, v, r, s);
 
         _revoke(uuid, attester);
