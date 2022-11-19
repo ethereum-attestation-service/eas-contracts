@@ -65,7 +65,7 @@ describe('AttesterResolver', () => {
   });
 
   it('should allow attesting to the correct attester', async () => {
-    const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
+    const { uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
       from: targetSender
     });
 

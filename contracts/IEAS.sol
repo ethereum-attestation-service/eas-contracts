@@ -118,7 +118,7 @@ interface IEAS {
      *
      * @param uuid The UUID of the attestation to revoke.
      */
-    function revoke(bytes32 uuid) external;
+    function revoke(bytes32 uuid) external payable;
 
     /**
      * @dev Attests to a specific schema the EIP712 signature.
@@ -129,13 +129,7 @@ interface IEAS {
      * @param r The x-coordinate of the nonce R.
      * @param s The signature data.
      */
-    function revokeByDelegation(
-        bytes32 uuid,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function revokeByDelegation(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) external payable;
 
     /**
      * @dev Returns an existing attestation by UUID.
