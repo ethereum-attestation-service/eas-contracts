@@ -76,7 +76,7 @@ export const expectAttestation = async (
   expect(attestation.refUUID).to.equal(refUUID);
   expect(attestation.data).to.equal(data);
 
-  return uuid;
+  return { uuid, res };
 };
 
 export const expectFailedAttestation = async (
@@ -100,16 +100,18 @@ export const expectRevocation = async (eas: TestEAS, uuid: string, options?: Opt
   const txSender = options?.from || (await ethers.getSigners())[0];
   const attestation = await eas.getAttestation(uuid);
 
-  const res = await eas.connect(txSender).revoke(uuid);
+  const res = await eas.connect(txSender).revoke(uuid, { value: options?.value });
 
   await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, txSender.address, uuid, attestation.schema);
 
   const attestation2 = await eas.getAttestation(uuid);
   expect(attestation2.revocationTime).to.equal(await eas.getTime());
+
+  return res;
 };
 
 export const expectFailedRevocation = async (eas: TestEAS, uuid: string, err: string, options?: Options) => {
   const txSender = options?.from || (await ethers.getSigners())[0];
 
-  await expect(eas.connect(txSender).revoke(uuid)).to.be.revertedWith(err);
+  await expect(eas.connect(txSender).revoke(uuid, { value: options?.value })).to.be.revertedWith(err);
 };

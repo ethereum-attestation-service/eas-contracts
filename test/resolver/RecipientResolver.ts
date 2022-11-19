@@ -62,9 +62,17 @@ describe('RecipientResolver', () => {
   });
 
   it('should allow attesting to the correct recipient', async () => {
-    const uuid = await expectAttestation(eas, targetRecipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
-      from: sender
-    });
+    const { uuid } = await expectAttestation(
+      eas,
+      targetRecipient.address,
+      schemaId,
+      expirationTime,
+      ZERO_BYTES32,
+      data,
+      {
+        from: sender
+      }
+    );
 
     await expectRevocation(eas, uuid, { from: sender });
   });

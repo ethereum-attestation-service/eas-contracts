@@ -79,7 +79,7 @@ describe('TokenResolver', () => {
   it('should allow attesting with correct token amount', async () => {
     await token.connect(sender).approve(resolver.address, targetAmount);
 
-    const uuid = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
+    const { uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
       from: sender
     });
 

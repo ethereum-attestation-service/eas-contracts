@@ -75,9 +75,17 @@ describe('AttestationResolver', () => {
   });
 
   it('should allow attesting to an existing attestation', async () => {
-    const uuid2 = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, uuid, {
-      from: sender
-    });
+    const { uuid: uuid2 } = await expectAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      ZERO_BYTES32,
+      uuid,
+      {
+        from: sender
+      }
+    );
 
     await expectRevocation(eas, uuid2, { from: sender });
   });
