@@ -1,7 +1,7 @@
 import Contracts from '../components/Contracts';
 import { EIP712Verifier } from '../typechain-types';
 import { HARDHAT_CHAIN_ID } from '../utils/Constants';
-import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
+import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
