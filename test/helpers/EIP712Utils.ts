@@ -1,5 +1,5 @@
 import { HARDHAT_CHAIN_ID } from '../../utils/Constants';
-import { Delegation } from '@ethereum-attestation-service/sdk';
+import { Delegation } from '@ethereum-attestation-service/eas-sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ecsign } from 'ethereumjs-util';
 import { BigNumber, BigNumberish } from 'ethers';

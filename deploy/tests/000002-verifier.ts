@@ -2,7 +2,7 @@ import { EIP712Verifier } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import { MAINNET_CHAIN_ID } from '../../utils/Constants';
 import { DeployedContracts } from '../../utils/Deploy';
-import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/sdk';
+import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
