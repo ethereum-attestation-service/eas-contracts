@@ -45,8 +45,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Packages
-        run: sudo apt-get update
-        run: sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
+        run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
 
       - name: Install NPM Dependencies
         env:
