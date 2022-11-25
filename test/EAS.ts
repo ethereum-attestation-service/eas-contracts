@@ -58,7 +58,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.15');
+      expect(await eas.VERSION()).to.equal('0.16');
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
       expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
@@ -129,6 +129,7 @@ describe('EAS', () => {
             txSender.address,
             await eas.getTime(),
             expirationTime,
+            refUUID,
             data,
             options?.bump ?? 0
           );
@@ -266,6 +267,7 @@ describe('EAS', () => {
               recipient.address,
               await eas.getTime(),
               expirationTime,
+              ZERO_BYTES32,
               data,
               0
             );
@@ -379,7 +381,16 @@ describe('EAS', () => {
         beforeEach(async () => {
           await eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
 
-          uuid = getUUID(schema1Id, recipient.address, sender.address, await eas.getTime(), expirationTime, data, 0);
+          uuid = getUUID(
+            schema1Id,
+            recipient.address,
+            sender.address,
+            await eas.getTime(),
+            expirationTime,
+            ZERO_BYTES32,
+            data,
+            0
+          );
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
