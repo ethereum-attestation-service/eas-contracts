@@ -5,12 +5,12 @@ import {
   expectAttestation,
   expectFailedAttestation,
   expectRevocation,
-  getSchemaUUID,
-  getUUID,
+  getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
+import { getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { Wallet } from 'ethers';
@@ -52,17 +52,7 @@ describe('AttestationResolver', () => {
 
     await registerSchema(schema2, registry, ZERO_ADDRESS);
 
-    await eas.attest(recipient.address, schema2Id, expirationTime, ZERO_BYTES32, data);
-    uuid = getUUID(
-      schema2Id,
-      recipient.address,
-      recipient.address,
-      await eas.getTime(),
-      expirationTime,
-      ZERO_BYTES32,
-      data,
-      0
-    );
+    uuid = await getUUIDFromAttestTx(eas.attest(recipient.address, schema2Id, expirationTime, ZERO_BYTES32, data));
 
     resolver = await Contracts.AttestationResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;
