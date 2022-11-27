@@ -46,7 +46,16 @@ describe('RevocationResolver', () => {
     schemaId = await registerSchema(schema, registry, resolver);
 
     await eas.connect(sender).attest(recipient.address, schemaId, expirationTime, ZERO_BYTES32, data);
-    uuid = getUUID(schemaId, recipient.address, sender.address, await eas.getTime(), expirationTime, data, 0);
+    uuid = getUUID(
+      schemaId,
+      recipient.address,
+      sender.address,
+      await eas.getTime(),
+      expirationTime,
+      ZERO_BYTES32,
+      data,
+      0
+    );
   });
 
   context('when revocations are allowed', () => {

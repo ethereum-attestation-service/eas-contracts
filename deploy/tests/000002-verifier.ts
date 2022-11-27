@@ -24,7 +24,7 @@ describeDeployment(__filename, () => {
       chainId: MAINNET_CHAIN_ID
     });
 
-    expect(await verifier.VERSION()).to.equal('0.15');
+    expect(await verifier.VERSION()).to.equal('0.16');
 
     expect(await verifier.getDomainSeparator()).to.equal(delegation.getDomainSeparator());
     expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));

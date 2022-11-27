@@ -53,7 +53,16 @@ describe('AttestationResolver', () => {
     await registerSchema(schema2, registry, ZERO_ADDRESS);
 
     await eas.attest(recipient.address, schema2Id, expirationTime, ZERO_BYTES32, data);
-    uuid = getUUID(schema2Id, recipient.address, recipient.address, await eas.getTime(), expirationTime, data, 0);
+    uuid = getUUID(
+      schema2Id,
+      recipient.address,
+      recipient.address,
+      await eas.getTime(),
+      expirationTime,
+      ZERO_BYTES32,
+      data,
+      0
+    );
 
     resolver = await Contracts.AttestationResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;

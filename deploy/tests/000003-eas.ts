@@ -15,7 +15,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy the EAS', async () => {
-    expect(await eas.VERSION()).to.equal('0.15');
+    expect(await eas.VERSION()).to.equal('0.16');
 
     expect(await eas.getSchemaRegistry()).to.equal(registry.address);
     expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
