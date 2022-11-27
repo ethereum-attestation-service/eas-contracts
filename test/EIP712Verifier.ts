@@ -1,13 +1,17 @@
 import Contracts from '../components/Contracts';
 import { EIP712Verifier } from '../typechain-types';
 import { HARDHAT_CHAIN_ID } from '../utils/Constants';
-import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/eas-sdk';
+import { Delegated } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
 const {
   utils: { keccak256, toUtf8Bytes }
 } = ethers;
+
+const ATTEST_TYPED_SIGNATURE =
+  'Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)';
+const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 uuid,uint256 nonce)';
 
 describe('EIP712Verifier', () => {
   let verifier: EIP712Verifier;
@@ -21,7 +25,7 @@ describe('EIP712Verifier', () => {
   });
 
   it('should return the correct domain separator', async () => {
-    const delegation = new Delegation({
+    const delegation = new Delegated({
       address: verifier.address,
       version: await verifier.VERSION(),
       chainId: HARDHAT_CHAIN_ID

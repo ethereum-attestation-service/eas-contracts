@@ -1,29 +1,8 @@
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
+import { getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
-import { BigNumberish, Wallet } from 'ethers';
+import { BigNumberish, ContractTransaction, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
-
-const {
-  utils: { solidityKeccak256 }
-} = ethers;
-
-export const getSchemaUUID = (schema: string, resolver: string) =>
-  solidityKeccak256(['string', 'address'], [schema, resolver]);
-
-export const getUUID = (
-  schema: string,
-  recipient: string,
-  attester: string,
-  time: number,
-  expirationTime: number,
-  refUUID: string,
-  data: string,
-  bump: number
-) =>
-  solidityKeccak256(
-    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bytes32', 'bytes', 'uint32'],
-    [schema, recipient, attester, time, expirationTime, refUUID, data, bump]
-  );
 
 interface Options {
   from?: Wallet;
@@ -37,6 +16,15 @@ export const registerSchema = async (schema: string, registry: SchemaRegistry, r
   await registry.register(schema, address);
 
   return getSchemaUUID(schema, address);
+};
+
+export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
+  const receipt = await (await res).wait();
+  const event = receipt.events?.find((e) => e.event === 'Attested');
+  if (!event) {
+    throw new Error('Unable to process attestation event');
+  }
+  return event.args?.uuid;
 };
 
 export const expectAttestation = async (
@@ -54,16 +42,7 @@ export const expectAttestation = async (
     .connect(txSender)
     .attest(recipient, schema, expirationTime, refUUID, data, { value: options?.value });
 
-  const uuid = getUUID(
-    schema,
-    recipient,
-    txSender.address,
-    await eas.getTime(),
-    expirationTime,
-    refUUID,
-    data,
-    options?.bump ?? 0
-  );
+  const uuid = await getUUIDFromAttestTx(res);
 
   await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, uuid, schema);
 
