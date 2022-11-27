@@ -16,12 +16,13 @@ export const getUUID = (
   attester: string,
   time: number,
   expirationTime: number,
+  refUUID: string,
   data: string,
   bump: number
 ) =>
   solidityKeccak256(
-    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bytes', 'uint32'],
-    [schema, recipient, attester, time, expirationTime, data, bump]
+    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bytes32', 'bytes', 'uint32'],
+    [schema, recipient, attester, time, expirationTime, refUUID, data, bump]
   );
 
 interface Options {
@@ -59,6 +60,7 @@ export const expectAttestation = async (
     txSender.address,
     await eas.getTime(),
     expirationTime,
+    refUUID,
     data,
     options?.bump ?? 0
   );
