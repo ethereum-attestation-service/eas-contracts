@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectFailedRevocation, expectRevocation, getUUID, registerSchema } from '../helpers/EAS';
+import { expectFailedRevocation, expectRevocation, getUUIDFromAttestTx, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -45,16 +45,8 @@ describe('RevocationResolver', () => {
 
     schemaId = await registerSchema(schema, registry, resolver);
 
-    await eas.connect(sender).attest(recipient.address, schemaId, expirationTime, ZERO_BYTES32, data);
-    uuid = getUUID(
-      schemaId,
-      recipient.address,
-      sender.address,
-      await eas.getTime(),
-      expirationTime,
-      ZERO_BYTES32,
-      data,
-      0
+    uuid = await getUUIDFromAttestTx(
+      eas.connect(sender).attest(recipient.address, schemaId, expirationTime, ZERO_BYTES32, data)
     );
   });
 

@@ -1,57 +1,109 @@
 import { HARDHAT_CHAIN_ID } from '../../utils/Constants';
-import { Delegation } from '@ethereum-attestation-service/eas-sdk';
+import { Delegated, EIP712Request, Offchain, SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
+import { TypedDataSigner } from '@ethersproject/abstract-signer';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ecsign } from 'ethereumjs-util';
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber } from 'ethers';
+
+export const ATTEST_TYPED_SIGNATURE =
+  'Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)';
+export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 uuid,uint256 nonce)';
 
 export class EIP712Utils {
-  delegation: Delegation;
+  delegated: Delegated;
+  offchain: Offchain;
 
   constructor(contract: string | SignerWithAddress) {
     const contractAddress = typeof contract === 'string' ? contract : contract.address;
 
-    this.delegation = new Delegation({
+    const config = {
       address: contractAddress,
       version: '0.16',
       chainId: HARDHAT_CHAIN_ID
-    });
+    };
+
+    this.delegated = new Delegated(config);
+    this.offchain = new Offchain(config);
   }
 
-  async getAttestationRequest(
+  public async signDelegatedAttestation(
+    attester: TypedDataSigner,
     recipient: string | SignerWithAddress,
     schema: string,
-    expirationTime: BigNumberish,
+    expirationTime: number,
     refUUID: string,
     data: string,
-    nonce: BigNumber,
-    privateKey: Buffer
-  ) {
-    return this.delegation.getAttestationRequest(
+    nonce: BigNumber
+  ): Promise<EIP712Request> {
+    return this.delegated.signDelegatedAttestation(
       {
         recipient: typeof recipient === 'string' ? recipient : recipient.address,
         schema,
         expirationTime,
         refUUID,
         data: Buffer.from(data.slice(2), 'hex'),
-        nonce
+        nonce: nonce.toNumber()
       },
-      async (message) => {
-        const { v, r, s } = ecsign(message, privateKey);
-        return { v, r, s };
-      }
+      attester
     );
   }
 
-  async getRevocationRequest(uuid: string, nonce: BigNumber, privateKey: Buffer) {
-    return this.delegation.getRevocationRequest(
+  public async verifyDelegatedAttestationSignature(
+    attester: string | SignerWithAddress,
+    request: EIP712Request
+  ): Promise<boolean> {
+    return this.delegated.verifyDelegatedAttestationSignature(
+      typeof attester === 'string' ? attester : attester.address,
+      request
+    );
+  }
+
+  public async signDelegatedRevocation(
+    attester: TypedDataSigner,
+    uuid: string,
+    nonce: BigNumber
+  ): Promise<EIP712Request> {
+    return this.delegated.signDelegatedRevocation(
       {
         uuid,
-        nonce
+        nonce: nonce.toNumber()
       },
-      async (message) => {
-        const { v, r, s } = ecsign(message, privateKey);
-        return { v, r, s };
-      }
+      attester
     );
+  }
+
+  public async verifyDelegatedRevocationSignature(
+    attester: string | SignerWithAddress,
+    request: EIP712Request
+  ): Promise<boolean> {
+    return this.delegated.verifyDelegatedRevocationSignature(
+      typeof attester === 'string' ? attester : attester.address,
+      request
+    );
+  }
+
+  public async signOffchainAttestation(
+    attester: TypedDataSigner,
+    schema: string,
+    recipient: string | SignerWithAddress,
+    time: number,
+    expirationTime: number,
+    refUUID: string,
+    data: string
+  ): Promise<SignedOffchainAttestation> {
+    return this.offchain.signOffchainAttestation(
+      {
+        schema,
+        recipient: typeof recipient === 'string' ? recipient : recipient.address,
+        time,
+        expirationTime,
+        refUUID,
+        data
+      },
+      attester
+    );
+  }
+
+  public async verifyOffchainAttestation(attester: string, request: SignedOffchainAttestation): Promise<boolean> {
+    return this.offchain.verifyOffchainAttestationSignature(attester, request);
   }
 }

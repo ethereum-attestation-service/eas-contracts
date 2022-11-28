@@ -1,8 +1,9 @@
 import { EIP712Verifier } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
+import { ATTEST_TYPED_SIGNATURE, REVOKE_TYPED_SIGNATURE } from '../../test/helpers/EIP712Utils';
 import { MAINNET_CHAIN_ID } from '../../utils/Constants';
 import { DeployedContracts } from '../../utils/Deploy';
-import { ATTEST_TYPED_SIGNATURE, Delegation, REVOKE_TYPED_SIGNATURE } from '@ethereum-attestation-service/eas-sdk';
+import { Delegated } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
@@ -18,7 +19,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy a EIP712 verifier', async () => {
-    const delegation = new Delegation({
+    const delegation = new Delegated({
       address: verifier.address,
       version: await verifier.VERSION(),
       chainId: MAINNET_CHAIN_ID
