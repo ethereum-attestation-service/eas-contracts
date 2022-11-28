@@ -25,12 +25,14 @@ struct Attestation {
     address recipient;
     // The attester/sender of the attestation.
     address attester;
+    // Whether the attestation is revocable.
+    bool revocable;
     // Custom attestation data.
     bytes data;
 }
 
 /**
- * @title EAS - Ethereum Attestation Service interface
+ * @title EAS - Ethereum Attestation Service interface.
  */
 interface IEAS {
     /**
@@ -73,6 +75,7 @@ interface IEAS {
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
+     * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
      *
@@ -82,6 +85,7 @@ interface IEAS {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data
     ) external payable returns (bytes32);
@@ -92,6 +96,7 @@ interface IEAS {
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
+     * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
      * @param attester The attesting account.
@@ -105,6 +110,7 @@ interface IEAS {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data,
         address attester,

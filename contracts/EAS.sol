@@ -22,11 +22,12 @@ contract EAS is IEAS {
     error InvalidRevocation();
     error InvalidSchema();
     error InvalidVerifier();
+    error Irrevocable();
     error NotFound();
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.16";
+    string public constant VERSION = "0.17";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -77,10 +78,11 @@ contract EAS is IEAS {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data
     ) public payable virtual returns (bytes32) {
-        return _attest(recipient, schema, expirationTime, refUUID, data, msg.sender);
+        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, msg.sender);
     }
 
     /**
@@ -90,6 +92,7 @@ contract EAS is IEAS {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
@@ -97,9 +100,9 @@ contract EAS is IEAS {
         bytes32 r,
         bytes32 s
     ) public payable virtual returns (bytes32) {
-        _eip712Verifier.attest(recipient, schema, expirationTime, refUUID, data, attester, v, r, s);
+        _eip712Verifier.attest(recipient, schema, expirationTime, revocable, refUUID, data, attester, v, r, s);
 
-        return _attest(recipient, schema, expirationTime, refUUID, data, attester);
+        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, attester);
     }
 
     /**
@@ -138,6 +141,7 @@ contract EAS is IEAS {
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation (0 represents no expiration).
+     * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
      * @param attester The attesting account.
@@ -148,6 +152,7 @@ contract EAS is IEAS {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data,
         address attester
@@ -170,6 +175,7 @@ contract EAS is IEAS {
             revocationTime: 0,
             recipient: recipient,
             attester: attester,
+            revocable: revocable,
             data: data
         });
 
@@ -219,6 +225,10 @@ contract EAS is IEAS {
             revert AccessDenied();
         }
 
+        if (!attestation.revocable) {
+            revert Irrevocable();
+        }
+
         if (attestation.revocationTime != 0) {
             revert AlreadyRevoked();
         }
@@ -247,6 +257,7 @@ contract EAS is IEAS {
                     attestation.attester,
                     attestation.time,
                     attestation.expirationTime,
+                    attestation.revocable,
                     attestation.refUUID,
                     attestation.data,
                     bump

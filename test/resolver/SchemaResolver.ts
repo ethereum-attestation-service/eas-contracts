@@ -42,7 +42,7 @@ describe('SchemaResolver', () => {
     it('should be properly initialized', async () => {
       const resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
 
-      expect(await resolver.VERSION()).to.equal('0.16');
+      expect(await resolver.VERSION()).to.equal('0.17');
     });
   });
 
@@ -68,6 +68,7 @@ describe('SchemaResolver', () => {
             time: await latest(),
             expirationTime: 0,
             revocationTime: 0,
+            revocable: true,
             recipient: recipient.address,
             attester: sender.address,
             data: ZERO_BYTES
@@ -84,6 +85,7 @@ describe('SchemaResolver', () => {
             time: await latest(),
             expirationTime: 0,
             revocationTime: 0,
+            revocable: true,
             recipient: recipient.address,
             attester: sender.address,
             data: ZERO_BYTES
@@ -107,6 +109,7 @@ describe('SchemaResolver', () => {
           recipient.address,
           schemaId,
           expirationTime,
+          true,
           ZERO_BYTES32,
           data,
           'NotPayable',

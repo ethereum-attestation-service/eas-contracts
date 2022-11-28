@@ -32,6 +32,7 @@ export const expectAttestation = async (
   recipient: string,
   schema: string,
   expirationTime: number,
+  revocable: boolean,
   refUUID: string,
   data: any,
   options?: Options
@@ -40,7 +41,7 @@ export const expectAttestation = async (
 
   const res = await eas
     .connect(txSender)
-    .attest(recipient, schema, expirationTime, refUUID, data, { value: options?.value });
+    .attest(recipient, schema, expirationTime, revocable, refUUID, data, { value: options?.value });
 
   const uuid = await getUUIDFromAttestTx(res);
 
@@ -54,6 +55,7 @@ export const expectAttestation = async (
   expect(attestation.time).to.equal(await eas.getTime());
   expect(attestation.expirationTime).to.equal(expirationTime);
   expect(attestation.revocationTime).to.equal(0);
+  expect(attestation.revocable).to.equal(revocable);
   expect(attestation.refUUID).to.equal(refUUID);
   expect(attestation.data).to.equal(data);
 
@@ -65,6 +67,7 @@ export const expectFailedAttestation = async (
   recipient: string,
   as: string,
   expirationTime: number,
+  revocable: boolean,
   refUUID: string,
   data: any,
   err: string,
@@ -73,7 +76,7 @@ export const expectFailedAttestation = async (
   const txSender = options?.from || (await ethers.getSigners())[0];
 
   await expect(
-    eas.connect(txSender).attest(recipient, as, expirationTime, refUUID, data, { value: options?.value })
+    eas.connect(txSender).attest(recipient, as, expirationTime, revocable, refUUID, data, { value: options?.value })
   ).to.be.revertedWith(err);
 };
 
