@@ -59,7 +59,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.16');
+      expect(await eas.VERSION()).to.equal('0.17');
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
       expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
@@ -91,6 +91,7 @@ describe('EAS', () => {
           recipient: string,
           schema: string,
           expirationTime: number,
+          revocable: boolean,
           refUUID: string,
           data: string,
           options?: Options
@@ -102,7 +103,7 @@ describe('EAS', () => {
           switch (signatureType) {
             case SignatureType.Direct: {
               uuid = await getUUIDFromAttestTx(
-                eas.connect(txSender).attest(recipient, schema, expirationTime, refUUID, data, {
+                eas.connect(txSender).attest(recipient, schema, expirationTime, revocable, refUUID, data, {
                   value: options?.value
                 })
               );
@@ -116,6 +117,7 @@ describe('EAS', () => {
                 recipient,
                 schema,
                 expirationTime,
+                revocable,
                 refUUID,
                 data,
                 await verifier.getNonce(txSender.address)
@@ -130,6 +132,7 @@ describe('EAS', () => {
                     recipient,
                     schema,
                     expirationTime,
+                    revocable,
                     refUUID,
                     data,
                     txSender.address,
@@ -148,7 +151,7 @@ describe('EAS', () => {
             case SignatureType.Offchain: {
               const now = await latest();
 
-              uuid = getOffchainUUID(schema, recipient, now, expirationTime, refUUID, data);
+              uuid = getOffchainUUID(schema, recipient, now, expirationTime, revocable, refUUID, data);
 
               const request = await eip712Utils.signOffchainAttestation(
                 txSender,
@@ -156,6 +159,7 @@ describe('EAS', () => {
                 recipient,
                 now,
                 expirationTime,
+                revocable,
                 refUUID,
                 data
               );
@@ -177,6 +181,7 @@ describe('EAS', () => {
           expect(attestation.time).to.equal(await eas.getTime());
           expect(attestation.expirationTime).to.equal(expirationTime);
           expect(attestation.revocationTime).to.equal(0);
+          expect(attestation.revocable).to.equal(revocable);
           expect(attestation.refUUID).to.equal(refUUID);
           expect(attestation.data).to.equal(data);
 
@@ -187,6 +192,7 @@ describe('EAS', () => {
           recipient: string,
           schema: string,
           expirationTime: number,
+          revocable: boolean,
           refUUID: string,
           data: any,
           err: string,
@@ -199,7 +205,7 @@ describe('EAS', () => {
               await expect(
                 eas
                   .connect(txSender)
-                  .attest(recipient, schema, expirationTime, refUUID, data, { value: options?.value })
+                  .attest(recipient, schema, expirationTime, revocable, refUUID, data, { value: options?.value })
               ).to.be.revertedWith(err);
 
               break;
@@ -211,6 +217,7 @@ describe('EAS', () => {
                 recipient,
                 schema,
                 expirationTime,
+                revocable,
                 refUUID,
                 data,
                 await verifier.getNonce(txSender.address)
@@ -225,6 +232,7 @@ describe('EAS', () => {
                     recipient,
                     schema,
                     expirationTime,
+                    revocable,
                     refUUID,
                     data,
                     txSender.address,
@@ -245,6 +253,7 @@ describe('EAS', () => {
             recipient.address,
             formatBytes32String('BAD'),
             expirationTime,
+            true,
             ZERO_BYTES32,
             data,
             'InvalidSchema'
@@ -271,6 +280,7 @@ describe('EAS', () => {
               recipient.address,
               schema1Id,
               expired,
+              true,
               ZERO_BYTES32,
               data,
               'InvalidExpirationTime'
@@ -278,50 +288,89 @@ describe('EAS', () => {
           });
 
           it('should allow attestation to an empty recipient', async () => {
-            await expectAttestation(ZERO_ADDRESS, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await expectAttestation(ZERO_ADDRESS, schema1Id, expirationTime, true, ZERO_BYTES32, data);
           });
 
           it('should allow self attestations', async () => {
-            await expectAttestation(sender.address, schema2Id, expirationTime, ZERO_BYTES32, data, { from: sender });
+            await expectAttestation(sender.address, schema2Id, expirationTime, true, ZERO_BYTES32, data, {
+              from: sender
+            });
           });
 
           it('should allow multiple attestations', async () => {
-            await expectAttestation(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-            await expectAttestation(recipient2.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
+            await expectAttestation(recipient2.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
           });
 
           it('should allow multiple attestations to the same schema', async () => {
-            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 0 });
-            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 1 });
-            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, { bump: 2 });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+              bump: 0
+            });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+              bump: 1
+            });
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+              bump: 2
+            });
           });
 
           it('should allow attestation without expiration time', async () => {
-            await expectAttestation(recipient.address, schema1Id, 0, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, 0, true, ZERO_BYTES32, data);
           });
 
           it('should allow attestation without any data', async () => {
-            await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, ZERO_BYTES);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, ZERO_BYTES);
           });
 
           it('should store referenced attestation', async () => {
-            const uuid = await eas.callStatic.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
-            await eas.attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data);
+            const uuid = await eas.callStatic.attest(
+              recipient.address,
+              schema1Id,
+              expirationTime,
+              true,
+              ZERO_BYTES32,
+              data
+            );
+            await eas.attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
 
-            await expectAttestation(recipient.address, schema3Id, expirationTime, uuid, data);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, uuid, data);
           });
 
           if (signatureType !== SignatureType.Offchain) {
             it('should generate unique UUIDs for similar attestations', async () => {
-              const uuid1 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
-                bump: 0
-              });
-              const uuid2 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
-                bump: 1
-              });
-              const uuid3 = await expectAttestation(recipient.address, schema3Id, expirationTime, ZERO_BYTES32, data, {
-                bump: 2
-              });
+              const uuid1 = await expectAttestation(
+                recipient.address,
+                schema3Id,
+                expirationTime,
+                true,
+                ZERO_BYTES32,
+                data,
+                {
+                  bump: 0
+                }
+              );
+              const uuid2 = await expectAttestation(
+                recipient.address,
+                schema3Id,
+                expirationTime,
+                true,
+                ZERO_BYTES32,
+                data,
+                {
+                  bump: 1
+                }
+              );
+              const uuid3 = await expectAttestation(
+                recipient.address,
+                schema3Id,
+                expirationTime,
+                true,
+                ZERO_BYTES32,
+                data,
+                {
+                  bump: 2
+                }
+              );
               expect(uuid1).not.to.equal(uuid2);
               expect(uuid2).not.to.equal(uuid3);
             });
@@ -332,6 +381,7 @@ describe('EAS', () => {
               recipient.address,
               schema3Id,
               expirationTime,
+              true,
               formatBytes32String('INVALID'),
               data,
               'NotFound'
@@ -347,6 +397,7 @@ describe('EAS', () => {
           recipient.address,
           formatBytes32String('BAD'),
           expirationTime,
+          true,
           ZERO_BYTES32,
           ZERO_BYTES32,
           sender.address,
@@ -436,7 +487,7 @@ describe('EAS', () => {
 
         beforeEach(async () => {
           uuid = await getUUIDFromAttestTx(
-            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, ZERO_BYTES32, data)
+            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data)
           );
         });
 
@@ -455,6 +506,13 @@ describe('EAS', () => {
         it('should revert when revoking an already revoked attestation', async () => {
           await expectRevocation(uuid);
           await expectFailedRevocation(uuid, 'AlreadyRevoked');
+        });
+
+        it('should revert when revoking an irrevocable attestation', async () => {
+          const uuid = await getUUIDFromAttestTx(
+            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data)
+          );
+          await expectFailedRevocation(uuid, 'Irrevocable');
         });
       });
     }

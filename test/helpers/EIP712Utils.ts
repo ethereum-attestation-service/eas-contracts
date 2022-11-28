@@ -17,7 +17,7 @@ export class EIP712Utils {
 
     const config = {
       address: contractAddress,
-      version: '0.16',
+      version: '0.17',
       chainId: HARDHAT_CHAIN_ID
     };
 
@@ -30,6 +30,7 @@ export class EIP712Utils {
     recipient: string | SignerWithAddress,
     schema: string,
     expirationTime: number,
+    revocable: boolean,
     refUUID: string,
     data: string,
     nonce: BigNumber
@@ -39,6 +40,7 @@ export class EIP712Utils {
         recipient: typeof recipient === 'string' ? recipient : recipient.address,
         schema,
         expirationTime,
+        revocable,
         refUUID,
         data: Buffer.from(data.slice(2), 'hex'),
         nonce: nonce.toNumber()
@@ -87,6 +89,7 @@ export class EIP712Utils {
     recipient: string | SignerWithAddress,
     time: number,
     expirationTime: number,
+    revocable: boolean,
     refUUID: string,
     data: string
   ): Promise<SignedOffchainAttestation> {
@@ -96,6 +99,7 @@ export class EIP712Utils {
         recipient: typeof recipient === 'string' ? recipient : recipient.address,
         time,
         expirationTime,
+        revocable,
         refUUID,
         data
       },

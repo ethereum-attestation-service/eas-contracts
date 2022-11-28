@@ -26,6 +26,7 @@ interface IEIP712Verifier {
      * @param recipient The recipient of the attestation.
      * @param schema The UUID of the schema.
      * @param expirationTime The expiration time of the attestation.
+     * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
      * @param attester The attesting account.
@@ -37,6 +38,7 @@ interface IEIP712Verifier {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
@@ -54,11 +56,5 @@ interface IEIP712Verifier {
      * @param r The x-coordinate of the nonce R.
      * @param s The signature data.
      */
-    function revoke(
-        bytes32 uuid,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function revoke(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) external;
 }

@@ -49,6 +49,7 @@ describe('DataResolver', () => {
       recipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       '0x1234',
       'InvalidAttestation',
@@ -60,6 +61,7 @@ describe('DataResolver', () => {
       recipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       '0x02',
       'InvalidAttestation',
@@ -68,9 +70,18 @@ describe('DataResolver', () => {
   });
 
   it('should allow attesting with correct data', async () => {
-    const { uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, '0x00', {
-      from: sender
-    });
+    const { uuid } = await expectAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      true,
+      ZERO_BYTES32,
+      '0x00',
+      {
+        from: sender
+      }
+    );
 
     await expectRevocation(eas, uuid, { from: sender });
 
@@ -79,6 +90,7 @@ describe('DataResolver', () => {
       recipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       '0x01',
       {

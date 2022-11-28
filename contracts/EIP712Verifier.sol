@@ -14,11 +14,11 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     error InvalidSignature();
 
     // The version of the contract.
-    string public constant VERSION = "0.16";
+    string public constant VERSION = "0.17";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(address recipient,bytes32 schema,uint32 expirationTime,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 private constant ATTEST_TYPEHASH = 0xfd4dc6e2693a62bd64d4a19b3cff766012b6aed3bb661a4b20ffcf8236431150;
+    // keccak256("Attest(address recipient,bytes32 schema,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
+    bytes32 private constant ATTEST_TYPEHASH = 0x227c2175d9fc17b0f2b4bea1a33eaab23cef0d6a13022dd0cd9d60facfb0d6d7;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
     // keccak256("Revoke(bytes32 uuid,uint256 nonce)").
@@ -67,6 +67,7 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
         address recipient,
         bytes32 schema,
         uint32 expirationTime,
+        bool revocable,
         bytes32 refUUID,
         bytes calldata data,
         address attester,
@@ -80,7 +81,18 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
         }
 
         bytes32 digest = _hashTypedDataV4(
-            keccak256(abi.encode(ATTEST_TYPEHASH, recipient, schema, expirationTime, refUUID, keccak256(data), nonce))
+            keccak256(
+                abi.encode(
+                    ATTEST_TYPEHASH,
+                    recipient,
+                    schema,
+                    expirationTime,
+                    revocable,
+                    refUUID,
+                    keccak256(data),
+                    nonce
+                )
+            )
         );
 
         if (ECDSA.recover(digest, v, r, s) != attester) {
