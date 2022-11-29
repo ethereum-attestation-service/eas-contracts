@@ -52,6 +52,7 @@ describe('ExpirationTimeResolver', () => {
       recipient.address,
       schemaId,
       validAfter - duration.days(1),
+      true,
       ZERO_BYTES32,
       data,
       'InvalidAttestation',
@@ -65,6 +66,7 @@ describe('ExpirationTimeResolver', () => {
       recipient.address,
       schemaId,
       validAfter + duration.seconds(1),
+      true,
       ZERO_BYTES32,
       data,
       {
