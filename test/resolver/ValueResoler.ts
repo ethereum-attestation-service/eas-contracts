@@ -52,6 +52,7 @@ describe('ValueResolver', () => {
       recipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       data,
       'InvalidAttestation',
@@ -60,10 +61,19 @@ describe('ValueResolver', () => {
   });
 
   it('should allow attesting with the correct value', async () => {
-    const { uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
-      from: sender,
-      value: targetValue
-    });
+    const { uuid } = await expectAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      true,
+      ZERO_BYTES32,
+      data,
+      {
+        from: sender,
+        value: targetValue
+      }
+    );
 
     await expectRevocation(eas, uuid, { from: sender });
   });

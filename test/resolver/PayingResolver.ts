@@ -58,9 +58,18 @@ describe('PayingResolver', () => {
     const prevResolverBalance = await getBalance(resolver.address);
     const prevAttesterBalance = await getBalance(sender.address);
 
-    const { res } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
-      from: sender
-    });
+    const { res } = await expectAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      true,
+      ZERO_BYTES32,
+      data,
+      {
+        from: sender
+      }
+    );
     const transactionCost = await getTransactionCost(res);
 
     expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.sub(incentive));
@@ -71,7 +80,7 @@ describe('PayingResolver', () => {
     let uuid: string;
 
     beforeEach(async () => {
-      ({ uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, ZERO_BYTES32, data, {
+      ({ uuid } = await expectAttestation(eas, recipient.address, schemaId, expirationTime, true, ZERO_BYTES32, data, {
         from: sender
       }));
     });

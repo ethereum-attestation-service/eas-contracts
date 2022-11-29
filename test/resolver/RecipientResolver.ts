@@ -54,6 +54,7 @@ describe('RecipientResolver', () => {
       recipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       data,
       'InvalidAttestation',
@@ -67,6 +68,7 @@ describe('RecipientResolver', () => {
       targetRecipient.address,
       schemaId,
       expirationTime,
+      true,
       ZERO_BYTES32,
       data,
       {
