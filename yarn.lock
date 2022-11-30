@@ -279,21 +279,21 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@ethereum-attestation-service/eas-contracts@^0.14.8":
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/eas-contracts/-/eas-contracts-0.14.8.tgz#65259d27cf2fcb655f96e896e2202697794c3e23"
-  integrity sha512-LPyuFmjnRknxOFoHwWkxVF0uW4lTUvoxfwnH07jQZ8SuFPftMhgdijA6J5saFUupqJHz8xPFSBYDhWNoB931HA==
+"@ethereum-attestation-service/eas-contracts@^0.17.1":
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/@ethereum-attestation-service/eas-contracts/-/eas-contracts-0.17.1.tgz#4eec937d74901da8a98c5090a754302f8483ee0a"
+  integrity sha512-Z1iCRxqepC3k29UCzOfiVsbRM2iSvofYYGNiw0f1+swXDptE9XAbnjERFRfwp3Eb5CfJ02BbXRiTayz6oJTc6A==
   dependencies:
-    "@typechain/ethers-v5" "^10.1.0"
-    "@typechain/hardhat" "^6.1.3"
-    hardhat "2.12.0"
-    typechain "^8.1.0"
+    "@typechain/ethers-v5" "^10.1.1"
+    "@typechain/hardhat" "^6.1.4"
+    hardhat "2.12.2"
+    typechain "^8.1.1"
 
-"@ethereum-attestation-service/eas-sdk@ethereum-attestation-service/eas-sdk#revocable":
-  version "0.17.0"
-  resolved "https://codeload.github.com/ethereum-attestation-service/eas-sdk/tar.gz/9dd09f49bec1ebfa988348af8226fc78b7198345"
+"@ethereum-attestation-service/eas-sdk@ethereum-attestation-service/eas-sdk#revocable-schema":
+  version "0.18.0"
+  resolved "https://codeload.github.com/ethereum-attestation-service/eas-sdk/tar.gz/d207c2c25d6e74725a746c81e8e46144593fc181"
   dependencies:
-    "@ethereum-attestation-service/eas-contracts" "^0.14.8"
+    "@ethereum-attestation-service/eas-contracts" "^0.17.1"
     ethers "^5.7.2"
     multiformats "9.9.0"
 
@@ -1452,7 +1452,7 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@typechain/ethers-v5@^10.1.0", "@typechain/ethers-v5@^10.1.1":
+"@typechain/ethers-v5@^10.1.1":
   version "10.1.1"
   resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-10.1.1.tgz#fdb527d8854129cea5f139d76c6c6e1c9bb040ec"
   integrity sha512-o6nffJBxwmeX1ZiZpdnP/tqGd/7M7iYvQC88ZXaFFoyAGh7eYncynzVjOJV0XmaKzAc6puqyqZrnva+gJbk4sw==
@@ -1467,7 +1467,7 @@
   dependencies:
     ethers "^5.0.2"
 
-"@typechain/hardhat@^6.1.3", "@typechain/hardhat@^6.1.4":
+"@typechain/hardhat@^6.1.4":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-6.1.4.tgz#da930bf17bdae5e0996b86d37992c6c58b8a49c8"
   integrity sha512-S8k5d1Rjc+plwKpkorlifmh72M7Ki0XNUOVVLtdbcA/vLaEkuqZSJFdddpBgS5QxiJP+6CbRa/yO6EVTE2+fMQ==
@@ -6144,62 +6144,6 @@ hardhat-gas-reporter@^1.0.9:
     eth-gas-reporter "^0.2.25"
     sha1 "^1.1.1"
 
-hardhat@2.12.0:
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.12.0.tgz#51e59f1ff4991bcb66d1a380ea807e6c15fcac34"
-  integrity sha512-mNJFbVG479HwOzxiaLxobyvED2M1aEAuPPYhEo1+88yicMDSTrU2JIS7vV+V0GSNQKaDoiHCmV6bcKjiljT/dQ==
-  dependencies:
-    "@ethersproject/abi" "^5.1.2"
-    "@metamask/eth-sig-util" "^4.0.0"
-    "@nomicfoundation/ethereumjs-block" "^4.0.0"
-    "@nomicfoundation/ethereumjs-blockchain" "^6.0.0"
-    "@nomicfoundation/ethereumjs-common" "^3.0.0"
-    "@nomicfoundation/ethereumjs-evm" "^1.0.0"
-    "@nomicfoundation/ethereumjs-rlp" "^4.0.0"
-    "@nomicfoundation/ethereumjs-statemanager" "^1.0.0"
-    "@nomicfoundation/ethereumjs-trie" "^5.0.0"
-    "@nomicfoundation/ethereumjs-tx" "^4.0.0"
-    "@nomicfoundation/ethereumjs-util" "^8.0.0"
-    "@nomicfoundation/ethereumjs-vm" "^6.0.0"
-    "@nomicfoundation/solidity-analyzer" "^0.1.0"
-    "@sentry/node" "^5.18.1"
-    "@types/bn.js" "^5.1.0"
-    "@types/lru-cache" "^5.1.0"
-    abort-controller "^3.0.0"
-    adm-zip "^0.4.16"
-    aggregate-error "^3.0.0"
-    ansi-escapes "^4.3.0"
-    chalk "^2.4.2"
-    chokidar "^3.4.0"
-    ci-info "^2.0.0"
-    debug "^4.1.1"
-    enquirer "^2.3.0"
-    env-paths "^2.2.0"
-    ethereum-cryptography "^1.0.3"
-    ethereumjs-abi "^0.6.8"
-    find-up "^2.1.0"
-    fp-ts "1.19.3"
-    fs-extra "^7.0.1"
-    glob "7.2.0"
-    immutable "^4.0.0-rc.12"
-    io-ts "1.10.4"
-    keccak "^3.0.2"
-    lodash "^4.17.11"
-    mnemonist "^0.38.0"
-    mocha "^10.0.0"
-    p-map "^4.0.0"
-    qs "^6.7.0"
-    raw-body "^2.4.1"
-    resolve "1.17.0"
-    semver "^6.3.0"
-    solc "0.7.3"
-    source-map-support "^0.5.13"
-    stacktrace-parser "^0.1.10"
-    tsort "0.0.1"
-    undici "^5.4.0"
-    uuid "^8.3.2"
-    ws "^7.4.6"
-
 hardhat@2.12.2:
   version "2.12.2"
   resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.12.2.tgz#6ae985007b20c1f381c6573799d66c1438c4c802"
@@ -10810,7 +10754,7 @@ typechain@^3.0.0:
     ts-essentials "^6.0.3"
     ts-generator "^0.1.1"
 
-typechain@^8.1.0, typechain@^8.1.1:
+typechain@^8.1.1:
   version "8.1.1"
   resolved "https://registry.yarnpkg.com/typechain/-/typechain-8.1.1.tgz#9c2e8012c2c4c586536fc18402dcd7034c4ff0bd"
   integrity sha512-uF/sUvnXTOVF2FHKhQYnxHk4su4JjZR8vr4mA2mBaRwHTbwh0jIlqARz9XJr1tA0l7afJGvEa1dTSi4zt039LQ==

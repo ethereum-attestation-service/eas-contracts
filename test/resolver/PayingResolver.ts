@@ -51,7 +51,7 @@ describe('PayingResolver', () => {
 
     await sender.sendTransaction({ to: resolver.address, value: incentive * 2 });
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should incentivize attesters', async () => {

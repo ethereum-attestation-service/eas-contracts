@@ -43,7 +43,7 @@ describe('RevocationResolver', () => {
     resolver = await Contracts.RevocationResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
 
     uuid = await getUUIDFromAttestTx(
       eas.connect(sender).attest(recipient.address, schemaId, expirationTime, true, ZERO_BYTES32, data)

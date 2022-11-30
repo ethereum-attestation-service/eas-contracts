@@ -233,9 +233,14 @@ contract EAS is IEAS {
             revert AlreadyRevoked();
         }
 
+        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(attestation.schema);
+        if (!schemaRecord.revocable) {
+            revert Irrevocable();
+        }
+
         attestation.revocationTime = _time();
 
-        _resolveAttestation(_schemaRegistry.getSchema(attestation.schema), attestation, true);
+        _resolveAttestation(schemaRecord, attestation, true);
 
         emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }

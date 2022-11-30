@@ -32,7 +32,7 @@ describe('AttestationResolver', () => {
   const data = '0x1234';
 
   const schema2 = 'S2';
-  const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
+  const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
   let uuid: string;
 
   before(async () => {
@@ -50,7 +50,7 @@ describe('AttestationResolver', () => {
 
     await eas.setTime(await latest());
 
-    await registerSchema(schema2, registry, ZERO_ADDRESS);
+    await registerSchema(schema2, registry, ZERO_ADDRESS, true);
 
     uuid = await getUUIDFromAttestTx(
       eas.attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data)
@@ -59,7 +59,7 @@ describe('AttestationResolver', () => {
     resolver = await Contracts.AttestationResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting to a non-existing attestation', async () => {
