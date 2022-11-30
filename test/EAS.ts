@@ -264,14 +264,14 @@ describe('EAS', () => {
           const schema1 = 'S1';
           const schema2 = 'S2';
           const schema3 = 'S3';
-          const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
-          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS);
-          const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS);
+          const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
+          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
+          const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS, true);
 
           beforeEach(async () => {
-            await registry.register(schema1, ZERO_ADDRESS);
-            await registry.register(schema2, ZERO_ADDRESS);
-            await registry.register(schema3, ZERO_ADDRESS);
+            await registry.register(schema1, ZERO_ADDRESS, true);
+            await registry.register(schema2, ZERO_ADDRESS, true);
+            await registry.register(schema3, ZERO_ADDRESS, true);
           });
 
           it('should revert when attesting with passed expiration time', async () => {
@@ -411,14 +411,14 @@ describe('EAS', () => {
 
   describe('revocation', () => {
     const schema1 = 'S1';
-    const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS);
+    const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
     let uuid: string;
 
     let expirationTime: number;
     const data = '0x1234';
 
     beforeEach(async () => {
-      await registry.register(schema1, ZERO_ADDRESS);
+      await registry.register(schema1, ZERO_ADDRESS, true);
 
       expirationTime = (await eas.getTime()) + duration.days(30);
     });
@@ -508,11 +508,33 @@ describe('EAS', () => {
           await expectFailedRevocation(uuid, 'AlreadyRevoked');
         });
 
-        it('should revert when revoking an irrevocable attestation', async () => {
-          const uuid = await getUUIDFromAttestTx(
-            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data)
-          );
-          await expectFailedRevocation(uuid, 'Irrevocable');
+        context('with an irrevocable attestation', () => {
+          beforeEach(async () => {
+            uuid = await getUUIDFromAttestTx(
+              eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data)
+            );
+          });
+
+          it('should revert when revoking', async () => {
+            await expectFailedRevocation(uuid, 'Irrevocable');
+          });
+        });
+
+        context('with an irrevocable schema', () => {
+          const schema2 = 'S2';
+          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, false);
+
+          beforeEach(async () => {
+            await registry.register(schema2, ZERO_ADDRESS, false);
+
+            uuid = await getUUIDFromAttestTx(
+              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data)
+            );
+          });
+
+          it('should revert when revoking', async () => {
+            await expectFailedRevocation(uuid, 'Irrevocable');
+          });
         });
       });
     }

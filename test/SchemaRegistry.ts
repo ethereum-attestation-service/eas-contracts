@@ -33,13 +33,13 @@ describe('SchemaRegistry', () => {
   });
 
   describe('registration', () => {
-    const testRegister = async (schema: string, resolver: string | SignerWithAddress) => {
+    const testRegister = async (schema: string, resolver: string | SignerWithAddress, revocable: boolean) => {
       const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
 
-      const uuid = getSchemaUUID(schema, resolverAddress);
+      const uuid = getSchemaUUID(schema, resolverAddress, revocable);
 
-      const retUUID = await registry.callStatic.register(schema, resolverAddress);
-      const res = await registry.register(schema, resolverAddress);
+      const retUUID = await registry.callStatic.register(schema, resolverAddress, revocable);
+      const res = await registry.register(schema, resolverAddress, revocable);
       expect(retUUID).to.equal(uuid);
       await expect(res).to.emit(registry, 'Registered').withArgs(uuid, sender.address);
 
@@ -47,23 +47,29 @@ describe('SchemaRegistry', () => {
       expect(schemaRecord.uuid).to.equal(uuid);
       expect(schemaRecord.schema).to.equal(schema);
       expect(schemaRecord.resolver).to.equal(resolverAddress);
+      expect(schemaRecord.revocable).to.equal(revocable);
     };
 
-    it('should allow to register an schema without a schema', async () => {
-      await testRegister(ZERO_BYTES, accounts[3]);
+    it('should allow to register a schema', async () => {
+      await testRegister('SC1', accounts[3], true);
+      await testRegister('SC2', accounts[3], false);
     });
 
-    it('should allow to register an schema without a resolver', async () => {
-      await testRegister('0x1234', ZERO_ADDRESS);
+    it('should allow to register a schema without a schema', async () => {
+      await testRegister(ZERO_BYTES, accounts[3], true);
     });
 
-    it('should allow to register an schema without neither a schema or a resolver', async () => {
-      await testRegister(ZERO_BYTES, ZERO_ADDRESS);
+    it('should allow to register a schema without a resolver', async () => {
+      await testRegister('0x1234', ZERO_ADDRESS, true);
+    });
+
+    it('should allow to register a schema without neither a schema or a resolver', async () => {
+      await testRegister(ZERO_BYTES, ZERO_ADDRESS, true);
     });
 
     it('should not allow to register the same schema and resolver twice', async () => {
-      await testRegister('0x1234', ZERO_ADDRESS);
-      await expect(testRegister('0x1234', ZERO_ADDRESS)).to.be.revertedWith('AlreadyExists');
+      await testRegister('0x1234', ZERO_ADDRESS, true);
+      await expect(testRegister('0x1234', ZERO_ADDRESS, true)).to.be.revertedWith('AlreadyExists');
     });
   });
 
@@ -72,13 +78,14 @@ describe('SchemaRegistry', () => {
       const schema = '0x1234';
       const resolver = accounts[5];
 
-      await registry.register(schema, resolver.address);
+      await registry.register(schema, resolver.address, true);
 
-      const uuid = getSchemaUUID(schema, resolver.address);
+      const uuid = getSchemaUUID(schema, resolver.address, true);
       const schemaRecord = await registry.getSchema(uuid);
       expect(schemaRecord.uuid).to.equal(uuid);
       expect(schemaRecord.schema).to.equal(schema);
       expect(schemaRecord.resolver).to.equal(resolver.address);
+      expect(schemaRecord.revocable).to.equal(true);
     });
 
     it('should return an empty schema given non-existing id', async () => {
@@ -86,6 +93,7 @@ describe('SchemaRegistry', () => {
       expect(schemaRecord.uuid).to.equal(ZERO_BYTES32);
       expect(schemaRecord.schema).to.equal('');
       expect(schemaRecord.resolver).to.equal(ZERO_ADDRESS);
+      expect(schemaRecord.revocable).to.equal(false);
     });
   });
 });

@@ -1,5 +1,13 @@
 import { HARDHAT_CHAIN_ID } from '../../utils/Constants';
-import { Delegated, EIP712Request, Offchain, SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
+import {
+  Delegated,
+  EIP712AttestationParams,
+  EIP712MessageTypes,
+  EIP712Request,
+  EIP712RevocationParams,
+  Offchain,
+  SignedOffchainAttestation
+} from '@ethereum-attestation-service/eas-sdk';
 import { TypedDataSigner } from '@ethersproject/abstract-signer';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber } from 'ethers';
@@ -34,7 +42,7 @@ export class EIP712Utils {
     refUUID: string,
     data: string,
     nonce: BigNumber
-  ): Promise<EIP712Request> {
+  ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     return this.delegated.signDelegatedAttestation(
       {
         recipient: typeof recipient === 'string' ? recipient : recipient.address,
@@ -51,7 +59,7 @@ export class EIP712Utils {
 
   public async verifyDelegatedAttestationSignature(
     attester: string | SignerWithAddress,
-    request: EIP712Request
+    request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
   ): Promise<boolean> {
     return this.delegated.verifyDelegatedAttestationSignature(
       typeof attester === 'string' ? attester : attester.address,
@@ -63,7 +71,7 @@ export class EIP712Utils {
     attester: TypedDataSigner,
     uuid: string,
     nonce: BigNumber
-  ): Promise<EIP712Request> {
+  ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     return this.delegated.signDelegatedRevocation(
       {
         uuid,
@@ -75,7 +83,7 @@ export class EIP712Utils {
 
   public async verifyDelegatedRevocationSignature(
     attester: string | SignerWithAddress,
-    request: EIP712Request
+    request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
   ): Promise<boolean> {
     return this.delegated.verifyDelegatedRevocationSignature(
       typeof attester === 'string' ? attester : attester.address,
