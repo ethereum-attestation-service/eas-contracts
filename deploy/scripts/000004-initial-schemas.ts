@@ -28,7 +28,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     const res = await execute({
       name: InstanceName.SchemaRegistry,
       methodName: 'register',
-      args: [schema, ZERO_ADDRESS],
+      args: [schema, ZERO_ADDRESS, true],
       from: deployer
     });
 
