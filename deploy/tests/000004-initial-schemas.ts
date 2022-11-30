@@ -15,7 +15,7 @@ describeDeployment(__filename, () => {
 
   it('should register initial schemas', async () => {
     for (const schema of INITIAL_SCHEMAS) {
-      const uuid = getSchemaUUID(schema, ZERO_ADDRESS);
+      const uuid = getSchemaUUID(schema, ZERO_ADDRESS, true);
       const schemaRecord = await registry.getSchema(uuid);
 
       expect(schemaRecord.uuid).to.equal(uuid);
