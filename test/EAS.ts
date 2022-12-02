@@ -549,7 +549,7 @@ describe('EAS', () => {
             await registry.register(schema2, ZERO_ADDRESS, false);
 
             uuid = await getUUIDFromAttestTx(
-              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data)
+              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, false, ZERO_BYTES32, data)
             );
           });
 
