@@ -166,6 +166,10 @@ contract EAS is IEAS {
             revert InvalidSchema();
         }
 
+        if (!schemaRecord.revocable && revocable) {
+            revert Irrevocable();
+        }
+
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
             schema: schema,

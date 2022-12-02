@@ -388,6 +388,27 @@ describe('EAS', () => {
             );
           });
         });
+
+        context('with an irrevocable schema', () => {
+          const schema = 'S2';
+          const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, false);
+
+          beforeEach(async () => {
+            await registry.register(schema, ZERO_ADDRESS, false);
+          });
+
+          it('should revert when attempting make a revocable attestation', async () => {
+            await expectFailedAttestation(
+              recipient.address,
+              schemaId,
+              expirationTime,
+              true,
+              ZERO_BYTES32,
+              data,
+              'Irrevocable'
+            );
+          });
+        });
       });
     }
 
