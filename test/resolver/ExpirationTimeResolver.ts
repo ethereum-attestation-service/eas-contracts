@@ -43,7 +43,7 @@ describe('ExpirationTimeResolver', () => {
     const resolver = await Contracts.ExpirationTimeResolver.deploy(eas.address, validAfter);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting with a wrong expiration time', async () => {

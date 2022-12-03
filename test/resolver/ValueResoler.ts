@@ -43,7 +43,7 @@ describe('ValueResolver', () => {
     const resolver = await Contracts.ValueResolver.deploy(eas.address, targetValue);
     expect(await resolver.isPayable()).to.be.true;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting with the wrong value', async () => {

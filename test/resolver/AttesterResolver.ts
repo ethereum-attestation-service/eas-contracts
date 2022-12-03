@@ -46,7 +46,7 @@ describe('AttesterResolver', () => {
     const resolver = await Contracts.AttesterResolver.deploy(eas.address, targetSender.address);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting to the wrong attester', async () => {

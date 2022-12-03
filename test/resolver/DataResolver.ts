@@ -40,7 +40,7 @@ describe('DataResolver', () => {
     const resolver = await Contracts.DataResolver.deploy(eas.address);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting with wrong data', async () => {
