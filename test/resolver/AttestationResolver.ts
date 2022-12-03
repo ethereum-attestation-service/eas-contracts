@@ -5,12 +5,12 @@ import {
   expectAttestation,
   expectFailedAttestation,
   expectRevocation,
+  getSchemaUUID,
   getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { Wallet } from 'ethers';
