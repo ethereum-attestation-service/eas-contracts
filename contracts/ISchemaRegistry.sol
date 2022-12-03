@@ -12,6 +12,8 @@ struct SchemaRecord {
     bytes32 uuid;
     // Optional schema resolver.
     ISchemaResolver resolver;
+    // Whether the schema allows revocations explicitly.
+    bool revocable;
     // Custom specification of the schema (e.g., an ABI).
     string schema;
 }
@@ -33,10 +35,11 @@ interface ISchemaRegistry {
      *
      * @param schema The schema data schema.
      * @param resolver An optional schema resolver.
+     * @param revocable Whether the schema allows revocations explicitly.
      *
      * @return The UUID of the new schema.
      */
-    function register(string calldata schema, ISchemaResolver resolver) external returns (bytes32);
+    function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32);
 
     /**
      * @dev Returns an existing schema by UUID

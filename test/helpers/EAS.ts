@@ -11,11 +11,16 @@ interface Options {
   delegate?: boolean;
 }
 
-export const registerSchema = async (schema: string, registry: SchemaRegistry, resolver: SchemaResolver | string) => {
+export const registerSchema = async (
+  schema: string,
+  registry: SchemaRegistry,
+  resolver: SchemaResolver | string,
+  revocable: boolean
+) => {
   const address = typeof resolver === 'string' ? resolver : resolver.address;
-  await registry.register(schema, address);
+  await registry.register(schema, address, revocable);
 
-  return getSchemaUUID(schema, address);
+  return getSchemaUUID(schema, address, revocable);
 };
 
 export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {

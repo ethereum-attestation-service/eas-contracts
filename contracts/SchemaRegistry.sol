@@ -14,7 +14,7 @@ contract SchemaRegistry is ISchemaRegistry {
     error AlreadyExists();
 
     // The version of the contract.
-    string public constant VERSION = "0.17";
+    string public constant VERSION = "0.18";
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 => SchemaRecord) private _registry;
@@ -22,8 +22,13 @@ contract SchemaRegistry is ISchemaRegistry {
     /**
      * @inheritdoc ISchemaRegistry
      */
-    function register(string calldata schema, ISchemaResolver resolver) external returns (bytes32) {
-        SchemaRecord memory schemaRecord = SchemaRecord({ uuid: EMPTY_UUID, schema: schema, resolver: resolver });
+    function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32) {
+        SchemaRecord memory schemaRecord = SchemaRecord({
+            uuid: EMPTY_UUID,
+            schema: schema,
+            resolver: resolver,
+            revocable: revocable
+        });
 
         bytes32 uuid = _getUUID(schemaRecord);
         if (_registry[uuid].uuid != EMPTY_UUID) {
@@ -53,6 +58,6 @@ contract SchemaRegistry is ISchemaRegistry {
      * @return schema UUID.
      */
     function _getUUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(schemaRecord.schema, schemaRecord.resolver));
+        return keccak256(abi.encodePacked(schemaRecord.schema, schemaRecord.resolver, schemaRecord.revocable));
     }
 }

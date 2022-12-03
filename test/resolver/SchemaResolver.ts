@@ -42,7 +42,7 @@ describe('SchemaResolver', () => {
     it('should be properly initialized', async () => {
       const resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
 
-      expect(await resolver.VERSION()).to.equal('0.17');
+      expect(await resolver.VERSION()).to.equal('0.18');
     });
   });
 
@@ -56,7 +56,7 @@ describe('SchemaResolver', () => {
     context('with a standard resolver', () => {
       beforeEach(async () => {
         resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
-        schemaId = await registerSchema(schema, registry, resolver);
+        schemaId = await registerSchema(schema, registry, resolver, true);
       });
 
       it('should revert when the attestation callback is invoked directly', async () => {
@@ -99,7 +99,7 @@ describe('SchemaResolver', () => {
         resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
         expect(await resolver.isPayable()).to.be.false;
 
-        schemaId = await registerSchema(schema, registry, resolver);
+        schemaId = await registerSchema(schema, registry, resolver, true);
       });
 
       it('should revert when sending', async () => {

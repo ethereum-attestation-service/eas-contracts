@@ -48,7 +48,7 @@ describe('TokenResolver', () => {
     resolver = await Contracts.TokenResolver.deploy(eas.address, token.address, targetAmount);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting with wrong token amount', async () => {

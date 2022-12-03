@@ -45,7 +45,7 @@ describe('RecipientResolver', () => {
     const resolver = await Contracts.RecipientResolver.deploy(eas.address, targetRecipient.address);
     expect(await resolver.isPayable()).to.be.false;
 
-    schemaId = await registerSchema(schema, registry, resolver);
+    schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
   it('should revert when attesting to a wrong recipient', async () => {
