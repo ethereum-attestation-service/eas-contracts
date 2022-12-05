@@ -31,12 +31,14 @@ import type {
 export type SchemaRecordStruct = {
   uuid: PromiseOrValue<BytesLike>;
   resolver: PromiseOrValue<string>;
+  revocable: PromiseOrValue<boolean>;
   schema: PromiseOrValue<string>;
 };
 
-export type SchemaRecordStructOutput = [string, string, string] & {
+export type SchemaRecordStructOutput = [string, string, boolean, string] & {
   uuid: string;
   resolver: string;
+  revocable: boolean;
   schema: string;
 };
 
@@ -44,7 +46,7 @@ export interface SchemaRegistryInterface extends utils.Interface {
   functions: {
     "VERSION()": FunctionFragment;
     "getSchema(bytes32)": FunctionFragment;
-    "register(string,address)": FunctionFragment;
+    "register(string,address,bool)": FunctionFragment;
   };
 
   getFunction(
@@ -58,7 +60,11 @@ export interface SchemaRegistryInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "register",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<boolean>
+    ]
   ): string;
 
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
@@ -120,6 +126,7 @@ export interface SchemaRegistry extends BaseContract {
     register(
       schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
+      revocable: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -134,6 +141,7 @@ export interface SchemaRegistry extends BaseContract {
   register(
     schema: PromiseOrValue<string>,
     resolver: PromiseOrValue<string>,
+    revocable: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -148,6 +156,7 @@ export interface SchemaRegistry extends BaseContract {
     register(
       schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
+      revocable: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -174,6 +183,7 @@ export interface SchemaRegistry extends BaseContract {
     register(
       schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
+      revocable: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -189,6 +199,7 @@ export interface SchemaRegistry extends BaseContract {
     register(
       schema: PromiseOrValue<string>,
       resolver: PromiseOrValue<string>,
+      revocable: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

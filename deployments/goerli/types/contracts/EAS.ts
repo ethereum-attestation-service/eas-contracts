@@ -23,7 +23,6 @@ import type {
   BytesLike,
   CallOverrides,
   ContractTransaction,
-  Overrides,
   PayableOverrides,
   PopulatedTransaction,
   Signer,
@@ -39,6 +38,7 @@ export type AttestationStruct = {
   revocationTime: PromiseOrValue<BigNumberish>;
   recipient: PromiseOrValue<string>;
   attester: PromiseOrValue<string>;
+  revocable: PromiseOrValue<boolean>;
   data: PromiseOrValue<BytesLike>;
 };
 
@@ -51,6 +51,7 @@ export type AttestationStructOutput = [
   number,
   string,
   string,
+  boolean,
   string
 ] & {
   uuid: string;
@@ -61,14 +62,15 @@ export type AttestationStructOutput = [
   revocationTime: number;
   recipient: string;
   attester: string;
+  revocable: boolean;
   data: string;
 };
 
 export interface EASInterface extends utils.Interface {
   functions: {
     "VERSION()": FunctionFragment;
-    "attest(address,bytes32,uint32,bytes32,bytes)": FunctionFragment;
-    "attestByDelegation(address,bytes32,uint32,bytes32,bytes,address,uint8,bytes32,bytes32)": FunctionFragment;
+    "attest(address,bytes32,uint32,bool,bytes32,bytes)": FunctionFragment;
+    "attestByDelegation(address,bytes32,uint32,bool,bytes32,bytes,address,uint8,bytes32,bytes32)": FunctionFragment;
     "getAttestation(bytes32)": FunctionFragment;
     "getEIP712Verifier()": FunctionFragment;
     "getSchemaRegistry()": FunctionFragment;
@@ -97,6 +99,7 @@ export interface EASInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<boolean>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>
     ]
@@ -107,6 +110,7 @@ export interface EASInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<boolean>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<string>,
@@ -242,6 +246,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -251,6 +256,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -276,7 +282,7 @@ export interface EAS extends BaseContract {
 
     revoke(
       uuid: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     revokeByDelegation(
@@ -285,7 +291,7 @@ export interface EAS extends BaseContract {
       v: PromiseOrValue<BigNumberish>,
       r: PromiseOrValue<BytesLike>,
       s: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
 
@@ -295,6 +301,7 @@ export interface EAS extends BaseContract {
     recipient: PromiseOrValue<string>,
     schema: PromiseOrValue<BytesLike>,
     expirationTime: PromiseOrValue<BigNumberish>,
+    revocable: PromiseOrValue<boolean>,
     refUUID: PromiseOrValue<BytesLike>,
     data: PromiseOrValue<BytesLike>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -304,6 +311,7 @@ export interface EAS extends BaseContract {
     recipient: PromiseOrValue<string>,
     schema: PromiseOrValue<BytesLike>,
     expirationTime: PromiseOrValue<BigNumberish>,
+    revocable: PromiseOrValue<boolean>,
     refUUID: PromiseOrValue<BytesLike>,
     data: PromiseOrValue<BytesLike>,
     attester: PromiseOrValue<string>,
@@ -329,7 +337,7 @@ export interface EAS extends BaseContract {
 
   revoke(
     uuid: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   revokeByDelegation(
@@ -338,7 +346,7 @@ export interface EAS extends BaseContract {
     v: PromiseOrValue<BigNumberish>,
     r: PromiseOrValue<BytesLike>,
     s: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
@@ -348,6 +356,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -357,6 +366,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -430,6 +440,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -439,6 +450,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -464,7 +476,7 @@ export interface EAS extends BaseContract {
 
     revoke(
       uuid: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     revokeByDelegation(
@@ -473,7 +485,7 @@ export interface EAS extends BaseContract {
       v: PromiseOrValue<BigNumberish>,
       r: PromiseOrValue<BytesLike>,
       s: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
 
@@ -484,6 +496,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -493,6 +506,7 @@ export interface EAS extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -518,7 +532,7 @@ export interface EAS extends BaseContract {
 
     revoke(
       uuid: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     revokeByDelegation(
@@ -527,7 +541,7 @@ export interface EAS extends BaseContract {
       v: PromiseOrValue<BigNumberish>,
       r: PromiseOrValue<BytesLike>,
       s: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }
