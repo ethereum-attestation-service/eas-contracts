@@ -28,7 +28,7 @@ import type {
 export interface EIP712VerifierInterface extends utils.Interface {
   functions: {
     "VERSION()": FunctionFragment;
-    "attest(address,bytes32,uint32,bytes32,bytes,address,uint8,bytes32,bytes32)": FunctionFragment;
+    "attest(address,bytes32,uint32,bool,bytes32,bytes,address,uint8,bytes32,bytes32)": FunctionFragment;
     "getAttestTypeHash()": FunctionFragment;
     "getDomainSeparator()": FunctionFragment;
     "getNonce(address)": FunctionFragment;
@@ -54,6 +54,7 @@ export interface EIP712VerifierInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<boolean>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<string>,
@@ -142,6 +143,7 @@ export interface EIP712Verifier extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -178,6 +180,7 @@ export interface EIP712Verifier extends BaseContract {
     recipient: PromiseOrValue<string>,
     schema: PromiseOrValue<BytesLike>,
     expirationTime: PromiseOrValue<BigNumberish>,
+    revocable: PromiseOrValue<boolean>,
     refUUID: PromiseOrValue<BytesLike>,
     data: PromiseOrValue<BytesLike>,
     attester: PromiseOrValue<string>,
@@ -214,6 +217,7 @@ export interface EIP712Verifier extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -253,6 +257,7 @@ export interface EIP712Verifier extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
@@ -290,6 +295,7 @@ export interface EIP712Verifier extends BaseContract {
       recipient: PromiseOrValue<string>,
       schema: PromiseOrValue<BytesLike>,
       expirationTime: PromiseOrValue<BigNumberish>,
+      revocable: PromiseOrValue<boolean>,
       refUUID: PromiseOrValue<BytesLike>,
       data: PromiseOrValue<BytesLike>,
       attester: PromiseOrValue<string>,
