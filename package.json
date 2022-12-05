@@ -46,7 +46,7 @@
     "prepare": "yarn hardhat-deploy-fix && yarn clean && yarn compile && yarn delete-test-types && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
     "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh",
     "delete-test-types": "sed -i.bak '/\\/tests/d' ./typechain-types/index.ts ./typechain-types/factories/contracts/index.ts",
-    "release": "yarn prepare && yarn lint && yarn test && yarn delete-test-types"
+    "release": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "@typechain/ethers-v5": "^10.1.1",
