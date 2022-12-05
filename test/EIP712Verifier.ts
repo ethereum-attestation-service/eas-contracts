@@ -1,7 +1,6 @@
 import Contracts from '../components/Contracts';
 import { EIP712Verifier } from '../typechain-types';
-import { HARDHAT_CHAIN_ID } from '../utils/Constants';
-import { Delegated } from '@ethereum-attestation-service/eas-sdk';
+import { EIP712Utils } from './helpers/EIP712Utils';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
@@ -25,13 +24,9 @@ describe('EIP712Verifier', () => {
   });
 
   it('should return the correct domain separator', async () => {
-    const delegation = new Delegated({
-      address: verifier.address,
-      version: await verifier.VERSION(),
-      chainId: HARDHAT_CHAIN_ID
-    });
+    const utils = await EIP712Utils.fromVerifier(verifier);
 
-    expect(await verifier.getDomainSeparator()).to.equal(delegation.getDomainSeparator());
+    expect(await verifier.getDomainSeparator()).to.equal(utils.getDomainSeparator());
   });
 
   it('should return the attest type hash', async () => {

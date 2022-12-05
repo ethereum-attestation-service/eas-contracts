@@ -1,8 +1,28 @@
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
-import { getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
 import { expect } from 'chai';
-import { BigNumberish, ContractTransaction, Wallet } from 'ethers';
+import { BigNumberish, ContractTransaction, utils, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
+
+const { solidityKeccak256, hexlify, toUtf8Bytes } = utils;
+
+export const getSchemaUUID = (schema: string, resolverAddress: string, revocable: boolean) =>
+  solidityKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
+
+export const getUUID = (
+  schema: string,
+  recipient: string,
+  attester: string,
+  time: number,
+  expirationTime: number,
+  revocable: boolean,
+  refUUID: string,
+  data: string,
+  bump: number
+) =>
+  solidityKeccak256(
+    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bool', 'bytes32', 'bytes', 'uint32'],
+    [hexlify(toUtf8Bytes(schema)), recipient, attester, time, expirationTime, revocable, refUUID, data, bump]
+  );
 
 interface Options {
   from?: Wallet;
