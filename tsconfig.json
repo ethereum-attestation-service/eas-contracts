@@ -16,15 +16,5 @@
     },
     "outDir": "./dist"
   },
-  "include": [
-    "./components",
-    "./data",
-    "./deploy",
-    "./deployments",
-    "./hardhat.config.ts",
-    "./scripts",
-    "./test",
-    "./typechain-types",
-    "./utils"
-  ]
+  "include": ["./typechain-types"]
 }
