@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -16,8 +16,8 @@
     "/artifacts/contracts",
     "!/artifacts/contracts/tests/**/*",
     "/dist/typechain-types",
-    "!/dist//typechain-types/contracts/tests/**/*",
-    "!/dist//typechain-types/factories/contracts/tests/**/*",
+    "!/dist/typechain-types/contracts/tests/**/*",
+    "!/dist/typechain-types/factories/contracts/tests/**/*",
     "/deployments/mainnet/**/*",
     "/deployments/goerli/**/*"
   ],
@@ -45,7 +45,8 @@
     "clean": "rm -rf artifacts cache dist coverage typechain-types",
     "prepare": "yarn hardhat-deploy-fix && yarn clean && yarn compile && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types",
     "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh",
-    "release": "yarn prepare && yarn lint && yarn test"
+    "delete-test-types": "sed -i.bak '/\\/tests\\//d' ./typechain-types/index.ts",
+    "release": "yarn prepare && yarn lint && yarn test && yarn delete-test-types"
   },
   "dependencies": {
     "@typechain/ethers-v5": "^10.1.1",
