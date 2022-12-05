@@ -14,7 +14,7 @@
       "@nomiclabs/hardhat-ethers/*": ["node_modules/@nomiclabs/hardhat-ethers/dist/src/*"],
       "*": ["node_modules/*"]
     },
-    "outDir": "./dist"
+    "outDir": "./dist/typechain-types"
   },
   "include": ["./typechain-types"]
 }
