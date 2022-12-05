@@ -1,7 +1,7 @@
 import Contracts from '../components/Contracts';
 import { SchemaRegistry } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
+import { getSchemaUUID } from './helpers/EAS';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';

@@ -1,11 +1,10 @@
 import Contracts from '../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { getUUIDFromAttestTx } from './helpers/EAS';
+import { getSchemaUUID, getUUIDFromAttestTx } from './helpers/EAS';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
-import { getOffchainUUID, getSchemaUUID } from '@ethereum-attestation-service/eas-sdk';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { BigNumberish, Wallet } from 'ethers';
@@ -39,7 +38,7 @@ describe('EAS', () => {
 
     registry = await Contracts.SchemaRegistry.deploy();
     verifier = await Contracts.EIP712Verifier.deploy();
-    eip712Utils = new EIP712Utils(verifier.address);
+    eip712Utils = await EIP712Utils.fromVerifier(verifier);
 
     eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
 
@@ -73,8 +72,7 @@ describe('EAS', () => {
 
   enum SignatureType {
     Direct = 'direct',
-    Delegated = 'delegated',
-    Offchain = 'offchain'
+    Delegated = 'delegated'
   }
 
   describe('attesting', () => {
@@ -85,7 +83,7 @@ describe('EAS', () => {
       expirationTime = (await eas.getTime()) + duration.days(30);
     });
 
-    for (const signatureType of [SignatureType.Direct, SignatureType.Delegated, SignatureType.Offchain]) {
+    for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
       context(`via ${signatureType} attestation`, () => {
         const expectAttestation = async (
           recipient: string,
@@ -146,28 +144,6 @@ describe('EAS', () => {
               );
 
               break;
-            }
-
-            case SignatureType.Offchain: {
-              const now = await latest();
-
-              uuid = getOffchainUUID(schema, recipient, now, expirationTime, revocable, refUUID, data);
-
-              const request = await eip712Utils.signOffchainAttestation(
-                txSender,
-                schema,
-                recipient,
-                now,
-                expirationTime,
-                revocable,
-                refUUID,
-                data
-              );
-              expect(await eip712Utils.verifyOffchainAttestation(txSender.address, request));
-
-              expect(request.uuid).to.equal(uuid);
-
-              return uuid;
             }
           }
 
@@ -336,45 +312,43 @@ describe('EAS', () => {
             await expectAttestation(recipient.address, schema3Id, expirationTime, true, uuid, data);
           });
 
-          if (signatureType !== SignatureType.Offchain) {
-            it('should generate unique UUIDs for similar attestations', async () => {
-              const uuid1 = await expectAttestation(
-                recipient.address,
-                schema3Id,
-                expirationTime,
-                true,
-                ZERO_BYTES32,
-                data,
-                {
-                  bump: 0
-                }
-              );
-              const uuid2 = await expectAttestation(
-                recipient.address,
-                schema3Id,
-                expirationTime,
-                true,
-                ZERO_BYTES32,
-                data,
-                {
-                  bump: 1
-                }
-              );
-              const uuid3 = await expectAttestation(
-                recipient.address,
-                schema3Id,
-                expirationTime,
-                true,
-                ZERO_BYTES32,
-                data,
-                {
-                  bump: 2
-                }
-              );
-              expect(uuid1).not.to.equal(uuid2);
-              expect(uuid2).not.to.equal(uuid3);
-            });
-          }
+          it('should generate unique UUIDs for similar attestations', async () => {
+            const uuid1 = await expectAttestation(
+              recipient.address,
+              schema3Id,
+              expirationTime,
+              true,
+              ZERO_BYTES32,
+              data,
+              {
+                bump: 0
+              }
+            );
+            const uuid2 = await expectAttestation(
+              recipient.address,
+              schema3Id,
+              expirationTime,
+              true,
+              ZERO_BYTES32,
+              data,
+              {
+                bump: 1
+              }
+            );
+            const uuid3 = await expectAttestation(
+              recipient.address,
+              schema3Id,
+              expirationTime,
+              true,
+              ZERO_BYTES32,
+              data,
+              {
+                bump: 2
+              }
+            );
+            expect(uuid1).not.to.equal(uuid2);
+            expect(uuid2).not.to.equal(uuid3);
+          });
 
           it('should revert when attesting to a non-existing attestation', async () => {
             await expectFailedAttestation(
