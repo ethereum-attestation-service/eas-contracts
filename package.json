@@ -43,17 +43,17 @@
     "verify": "hardhat verify",
     "flatten": "hardhat flatten",
     "clean": "rm -rf artifacts cache dist coverage typechain-types",
-    "prepare": "yarn hardhat-deploy-fix && yarn recompile && yarn export-types",
+    "prepare": "yarn hardhat-deploy-fix && yarn recompile",
     "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh",
-    "export-types": "yarn delete-test-types && tsc && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && yarn restore-test-types",
+    "export-types": "yarn delete-test-types && tsc -p tsconfig-release.json && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && yarn restore-test-types",
     "delete-test-types": "sed -i.bak '/\\/tests/d' typechain-types/index.ts typechain-types/factories/contracts/index.ts",
     "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts",
-    "release": "yarn prepare && yarn lint && yarn test"
+    "prepare-release": "yarn prepare && yarn export-types && yarn lint && yarn test"
   },
   "dependencies": {
     "@typechain/ethers-v5": "^10.1.1",
     "@typechain/hardhat": "^6.1.4",
-    "hardhat": "2.12.3",
+    "hardhat": "2.12.4",
     "typechain": "^8.1.1"
   },
   "devDependencies": {
@@ -64,13 +64,13 @@
     "@nomiclabs/hardhat-solhint": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@openzeppelin/contracts": "4.8.0",
-    "@tenderly/hardhat-tenderly": "1.3.2",
+    "@tenderly/hardhat-tenderly": "1.1.6",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.10",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
+    "@types/node": "^18.11.12",
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "@typescript-eslint/parser": "^5.46.0",
     "chai": "^4.3.7",
     "copyfiles": "^2.4.1",
     "decimal.js": "^10.4.3",
@@ -93,14 +93,14 @@
     "hardhat-gas-reporter": "^1.0.9",
     "mocha": "^10.1.0",
     "mocha-silent-reporter": "^1.0.0",
-    "prettier": "^2.8.0",
+    "prettier": "^2.8.1",
     "prettier-package-json": "^2.7.0",
     "prettier-plugin-solidity": "^1.0.0",
     "solc": "0.8.17",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.2",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.4"
   },
   "resolutions": {
     "@tenderly/hardhat-tenderly/@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers"
