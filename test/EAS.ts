@@ -237,9 +237,9 @@ describe('EAS', () => {
         });
 
         context('with registered schemas', () => {
-          const schema1 = 'S1';
-          const schema2 = 'S2';
-          const schema3 = 'S3';
+          const schema1 = 'bool liked';
+          const schema2 = 'bytes32 proposalId, bool vote';
+          const schema3 = 'bool hasPhoneNumber, bytes32 phoneHash';
           const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
           const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
           const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS, true);
@@ -364,7 +364,7 @@ describe('EAS', () => {
         });
 
         context('with an irrevocable schema', () => {
-          const schema = 'S2';
+          const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
           const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, false);
 
           beforeEach(async () => {
@@ -405,7 +405,7 @@ describe('EAS', () => {
   });
 
   describe('revocation', () => {
-    const schema1 = 'S1';
+    const schema1 = 'bool hasPhoneNumber, bytes32 phoneHash';
     const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
     let uuid: string;
 
@@ -516,7 +516,7 @@ describe('EAS', () => {
         });
 
         context('with an irrevocable schema', () => {
-          const schema2 = 'S2';
+          const schema2 = 'bool isFriend';
           const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, false);
 
           beforeEach(async () => {

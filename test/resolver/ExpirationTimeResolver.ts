@@ -18,7 +18,7 @@ describe('ExpirationTimeResolver', () => {
   let verifier: EIP712Verifier;
   let eas: TestEAS;
 
-  const schema = 'S';
+  const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
   let validAfter: number;

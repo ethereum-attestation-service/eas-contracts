@@ -20,7 +20,7 @@ describe('RevocationResolver', () => {
   let resolver: RevocationResolver;
   let uuid: string;
 
-  const schema = 'S';
+  const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
   const expirationTime = 0;
