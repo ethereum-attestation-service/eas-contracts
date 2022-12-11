@@ -51,7 +51,7 @@ describe('SchemaRegistry', () => {
     };
 
     it('should allow to register a schema', async () => {
-      await testRegister('bool liked', accounts[3], true);
+      await testRegister('bool like', accounts[3], true);
       await testRegister('bytes32 proposalId, bool vote', accounts[3], false);
     });
 

@@ -237,7 +237,7 @@ describe('EAS', () => {
         });
 
         context('with registered schemas', () => {
-          const schema1 = 'bool liked';
+          const schema1 = 'bool like';
           const schema2 = 'bytes32 proposalId, bool vote';
           const schema3 = 'bool hasPhoneNumber, bytes32 phoneHash';
           const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
