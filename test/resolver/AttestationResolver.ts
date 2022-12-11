@@ -26,12 +26,12 @@ describe('AttestationResolver', () => {
   let eas: TestEAS;
   let resolver: AttestationResolver;
 
-  const schema = 'S';
+  const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const expirationTime = 0;
   const data = '0x1234';
 
-  const schema2 = 'S2';
+  const schema2 = 'bool isFriend';
   const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
   let uuid: string;
 

@@ -51,8 +51,8 @@ describe('SchemaRegistry', () => {
     };
 
     it('should allow to register a schema', async () => {
-      await testRegister('SC1', accounts[3], true);
-      await testRegister('SC2', accounts[3], false);
+      await testRegister('bool liked', accounts[3], true);
+      await testRegister('bytes32 proposalId, bool vote', accounts[3], false);
     });
 
     it('should allow to register a schema without a schema', async () => {
@@ -60,7 +60,7 @@ describe('SchemaRegistry', () => {
     });
 
     it('should allow to register a schema without a resolver', async () => {
-      await testRegister('0x1234', ZERO_ADDRESS, true);
+      await testRegister('bool hasPhoneNumber, bytes32 phoneHash', ZERO_ADDRESS, true);
     });
 
     it('should allow to register a schema without neither a schema or a resolver', async () => {
@@ -68,14 +68,14 @@ describe('SchemaRegistry', () => {
     });
 
     it('should not allow to register the same schema and resolver twice', async () => {
-      await testRegister('0x1234', ZERO_ADDRESS, true);
-      await expect(testRegister('0x1234', ZERO_ADDRESS, true)).to.be.revertedWith('AlreadyExists');
+      await testRegister('bool isFriend', ZERO_ADDRESS, true);
+      await expect(testRegister('bool isFriend', ZERO_ADDRESS, true)).to.be.revertedWith('AlreadyExists');
     });
   });
 
   describe('schema querying', () => {
     it('should return a schema', async () => {
-      const schema = '0x1234';
+      const schema = 'bool isFriend';
       const resolver = accounts[5];
 
       await registry.register(schema, resolver.address, true);

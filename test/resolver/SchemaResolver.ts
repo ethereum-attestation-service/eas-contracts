@@ -47,7 +47,7 @@ describe('SchemaResolver', () => {
   });
 
   describe('resolution', () => {
-    const schema = 'S';
+    const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
     let schemaId: string;
     const expirationTime = 0;
     const data = '0x1234';

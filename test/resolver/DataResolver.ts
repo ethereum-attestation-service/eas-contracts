@@ -18,7 +18,7 @@ describe('DataResolver', () => {
   let verifier: EIP712Verifier;
   let eas: TestEAS;
 
-  const schema = 'S';
+  const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const expirationTime = 0;
 
