@@ -58,6 +58,7 @@ describe('AttesterResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      0,
       'InvalidAttestation',
       {
         from: sender
@@ -74,11 +75,12 @@ describe('AttesterResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      0,
       {
         from: targetSender
       }
     );
 
-    await expectRevocation(eas, uuid, { from: targetSender });
+    await expectRevocation(eas, uuid, 0, { from: targetSender });
   });
 });

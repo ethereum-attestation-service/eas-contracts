@@ -47,6 +47,8 @@ describe('ValueResolver', () => {
   });
 
   it('should revert when attesting with the wrong value', async () => {
+    const value = targetValue + 1;
+
     await expectFailedAttestation(
       eas,
       recipient.address,
@@ -55,12 +57,14 @@ describe('ValueResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      value,
       'InvalidAttestation',
-      { from: sender, value: targetValue + 1 }
+      { from: sender }
     );
   });
 
   it('should allow attesting with the correct value', async () => {
+    const value = targetValue;
     const { uuid } = await expectAttestation(
       eas,
       recipient.address,
@@ -69,12 +73,49 @@ describe('ValueResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      value,
       {
-        from: sender,
-        value: targetValue
+        from: sender
       }
     );
 
-    await expectRevocation(eas, uuid, { from: sender });
+    await expectRevocation(eas, uuid, 0, { from: sender });
+  });
+
+  it('should revert when attempting to attest with more value than was actually sent', async () => {
+    const value = targetValue;
+
+    await expectFailedAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      true,
+      ZERO_BYTES32,
+      data,
+      value + 1000,
+      'InsufficientValue',
+      { from: sender, value }
+    );
+  });
+
+  it('should allow attesting with the correct value when accidentally sending too much', async () => {
+    const value = targetValue;
+    const { uuid } = await expectAttestation(
+      eas,
+      recipient.address,
+      schemaId,
+      expirationTime,
+      true,
+      ZERO_BYTES32,
+      data,
+      value,
+      {
+        from: sender,
+        value: value + 1000
+      }
+    );
+
+    await expectRevocation(eas, uuid, 0, { from: sender });
   });
 });

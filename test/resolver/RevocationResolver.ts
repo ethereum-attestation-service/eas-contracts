@@ -46,7 +46,7 @@ describe('RevocationResolver', () => {
     schemaId = await registerSchema(schema, registry, resolver, true);
 
     uuid = await getUUIDFromAttestTx(
-      eas.connect(sender).attest(recipient.address, schemaId, expirationTime, true, ZERO_BYTES32, data)
+      eas.connect(sender).attest(recipient.address, schemaId, expirationTime, true, ZERO_BYTES32, data, 0)
     );
   });
 
@@ -56,7 +56,7 @@ describe('RevocationResolver', () => {
     });
 
     it('should allow revoking an existing attestation', async () => {
-      await expectRevocation(eas, uuid, { from: sender });
+      await expectRevocation(eas, uuid, 0, { from: sender });
     });
   });
 
@@ -66,7 +66,7 @@ describe('RevocationResolver', () => {
     });
 
     it('should revert when attempting to revoke an existing attestation', async () => {
-      await expectFailedRevocation(eas, uuid, 'InvalidRevocation', { from: sender });
+      await expectFailedRevocation(eas, uuid, 0, 'InvalidRevocation', { from: sender });
     });
   });
 });
