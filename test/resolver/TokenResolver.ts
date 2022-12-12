@@ -60,6 +60,7 @@ describe('TokenResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      0,
       'ERC20: insufficient allowance',
       { from: sender }
     );
@@ -73,6 +74,7 @@ describe('TokenResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      0,
       'ERC20: insufficient allowance',
       { from: sender }
     );
@@ -89,11 +91,12 @@ describe('TokenResolver', () => {
       true,
       ZERO_BYTES32,
       data,
+      0,
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid, { from: sender });
+    await expectRevocation(eas, uuid, 0, { from: sender });
   });
 });

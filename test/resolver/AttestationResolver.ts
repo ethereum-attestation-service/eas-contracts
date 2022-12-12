@@ -53,7 +53,7 @@ describe('AttestationResolver', () => {
     await registerSchema(schema2, registry, ZERO_ADDRESS, true);
 
     uuid = await getUUIDFromAttestTx(
-      eas.attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data)
+      eas.attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data, 0)
     );
 
     resolver = await Contracts.AttestationResolver.deploy(eas.address);
@@ -71,6 +71,7 @@ describe('AttestationResolver', () => {
       true,
       ZERO_BYTES32,
       ZERO_BYTES32,
+      0,
       'InvalidAttestation',
       { from: sender }
     );
@@ -85,12 +86,13 @@ describe('AttestationResolver', () => {
       true,
       ZERO_BYTES32,
       uuid,
+      0,
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid2, { from: sender });
+    await expectRevocation(eas, uuid2, 0, { from: sender });
   });
 
   it('should revert invalid input', async () => {

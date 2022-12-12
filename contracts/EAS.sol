@@ -2,6 +2,8 @@
 
 pragma solidity 0.8.17;
 
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+
 import { EMPTY_UUID } from "./Types.sol";
 import { IEAS, Attestation } from "./IEAS.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
@@ -13,8 +15,11 @@ import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
  * @title EAS - Ethereum Attestation Service
  */
 contract EAS is IEAS {
+    using Address for address payable;
+
     error AccessDenied();
     error AlreadyRevoked();
+    error InsufficientValue();
     error InvalidAttestation();
     error InvalidExpirationTime();
     error InvalidOffset();
@@ -80,9 +85,10 @@ contract EAS is IEAS {
         uint32 expirationTime,
         bool revocable,
         bytes32 refUUID,
-        bytes calldata data
+        bytes calldata data,
+        uint256 value
     ) public payable virtual returns (bytes32) {
-        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, msg.sender);
+        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, value, msg.sender);
     }
 
     /**
@@ -95,6 +101,7 @@ contract EAS is IEAS {
         bool revocable,
         bytes32 refUUID,
         bytes calldata data,
+        uint256 value,
         address attester,
         uint8 v,
         bytes32 r,
@@ -102,23 +109,30 @@ contract EAS is IEAS {
     ) public payable virtual returns (bytes32) {
         _eip712Verifier.attest(recipient, schema, expirationTime, revocable, refUUID, data, attester, v, r, s);
 
-        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, attester);
+        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, value, attester);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function revoke(bytes32 uuid) public payable virtual {
-        return _revoke(uuid, msg.sender);
+    function revoke(bytes32 uuid, uint256 value) public payable virtual {
+        return _revoke(uuid, value, msg.sender);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function revokeByDelegation(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) public payable virtual {
+    function revokeByDelegation(
+        bytes32 uuid,
+        uint256 value,
+        address attester,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public payable virtual {
         _eip712Verifier.revoke(uuid, attester, v, r, s);
 
-        _revoke(uuid, attester);
+        _revoke(uuid, value, attester);
     }
 
     /**
@@ -144,6 +158,7 @@ contract EAS is IEAS {
      * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @param attester The attesting account.
      *
      * @return The UUID of the new attestation.
@@ -155,6 +170,7 @@ contract EAS is IEAS {
         bool revocable,
         bytes32 refUUID,
         bytes calldata data,
+        uint256 value,
         address attester
     ) private returns (bytes32) {
         if (expirationTime != 0 && expirationTime <= _time()) {
@@ -198,7 +214,7 @@ contract EAS is IEAS {
         }
         attestation.uuid = uuid;
 
-        _resolveAttestation(schemaRecord, attestation, false);
+        _resolveAttestation(schemaRecord, attestation, value, false);
 
         _db[uuid] = attestation;
 
@@ -217,9 +233,10 @@ contract EAS is IEAS {
      * @dev Revokes an existing attestation to a specific schema.
      *
      * @param uuid The UUID of the attestation to revoke.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @param attester The attesting account.
      */
-    function _revoke(bytes32 uuid, address attester) private {
+    function _revoke(bytes32 uuid, uint256 value, address attester) private {
         Attestation storage attestation = _db[uuid];
         if (attestation.uuid == EMPTY_UUID) {
             revert NotFound();
@@ -242,7 +259,7 @@ contract EAS is IEAS {
         attestation.revocationTime = _time();
 
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(attestation.schema);
-        _resolveAttestation(schemaRecord, attestation, true);
+        _resolveAttestation(schemaRecord, attestation, value, true);
 
         emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
     }
@@ -277,11 +294,13 @@ contract EAS is IEAS {
      *
      * @param schemaRecord The schema of the attestation.
      * @param attestation The data of attestation.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @param isRevocation Whether to resolve an attestation or its revocation.
      */
     function _resolveAttestation(
         SchemaRecord memory schemaRecord,
         Attestation memory attestation,
+        uint256 value,
         bool isRevocation
     ) private {
         ISchemaResolver resolver = schemaRecord.resolver;
@@ -289,20 +308,31 @@ contract EAS is IEAS {
             return;
         }
 
-        if (msg.value != 0 && !resolver.isPayable()) {
+        if (value != 0 && !resolver.isPayable()) {
             revert NotPayable();
         }
 
-        if (isRevocation) {
-            if (!resolver.revoke{ value: msg.value }(attestation)) {
-                revert InvalidRevocation();
-            }
-
-            return;
+        if (value > msg.value) {
+            revert InsufficientValue();
         }
 
-        if (!resolver.attest{ value: msg.value }(attestation)) {
+        if (isRevocation) {
+            if (!resolver.revoke{ value: value }(attestation)) {
+                revert InvalidRevocation();
+            }
+        } else if (!resolver.attest{ value: value }(attestation)) {
             revert InvalidAttestation();
+        }
+
+        // Refund any remaining ETH back to the attester.
+        unchecked {
+            uint256 refund = msg.value - value;
+            if (refund > 0) {
+                // Using a regular transfer here might revert, for some non-EOA attesters, due to exceeding of the 2300
+                // gas limit which is why we're using call instead (via sendValue), which the 2300 gas limit does not
+                // apply for.
+                payable(msg.sender).sendValue(refund);
+            }
         }
     }
 

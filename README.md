@@ -84,10 +84,10 @@ This will automatically be skipped on an already deployed and configured deploym
 
 #### Latest Test Coverage Report (2022-12-05)
 
-* 100% Statements 97/97
-* 100% Branches 58/58
+* 100% Statements 102/102
+* 100% Branches 64/64
 * 100% Functions 62/62
-* 100% Lines 145/145
+* 100% Lines 151/151
 
 ```sh
 ------------------------------|----------|----------|----------|----------|----------------|
