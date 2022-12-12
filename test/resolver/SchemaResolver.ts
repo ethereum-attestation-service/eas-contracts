@@ -103,7 +103,10 @@ describe('SchemaResolver', () => {
       });
 
       it('should revert when sending', async () => {
-        await expect(sender.sendTransaction({ to: resolver.address, value: 1 })).to.be.revertedWith('NotPayable');
+        const value = 1;
+
+        await expect(sender.sendTransaction({ to: resolver.address, value })).to.be.revertedWith('NotPayable');
+
         await expectFailedAttestation(
           eas,
           recipient.address,
@@ -112,9 +115,10 @@ describe('SchemaResolver', () => {
           true,
           ZERO_BYTES32,
           data,
+          value,
           'NotPayable',
           {
-            value: 1,
+            value,
             from: sender
           }
         );

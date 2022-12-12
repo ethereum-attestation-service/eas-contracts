@@ -78,6 +78,7 @@ interface IEAS {
      * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      *
      * @return The UUID of the new attestation.
      */
@@ -87,7 +88,8 @@ interface IEAS {
         uint32 expirationTime,
         bool revocable,
         bytes32 refUUID,
-        bytes calldata data
+        bytes calldata data,
+        uint256 value
     ) external payable returns (bytes32);
 
     /**
@@ -99,6 +101,7 @@ interface IEAS {
      * @param revocable Whether the attestation is revocable.
      * @param refUUID An optional related attestation's UUID.
      * @param data Additional custom data.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @param attester The attesting account.
      * @param v The recovery ID.
      * @param r The x-coordinate of the nonce R.
@@ -113,6 +116,7 @@ interface IEAS {
         bool revocable,
         bytes32 refUUID,
         bytes calldata data,
+        uint256 value,
         address attester,
         uint8 v,
         bytes32 r,
@@ -123,19 +127,28 @@ interface IEAS {
      * @dev Revokes an existing attestation to a specific schema.
      *
      * @param uuid The UUID of the attestation to revoke.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      */
-    function revoke(bytes32 uuid) external payable;
+    function revoke(bytes32 uuid, uint256 value) external payable;
 
     /**
      * @dev Attests to a specific schema the EIP712 signature.
      *
      * @param uuid The UUID of the attestation to revoke.
+     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @param attester The attesting account.
      * @param v The recovery ID.
      * @param r The x-coordinate of the nonce R.
      * @param s The signature data.
      */
-    function revokeByDelegation(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) external payable;
+    function revokeByDelegation(
+        bytes32 uuid,
+        uint256 value,
+        address attester,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
 
     /**
      * @dev Returns an existing attestation by UUID.
