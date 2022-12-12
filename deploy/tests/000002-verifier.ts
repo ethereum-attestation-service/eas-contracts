@@ -19,7 +19,7 @@ describeDeployment(__filename, () => {
   it('should deploy a EIP712 verifier', async () => {
     const utils = await EIP712Utils.fromVerifier(verifier);
 
-    expect(await verifier.VERSION()).to.equal('0.19');
+    expect(await verifier.VERSION()).to.equal('0.20');
 
     expect(await verifier.getDomainSeparator()).to.equal(utils.getDomainSeparator());
     expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
