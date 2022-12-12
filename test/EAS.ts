@@ -4,13 +4,15 @@ import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUUID, getUUIDFromAttestTx } from './helpers/EAS';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
+import { getTransactionCost } from './helpers/Transaction';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumberish, Wallet } from 'ethers';
+import { BigNumber, BigNumberish, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
+  provider: { getBalance },
   utils: { formatBytes32String, hexlify }
 } = ethers;
 
@@ -58,7 +60,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.19');
+      expect(await eas.VERSION()).to.equal('0.20');
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
       expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
     });
@@ -92,19 +94,26 @@ describe('EAS', () => {
           revocable: boolean,
           refUUID: string,
           data: string,
+          value: BigNumberish,
           options?: Options
         ) => {
           const txSender = options?.from || sender;
+          const prevBalance = await getBalance(txSender.address);
 
+          const msgValue = BigNumber.from(options?.value ?? value);
+          let transactionCost = BigNumber.from(0);
           let uuid;
 
           switch (signatureType) {
             case SignatureType.Direct: {
-              uuid = await getUUIDFromAttestTx(
-                eas.connect(txSender).attest(recipient, schema, expirationTime, revocable, refUUID, data, {
-                  value: options?.value
-                })
-              );
+              const res = await eas
+                .connect(txSender)
+                .attest(recipient, schema, expirationTime, revocable, refUUID, data, value, {
+                  value: msgValue
+                });
+
+              transactionCost = await getTransactionCost(res);
+              uuid = await getUUIDFromAttestTx(res);
 
               break;
             }
@@ -123,29 +132,33 @@ describe('EAS', () => {
 
               expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
 
-              uuid = await getUUIDFromAttestTx(
-                eas
-                  .connect(txSender)
-                  .attestByDelegation(
-                    recipient,
-                    schema,
-                    expirationTime,
-                    revocable,
-                    refUUID,
-                    data,
-                    txSender.address,
-                    request.v,
-                    hexlify(request.r),
-                    hexlify(request.s),
-                    {
-                      value: options?.value
-                    }
-                  )
-              );
+              const res = await eas
+                .connect(txSender)
+                .attestByDelegation(
+                  recipient,
+                  schema,
+                  expirationTime,
+                  revocable,
+                  refUUID,
+                  data,
+                  value,
+                  txSender.address,
+                  request.v,
+                  hexlify(request.r),
+                  hexlify(request.s),
+                  {
+                    value: msgValue
+                  }
+                );
+
+              transactionCost = await getTransactionCost(res);
+              uuid = await getUUIDFromAttestTx(res);
 
               break;
             }
           }
+
+          expect(await getBalance(txSender.address)).to.equal(prevBalance.sub(value).sub(transactionCost));
 
           expect(await eas.isAttestationValid(uuid)).to.be.true;
 
@@ -171,6 +184,7 @@ describe('EAS', () => {
           revocable: boolean,
           refUUID: string,
           data: any,
+          value: BigNumberish,
           err: string,
           options?: Options
         ) => {
@@ -179,9 +193,9 @@ describe('EAS', () => {
           switch (signatureType) {
             case SignatureType.Direct: {
               await expect(
-                eas
-                  .connect(txSender)
-                  .attest(recipient, schema, expirationTime, revocable, refUUID, data, { value: options?.value })
+                eas.connect(txSender).attest(recipient, schema, expirationTime, revocable, refUUID, data, value, {
+                  value: options?.value ?? value
+                })
               ).to.be.revertedWith(err);
 
               break;
@@ -211,6 +225,7 @@ describe('EAS', () => {
                     revocable,
                     refUUID,
                     data,
+                    0,
                     txSender.address,
                     request.v,
                     hexlify(request.r),
@@ -232,6 +247,7 @@ describe('EAS', () => {
             true,
             ZERO_BYTES32,
             data,
+            0,
             'InvalidSchema'
           );
         });
@@ -259,43 +275,44 @@ describe('EAS', () => {
               true,
               ZERO_BYTES32,
               data,
+              0,
               'InvalidExpirationTime'
             );
           });
 
           it('should allow attestation to an empty recipient', async () => {
-            await expectAttestation(ZERO_ADDRESS, schema1Id, expirationTime, true, ZERO_BYTES32, data);
+            await expectAttestation(ZERO_ADDRESS, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0);
           });
 
           it('should allow self attestations', async () => {
-            await expectAttestation(sender.address, schema2Id, expirationTime, true, ZERO_BYTES32, data, {
+            await expectAttestation(sender.address, schema2Id, expirationTime, true, ZERO_BYTES32, data, 0, {
               from: sender
             });
           });
 
           it('should allow multiple attestations', async () => {
-            await expectAttestation(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
-            await expectAttestation(recipient2.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0);
+            await expectAttestation(recipient2.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0);
           });
 
           it('should allow multiple attestations to the same schema', async () => {
-            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, 0, {
               bump: 0
             });
-            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, 0, {
               bump: 1
             });
-            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, {
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, data, 0, {
               bump: 2
             });
           });
 
           it('should allow attestation without expiration time', async () => {
-            await expectAttestation(recipient.address, schema1Id, 0, true, ZERO_BYTES32, data);
+            await expectAttestation(recipient.address, schema1Id, 0, true, ZERO_BYTES32, data, 0);
           });
 
           it('should allow attestation without any data', async () => {
-            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, ZERO_BYTES);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, ZERO_BYTES32, ZERO_BYTES, 0);
           });
 
           it('should store referenced attestation', async () => {
@@ -305,11 +322,12 @@ describe('EAS', () => {
               expirationTime,
               true,
               ZERO_BYTES32,
-              data
+              data,
+              0
             );
-            await eas.attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data);
+            await eas.attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0);
 
-            await expectAttestation(recipient.address, schema3Id, expirationTime, true, uuid, data);
+            await expectAttestation(recipient.address, schema3Id, expirationTime, true, uuid, data, 0);
           });
 
           it('should generate unique UUIDs for similar attestations', async () => {
@@ -320,6 +338,7 @@ describe('EAS', () => {
               true,
               ZERO_BYTES32,
               data,
+              0,
               {
                 bump: 0
               }
@@ -331,6 +350,7 @@ describe('EAS', () => {
               true,
               ZERO_BYTES32,
               data,
+              0,
               {
                 bump: 1
               }
@@ -342,6 +362,7 @@ describe('EAS', () => {
               true,
               ZERO_BYTES32,
               data,
+              0,
               {
                 bump: 2
               }
@@ -358,6 +379,7 @@ describe('EAS', () => {
               true,
               formatBytes32String('INVALID'),
               data,
+              0,
               'NotFound'
             );
           });
@@ -379,6 +401,7 @@ describe('EAS', () => {
               true,
               ZERO_BYTES32,
               data,
+              0,
               'Irrevocable'
             );
           });
@@ -395,6 +418,7 @@ describe('EAS', () => {
           true,
           ZERO_BYTES32,
           ZERO_BYTES32,
+          0,
           sender.address,
           28,
           formatBytes32String('BAD'),
@@ -420,13 +444,17 @@ describe('EAS', () => {
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
       context(`via ${signatureType} attestation`, () => {
-        const expectRevocation = async (uuid: string, options?: Options) => {
+        const expectRevocation = async (uuid: string, value: BigNumberish, options?: Options) => {
           const txSender = options?.from || sender;
+          const prevBalance = await getBalance(txSender.address);
+
           let res;
+          let transactionCost = BigNumber.from(0);
 
           switch (signatureType) {
             case SignatureType.Direct: {
-              res = await eas.connect(txSender).revoke(uuid);
+              res = await eas.connect(txSender).revoke(uuid, value, { value: options?.value ?? value });
+              transactionCost = await getTransactionCost(res);
 
               break;
             }
@@ -440,7 +468,16 @@ describe('EAS', () => {
 
               res = await eas
                 .connect(txSender)
-                .revokeByDelegation(uuid, txSender.address, signature.v, hexlify(signature.r), hexlify(signature.s));
+                .revokeByDelegation(
+                  uuid,
+                  value,
+                  txSender.address,
+                  signature.v,
+                  hexlify(signature.r),
+                  hexlify(signature.s),
+                  { value: options?.value ?? value }
+                );
+              transactionCost = await getTransactionCost(res);
 
               break;
             }
@@ -448,16 +485,20 @@ describe('EAS', () => {
 
           await expect(res).to.emit(eas, 'Revoked').withArgs(recipient.address, txSender.address, uuid, schema1Id);
 
+          expect(await getBalance(txSender.address)).to.equal(prevBalance.sub(value).sub(transactionCost));
+
           const attestation = await eas.getAttestation(uuid);
           expect(attestation.revocationTime).to.equal(await eas.getTime());
         };
 
-        const expectFailedRevocation = async (uuid: string, err: string, options?: Options) => {
+        const expectFailedRevocation = async (uuid: string, value: BigNumberish, err: string, options?: Options) => {
           const txSender = options?.from || sender;
 
           switch (signatureType) {
             case SignatureType.Direct: {
-              await expect(eas.connect(txSender).revoke(uuid)).to.be.revertedWith(err);
+              await expect(
+                eas.connect(txSender).revoke(uuid, value, { value: options?.value ?? value })
+              ).to.be.revertedWith(err);
 
               break;
             }
@@ -472,7 +513,15 @@ describe('EAS', () => {
               expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, request)).to.be.true;
 
               await expect(
-                eas.revokeByDelegation(uuid, txSender.address, request.v, hexlify(request.r), hexlify(request.s))
+                eas.revokeByDelegation(
+                  uuid,
+                  value,
+                  txSender.address,
+                  request.v,
+                  hexlify(request.r),
+                  hexlify(request.s),
+                  { value: options?.value ?? value }
+                )
               ).to.be.revertedWith(err);
 
               break;
@@ -482,36 +531,36 @@ describe('EAS', () => {
 
         beforeEach(async () => {
           uuid = await getUUIDFromAttestTx(
-            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data)
+            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0)
           );
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
-          await expectFailedRevocation(formatBytes32String('BAD'), 'NotFound');
+          await expectFailedRevocation(formatBytes32String('BAD'), 0, 'NotFound');
         });
 
         it("should revert when revoking a someone's else attestation", async () => {
-          await expectFailedRevocation(uuid, 'AccessDenied', { from: sender2 });
+          await expectFailedRevocation(uuid, 0, 'AccessDenied', { from: sender2 });
         });
 
         it('should allow to revoke an existing attestation', async () => {
-          await expectRevocation(uuid);
+          await expectRevocation(uuid, 0);
         });
 
         it('should revert when revoking an already revoked attestation', async () => {
-          await expectRevocation(uuid);
-          await expectFailedRevocation(uuid, 'AlreadyRevoked');
+          await expectRevocation(uuid, 0);
+          await expectFailedRevocation(uuid, 0, 'AlreadyRevoked');
         });
 
         context('with an irrevocable attestation', () => {
           beforeEach(async () => {
             uuid = await getUUIDFromAttestTx(
-              eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data)
+              eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data, 0)
             );
           });
 
           it('should revert when revoking', async () => {
-            await expectFailedRevocation(uuid, 'Irrevocable');
+            await expectFailedRevocation(uuid, 0, 'Irrevocable');
           });
         });
 
@@ -523,12 +572,12 @@ describe('EAS', () => {
             await registry.register(schema2, ZERO_ADDRESS, false);
 
             uuid = await getUUIDFromAttestTx(
-              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, false, ZERO_BYTES32, data)
+              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, false, ZERO_BYTES32, data, 0)
             );
           });
 
           it('should revert when revoking', async () => {
-            await expectFailedRevocation(uuid, 'Irrevocable');
+            await expectFailedRevocation(uuid, 0, 'Irrevocable');
           });
         });
       });
@@ -536,7 +585,14 @@ describe('EAS', () => {
 
     it('should revert when delegation revoking with a wrong signature', async () => {
       await expect(
-        eas.revokeByDelegation(ZERO_BYTES32, sender.address, 28, formatBytes32String('BAD'), formatBytes32String('BAD'))
+        eas.revokeByDelegation(
+          ZERO_BYTES32,
+          0,
+          sender.address,
+          28,
+          formatBytes32String('BAD'),
+          formatBytes32String('BAD')
+        )
       ).to.be.revertedWith('InvalidSignature');
     });
   });

@@ -52,6 +52,7 @@ describe('DataResolver', () => {
       true,
       ZERO_BYTES32,
       '0x1234',
+      0,
       'InvalidAttestation',
       { from: sender }
     );
@@ -64,6 +65,7 @@ describe('DataResolver', () => {
       true,
       ZERO_BYTES32,
       '0x02',
+      0,
       'InvalidAttestation',
       { from: sender }
     );
@@ -78,12 +80,13 @@ describe('DataResolver', () => {
       true,
       ZERO_BYTES32,
       '0x00',
+      0,
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid, { from: sender });
+    await expectRevocation(eas, uuid, 0, { from: sender });
 
     const { uuid: uuid2 } = await expectAttestation(
       eas,
@@ -93,11 +96,12 @@ describe('DataResolver', () => {
       true,
       ZERO_BYTES32,
       '0x01',
+      0,
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid2, { from: sender });
+    await expectRevocation(eas, uuid2, 0, { from: sender });
   });
 });

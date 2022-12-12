@@ -14,6 +14,8 @@ import { IEAS, Attestation } from "../../IEAS.sol";
 contract PayingResolver is SchemaResolver {
     using Address for address payable;
 
+    error InvalidValue();
+
     uint256 private immutable _incentive;
 
     constructor(IEAS eas, uint256 incentive) SchemaResolver(eas) {
@@ -25,6 +27,10 @@ contract PayingResolver is SchemaResolver {
     }
 
     function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+        if (msg.value > 0) {
+            return false;
+        }
+
         payable(attestation.attester).transfer(_incentive);
 
         return true;
