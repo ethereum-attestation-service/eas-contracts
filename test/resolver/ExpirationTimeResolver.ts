@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { duration, latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
@@ -48,34 +47,18 @@ describe('ExpirationTimeResolver', () => {
 
   it('should revert when attesting with a wrong expiration time', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      validAfter - duration.days(1),
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'InvalidAttestation',
-      { from: sender }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime: validAfter - duration.days(1), data },
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
   it('should allow attesting with the correct expiration time', async () => {
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      validAfter + duration.seconds(1),
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      {
-        from: sender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.seconds(1), data },
+      { from: sender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas, uuid }, { from: sender });
   });
 });

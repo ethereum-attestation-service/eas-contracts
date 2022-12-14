@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
@@ -51,36 +50,18 @@ describe('AttesterResolver', () => {
 
   it('should revert when attesting to the wrong attester', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'InvalidAttestation',
-      {
-        from: sender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
   it('should allow attesting to the correct attester', async () => {
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      {
-        from: targetSender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: targetSender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: targetSender });
+    await expectRevocation({ eas, uuid }, { from: targetSender });
   });
 });

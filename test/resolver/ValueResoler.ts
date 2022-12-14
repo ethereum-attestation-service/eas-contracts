@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
@@ -50,72 +49,39 @@ describe('ValueResolver', () => {
     const value = targetValue + 1;
 
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      value,
-      'InvalidAttestation',
-      { from: sender }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
   it('should allow attesting with the correct value', async () => {
     const value = targetValue;
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      value,
-      {
-        from: sender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      { from: sender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas, uuid }, { from: sender });
   });
 
   it('should revert when attempting to attest with more value than was actually sent', async () => {
     const value = targetValue;
 
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      value + 1000,
-      'InsufficientValue',
-      { from: sender, value }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value: value + 1000 },
+      { from: sender, value },
+      'InsufficientValue'
     );
   });
 
   it('should allow attesting with the correct value when accidentally sending too much', async () => {
     const value = targetValue;
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      value,
-      {
-        from: sender,
-        value: value + 1000
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      { from: sender, value: value + 1000 }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas, uuid }, { from: sender });
   });
 });

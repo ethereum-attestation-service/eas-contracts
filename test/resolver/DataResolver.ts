@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
@@ -21,6 +20,9 @@ describe('DataResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const expirationTime = 0;
+
+  const DATA1 = '0x00';
+  const DATA2 = '0x01';
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -45,63 +47,59 @@ describe('DataResolver', () => {
 
   it('should revert when attesting with wrong data', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      '0x1234',
-      0,
-      'InvalidAttestation',
-      { from: sender }
+      {
+        eas,
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime,
+        data: '0x1234'
+      },
+      { from: sender },
+      'InvalidAttestation'
     );
 
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      '0x02',
-      0,
-      'InvalidAttestation',
-      { from: sender }
+      {
+        eas,
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime,
+        data: '0x02'
+      },
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
   it('should allow attesting with correct data', async () => {
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      '0x00',
-      0,
+      {
+        eas,
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime,
+        data: DATA1
+      },
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas, uuid }, { from: sender });
 
     const { uuid: uuid2 } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      '0x01',
-      0,
+      {
+        eas,
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime,
+        data: DATA2
+      },
       {
         from: sender
       }
     );
 
-    await expectRevocation(eas, uuid2, 0, { from: sender });
+    await expectRevocation({ eas, uuid: uuid2 }, { from: sender });
   });
 });
