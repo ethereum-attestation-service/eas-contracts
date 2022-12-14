@@ -45,7 +45,7 @@
     "clean": "rm -rf artifacts cache dist coverage typechain-types",
     "prepare": "yarn hardhat-deploy-fix && yarn compile",
     "hardhat-deploy-fix": "scripts/fix-github-hardhat-deploy.sh",
-    "export-types": "yarn delete-test-types && tsc -p tsconfig-release.json && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && yarn restore-test-types",
+    "export-types": "yarn delete-test-types && tsc -p tsconfig.release.json && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && yarn restore-test-types",
     "delete-test-types": "sed -i.bak '/\\/tests/d' typechain-types/index.ts typechain-types/factories/contracts/index.ts",
     "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts",
     "prepare-release": "yarn prepare && yarn export-types && yarn lint && yarn test"
