@@ -74,7 +74,7 @@ export const expectAttestation = async (
   const msgValue = BigNumber.from(options?.value ?? value);
   const res = await eas
     .connect(txSender)
-    .attest(recipient, schema, expirationTime, revocable, refUUID, data, value, { value: msgValue });
+    .attest({ recipient, schema, expirationTime, revocable, refUUID, data, value }, { value: msgValue });
 
   if (!options?.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
@@ -104,7 +104,7 @@ export const expectAttestation = async (
 export const expectFailedAttestation = async (
   eas: TestEAS,
   recipient: string,
-  as: string,
+  schema: string,
   expirationTime: number,
   revocable: boolean,
   refUUID: string,
@@ -118,7 +118,10 @@ export const expectFailedAttestation = async (
   await expect(
     eas
       .connect(txSender)
-      .attest(recipient, as, expirationTime, revocable, refUUID, data, value, { value: options?.value ?? value })
+      .attest(
+        { recipient, schema, expirationTime, revocable, refUUID, data, value },
+        { value: options?.value ?? value }
+      )
   ).to.be.revertedWith(err);
 };
 
@@ -128,7 +131,7 @@ export const expectRevocation = async (eas: TestEAS, uuid: string, value: number
   const attestation = await eas.getAttestation(uuid);
 
   const msgValue = BigNumber.from(options?.value ?? value);
-  const res = await eas.connect(txSender).revoke(uuid, value, { value: msgValue });
+  const res = await eas.connect(txSender).revoke({ uuid, value }, { value: msgValue });
 
   if (!options?.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
@@ -153,5 +156,7 @@ export const expectFailedRevocation = async (
 ) => {
   const txSender = options?.from || (await ethers.getSigners())[0];
 
-  await expect(eas.connect(txSender).revoke(uuid, value, { value: options?.value ?? value })).to.be.revertedWith(err);
+  await expect(eas.connect(txSender).revoke({ uuid, value }, { value: options?.value ?? value })).to.be.revertedWith(
+    err
+  );
 };

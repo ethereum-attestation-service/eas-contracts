@@ -4,31 +4,59 @@ pragma solidity 0.8.17;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
+import { EIP712Signature } from "./Types.sol";
 
 /**
  * @dev A struct representing a single attestation.
  */
 struct Attestation {
-    // A unique identifier of the attestation.
-    bytes32 uuid;
-    // A unique identifier of the schema.
-    bytes32 schema;
-    // The UUID of the related attestation.
-    bytes32 refUUID;
-    // The time when the attestation was created (Unix timestamp).
-    uint32 time;
-    // The time when the attestation expires (Unix timestamp).
-    uint32 expirationTime;
-    // The time when the attestation was revoked (Unix timestamp).
-    uint32 revocationTime;
-    // The recipient of the attestation.
-    address recipient;
-    // The attester/sender of the attestation.
-    address attester;
-    // Whether the attestation is revocable.
-    bool revocable;
-    // Custom attestation data.
-    bytes data;
+    bytes32 uuid; // A unique identifier of the attestation.
+    bytes32 schema; // A unique identifier of the schema.
+    bytes32 refUUID; // The UUID of the related attestation.
+    uint32 time; // The time when the attestation was created (Unix timestamp).
+    uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
+    uint32 revocationTime; // The time when the attestation was revoked (Unix timestamp).
+    address recipient; // The recipient of the attestation.
+    address attester; // The attester/sender of the attestation.
+    bool revocable; // Whether the attestation is revocable.
+    bytes data; // Custom attestation data.
+}
+
+/**
+ * @dev A struct representing the arguments of the attestation request.
+ */
+struct AttestationRequest {
+    address recipient; // The recipient of the attestation.
+    bytes32 schema; // A unique identifier of the schema.
+    uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
+    bool revocable; // Whether the attestation is revocable.
+    bytes32 refUUID; // The UUID of the related attestation.
+    bytes data; // Custom attestation data.
+    uint256 value; // value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+}
+
+/**
+ * @dev A struct representing the arguments of the delegated attestation request.
+ */
+struct DelegatedAttestationRequest {
+    AttestationRequest request; // The arguments to the attestation request.
+    EIP712Signature signature; // The EIP712 signature data.
+}
+
+/**
+ * @dev A struct representing the arguments of the revocation request.
+ */
+struct RevocationRequest {
+    bytes32 uuid; // The UUID of the attestation to revoke.
+    uint256 value; // An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+}
+
+/**
+ * @dev A struct representing the arguments of the delegated revocation request.
+ */
+struct DelegatedRevocationRequest {
+    RevocationRequest request; // The arguments to the attestation request.
+    EIP712Signature signature; // The EIP712 signature data.
 }
 
 /**
@@ -72,83 +100,47 @@ interface IEAS {
     /**
      * @dev Attests to a specific schema.
      *
-     * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the schema.
-     * @param expirationTime The expiration time of the attestation.
-     * @param revocable Whether the attestation is revocable.
-     * @param refUUID An optional related attestation's UUID.
-     * @param data Additional custom data.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
-     *
+     * @param request The arguments of the attestation request (see the AttestationRequest struct):
+     *   - recipient: the recipient of the attestation.
+     *   - schema: the UUID of the schema.
+     *   - expirationTime: the expiration time of the attestation.
+     *   - revocable: whether the attestation is revocable.
+     *   - refUUID: an optional related attestation's UUID.
+     *   - data: additional custom data.
+     *   - value an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      * @return The UUID of the new attestation.
      */
-    function attest(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        uint256 value
-    ) external payable returns (bytes32);
+    function attest(AttestationRequest calldata request) external payable returns (bytes32);
 
     /**
      * @dev Attests to a specific schema using the provided EIP712 signature.
      *
-     * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the schema.
-     * @param expirationTime The expiration time of the attestation.
-     * @param revocable Whether the attestation is revocable.
-     * @param refUUID An optional related attestation's UUID.
-     * @param data Additional custom data.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
-     * @param attester The attesting account.
-     * @param v The recovery ID.
-     * @param r The x-coordinate of the nonce R.
-     * @param s The signature data.
-     *
+     * @param delegatedRequest The arguments of the delegated attestation request (see the AttestationRequest struct):
+     *   - request: the arguments to the attestation request.
+     *   - signature: the EIP712 signature data.
      * @return The UUID of the new attestation.
      */
     function attestByDelegation(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        uint256 value,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        DelegatedAttestationRequest calldata delegatedRequest
     ) external payable returns (bytes32);
 
     /**
      * @dev Revokes an existing attestation to a specific schema.
      *
-     * @param uuid The UUID of the attestation to revoke.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param request The arguments of the revocation request (see the RevocationRequest struct):
+     * - uuid: the UUID of the attestation to revoke.
+     * - value: an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
      */
-    function revoke(bytes32 uuid, uint256 value) external payable;
+    function revoke(RevocationRequest calldata request) external payable;
 
     /**
-     * @dev Attests to a specific schema the EIP712 signature.
+     * @dev Revokes an existing attestation to a specific schema using the provided EIP712 signature.
      *
-     * @param uuid The UUID of the attestation to revoke.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
-     * @param attester The attesting account.
-     * @param v The recovery ID.
-     * @param r The x-coordinate of the nonce R.
-     * @param s The signature data.
+     * @param delegatedRequest The arguments of the delegated attestation request (see the DelegatedRevocationRequest struct):
+     *   - request: arguments of the revocation request
+     *   - signature: the EIP712 signature data.
      */
-    function revokeByDelegation(
-        bytes32 uuid,
-        uint256 value,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external payable;
+    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable;
 
     /**
      * @dev Returns an existing attestation by UUID.

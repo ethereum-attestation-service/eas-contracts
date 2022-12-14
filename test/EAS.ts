@@ -106,11 +106,12 @@ describe('EAS', () => {
 
           switch (signatureType) {
             case SignatureType.Direct: {
-              const res = await eas
-                .connect(txSender)
-                .attest(recipient, schema, expirationTime, revocable, refUUID, data, value, {
+              const res = await eas.connect(txSender).attest(
+                { recipient, schema, expirationTime, revocable, refUUID, data, value },
+                {
                   value: msgValue
-                });
+                }
+              );
 
               transactionCost = await getTransactionCost(res);
               uuid = await getUUIDFromAttestTx(res);
@@ -132,24 +133,21 @@ describe('EAS', () => {
 
               expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
 
-              const res = await eas
-                .connect(txSender)
-                .attestByDelegation(
-                  recipient,
-                  schema,
-                  expirationTime,
-                  revocable,
-                  refUUID,
-                  data,
-                  value,
-                  txSender.address,
-                  request.v,
-                  hexlify(request.r),
-                  hexlify(request.s),
-                  {
-                    value: msgValue
+              const res = await eas.connect(txSender).attestByDelegation(
+                {
+                  request: { recipient, schema, expirationTime, revocable, refUUID, data, value },
+                  signature: {
+                    attester: txSender.address,
+                    v: request.v,
+                    r: hexlify(request.r),
+                    s: hexlify(request.s)
                   }
-                );
+                },
+
+                {
+                  value: msgValue
+                }
+              );
 
               transactionCost = await getTransactionCost(res);
               uuid = await getUUIDFromAttestTx(res);
@@ -193,9 +191,12 @@ describe('EAS', () => {
           switch (signatureType) {
             case SignatureType.Direct: {
               await expect(
-                eas.connect(txSender).attest(recipient, schema, expirationTime, revocable, refUUID, data, value, {
-                  value: options?.value ?? value
-                })
+                eas.connect(txSender).attest(
+                  { recipient, schema, expirationTime, revocable, refUUID, data, value },
+                  {
+                    value: options?.value ?? value
+                  }
+                )
               ).to.be.revertedWith(err);
 
               break;
@@ -216,22 +217,26 @@ describe('EAS', () => {
               expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
 
               await expect(
-                eas
-                  .connect(txSender)
-                  .attestByDelegation(
-                    recipient,
-                    schema,
-                    expirationTime,
-                    revocable,
-                    refUUID,
-                    data,
-                    0,
-                    txSender.address,
-                    request.v,
-                    hexlify(request.r),
-                    hexlify(request.s),
-                    { value: options?.value }
-                  )
+                eas.connect(txSender).attestByDelegation(
+                  {
+                    request: {
+                      recipient,
+                      schema,
+                      expirationTime,
+                      revocable,
+                      refUUID,
+                      data,
+                      value: 0
+                    },
+                    signature: {
+                      attester: txSender.address,
+                      v: request.v,
+                      r: hexlify(request.r),
+                      s: hexlify(request.s)
+                    }
+                  },
+                  { value: options?.value }
+                )
               ).to.be.revertedWith(err);
 
               break;
@@ -316,16 +321,24 @@ describe('EAS', () => {
           });
 
           it('should store referenced attestation', async () => {
-            const uuid = await eas.callStatic.attest(
-              recipient.address,
-              schema1Id,
+            const uuid = await eas.callStatic.attest({
+              recipient: recipient.address,
+              schema: schema1Id,
               expirationTime,
-              true,
-              ZERO_BYTES32,
+              revocable: true,
+              refUUID: ZERO_BYTES32,
               data,
-              0
-            );
-            await eas.attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0);
+              value: 0
+            });
+            await eas.attest({
+              recipient: recipient.address,
+              schema: schema1Id,
+              expirationTime,
+              revocable: true,
+              refUUID: ZERO_BYTES32,
+              data,
+              value: 0
+            });
 
             await expectAttestation(recipient.address, schema3Id, expirationTime, true, uuid, data, 0);
           });
@@ -411,19 +424,23 @@ describe('EAS', () => {
 
     it('should revert when delegation attesting with a wrong signature', async () => {
       await expect(
-        eas.attestByDelegation(
-          recipient.address,
-          formatBytes32String('BAD'),
-          expirationTime,
-          true,
-          ZERO_BYTES32,
-          ZERO_BYTES32,
-          0,
-          sender.address,
-          28,
-          formatBytes32String('BAD'),
-          formatBytes32String('BAD')
-        )
+        eas.attestByDelegation({
+          request: {
+            recipient: recipient.address,
+            schema: formatBytes32String('BAD'),
+            expirationTime,
+            revocable: true,
+            refUUID: ZERO_BYTES32,
+            data: ZERO_BYTES32,
+            value: 0
+          },
+          signature: {
+            attester: sender.address,
+            v: 28,
+            r: formatBytes32String('BAD'),
+            s: formatBytes32String('BAD')
+          }
+        })
       ).to.be.revertedWith('InvalidSignature');
     });
   });
@@ -453,7 +470,7 @@ describe('EAS', () => {
 
           switch (signatureType) {
             case SignatureType.Direct: {
-              res = await eas.connect(txSender).revoke(uuid, value, { value: options?.value ?? value });
+              res = await eas.connect(txSender).revoke({ uuid, value }, { value: options?.value ?? value });
               transactionCost = await getTransactionCost(res);
 
               break;
@@ -466,17 +483,18 @@ describe('EAS', () => {
                 await verifier.getNonce(txSender.address)
               );
 
-              res = await eas
-                .connect(txSender)
-                .revokeByDelegation(
-                  uuid,
-                  value,
-                  txSender.address,
-                  signature.v,
-                  hexlify(signature.r),
-                  hexlify(signature.s),
-                  { value: options?.value ?? value }
-                );
+              res = await eas.connect(txSender).revokeByDelegation(
+                {
+                  request: { uuid, value },
+                  signature: {
+                    attester: txSender.address,
+                    v: signature.v,
+                    r: hexlify(signature.r),
+                    s: hexlify(signature.s)
+                  }
+                },
+                { value: options?.value ?? value }
+              );
               transactionCost = await getTransactionCost(res);
 
               break;
@@ -497,7 +515,7 @@ describe('EAS', () => {
           switch (signatureType) {
             case SignatureType.Direct: {
               await expect(
-                eas.connect(txSender).revoke(uuid, value, { value: options?.value ?? value })
+                eas.connect(txSender).revoke({ uuid, value }, { value: options?.value ?? value })
               ).to.be.revertedWith(err);
 
               break;
@@ -514,12 +532,15 @@ describe('EAS', () => {
 
               await expect(
                 eas.revokeByDelegation(
-                  uuid,
-                  value,
-                  txSender.address,
-                  request.v,
-                  hexlify(request.r),
-                  hexlify(request.s),
+                  {
+                    request: { uuid, value },
+                    signature: {
+                      attester: txSender.address,
+                      v: request.v,
+                      r: hexlify(request.r),
+                      s: hexlify(request.s)
+                    }
+                  },
                   { value: options?.value ?? value }
                 )
               ).to.be.revertedWith(err);
@@ -531,7 +552,15 @@ describe('EAS', () => {
 
         beforeEach(async () => {
           uuid = await getUUIDFromAttestTx(
-            eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, true, ZERO_BYTES32, data, 0)
+            eas.connect(sender).attest({
+              recipient: recipient.address,
+              schema: schema1Id,
+              expirationTime,
+              revocable: true,
+              refUUID: ZERO_BYTES32,
+              data,
+              value: 0
+            })
           );
         });
 
@@ -555,7 +584,15 @@ describe('EAS', () => {
         context('with an irrevocable attestation', () => {
           beforeEach(async () => {
             uuid = await getUUIDFromAttestTx(
-              eas.connect(sender).attest(recipient.address, schema1Id, expirationTime, false, ZERO_BYTES32, data, 0)
+              eas.connect(sender).attest({
+                recipient: recipient.address,
+                schema: schema1Id,
+                expirationTime,
+                revocable: false,
+                refUUID: ZERO_BYTES32,
+                data,
+                value: 0
+              })
             );
           });
 
@@ -572,7 +609,15 @@ describe('EAS', () => {
             await registry.register(schema2, ZERO_ADDRESS, false);
 
             uuid = await getUUIDFromAttestTx(
-              eas.connect(sender).attest(recipient.address, schema2Id, expirationTime, false, ZERO_BYTES32, data, 0)
+              eas.connect(sender).attest({
+                recipient: recipient.address,
+                schema: schema2Id,
+                expirationTime,
+                revocable: false,
+                refUUID: ZERO_BYTES32,
+                data,
+                value: 0
+              })
             );
           });
 
@@ -585,14 +630,18 @@ describe('EAS', () => {
 
     it('should revert when delegation revoking with a wrong signature', async () => {
       await expect(
-        eas.revokeByDelegation(
-          ZERO_BYTES32,
-          0,
-          sender.address,
-          28,
-          formatBytes32String('BAD'),
-          formatBytes32String('BAD')
-        )
+        eas.revokeByDelegation({
+          request: {
+            uuid: ZERO_BYTES32,
+            value: 0
+          },
+          signature: {
+            attester: sender.address,
+            v: 28,
+            r: formatBytes32String('BAD'),
+            s: formatBytes32String('BAD')
+          }
+        })
       ).to.be.revertedWith('InvalidSignature');
     });
   });
