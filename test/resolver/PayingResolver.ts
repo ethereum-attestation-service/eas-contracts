@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { getTransactionCost } from '..//helpers/Transaction';
 import {
   expectAttestation,
@@ -65,14 +64,7 @@ describe('PayingResolver', () => {
     const prevAttesterBalance = await getBalance(sender.address);
 
     const { res } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
       {
         from: sender,
         skipBalanceCheck: true
@@ -86,18 +78,11 @@ describe('PayingResolver', () => {
 
   it('should revert when attempting to send any ETH', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      1,
-      'InvalidAttestation',
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value: 1 },
       {
         from: sender
-      }
+      },
+      'InvalidAttestation'
     );
   });
 
@@ -106,14 +91,8 @@ describe('PayingResolver', () => {
 
     beforeEach(async () => {
       ({ uuid } = await expectAttestation(
-        eas,
-        recipient.address,
-        schemaId,
-        expirationTime,
-        true,
-        ZERO_BYTES32,
-        data,
-        0,
+        { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+
         {
           from: sender,
           skipBalanceCheck: true
@@ -122,7 +101,7 @@ describe('PayingResolver', () => {
     });
 
     it('should revert when attempting to revoke an attestation without repaying the incentive', async () => {
-      await expectFailedRevocation(eas, uuid, 0, 'InvalidRevocation', { from: sender });
+      await expectFailedRevocation({ eas, uuid }, { from: sender }, 'InvalidRevocation');
     });
 
     it('should revoke an attestation', async () => {
@@ -130,7 +109,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive;
-      const res = await expectRevocation(eas, uuid, value, { from: sender });
+      const res = await expectRevocation({ eas, uuid, value }, { from: sender });
       const transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -142,7 +121,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive * 10;
-      const res = await expectRevocation(eas, uuid, value, { from: sender, skipBalanceCheck: true });
+      const res = await expectRevocation({ eas, uuid, value }, { from: sender, skipBalanceCheck: true });
       const transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -152,7 +131,7 @@ describe('PayingResolver', () => {
     it('should revert when attempting to revert with more value than was actually sent', async () => {
       const value = incentive;
 
-      await expectFailedRevocation(eas, uuid, value + 1000, 'InsufficientValue', { from: sender, value });
+      await expectFailedRevocation({ eas, uuid, value: value + 1000 }, { from: sender, value }, 'InsufficientValue');
     });
 
     it('should allow reverting with the correct value when accidentally sending too much', async () => {
@@ -160,11 +139,14 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive;
-      const res = await expectRevocation(eas, uuid, value, {
-        from: sender,
-        value: value + 1000,
-        skipBalanceCheck: true
-      });
+      const res = await expectRevocation(
+        { eas, uuid, value },
+        {
+          from: sender,
+          value: value + 1000,
+          skipBalanceCheck: true
+        }
+      );
       const transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));

@@ -108,19 +108,9 @@ describe('SchemaResolver', () => {
         await expect(sender.sendTransaction({ to: resolver.address, value })).to.be.revertedWith('NotPayable');
 
         await expectFailedAttestation(
-          eas,
-          recipient.address,
-          schemaId,
-          expirationTime,
-          true,
-          ZERO_BYTES32,
-          data,
-          value,
-          'NotPayable',
-          {
-            value,
-            from: sender
-          }
+          { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+          { value, from: sender },
+          'NotPayable'
         );
       });
     });

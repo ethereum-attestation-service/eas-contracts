@@ -1,6 +1,5 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
 import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
@@ -53,30 +52,16 @@ describe('TokenResolver', () => {
 
   it('should revert when attesting with wrong token amount', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'ERC20: insufficient allowance',
-      { from: sender }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: sender },
+      'ERC20: insufficient allowance'
     );
 
     await token.connect(sender).approve(resolver.address, targetAmount - 1);
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'ERC20: insufficient allowance',
-      { from: sender }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: sender },
+      'ERC20: insufficient allowance'
     );
   });
 
@@ -84,19 +69,10 @@ describe('TokenResolver', () => {
     await token.connect(sender).approve(resolver.address, targetAmount);
 
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      {
-        from: sender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: sender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas, uuid }, { from: sender });
   });
 });

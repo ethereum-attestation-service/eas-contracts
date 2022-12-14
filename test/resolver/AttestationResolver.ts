@@ -72,35 +72,25 @@ describe('AttestationResolver', () => {
 
   it('should revert when attesting to a non-existing attestation', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      ZERO_BYTES32,
-      0,
-      'InvalidAttestation',
-      { from: sender }
+      {
+        eas,
+        verifier,
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime
+      },
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
   it('should allow attesting to an existing attestation', async () => {
     const { uuid: uuid2 } = await expectAttestation(
-      eas,
-      recipient.address,
-      schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      uuid,
-      0,
-      {
-        from: sender
-      }
+      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
+      { from: sender }
     );
 
-    await expectRevocation(eas, uuid2, 0, { from: sender });
+    await expectRevocation({ eas, uuid: uuid2 }, { from: sender });
   });
 
   it('should revert invalid input', async () => {
