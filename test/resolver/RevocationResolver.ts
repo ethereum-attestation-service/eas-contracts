@@ -46,7 +46,15 @@ describe('RevocationResolver', () => {
     schemaId = await registerSchema(schema, registry, resolver, true);
 
     uuid = await getUUIDFromAttestTx(
-      eas.connect(sender).attest(recipient.address, schemaId, expirationTime, true, ZERO_BYTES32, data, 0)
+      eas.connect(sender).attest({
+        recipient: recipient.address,
+        schema: schemaId,
+        expirationTime,
+        revocable: true,
+        refUUID: ZERO_BYTES32,
+        data,
+        value: 0
+      })
     );
   });
 

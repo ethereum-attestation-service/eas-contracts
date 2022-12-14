@@ -5,7 +5,7 @@ pragma solidity 0.8.17;
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 import { EMPTY_UUID } from "./Types.sol";
-import { IEAS, Attestation } from "./IEAS.sol";
+import { IEAS, Attestation, AttestationRequest, DelegatedAttestationRequest, RevocationRequest, DelegatedRevocationRequest } from "./IEAS.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 
@@ -79,60 +79,35 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function attest(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        uint256 value
-    ) public payable virtual returns (bytes32) {
-        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, value, msg.sender);
+    function attest(AttestationRequest calldata request) public payable virtual returns (bytes32) {
+        return _attest(request, msg.sender);
     }
 
     /**
      * @inheritdoc IEAS
      */
     function attestByDelegation(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        uint256 value,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        DelegatedAttestationRequest calldata delegatedRequest
     ) public payable virtual returns (bytes32) {
-        _eip712Verifier.attest(recipient, schema, expirationTime, revocable, refUUID, data, attester, v, r, s);
+        _eip712Verifier.attest(delegatedRequest);
 
-        return _attest(recipient, schema, expirationTime, revocable, refUUID, data, value, attester);
+        return _attest(delegatedRequest.request, delegatedRequest.signature.attester);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function revoke(bytes32 uuid, uint256 value) public payable virtual {
-        return _revoke(uuid, value, msg.sender);
+    function revoke(RevocationRequest calldata request) public payable virtual {
+        return _revoke(request, msg.sender);
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function revokeByDelegation(
-        bytes32 uuid,
-        uint256 value,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public payable virtual {
-        _eip712Verifier.revoke(uuid, attester, v, r, s);
+    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
+        _eip712Verifier.revoke(delegatedRequest);
 
-        _revoke(uuid, value, attester);
+        _revoke(delegatedRequest.request, delegatedRequest.signature.attester);
     }
 
     /**
@@ -152,51 +127,36 @@ contract EAS is IEAS {
     /**
      * @dev Attests to a specific schema.
      *
-     * @param recipient The recipient of the attestation.
-     * @param schema The UUID of the schema.
-     * @param expirationTime The expiration time of the attestation (0 represents no expiration).
-     * @param revocable Whether the attestation is revocable.
-     * @param refUUID An optional related attestation's UUID.
-     * @param data Additional custom data.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param request The arguments of the attestation request.
      * @param attester The attesting account.
      *
      * @return The UUID of the new attestation.
      */
-    function _attest(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        uint256 value,
-        address attester
-    ) private returns (bytes32) {
-        if (expirationTime != 0 && expirationTime <= _time()) {
+    function _attest(AttestationRequest calldata request, address attester) private returns (bytes32) {
+        if (request.expirationTime != 0 && request.expirationTime <= _time()) {
             revert InvalidExpirationTime();
         }
 
-        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
+        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(request.schema);
         if (schemaRecord.uuid == EMPTY_UUID) {
             revert InvalidSchema();
         }
 
-        if (!schemaRecord.revocable && revocable) {
+        if (!schemaRecord.revocable && request.revocable) {
             revert Irrevocable();
         }
 
         Attestation memory attestation = Attestation({
             uuid: EMPTY_UUID,
-            schema: schema,
-            refUUID: refUUID,
+            schema: request.schema,
+            refUUID: request.refUUID,
             time: _time(),
-            expirationTime: expirationTime,
+            expirationTime: request.expirationTime,
             revocationTime: 0,
-            recipient: recipient,
+            recipient: request.recipient,
             attester: attester,
-            revocable: revocable,
-            data: data
+            revocable: request.revocable,
+            data: request.data
         });
 
         // Look for the first non-existing UUID (and use a bump seed/nonce in the rare case of a conflict).
@@ -214,17 +174,17 @@ contract EAS is IEAS {
         }
         attestation.uuid = uuid;
 
-        _resolveAttestation(schemaRecord, attestation, value, false);
+        _resolveAttestation(schemaRecord, attestation, request.value, false);
 
         _db[uuid] = attestation;
 
-        if (refUUID != 0) {
-            if (!isAttestationValid(refUUID)) {
+        if (request.refUUID != 0) {
+            if (!isAttestationValid(request.refUUID)) {
                 revert NotFound();
             }
         }
 
-        emit Attested(recipient, attester, uuid, schema);
+        emit Attested(request.recipient, attester, uuid, request.schema);
 
         return uuid;
     }
@@ -232,17 +192,16 @@ contract EAS is IEAS {
     /**
      * @dev Revokes an existing attestation to a specific schema.
      *
-     * @param uuid The UUID of the attestation to revoke.
-     * @param value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
-     * @param attester The attesting account.
+     * @param request The arguments of the revocation request.
+     * @param revoker The revoking account.
      */
-    function _revoke(bytes32 uuid, uint256 value, address attester) private {
-        Attestation storage attestation = _db[uuid];
+    function _revoke(RevocationRequest calldata request, address revoker) private {
+        Attestation storage attestation = _db[request.uuid];
         if (attestation.uuid == EMPTY_UUID) {
             revert NotFound();
         }
 
-        if (attestation.attester != attester) {
+        if (attestation.attester != revoker) {
             revert AccessDenied();
         }
 
@@ -259,9 +218,9 @@ contract EAS is IEAS {
         attestation.revocationTime = _time();
 
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(attestation.schema);
-        _resolveAttestation(schemaRecord, attestation, value, true);
+        _resolveAttestation(schemaRecord, attestation, request.value, true);
 
-        emit Revoked(attestation.recipient, attester, uuid, attestation.schema);
+        emit Revoked(attestation.recipient, revoker, request.uuid, attestation.schema);
     }
 
     /**

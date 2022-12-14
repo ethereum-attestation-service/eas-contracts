@@ -6,6 +6,8 @@ import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
+import { AttestationRequest, DelegatedAttestationRequest, RevocationRequest, DelegatedRevocationRequest } from "./IEAS.sol";
+import { EIP712Signature } from "./Types.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
@@ -63,39 +65,31 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function attest(
-        address recipient,
-        bytes32 schema,
-        uint32 expirationTime,
-        bool revocable,
-        bytes32 refUUID,
-        bytes calldata data,
-        address attester,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external {
+    function attest(DelegatedAttestationRequest calldata delegatedRequest) external {
+        AttestationRequest calldata request = delegatedRequest.request;
+        EIP712Signature calldata signature = delegatedRequest.signature;
+
         uint256 nonce;
         unchecked {
-            nonce = _nonces[attester]++;
+            nonce = _nonces[signature.attester]++;
         }
 
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
                     ATTEST_TYPEHASH,
-                    recipient,
-                    schema,
-                    expirationTime,
-                    revocable,
-                    refUUID,
-                    keccak256(data),
+                    request.recipient,
+                    request.schema,
+                    request.expirationTime,
+                    request.revocable,
+                    request.refUUID,
+                    keccak256(request.data),
                     nonce
                 )
             )
         );
 
-        if (ECDSA.recover(digest, v, r, s) != attester) {
+        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signature.attester) {
             revert InvalidSignature();
         }
     }
@@ -103,15 +97,18 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function revoke(bytes32 uuid, address attester, uint8 v, bytes32 r, bytes32 s) external {
+    function revoke(DelegatedRevocationRequest calldata delegatedRequest) external {
+        RevocationRequest calldata request = delegatedRequest.request;
+        EIP712Signature calldata signature = delegatedRequest.signature;
+
         uint256 nonce;
         unchecked {
-            nonce = _nonces[attester]++;
+            nonce = _nonces[signature.attester]++;
         }
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, uuid, nonce)));
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.uuid, nonce)));
 
-        if (ECDSA.recover(digest, v, r, s) != attester) {
+        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signature.attester) {
             revert InvalidSignature();
         }
     }

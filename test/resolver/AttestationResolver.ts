@@ -53,7 +53,15 @@ describe('AttestationResolver', () => {
     await registerSchema(schema2, registry, ZERO_ADDRESS, true);
 
     uuid = await getUUIDFromAttestTx(
-      eas.attest(recipient.address, schema2Id, expirationTime, true, ZERO_BYTES32, data, 0)
+      eas.attest({
+        recipient: recipient.address,
+        schema: schema2Id,
+        expirationTime,
+        revocable: true,
+        refUUID: ZERO_BYTES32,
+        data,
+        value: 0
+      })
     );
 
     resolver = await Contracts.AttestationResolver.deploy(eas.address);
