@@ -1,6 +1,14 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
+import {
+  expectAttestation,
+  expectAttestations,
+  expectFailedAttestation,
+  expectFailedAttestations,
+  expectRevocation,
+  expectRevocations,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -48,7 +56,9 @@ describe('DataResolver', () => {
   it('should revert when attesting with wrong data', async () => {
     await expectFailedAttestation(
       {
-        eas,
+        eas
+      },
+      {
         recipient: recipient.address,
         schema: schemaId,
         expirationTime,
@@ -60,7 +70,9 @@ describe('DataResolver', () => {
 
     await expectFailedAttestation(
       {
-        eas,
+        eas
+      },
+      {
         recipient: recipient.address,
         schema: schemaId,
         expirationTime,
@@ -69,12 +81,58 @@ describe('DataResolver', () => {
       { from: sender },
       'InvalidAttestation'
     );
+
+    await expectFailedAttestations(
+      {
+        eas
+      },
+      [
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: '0x02'
+        },
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: DATA1
+        }
+      ],
+      { from: sender },
+      'InvalidAttestation'
+    );
+
+    await expectFailedAttestations(
+      {
+        eas
+      },
+      [
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: DATA2
+        },
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: '0x02'
+        }
+      ],
+      { from: sender },
+      'InvalidAttestation'
+    );
   });
 
   it('should allow attesting with correct data', async () => {
     const { uuid } = await expectAttestation(
       {
-        eas,
+        eas
+      },
+      {
         recipient: recipient.address,
         schema: schemaId,
         expirationTime,
@@ -85,11 +143,13 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas, uuid }, { from: sender });
+    await expectRevocation({ eas }, { uuid }, { from: sender });
 
     const { uuid: uuid2 } = await expectAttestation(
       {
-        eas,
+        eas
+      },
+      {
         recipient: recipient.address,
         schema: schemaId,
         expirationTime,
@@ -100,6 +160,35 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas, uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, { uuid: uuid2 }, { from: sender });
+
+    const res = await expectAttestations(
+      {
+        eas
+      },
+      [
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: DATA1
+        },
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: DATA2
+        }
+      ],
+      {
+        from: sender
+      }
+    );
+
+    await expectRevocations(
+      { eas },
+      res.map((r) => ({ uuid: r.uuid })),
+      { from: sender }
+    );
   });
 });

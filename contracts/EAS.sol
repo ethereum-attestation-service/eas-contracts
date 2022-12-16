@@ -97,6 +97,59 @@ contract EAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
+    function multiAttest(AttestationRequest[] calldata requests) external payable returns (bytes32[] memory) {
+        bytes32[] memory uuids = new bytes32[](requests.length);
+
+        uint256 length = requests.length;
+        uint remainingValue = msg.value;
+        for (uint256 i = 0; i < length; ) {
+            AttestationRequest calldata request = requests[i];
+
+            uuids[i] = _attest(request, msg.sender, remainingValue);
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= request.value;
+
+                ++i;
+            }
+        }
+
+        return uuids;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function multiAttestByDelegation(
+        DelegatedAttestationRequest[] calldata delegatedRequests
+    ) external payable returns (bytes32[] memory) {
+        bytes32[] memory uuids = new bytes32[](delegatedRequests.length);
+
+        uint256 length = delegatedRequests.length;
+        uint remainingValue = msg.value;
+        for (uint256 i = 0; i < length; ) {
+            DelegatedAttestationRequest calldata delegatedRequest = delegatedRequests[i];
+            AttestationRequest calldata request = delegatedRequest.request;
+
+            _eip712Verifier.attest(delegatedRequest);
+
+            uuids[i] = _attest(request, delegatedRequest.signature.attester, remainingValue);
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= request.value;
+
+                ++i;
+            }
+        }
+
+        return uuids;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
     function revoke(RevocationRequest calldata request) public payable virtual {
         return _revoke(request, msg.sender, msg.value);
     }
@@ -108,6 +161,49 @@ contract EAS is IEAS {
         _eip712Verifier.revoke(delegatedRequest);
 
         _revoke(delegatedRequest.request, delegatedRequest.signature.attester, msg.value);
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function multiRevoke(RevocationRequest[] calldata requests) external payable {
+        uint256 length = requests.length;
+        uint remainingValue = msg.value;
+        for (uint256 i = 0; i < length; ) {
+            RevocationRequest calldata request = requests[i];
+
+            _revoke(request, msg.sender, remainingValue);
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= request.value;
+
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function multiRevokeByDelegation(DelegatedRevocationRequest[] calldata delegatedRequests) external payable {
+        uint256 length = delegatedRequests.length;
+        uint remainingValue = msg.value;
+        for (uint256 i = 0; i < length; ) {
+            DelegatedRevocationRequest calldata delegatedRequest = delegatedRequests[i];
+            RevocationRequest calldata request = delegatedRequest.request;
+
+            _eip712Verifier.revoke(delegatedRequest);
+
+            _revoke(request, delegatedRequest.signature.attester, remainingValue);
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= request.value;
+
+                ++i;
+            }
+        }
     }
 
     /**
@@ -180,8 +276,6 @@ contract EAS is IEAS {
         }
         attestation.uuid = uuid;
 
-        _resolveAttestation(schemaRecord, attestation, false, request.value, remainingValue, true);
-
         _db[uuid] = attestation;
 
         if (request.refUUID != 0) {
@@ -189,6 +283,8 @@ contract EAS is IEAS {
                 revert NotFound();
             }
         }
+
+        _resolveAttestation(schemaRecord, attestation, false, request.value, remainingValue, true);
 
         emit Attested(request.recipient, attester, uuid, request.schema);
 
@@ -226,6 +322,7 @@ contract EAS is IEAS {
         attestation.revocationTime = _time();
 
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(attestation.schema);
+
         _resolveAttestation(schemaRecord, attestation, true, request.value, remainingValue, true);
 
         emit Revoked(attestation.recipient, revoker, request.uuid, attestation.schema);

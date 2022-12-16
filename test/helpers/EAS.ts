@@ -1,6 +1,12 @@
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { EIP712Utils } from './EIP712Utils';
+import {
+  EIP712AttestationParams,
+  EIP712MessageTypes,
+  EIP712Request,
+  EIP712RevocationParams,
+  EIP712Utils
+} from './EIP712Utils';
 import { getTransactionCost } from './Transaction';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
@@ -57,6 +63,12 @@ export enum SignatureType {
   Delegated = 'delegated'
 }
 
+export interface RequestContracts {
+  eas: TestEAS;
+  verifier?: EIP712Verifier;
+  eip712Utils?: EIP712Utils;
+}
+
 export interface AttestationOptions {
   signatureType?: SignatureType;
   from: Wallet | SignerWithAddress;
@@ -66,9 +78,6 @@ export interface AttestationOptions {
 }
 
 export interface AttestationRequest {
-  eas: TestEAS;
-  verifier?: EIP712Verifier;
-  eip712Utils?: EIP712Utils;
   recipient: string;
   schema: string;
   expirationTime: number;
@@ -86,18 +95,17 @@ export interface RevocationOptions {
 }
 
 export interface RevocationRequest {
-  eas: TestEAS;
-  verifier?: EIP712Verifier;
-  eip712Utils?: EIP712Utils;
   uuid: string;
   value?: BigNumberish;
 }
 
-export const expectAttestation = async (request: AttestationRequest, options: AttestationOptions) => {
+export const expectAttestation = async (
+  contracts: RequestContracts,
+  request: AttestationRequest,
+  options: AttestationOptions
+) => {
+  const { eas, verifier, eip712Utils } = contracts;
   const {
-    eas,
-    verifier,
-    eip712Utils,
     recipient,
     schema,
     expirationTime,
@@ -157,7 +165,6 @@ export const expectAttestation = async (request: AttestationRequest, options: At
             s: hexlify(request.s)
           }
         },
-
         {
           value: msgValue
         }
@@ -192,15 +199,29 @@ export const expectAttestation = async (request: AttestationRequest, options: At
   return { uuid, res };
 };
 
+export const expectAttestations = async (
+  contracts: RequestContracts,
+  requests: AttestationRequest[],
+  options: AttestationOptions
+) => {
+  const ret = [];
+
+  for (const request of requests) {
+    const { uuid, res } = await expectAttestation(contracts, request, options);
+    ret.push({ uuid, res });
+  }
+
+  return ret;
+};
+
 export const expectFailedAttestation = async (
+  contracts: RequestContracts,
   request: AttestationRequest,
   options: AttestationOptions,
   err: string
 ) => {
+  const { eas, verifier, eip712Utils } = contracts;
   const {
-    eas,
-    verifier,
-    eip712Utils,
     recipient,
     schema,
     expirationTime,
@@ -211,13 +232,15 @@ export const expectFailedAttestation = async (
   } = request;
   const { from: txSender, signatureType = SignatureType.Direct } = options;
 
+  const msgValue = BigNumber.from(options.value ?? value);
+
   switch (signatureType) {
     case SignatureType.Direct: {
       await expect(
         eas.connect(txSender).attest(
           { recipient, schema, expirationTime, revocable, refUUID, data, value },
           {
-            value: options.value ?? value
+            value: msgValue
           }
         )
       ).to.be.revertedWith(err);
@@ -253,7 +276,7 @@ export const expectFailedAttestation = async (
               revocable,
               refUUID,
               data,
-              value: 0
+              value
             },
             signature: {
               attester: txSender.address,
@@ -262,7 +285,7 @@ export const expectFailedAttestation = async (
               s: hexlify(request.s)
             }
           },
-          { value: options.value }
+          { value: msgValue }
         )
       ).to.be.revertedWith(err);
 
@@ -271,19 +294,97 @@ export const expectFailedAttestation = async (
   }
 };
 
-export const expectRevocation = async (request: RevocationRequest, options: RevocationOptions) => {
-  const { eas, verifier, eip712Utils, uuid, value = 0 } = request;
+export const expectFailedAttestations = async (
+  contracts: RequestContracts,
+  requests: AttestationRequest[],
+  options: AttestationOptions,
+  err: string
+) => {
+  const { eas, verifier, eip712Utils } = contracts;
+  const attestationRequests = requests.map((r) => ({
+    recipient: r.recipient,
+    schema: r.schema,
+    expirationTime: r.expirationTime,
+    revocable: r.revocable ?? true,
+    refUUID: r.refUUID ?? ZERO_BYTES32,
+    data: r.data ?? ZERO_BYTES32,
+    value: r.value ?? 0
+  }));
+
   const { from: txSender, signatureType = SignatureType.Direct } = options;
 
-  const prevBalance = await getBalance(txSender.address);
+  const msgValue =
+    options.value ?? attestationRequests.reduce((res, request) => res.add(request.value), BigNumber.from(0));
 
+  switch (signatureType) {
+    case SignatureType.Direct: {
+      await expect(
+        eas.connect(txSender).multiAttest(attestationRequests, {
+          value: msgValue
+        })
+      ).to.be.revertedWith(err);
+
+      break;
+    }
+
+    case SignatureType.Delegated: {
+      if (!eip712Utils || !verifier) {
+        throw new Error('Invalid verifier');
+      }
+
+      const signatures: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>[] = [];
+
+      for (const request of attestationRequests) {
+        const signature = await eip712Utils.signDelegatedAttestation(
+          txSender,
+          request.recipient,
+          request.schema,
+          request.expirationTime,
+          request.revocable,
+          request.refUUID,
+          request.data,
+          await verifier.getNonce(txSender.address)
+        );
+
+        expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
+
+        signatures.push(signature);
+      }
+
+      await expect(
+        eas.connect(txSender).multiAttestByDelegation(
+          attestationRequests.map((r, i) => ({
+            request: r,
+            signature: { attester: txSender.address, ...signatures[i] }
+          })),
+          { value: msgValue }
+        )
+      ).to.be.revertedWith(err);
+
+      break;
+    }
+  }
+};
+
+export const expectRevocation = async (
+  contracts: RequestContracts,
+  request: RevocationRequest,
+  options: RevocationOptions
+) => {
+  const { eas, verifier, eip712Utils } = contracts;
+  const { uuid, value = 0 } = request;
+  const { from: txSender, signatureType = SignatureType.Direct } = options;
+
+  const msgValue = BigNumber.from(options.value ?? value);
+
+  const prevBalance = await getBalance(txSender.address);
   const attestation = await eas.getAttestation(uuid);
 
   let res;
 
   switch (signatureType) {
     case SignatureType.Direct: {
-      res = await eas.connect(txSender).revoke({ uuid, value }, { value: options.value ?? value });
+      res = await eas.connect(txSender).revoke({ uuid, value }, { value: msgValue });
 
       break;
     }
@@ -298,7 +399,7 @@ export const expectRevocation = async (request: RevocationRequest, options: Revo
         uuid,
         await verifier.getNonce(txSender.address)
       );
-
+      console.log('uuid', uuid);
       res = await eas.connect(txSender).revokeByDelegation(
         {
           request: { uuid, value },
@@ -309,7 +410,7 @@ export const expectRevocation = async (request: RevocationRequest, options: Revo
             s: hexlify(signature.s)
           }
         },
-        { value: options.value ?? value }
+        { value: msgValue }
       );
 
       break;
@@ -330,15 +431,36 @@ export const expectRevocation = async (request: RevocationRequest, options: Revo
   return res;
 };
 
-export const expectFailedRevocation = async (request: RevocationRequest, options: RevocationOptions, err: string) => {
-  const { eas, verifier, eip712Utils, uuid, value = 0 } = request;
+export const expectRevocations = async (
+  contracts: RequestContracts,
+  requests: RevocationRequest[],
+  options: RevocationOptions
+) => {
+  const ret = [];
+
+  for (const request of requests) {
+    const res = await expectRevocation(contracts, request, options);
+    ret.push(res);
+  }
+
+  return ret;
+};
+
+export const expectFailedRevocation = async (
+  contracts: RequestContracts,
+  request: RevocationRequest,
+  options: RevocationOptions,
+  err: string
+) => {
+  const { eas, verifier, eip712Utils } = contracts;
+  const { uuid, value = 0 } = request;
   const { from: txSender, signatureType = SignatureType.Direct } = options;
+
+  const msgValue = options.value ?? value;
 
   switch (signatureType) {
     case SignatureType.Direct: {
-      await expect(eas.connect(txSender).revoke({ uuid, value }, { value: options.value ?? value })).to.be.revertedWith(
-        err
-      );
+      await expect(eas.connect(txSender).revoke({ uuid, value }, { value: msgValue })).to.be.revertedWith(err);
 
       break;
     }
@@ -367,7 +489,65 @@ export const expectFailedRevocation = async (request: RevocationRequest, options
               s: hexlify(request.s)
             }
           },
-          { value: options.value ?? value }
+          { value: msgValue }
+        )
+      ).to.be.revertedWith(err);
+
+      break;
+    }
+  }
+};
+
+export const expectFailedRevocations = async (
+  contracts: RequestContracts,
+  requests: RevocationRequest[],
+  options: RevocationOptions,
+  err: string
+) => {
+  const { eas, verifier, eip712Utils } = contracts;
+  const revocationRequests = requests.map((r) => ({
+    uuid: r.uuid,
+    value: r.value ?? 0
+  }));
+
+  const { from: txSender, signatureType = SignatureType.Direct } = options;
+
+  const msgValue =
+    options.value ?? revocationRequests.reduce((res, request) => res.add(request.value), BigNumber.from(0));
+
+  switch (signatureType) {
+    case SignatureType.Direct: {
+      await expect(eas.connect(txSender).multiRevoke(revocationRequests, { value: msgValue })).to.be.revertedWith(err);
+
+      break;
+    }
+
+    case SignatureType.Delegated: {
+      if (!eip712Utils || !verifier) {
+        throw new Error('Invalid verifier');
+      }
+
+      const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
+
+      for (const request of revocationRequests) {
+        const signature = await eip712Utils.signDelegatedRevocation(
+          txSender,
+          request.uuid,
+          await verifier.getNonce(txSender.address)
+        );
+
+        expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
+
+        signatures.push(signature);
+      }
+
+      await expect(
+        eas.connect(txSender).multiRevokeByDelegation(
+          revocationRequests.map((r, i) => ({
+            request: r,
+            signature: { attester: txSender.address, ...signatures[i] }
+          })),
+          { value: msgValue }
         )
       ).to.be.revertedWith(err);
 

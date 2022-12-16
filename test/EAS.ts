@@ -3,9 +3,13 @@ import { EIP712Verifier, SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
 import {
   expectAttestation,
+  expectAttestations,
   expectFailedAttestation,
+  expectFailedAttestations,
   expectFailedRevocation,
+  expectFailedRevocations,
   expectRevocation,
+  expectRevocations,
   getSchemaUUID,
   getUUIDFromAttestTx,
   SignatureType
@@ -87,12 +91,39 @@ describe('EAS', () => {
             {
               eas,
               verifier,
-              eip712Utils,
+              eip712Utils
+            },
+            {
               recipient: recipient.address,
               schema: formatBytes32String('BAD'),
               expirationTime,
               data
             },
+            { from: sender },
+            'InvalidSchema'
+          );
+
+          // All requests are to unregistered schemas
+          await expectFailedAttestations(
+            {
+              eas,
+              verifier,
+              eip712Utils
+            },
+            [
+              {
+                recipient: recipient.address,
+                schema: formatBytes32String('BAD'),
+                expirationTime,
+                data
+              },
+              {
+                recipient: recipient.address,
+                schema: formatBytes32String('BAD2'),
+                expirationTime,
+                data
+              }
+            ],
             { from: sender },
             'InvalidSchema'
           );
@@ -112,13 +143,45 @@ describe('EAS', () => {
             await registry.register(schema3, ZERO_ADDRESS, true);
           });
 
+          it('should revert when multi attesting to multiple unregistered schemas', async () => {
+            // Only a single request is to an unregistered schema
+            await expectFailedAttestations(
+              { eas, verifier, eip712Utils },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: formatBytes32String('BAD'),
+                  expirationTime,
+                  data
+                }
+              ],
+              { from: sender },
+              'InvalidSchema'
+            );
+          });
+
           it('should revert when attesting with passed expiration time', async () => {
             const expired = (await eas.getTime()) - duration.days(1);
+
             await expectFailedAttestation(
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema1Id,
                 expirationTime: expired,
@@ -127,18 +190,84 @@ describe('EAS', () => {
               { from: sender },
               'InvalidExpirationTime'
             );
+
+            // The first request is invalid
+            await expectFailedAttestations(
+              { eas, verifier, eip712Utils },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime: expired,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime,
+                  data
+                }
+              ],
+              { from: sender },
+              'InvalidExpirationTime'
+            );
+
+            // The second request is invalid
+            await expectFailedAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime: expired,
+                  data
+                }
+              ],
+              { from: sender },
+              'InvalidExpirationTime'
+            );
           });
 
-          it('should allow attestation to an empty recipient', async () => {
+          it('should allow attesting to an empty recipient', async () => {
             await expectAttestation(
-              { eas, verifier, eip712Utils, recipient: ZERO_ADDRESS, schema: schema1Id, expirationTime, data },
+              { eas, verifier, eip712Utils },
+              { recipient: ZERO_ADDRESS, schema: schema1Id, expirationTime, data },
+              { from: sender }
+            );
+
+            await expectAttestations(
+              { eas, verifier, eip712Utils },
+              [
+                { recipient: ZERO_ADDRESS, schema: schema1Id, expirationTime, data },
+                { recipient: ZERO_ADDRESS, schema: schema2Id, expirationTime, data }
+              ],
               { from: sender }
             );
           });
 
           it('should allow self attestations', async () => {
             await expectAttestation(
-              { eas, verifier, eip712Utils, recipient: sender.address, schema: schema2Id, expirationTime, data },
+              { eas, verifier, eip712Utils },
+              { recipient: sender.address, schema: schema2Id, expirationTime, data },
+              { from: sender }
+            );
+
+            await expectAttestations(
+              { eas, verifier, eip712Utils },
+              [
+                { recipient: sender.address, schema: schema1Id, expirationTime, data },
+                { recipient: sender.address, schema: schema2Id, expirationTime, data }
+              ],
               { from: sender }
             );
           });
@@ -148,7 +277,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema1Id,
                 expirationTime,
@@ -161,7 +292,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient2.address,
                 schema: schema1Id,
                 expirationTime,
@@ -178,7 +311,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -193,7 +328,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -208,7 +345,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -226,12 +365,37 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema1Id,
                 expirationTime: 0,
                 data
               },
+              { from: sender }
+            );
+
+            await expectAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime: 0,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime: 0,
+                  data
+                }
+              ],
               { from: sender }
             );
           });
@@ -241,46 +405,91 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime
               },
               { from: sender }
             );
+
+            await expectAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema3Id,
+                  expirationTime
+                }
+              ],
+              { from: sender }
+            );
           });
 
           it('should store referenced attestation', async () => {
-            const uuid = await eas.callStatic.attest({
-              recipient: recipient.address,
-              schema: schema1Id,
-              expirationTime,
-              revocable: true,
-              refUUID: ZERO_BYTES32,
-              data,
-              value: 0
-            });
-            await eas.attest({
-              recipient: recipient.address,
-              schema: schema1Id,
-              expirationTime,
-              revocable: true,
-              refUUID: ZERO_BYTES32,
-              data,
-              value: 0
-            });
+            const uuid = await getUUIDFromAttestTx(
+              eas.attest({
+                recipient: recipient.address,
+                schema: schema1Id,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data,
+                value: 0
+              })
+            );
 
             await expectAttestation(
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
                 refUUID: uuid,
                 data
               },
+              {
+                from: sender
+              }
+            );
+
+            await expectAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  refUUID: uuid,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema2Id,
+                  expirationTime,
+                  refUUID: uuid,
+                  data
+                }
+              ],
               {
                 from: sender
               }
@@ -292,7 +501,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -307,7 +518,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -322,7 +535,9 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
@@ -337,18 +552,84 @@ describe('EAS', () => {
             expect(uuid2).not.to.equal(uuid3);
           });
 
-          it('should revert when attesting to a non-existing attestation', async () => {
+          it('should revert when attesting to non-existing attestations', async () => {
             await expectFailedAttestation(
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schema3Id,
                 expirationTime,
                 refUUID: formatBytes32String('INVALID'),
                 data
               },
+              { from: sender },
+              'NotFound'
+            );
+
+            const uuid = await getUUIDFromAttestTx(
+              eas.attest({
+                recipient: recipient.address,
+                schema: schema1Id,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data,
+                value: 0
+              })
+            );
+
+            await expectFailedAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  refUUID: formatBytes32String('INVALID'),
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema3Id,
+                  expirationTime,
+                  refUUID: uuid,
+                  data
+                }
+              ],
+              { from: sender },
+              'NotFound'
+            );
+
+            await expectFailedAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  refUUID: formatBytes32String('INVALID'),
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schema3Id,
+                  expirationTime,
+                  refUUID: uuid,
+                  data
+                }
+              ],
               { from: sender },
               'NotFound'
             );
@@ -368,12 +649,64 @@ describe('EAS', () => {
               {
                 eas,
                 verifier,
-                eip712Utils,
+                eip712Utils
+              },
+              {
                 recipient: recipient.address,
                 schema: schemaId,
                 expirationTime,
                 data
               },
+              { from: sender },
+              'Irrevocable'
+            );
+
+            await expectFailedAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schemaId,
+                  expirationTime,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schemaId,
+                  expirationTime,
+                  revocable: false,
+                  data
+                }
+              ],
+              { from: sender },
+              'Irrevocable'
+            );
+
+            await expectFailedAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  recipient: recipient.address,
+                  schema: schemaId,
+                  expirationTime,
+                  revocable: false,
+                  data
+                },
+                {
+                  recipient: recipient.address,
+                  schema: schemaId,
+                  expirationTime,
+                  data
+                }
+              ],
               { from: sender },
               'Irrevocable'
             );
@@ -402,6 +735,28 @@ describe('EAS', () => {
           }
         })
       ).to.be.revertedWith('InvalidSignature');
+
+      await expect(
+        eas.multiAttestByDelegation([
+          {
+            request: {
+              recipient: recipient.address,
+              schema: formatBytes32String('BAD'),
+              expirationTime,
+              revocable: true,
+              refUUID: ZERO_BYTES32,
+              data: ZERO_BYTES32,
+              value: 0
+            },
+            signature: {
+              attester: sender.address,
+              v: 28,
+              r: formatBytes32String('BAD'),
+              s: formatBytes32String('BAD')
+            }
+          }
+        ])
+      ).to.be.revertedWith('InvalidSignature');
     });
   });
 
@@ -409,6 +764,7 @@ describe('EAS', () => {
     const schema1 = 'bool hasPhoneNumber, bytes32 phoneHash';
     const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
     let uuid: string;
+    let uuids: string[] = [];
 
     let expirationTime: number;
     const data = '0x1234';
@@ -433,26 +789,70 @@ describe('EAS', () => {
               value: 0
             })
           );
+
+          uuids = [];
+
+          for (let i = 0; i < 2; i++) {
+            uuids.push(
+              await getUUIDFromAttestTx(
+                eas.connect(sender).attest({
+                  recipient: recipient.address,
+                  schema: schema1Id,
+                  expirationTime,
+                  revocable: true,
+                  refUUID: ZERO_BYTES32,
+                  data,
+                  value: 0
+                })
+              )
+            );
+          }
         });
 
         it('should revert when revoking a non-existing attestation', async () => {
-          await expectFailedRevocation({ eas, uuid: formatBytes32String('BAD') }, { from: sender }, 'NotFound');
+          await expectFailedRevocation({ eas }, { uuid: formatBytes32String('BAD') }, { from: sender }, 'NotFound');
+
+          await expectFailedRevocations(
+            { eas },
+            [{ uuid: formatBytes32String('BAD') }, { uuid }],
+            { from: sender },
+            'NotFound'
+          );
+
+          await expectFailedRevocations(
+            { eas },
+            [{ uuid }, { uuid: formatBytes32String('BAD') }],
+            { from: sender },
+            'NotFound'
+          );
         });
 
         it("should revert when revoking a someone's else attestation", async () => {
-          await expectFailedRevocation({ eas, uuid }, { from: sender2 }, 'AccessDenied');
+          await expectFailedRevocation({ eas }, { uuid }, { from: sender2 }, 'AccessDenied');
+
+          await expectFailedRevocations({ eas }, [{ uuid }, { uuid: uuids[0] }], { from: sender2 }, 'AccessDenied');
+          await expectFailedRevocations({ eas }, [{ uuid: uuids[1] }, { uuid }], { from: sender2 }, 'AccessDenied');
         });
 
-        it('should allow to revoke an existing attestation', async () => {
-          await expectRevocation({ eas, uuid }, { from: sender });
+        it('should allow to revoke existing attestation', async () => {
+          await expectRevocation({ eas }, { uuid }, { from: sender });
+
+          await expectRevocations(
+            { eas },
+            uuids.map((uuid) => ({ uuid })),
+            { from: sender }
+          );
         });
 
         it('should revert when revoking an already revoked attestation', async () => {
-          await expectRevocation({ eas, uuid }, { from: sender });
-          await expectFailedRevocation({ eas, uuid }, { from: sender }, 'AlreadyRevoked');
+          await expectRevocation({ eas }, { uuid }, { from: sender });
+          await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'AlreadyRevoked');
+
+          await expectFailedRevocations({ eas }, [{ uuid }, { uuid: uuids[0] }], { from: sender2 }, 'AlreadyRevoked');
+          await expectFailedRevocations({ eas }, [{ uuid: uuids[1] }, { uuid }], { from: sender2 }, 'AlreadyRevoked');
         });
 
-        context('with an irrevocable attestation', () => {
+        context('with irrevocable attestations', () => {
           beforeEach(async () => {
             uuid = await getUUIDFromAttestTx(
               eas.connect(sender).attest({
@@ -465,10 +865,31 @@ describe('EAS', () => {
                 value: 0
               })
             );
+
+            uuids = [];
+
+            for (let i = 0; i < 2; i++) {
+              uuids.push(
+                await getUUIDFromAttestTx(
+                  eas.connect(sender).attest({
+                    recipient: recipient.address,
+                    schema: schema1Id,
+                    expirationTime,
+                    revocable: false,
+                    refUUID: ZERO_BYTES32,
+                    data,
+                    value: 0
+                  })
+                )
+              );
+            }
           });
 
           it('should revert when revoking', async () => {
-            await expectFailedRevocation({ eas, uuid }, { from: sender }, 'Irrevocable');
+            await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'Irrevocable');
+
+            await expectFailedRevocations({ eas }, [{ uuid }, { uuid: uuids[0] }], { from: sender2 }, 'Irrevocable');
+            await expectFailedRevocations({ eas }, [{ uuid: uuids[1] }, { uuid }], { from: sender2 }, 'Irrevocable');
           });
         });
 
@@ -490,10 +911,31 @@ describe('EAS', () => {
                 value: 0
               })
             );
+
+            uuids = [];
+
+            for (let i = 0; i < 2; i++) {
+              uuids.push(
+                await getUUIDFromAttestTx(
+                  eas.connect(sender).attest({
+                    recipient: recipient.address,
+                    schema: schema2Id,
+                    expirationTime,
+                    revocable: false,
+                    refUUID: ZERO_BYTES32,
+                    data,
+                    value: 0
+                  })
+                )
+              );
+            }
           });
 
           it('should revert when revoking', async () => {
-            await expectFailedRevocation({ eas, uuid }, { from: sender }, 'Irrevocable');
+            await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'Irrevocable');
+
+            await expectFailedRevocations({ eas }, [{ uuid }, { uuid: uuids[0] }], { from: sender2 }, 'Irrevocable');
+            await expectFailedRevocations({ eas }, [{ uuid: uuids[1] }, { uuid }], { from: sender2 }, 'Irrevocable');
           });
         });
       });
@@ -513,6 +955,23 @@ describe('EAS', () => {
             s: formatBytes32String('BAD')
           }
         })
+      ).to.be.revertedWith('InvalidSignature');
+
+      await expect(
+        eas.multiRevokeByDelegation([
+          {
+            request: {
+              uuid: ZERO_BYTES32,
+              value: 0
+            },
+            signature: {
+              attester: sender.address,
+              v: 28,
+              r: formatBytes32String('BAD'),
+              s: formatBytes32String('BAD')
+            }
+          }
+        ])
       ).to.be.revertedWith('InvalidSignature');
     });
   });

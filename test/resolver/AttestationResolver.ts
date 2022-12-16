@@ -3,8 +3,11 @@ import { AttestationResolver, EIP712Verifier, SchemaRegistry, TestEAS } from '..
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import {
   expectAttestation,
+  expectAttestations,
   expectFailedAttestation,
+  expectFailedAttestations,
   expectRevocation,
+  expectRevocations,
   getSchemaUUID,
   getUUIDFromAttestTx,
   registerSchema
@@ -70,11 +73,12 @@ describe('AttestationResolver', () => {
     schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
-  it('should revert when attesting to a non-existing attestation', async () => {
+  it('should revert when attesting to non-existing attestations', async () => {
     await expectFailedAttestation(
       {
-        eas,
-        verifier,
+        eas
+      },
+      {
         recipient: recipient.address,
         schema: schemaId,
         expirationTime
@@ -82,18 +86,76 @@ describe('AttestationResolver', () => {
       { from: sender },
       'InvalidAttestation'
     );
+
+    await expectFailedAttestations(
+      {
+        eas
+      },
+      [
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime
+        },
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: uuid
+        }
+      ],
+      { from: sender },
+      'InvalidAttestation'
+    );
+
+    await expectFailedAttestations(
+      {
+        eas
+      },
+      [
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime,
+          data: uuid
+        },
+        {
+          recipient: recipient.address,
+          schema: schemaId,
+          expirationTime
+        }
+      ],
+      { from: sender },
+      'InvalidAttestation'
+    );
   });
 
   it('should allow attesting to an existing attestation', async () => {
     const { uuid: uuid2 } = await expectAttestation(
-      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
+      { eas },
+      { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
       { from: sender }
     );
 
-    await expectRevocation({ eas, uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, { uuid: uuid2 }, { from: sender });
+
+    const res = await expectAttestations(
+      { eas },
+      [
+        { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
+        { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid }
+      ],
+      { from: sender }
+    );
+
+    await expectRevocations(
+      { eas },
+      res.map((r) => ({ uuid: r.uuid })),
+      { from: sender }
+    );
   });
 
-  it('should revert invalid input', async () => {
+  it('should revert on invalid input', async () => {
     await expect(resolver.toBytes32(data, 1000)).to.be.revertedWith('OutOfBounds');
   });
 });

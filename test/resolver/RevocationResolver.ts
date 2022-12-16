@@ -1,7 +1,14 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectFailedRevocation, expectRevocation, getUUIDFromAttestTx, registerSchema } from '../helpers/EAS';
+import {
+  expectFailedRevocation,
+  expectFailedRevocations,
+  expectRevocation,
+  expectRevocations,
+  getUUIDFromAttestTx,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -19,6 +26,7 @@ describe('RevocationResolver', () => {
   let eas: TestEAS;
   let resolver: RevocationResolver;
   let uuid: string;
+  let uuids: string[] = [];
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
@@ -56,6 +64,24 @@ describe('RevocationResolver', () => {
         value: 0
       })
     );
+
+    uuids = [];
+
+    for (let i = 0; i < 2; i++) {
+      uuids.push(
+        await getUUIDFromAttestTx(
+          eas.connect(sender).attest({
+            recipient: recipient.address,
+            schema: schemaId,
+            expirationTime,
+            revocable: true,
+            refUUID: ZERO_BYTES32,
+            data,
+            value: 0
+          })
+        )
+      );
+    }
   });
 
   context('when revocations are allowed', () => {
@@ -64,7 +90,13 @@ describe('RevocationResolver', () => {
     });
 
     it('should allow revoking an existing attestation', async () => {
-      await expectRevocation({ eas, uuid }, { from: sender });
+      await expectRevocation({ eas }, { uuid }, { from: sender });
+
+      await expectRevocations(
+        { eas },
+        uuids.map((uuid) => ({ uuid })),
+        { from: sender }
+      );
     });
   });
 
@@ -74,7 +106,14 @@ describe('RevocationResolver', () => {
     });
 
     it('should revert when attempting to revoke an existing attestation', async () => {
-      await expectFailedRevocation({ eas, uuid }, { from: sender }, 'InvalidRevocation');
+      await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'InvalidRevocation');
+
+      await expectFailedRevocations(
+        { eas },
+        uuids.map((uuid) => ({ uuid })),
+        { from: sender },
+        'InvalidRevocation'
+      );
     });
   });
 });
