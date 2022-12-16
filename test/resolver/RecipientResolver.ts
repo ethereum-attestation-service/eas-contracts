@@ -1,6 +1,14 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
+import {
+  expectAttestation,
+  expectAttestations,
+  expectFailedAttestation,
+  expectFailedAttestations,
+  expectRevocation,
+  expectRevocations,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -49,7 +57,28 @@ describe('RecipientResolver', () => {
 
   it('should revert when attesting to a wrong recipient', async () => {
     await expectFailedAttestation(
-      { eas, recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { eas },
+      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      { from: sender },
+      'InvalidAttestation'
+    );
+
+    await expectFailedAttestations(
+      { eas },
+      [
+        { recipient: recipient.address, schema: schemaId, expirationTime, data },
+        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data }
+      ],
+      { from: sender },
+      'InvalidAttestation'
+    );
+
+    await expectFailedAttestations(
+      { eas },
+      [
+        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
+        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+      ],
       { from: sender },
       'InvalidAttestation'
     );
@@ -57,10 +86,26 @@ describe('RecipientResolver', () => {
 
   it('should allow attesting to the correct recipient', async () => {
     const { uuid } = await expectAttestation(
-      { eas, recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
+      { eas },
+      { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
       { from: sender }
     );
 
-    await expectRevocation({ eas, uuid }, { from: sender });
+    await expectRevocation({ eas }, { uuid }, { from: sender });
+
+    const res = await expectAttestations(
+      { eas },
+      [
+        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
+        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data }
+      ],
+      { from: sender }
+    );
+
+    await expectRevocations(
+      { eas },
+      res.map((r) => ({ uuid: r.uuid })),
+      { from: sender }
+    );
   });
 });

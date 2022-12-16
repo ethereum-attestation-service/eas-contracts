@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
-import { expectFailedAttestation, registerSchema } from '../helpers/EAS';
+import { expectFailedAttestation, expectFailedAttestations, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -108,7 +108,18 @@ describe('SchemaResolver', () => {
         await expect(sender.sendTransaction({ to: resolver.address, value })).to.be.revertedWith('NotPayable');
 
         await expectFailedAttestation(
-          { eas, recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+          { eas },
+          { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+          { value, from: sender },
+          'NotPayable'
+        );
+
+        await expectFailedAttestations(
+          { eas },
+          [
+            { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+            { recipient: recipient.address, schema: schemaId, expirationTime, data, value }
+          ],
           { value, from: sender },
           'NotPayable'
         );
