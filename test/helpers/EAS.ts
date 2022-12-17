@@ -182,10 +182,10 @@ export const expectAttestation = async (
         throw new Error('Invalid verifier');
       }
 
-      const request = await eip712Utils.signDelegatedAttestation(
+      const signature = await eip712Utils.signDelegatedAttestation(
         txSender,
-        recipient,
         schema,
+        recipient,
         expirationTime,
         revocable,
         refUUID,
@@ -193,16 +193,16 @@ export const expectAttestation = async (
         await verifier.getNonce(txSender.address)
       );
 
-      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
 
       const args = [
         {
           schema,
           data: { recipient, expirationTime, revocable, refUUID, data, value },
           signature: {
-            v: request.v,
-            r: hexlify(request.r),
-            s: hexlify(request.s)
+            v: signature.v,
+            r: hexlify(signature.r),
+            s: hexlify(signature.s)
           },
           attester: txSender.address
         },
@@ -285,10 +285,10 @@ export const expectFailedAttestation = async (
         throw new Error('Invalid verifier');
       }
 
-      const request = await eip712Utils.signDelegatedAttestation(
+      const signature = await eip712Utils.signDelegatedAttestation(
         txSender,
-        recipient,
         schema,
+        recipient,
         expirationTime,
         revocable,
         refUUID,
@@ -296,7 +296,7 @@ export const expectFailedAttestation = async (
         await verifier.getNonce(txSender.address)
       );
 
-      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
 
       await expect(
         eas.connect(txSender).attestByDelegation(
@@ -311,9 +311,9 @@ export const expectFailedAttestation = async (
               value
             },
             signature: {
-              v: request.v,
-              r: hexlify(request.r),
-              s: hexlify(request.s)
+              v: signature.v,
+              r: hexlify(signature.r),
+              s: hexlify(signature.s)
             },
             attester: txSender.address
           },
@@ -383,6 +383,8 @@ export const expectMultiAttestations = async (
 
       const multiDelegatedAttestationRequests: MultiDelegatedAttestationRequestStruct[] = [];
 
+      let nonce = await verifier.getNonce(txSender.address);
+
       for (const { schema, data } of multiAttestationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>[] = [];
 
@@ -395,12 +397,14 @@ export const expectMultiAttestations = async (
             request.revocable,
             request.refUUID,
             request.data,
-            await verifier.getNonce(txSender.address)
+            nonce
           );
 
           expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
 
           signatures.push(signature);
+
+          nonce = nonce.add(1);
         }
 
         multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address });
@@ -498,6 +502,8 @@ export const expectFailedMultiAttestations = async (
 
       const multiDelegatedAttestationRequests: MultiDelegatedAttestationRequestStruct[] = [];
 
+      let nonce = await verifier.getNonce(txSender.address);
+
       for (const { schema, data } of multiAttestationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>[] = [];
 
@@ -510,12 +516,14 @@ export const expectFailedMultiAttestations = async (
             request.revocable,
             request.refUUID,
             request.data,
-            await verifier.getNonce(txSender.address)
+            nonce
           );
 
           expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
 
           signatures.push(signature);
+
+          nonce = nonce.add(1);
         }
 
         multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address });
@@ -648,20 +656,19 @@ export const expectMultiRevocations = async (
 
       const multiDelegatedRevocationRequests: MultiDelegatedRevocationRequestStruct[] = [];
 
+      let nonce = await verifier.getNonce(txSender.address);
+
       for (const { schema, data } of multiRevocationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(
-            txSender,
-            schema,
-            request.uuid,
-            await verifier.getNonce(txSender.address)
-          );
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uuid, nonce);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
 
           signatures.push(signature);
+
+          nonce = nonce.add(1);
         }
 
         multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address });
@@ -723,14 +730,14 @@ export const expectFailedRevocation = async (
         throw new Error('Invalid verifier');
       }
 
-      const request = await eip712Utils.signDelegatedRevocation(
+      const signature = await eip712Utils.signDelegatedRevocation(
         txSender,
         schema,
         uuid,
         await verifier.getNonce(txSender.address)
       );
 
-      expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, request)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
 
       await expect(
         eas.revokeByDelegation(
@@ -738,9 +745,9 @@ export const expectFailedRevocation = async (
             schema,
             data: { uuid, value },
             signature: {
-              v: request.v,
-              r: hexlify(request.r),
-              s: hexlify(request.s)
+              v: signature.v,
+              r: hexlify(signature.r),
+              s: hexlify(signature.s)
             },
             revoker: txSender.address
           },
@@ -760,7 +767,6 @@ export const expectFailedMultiRevocations = async (
   err: string
 ) => {
   const { eas, verifier, eip712Utils } = contracts;
-
   const { from: txSender, signatureType = SignatureType.Direct } = options;
 
   const multiRevocationRequests = requests.map((r) => ({
@@ -796,20 +802,19 @@ export const expectFailedMultiRevocations = async (
 
       const multiDelegatedRevocationRequests: MultiDelegatedRevocationRequestStruct[] = [];
 
+      let nonce = await verifier.getNonce(txSender.address);
+
       for (const { schema, data } of multiRevocationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(
-            txSender,
-            schema,
-            request.uuid,
-            await verifier.getNonce(txSender.address)
-          );
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uuid, nonce);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
 
           signatures.push(signature);
+
+          nonce = nonce.add(1);
         }
 
         multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address });
