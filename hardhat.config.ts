@@ -42,18 +42,10 @@ const mochaOptions = (): MochaOptions => {
   let timeout = 600000;
   let grep;
   let reporter;
-  let invert = false;
 
   if (isProfiling) {
-    // if we're profiling, make sure to only run @profile tests without any timeout restriction, and silence most
-    // of test output
     timeout = 0;
-    grep = '@profile';
     reporter = 'mocha-silent-reporter';
-  } else {
-    // if we're running in dev, filter out profile tests
-    grep = '@profile';
-    invert = true;
   }
 
   return {
@@ -61,7 +53,6 @@ const mochaOptions = (): MochaOptions => {
     color: true,
     bail: true,
     grep,
-    invert,
     reporter
   };
 };
