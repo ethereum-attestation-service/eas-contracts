@@ -900,13 +900,82 @@ describe('EAS', () => {
         ])
       ).to.be.revertedWith('InvalidSignature');
     });
+
+    it('should revert when multi delegation attesting with inconsistent input lengths', async () => {
+      const schema = 'bool count, bytes32 id';
+      const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+      await registry.register(schema, ZERO_ADDRESS, true);
+
+      await expect(
+        eas.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('BAD'),
+                s: formatBytes32String('BAD')
+              }
+            ],
+            attester: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('1'),
+                s: formatBytes32String('2')
+              },
+              {
+                v: 28,
+                r: formatBytes32String('3'),
+                s: formatBytes32String('4')
+              }
+            ],
+            attester: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+    });
   });
 
   describe('revocation', () => {
     const schema = 'bool hasPhoneNumber, bytes32 phoneHash';
     const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
-    let uuid: string;
-    let uuids: string[] = [];
 
     let expirationTime: number;
     const data = '0x1234';
@@ -919,6 +988,9 @@ describe('EAS', () => {
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
       context(`via ${signatureType} attestation`, () => {
+        let uuid: string;
+        let uuids: string[] = [];
+
         beforeEach(async () => {
           uuid = await getUUIDFromAttestTx(
             eas.connect(sender).attest({
@@ -1240,6 +1312,77 @@ describe('EAS', () => {
           }
         ])
       ).to.be.revertedWith('InvalidSignature');
+    });
+
+    it('should revert when multi delegation revoking with inconsistent input lengths', async () => {
+      const uuid = await getUUIDFromAttestTx(
+        eas.connect(sender).attest({
+          schema: schemaId,
+          data: {
+            recipient: recipient.address,
+            expirationTime,
+            revocable: true,
+            refUUID: ZERO_BYTES32,
+            data,
+            value: 0
+          }
+        })
+      );
+      const uuid2 = await getUUIDFromAttestTx(
+        eas.connect(sender).attest({
+          schema: schemaId,
+          data: {
+            recipient: recipient.address,
+            expirationTime,
+            revocable: true,
+            refUUID: ZERO_BYTES32,
+            data,
+            value: 0
+          }
+        })
+      );
+
+      await expect(
+        eas.multiRevokeByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              { uuid, value: 0 },
+              { uuid: uuid2, value: 0 }
+            ],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('1'),
+                s: formatBytes32String('2')
+              }
+            ],
+            revoker: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiRevokeByDelegation([
+          {
+            schema: schemaId,
+            data: [{ uuid, value: 0 }],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('1'),
+                s: formatBytes32String('2')
+              },
+              {
+                v: 28,
+                r: formatBytes32String('3'),
+                s: formatBytes32String('4')
+              }
+            ],
+            revoker: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
     });
   });
 });
