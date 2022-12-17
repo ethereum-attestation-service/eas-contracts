@@ -133,5 +133,38 @@ describe('SchemaResolver', () => {
         );
       });
     });
+
+    context('without any resolvers', () => {
+      beforeEach(async () => {
+        schemaId = await registerSchema(schema, registry, ZERO_ADDRESS, true);
+      });
+
+      it('should revert when sending', async () => {
+        const value = 1;
+
+        await expectFailedAttestation(
+          { eas },
+          schemaId,
+          { recipient: recipient.address, expirationTime, data, value },
+          { value, from: sender },
+          'NotPayable'
+        );
+
+        await expectFailedMultiAttestations(
+          { eas },
+          [
+            {
+              schema: schemaId,
+              requests: [
+                { recipient: recipient.address, expirationTime, data, value },
+                { recipient: recipient.address, expirationTime, data, value }
+              ]
+            }
+          ],
+          { value, from: sender },
+          'NotPayable'
+        );
+      });
+    });
   });
 });

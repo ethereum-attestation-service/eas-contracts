@@ -514,15 +514,20 @@ contract EAS is IEAS {
     ) private returns (uint256) {
         ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) == address(0)) {
-            // TODO: refund
+            // Ensure that we don't accept payments if there is no resolver
+            if (value != 0) {
+                revert NotPayable();
+            }
 
             return 0;
         }
 
+        // Ensure that we don't accept payments which can't be forwarded to the resolver
         if (value != 0 && !resolver.isPayable()) {
             revert NotPayable();
         }
 
+        // Ensure that the attester/revoker doesn't try to spend more than available
         if (value > availableValue) {
             revert InsufficientValue();
         }
@@ -573,7 +578,12 @@ contract EAS is IEAS {
 
         ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) == address(0)) {
-            // TODO: refund
+            // Ensure that we don't accept payments if there is no resolver
+            for (uint256 i = 0; i < length; ) {
+                if (values[i] != 0) {
+                    revert NotPayable();
+                }
+            }
 
             return 0;
         }
@@ -583,10 +593,12 @@ contract EAS is IEAS {
         for (uint256 i = 0; i < length; ) {
             uint256 value = values[i];
 
+            // Ensure that we don't accept payments which can't be forwarded to the resolver
             if (value != 0 && !resolver.isPayable()) {
                 revert NotPayable();
             }
 
+            // Ensure that the attester/revoker doesn't try to spend more than available
             if (value > availableValue) {
                 revert InsufficientValue();
             }
