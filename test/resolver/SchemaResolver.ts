@@ -94,6 +94,64 @@ describe('SchemaResolver', () => {
         await expect(resolver.revoke(attestation)).to.be.revertedWith('AccessDenied');
         await expect(resolver.multiRevoke([attestation, attestation], [0, 0])).to.be.revertedWith('AccessDenied');
       });
+
+      context('as an EAS', () => {
+        let sender: SignerWithAddress;
+
+        before(async () => {
+          sender = accounts[0];
+        });
+
+        beforeEach(async () => {
+          resolver = await Contracts.TestSchemaResolver.deploy(sender.address);
+        });
+
+        it('should revert when attempting to multi attest with more value than was actually sent', async () => {
+          const attestation = {
+            uuid: ZERO_BYTES32,
+            schema: ZERO_BYTES32,
+            refUUID: ZERO_BYTES32,
+            time: await latest(),
+            expirationTime: 0,
+            revocationTime: 0,
+            revocable: true,
+            recipient: recipient.address,
+            attester: sender.address,
+            data: ZERO_BYTES
+          };
+          const value = 12345;
+
+          await expect(resolver.multiAttest([attestation, attestation], [value, value], { value })).to.be.revertedWith(
+            'InsufficientValue'
+          );
+          await expect(resolver.multiAttest([attestation, attestation], [value - 1, 2], { value })).to.be.revertedWith(
+            'InsufficientValue'
+          );
+        });
+
+        it('should revert when attempting to multi revoke with more value than was actually sent', async () => {
+          const attestation = {
+            uuid: ZERO_BYTES32,
+            schema: ZERO_BYTES32,
+            refUUID: ZERO_BYTES32,
+            time: await latest(),
+            expirationTime: 0,
+            revocationTime: 0,
+            revocable: true,
+            recipient: recipient.address,
+            attester: sender.address,
+            data: ZERO_BYTES
+          };
+          const value = 12345;
+
+          await expect(resolver.multiRevoke([attestation, attestation], [value, value], { value })).to.be.revertedWith(
+            'InsufficientValue'
+          );
+          await expect(resolver.multiRevoke([attestation, attestation], [value - 1, 2], { value })).to.be.revertedWith(
+            'InsufficientValue'
+          );
+        });
+      });
     });
 
     context('with a non-payable resolver', () => {
