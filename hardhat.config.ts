@@ -116,11 +116,9 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 100000,
-        details: {
-          yul: true
-        }
+        runs: 100000
       },
+      viaIR: true,
       metadata: {
         bytecodeHash: 'none'
       }
