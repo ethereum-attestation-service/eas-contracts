@@ -932,7 +932,7 @@ describe('EAS', () => {
           );
         });
 
-        it('should allow to revoke existing attestation', async () => {
+        it('should allow to revoke existing attestations', async () => {
           await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
           await expectMultiRevocations(
@@ -954,7 +954,7 @@ describe('EAS', () => {
           await expectFailedMultiRevocations(
             { eas },
             [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
-            { from: sender2 },
+            { from: sender },
             'AlreadyRevoked'
           );
 
@@ -963,6 +963,34 @@ describe('EAS', () => {
             [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
             { from: sender },
             'AlreadyRevoked'
+          );
+        });
+
+        it('should revert when attempting to revoke attestations while specifying the wrong schema', async () => {
+          const schema2 = 'bool count, bytes32 id';
+          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
+          await registry.register(schema2, ZERO_ADDRESS, true);
+
+          await expectFailedRevocation({ eas }, schema2Id, { uuid }, { from: sender }, 'InvalidSchema');
+
+          await expectFailedMultiRevocations(
+            { eas },
+            [
+              { schema: schema2Id, requests: [{ uuid }] },
+              { schema: schemaId, requests: [{ uuid: uuids[0] }] }
+            ],
+            { from: sender },
+            'InvalidSchema'
+          );
+
+          await expectFailedMultiRevocations(
+            { eas },
+            [
+              { schema: schemaId, requests: [{ uuid }] },
+              { schema: schema2Id, requests: [{ uuid: uuids[0] }] }
+            ],
+            { from: sender },
+            'InvalidSchema'
           );
         });
 
@@ -1009,7 +1037,7 @@ describe('EAS', () => {
             await expectFailedMultiRevocations(
               { eas },
               [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
-              { from: sender2 },
+              { from: sender },
               'Irrevocable'
             );
 
@@ -1070,7 +1098,7 @@ describe('EAS', () => {
             await expectFailedMultiRevocations(
               { eas },
               [{ schema: schema2Id, requests: [{ uuid }, { uuid: uuids[0] }] }],
-              { from: sender2 },
+              { from: sender },
               'Irrevocable'
             );
 
