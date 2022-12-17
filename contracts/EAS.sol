@@ -686,13 +686,15 @@ contract EAS is IEAS {
     function _mergeUUIDs(bytes32[][] memory uuidLists, uint256 uuidsCount) private pure returns (bytes32[] memory) {
         bytes32[] memory uuids = new bytes32[](uuidsCount);
 
+        uint256 currentIndex = 0;
         for (uint256 i = 0; i < uuidLists.length; ) {
             bytes32[] memory currentUuids = uuidLists[i];
             for (uint256 j = 0; j < currentUuids.length; ) {
-                uuids[i * uuidLists.length + j] = currentUuids[j];
+                uuids[currentIndex] = currentUuids[j];
 
                 unchecked {
                     ++j;
+                    ++currentIndex;
                 }
             }
             unchecked {
