@@ -2,11 +2,11 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -58,26 +58,37 @@ describe('RecipientResolver', () => {
   it('should revert when attesting to a wrong recipient', async () => {
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data },
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: targetRecipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: targetRecipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
@@ -87,24 +98,35 @@ describe('RecipientResolver', () => {
   it('should allow attesting to the correct recipient', async () => {
     const { uuid } = await expectAttestation(
       { eas },
-      { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: targetRecipient.address, expirationTime, data },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       { eas },
       [
-        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data },
-        { recipient: targetRecipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: targetRecipient.address, expirationTime, data },
+            { recipient: targetRecipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });

@@ -2,11 +2,11 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -58,26 +58,37 @@ describe('ValueResolver', () => {
 
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data, value },
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value: targetValue }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value },
+            { recipient: recipient.address, expirationTime, data, value: targetValue }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value: targetValue },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value: targetValue },
+            { recipient: recipient.address, expirationTime, data, value }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
@@ -88,24 +99,35 @@ describe('ValueResolver', () => {
     const value = targetValue;
     const { uuid } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data, value },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value },
+            { recipient: recipient.address, expirationTime, data, value }
+          ]
+        }
       ],
       { from: sender }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });
@@ -115,7 +137,24 @@ describe('ValueResolver', () => {
 
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data, value: value + 1000 },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data, value: value + 1000 },
+      { from: sender, value },
+      'InsufficientValue'
+    );
+
+    await expectFailedMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value: value - 500 },
+            { recipient: recipient.address, expirationTime, data, value: 500 },
+            { recipient: recipient.address, expirationTime, data, value: 1 }
+          ]
+        }
+      ],
       { from: sender, value },
       'InsufficientValue'
     );
@@ -125,10 +164,36 @@ describe('ValueResolver', () => {
     const value = targetValue;
     const { uuid } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data, value },
       { from: sender, value: value + 1000 }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
+
+    const res = await expectMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value },
+            { recipient: recipient.address, expirationTime, data, value }
+          ]
+        }
+      ],
+      { from: sender, value: value * 2 + 9999 }
+    );
+
+    await expectMultiRevocations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
+      { from: sender }
+    );
   });
 });

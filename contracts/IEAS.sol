@@ -11,7 +11,7 @@ import { EIP712Signature } from "./Types.sol";
  */
 struct Attestation {
     bytes32 uuid; // A unique identifier of the attestation.
-    bytes32 schema; // A unique identifier of the schema.
+    bytes32 schema; // The unique identifier of the schema.
     bytes32 refUUID; // The UUID of the related attestation.
     uint32 time; // The time when the attestation was created (Unix timestamp).
     uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
@@ -25,38 +25,93 @@ struct Attestation {
 /**
  * @dev A struct representing the arguments of the attestation request.
  */
-struct AttestationRequest {
+struct AttestationRequestData {
     address recipient; // The recipient of the attestation.
-    bytes32 schema; // A unique identifier of the schema.
     uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
     bool revocable; // Whether the attestation is revocable.
     bytes32 refUUID; // The UUID of the related attestation.
     bytes data; // Custom attestation data.
-    uint256 value; // value An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+    uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
 }
 
 /**
- * @dev A struct representing the arguments of the delegated attestation request.
+ * @dev A struct representing the full arguments of the attestation request.
+ */
+struct AttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData data; // The arguments of the attestation request.
+}
+
+/**
+ * @dev A struct representing the full arguments of the full delegated attestation request.
  */
 struct DelegatedAttestationRequest {
-    AttestationRequest request; // The arguments to the attestation request.
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData data; // The arguments of the attestation request.
     EIP712Signature signature; // The EIP712 signature data.
+    address attester; // The attesting account.
+}
+
+/**
+ * @dev A struct representing the full arguments of the multi attestation request.
+ */
+struct MultiAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData[] data; // The arguments of the attestation request.
+}
+
+/**
+ * @dev A struct representing the full arguments of the delegated multi attestation request.
+ */
+struct MultiDelegatedAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData[] data; // The arguments of the attestation requests.
+    EIP712Signature[] signatures; // The EIP712 signatures data.
+    address attester; // The attesting account.
 }
 
 /**
  * @dev A struct representing the arguments of the revocation request.
  */
-struct RevocationRequest {
+struct RevocationRequestData {
     bytes32 uuid; // The UUID of the attestation to revoke.
-    uint256 value; // An explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+    uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
 }
 
 /**
- * @dev A struct representing the arguments of the delegated revocation request.
+ * @dev A struct representing the full arguments of the revocation request.
+ */
+struct RevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData data; // The arguments of the revocation request.
+}
+
+/**
+ * @dev A struct representing the arguments of the full delegated revocation request.
  */
 struct DelegatedRevocationRequest {
-    RevocationRequest request; // The arguments to the attestation request.
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData data; // The arguments of the revocation request.
     EIP712Signature signature; // The EIP712 signature data.
+    address revoker; // The revoking account.
+}
+
+/**
+ * @dev A struct representing the full arguments of the multi revocation request.
+ */
+struct MultiRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData[] data; // The arguments of the revocation request.
+}
+
+/**
+ * @dev A struct representing the full arguments of the delegated multi revocation request.
+ */
+struct MultiDelegatedRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData[] data; // The arguments of the revocation requests.
+    EIP712Signature[] signatures; // The EIP712 signatures data.
+    address revoker; // The revoking account.
 }
 
 /**
@@ -100,14 +155,8 @@ interface IEAS {
     /**
      * @dev Attests to a specific schema.
      *
-     * @param request The arguments of the attestation request (see the AttestationRequest struct):
-     *   - recipient: the recipient of the attestation.
-     *   - schema: the UUID of the schema.
-     *   - expirationTime: the expiration time of the attestation.
-     *   - revocable: whether the attestation is revocable.
-     *   - refUUID: an optional related attestation's UUID.
-     *   - data: additional custom data.
-     *   - value an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param request The arguments of the attestation request.
+     *
      * @return The UUID of the new attestation.
      */
     function attest(AttestationRequest calldata request) external payable returns (bytes32);
@@ -115,9 +164,8 @@ interface IEAS {
     /**
      * @dev Attests to a specific schema via the provided EIP712 signature.
      *
-     * @param delegatedRequest The arguments of the delegated attestation request (see the AttestationRequest struct):
-     *   - request: the arguments to the attestation request.
-     *   - signature: the EIP712 signature data.
+     * @param delegatedRequest The arguments of the delegated attestation request.
+     *
      * @return The UUID of the new attestation.
      */
     function attestByDelegation(
@@ -127,65 +175,56 @@ interface IEAS {
     /**
      * @dev Attests to multiple schemas.
      *
-     * @param requests The arguments of the attestation requests (see the AttestationRequest struct):
-     *   - recipient: the recipient of the attestation.
-     *   - schema: the UUID of the schema.
-     *   - expirationTime: the expiration time of the attestation.
-     *   - revocable: whether the attestation is revocable.
-     *   - refUUID: an optional related attestation's UUID.
-     *   - data: additional custom data.
-     *   - value an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param multiRequests The arguments of the multi attestation requests. The requests should be grouped by distinct
+     * schema ids to benefit from the best batching optimization.
+     *
      * @return The UUIDs of the new attestations.
      */
-    function multiAttest(AttestationRequest[] calldata requests) external payable returns (bytes32[] memory);
+    function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory);
 
     /**
      * @dev Attests to multiple schemas using via provided EIP712 signatures.
      *
-     * @param delegatedRequests The arguments of the delegated attestation requests (see the AttestationRequest struct):
-     *   - request: the arguments to the attestation request.
-     *   - signature: the EIP712 signature data.
+     * @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
+     * grouped by distinct schema ids to benefit from the best batching optimization.
+     *
      * @return The UUIDs of the new attestations.
      */
     function multiAttestByDelegation(
-        DelegatedAttestationRequest[] calldata delegatedRequests
+        MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
     ) external payable returns (bytes32[] memory);
 
     /**
      * @dev Revokes an existing attestation to a specific schema.
      *
-     * @param request The arguments of the revocation request (see the RevocationRequest struct):
-     * - uuid: the UUID of the attestation to revoke.
-     * - value: an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param request The arguments of the revocation request.
      */
     function revoke(RevocationRequest calldata request) external payable;
 
     /**
      * @dev Revokes an existing attestation to a specific schema via the provided EIP712 signature.
      *
-     * @param delegatedRequest The arguments of the delegated attestation request (see the DelegatedRevocationRequest struct):
-     *   - request: arguments of the revocation request
-     *   - signature: the EIP712 signature data.
+     * @param delegatedRequest The arguments of the delegated revocation request.
      */
     function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable;
 
     /**
      * @dev Revokes existing attestations to multiple schemas.
      *
-     * @param requests The arguments of the revocation requests (see the RevocationRequest struct):
-     * - uuid: the UUID of the attestation to revoke.
-     * - value: an explicit ETH value to send to the resolver. This is important to prevent accidental user errors.
+     * @param multiRequests The arguments of the multi revocation requests. The requests should be grouped by distinct
+     * schema ids to benefit from the best batching optimization.
      */
-    function multiRevoke(RevocationRequest[] calldata requests) external payable;
+    function multiRevoke(MultiRevocationRequest[] calldata multiRequests) external payable;
 
     /**
      * @dev Revokes existing attestations to multiple schemas via provided EIP712 signatures.
      *
-     * @param delegatedRequests The arguments of the delegated attestation requests (see the DelegatedRevocationRequest struct):
-     *   - request: arguments of the revocation request
-     *   - signature: the EIP712 signature data.
+     * @param multiDelegatedRequests The arguments of the delegated multi revocation attestation requests. The requests should be
+     * grouped by distinct schema ids to benefit from the best batching optimization.
      */
-    function multiRevokeByDelegation(DelegatedRevocationRequest[] calldata delegatedRequests) external payable;
+    function multiRevokeByDelegation(
+        MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests
+    ) external payable;
 
     /**
      * @dev Returns an existing attestation by UUID.

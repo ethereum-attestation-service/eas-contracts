@@ -18,23 +18,20 @@ contract TokenResolver is SchemaResolver {
     IERC20 private immutable _targetToken;
     uint256 private immutable _targetAmount;
 
-    constructor(
-        IEAS eas,
-        IERC20 targetToken,
-        uint256 targetAmount
-    ) SchemaResolver(eas) {
+    constructor(IEAS eas, IERC20 targetToken, uint256 targetAmount) SchemaResolver(eas) {
         _targetToken = targetToken;
         _targetAmount = targetAmount;
     }
 
-    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal virtual override returns (bool) {
         _targetToken.safeTransferFrom(attestation.attester, address(this), _targetAmount);
 
         return true;
     }
 
     function onRevoke(
-        Attestation calldata /*attestation*/
+        Attestation calldata /*attestation*/,
+        uint256 /*value*/
     ) internal virtual override returns (bool) {
         return true;
     }

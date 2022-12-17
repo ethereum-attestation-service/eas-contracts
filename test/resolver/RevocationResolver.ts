@@ -2,10 +2,10 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
 import {
+  expectFailedMultiRevocations,
   expectFailedRevocation,
-  expectFailedRevocations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
@@ -55,13 +55,15 @@ describe('RevocationResolver', () => {
 
     uuid = await getUUIDFromAttestTx(
       eas.connect(sender).attest({
-        recipient: recipient.address,
         schema: schemaId,
-        expirationTime,
-        revocable: true,
-        refUUID: ZERO_BYTES32,
-        data,
-        value: 0
+        data: {
+          recipient: recipient.address,
+          expirationTime,
+          revocable: true,
+          refUUID: ZERO_BYTES32,
+          data,
+          value: 0
+        }
       })
     );
 
@@ -71,13 +73,15 @@ describe('RevocationResolver', () => {
       uuids.push(
         await getUUIDFromAttestTx(
           eas.connect(sender).attest({
-            recipient: recipient.address,
             schema: schemaId,
-            expirationTime,
-            revocable: true,
-            refUUID: ZERO_BYTES32,
-            data,
-            value: 0
+            data: {
+              recipient: recipient.address,
+              expirationTime,
+              revocable: true,
+              refUUID: ZERO_BYTES32,
+              data,
+              value: 0
+            }
           })
         )
       );
@@ -90,13 +94,11 @@ describe('RevocationResolver', () => {
     });
 
     it('should allow revoking an existing attestation', async () => {
-      await expectRevocation({ eas }, { uuid }, { from: sender });
+      await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
-      await expectRevocations(
-        { eas },
-        uuids.map((uuid) => ({ uuid })),
-        { from: sender }
-      );
+      await expectMultiRevocations({ eas }, [{ schema: schemaId, requests: uuids.map((uuid) => ({ uuid })) }], {
+        from: sender
+      });
     });
   });
 
@@ -106,11 +108,11 @@ describe('RevocationResolver', () => {
     });
 
     it('should revert when attempting to revoke an existing attestation', async () => {
-      await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'InvalidRevocation');
+      await expectFailedRevocation({ eas }, schemaId, { uuid }, { from: sender }, 'InvalidRevocation');
 
-      await expectFailedRevocations(
+      await expectFailedMultiRevocations(
         { eas },
-        uuids.map((uuid) => ({ uuid })),
+        [{ schema: schemaId, requests: uuids.map((uuid) => ({ uuid })) }],
         { from: sender },
         'InvalidRevocation'
       );

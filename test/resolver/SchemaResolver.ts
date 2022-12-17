@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
-import { expectFailedAttestation, expectFailedAttestations, registerSchema } from '../helpers/EAS';
+import { expectFailedAttestation, expectFailedMultiAttestations, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -60,37 +60,39 @@ describe('SchemaResolver', () => {
       });
 
       it('should revert when the attestation callback is invoked directly', async () => {
-        await expect(
-          resolver.attest({
-            uuid: ZERO_BYTES32,
-            schema: ZERO_BYTES32,
-            refUUID: ZERO_BYTES32,
-            time: await latest(),
-            expirationTime: 0,
-            revocationTime: 0,
-            revocable: true,
-            recipient: recipient.address,
-            attester: sender.address,
-            data: ZERO_BYTES
-          })
-        ).to.be.revertedWith('AccessDenied');
+        const attestation = {
+          uuid: ZERO_BYTES32,
+          schema: ZERO_BYTES32,
+          refUUID: ZERO_BYTES32,
+          time: await latest(),
+          expirationTime: 0,
+          revocationTime: 0,
+          revocable: true,
+          recipient: recipient.address,
+          attester: sender.address,
+          data: ZERO_BYTES
+        };
+
+        await expect(resolver.attest(attestation)).to.be.revertedWith('AccessDenied');
+        await expect(resolver.multiAttest([attestation, attestation], [0, 0])).to.be.revertedWith('AccessDenied');
       });
 
       it('should revert when the attestation revocation callback is invoked directly', async () => {
-        await expect(
-          resolver.revoke({
-            uuid: ZERO_BYTES32,
-            schema: ZERO_BYTES32,
-            refUUID: ZERO_BYTES32,
-            time: await latest(),
-            expirationTime: 0,
-            revocationTime: 0,
-            revocable: true,
-            recipient: recipient.address,
-            attester: sender.address,
-            data: ZERO_BYTES
-          })
-        ).to.be.revertedWith('AccessDenied');
+        const attestation = {
+          uuid: ZERO_BYTES32,
+          schema: ZERO_BYTES32,
+          refUUID: ZERO_BYTES32,
+          time: await latest(),
+          expirationTime: 0,
+          revocationTime: 0,
+          revocable: true,
+          recipient: recipient.address,
+          attester: sender.address,
+          data: ZERO_BYTES
+        };
+
+        await expect(resolver.revoke(attestation)).to.be.revertedWith('AccessDenied');
+        await expect(resolver.multiRevoke([attestation, attestation], [0, 0])).to.be.revertedWith('AccessDenied');
       });
     });
 
@@ -109,16 +111,22 @@ describe('SchemaResolver', () => {
 
         await expectFailedAttestation(
           { eas },
-          { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
+          schemaId,
+          { recipient: recipient.address, expirationTime, data, value },
           { value, from: sender },
           'NotPayable'
         );
 
-        await expectFailedAttestations(
+        await expectFailedMultiAttestations(
           { eas },
           [
-            { recipient: recipient.address, schema: schemaId, expirationTime, data, value },
-            { recipient: recipient.address, schema: schemaId, expirationTime, data, value }
+            {
+              schema: schemaId,
+              requests: [
+                { recipient: recipient.address, expirationTime, data, value },
+                { recipient: recipient.address, expirationTime, data, value }
+              ]
+            }
           ],
           { value, from: sender },
           'NotPayable'

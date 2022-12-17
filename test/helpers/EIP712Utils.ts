@@ -37,13 +37,13 @@ export interface TypedData {
 export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
 export const EIP712_NAME = 'EAS';
 export const ATTEST_TYPED_SIGNATURE =
-  'Attest(address recipient,bytes32 schema,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)';
-export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 uuid,uint256 nonce)';
+  'Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)';
+export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)';
 export const ATTEST_PRIMARY_TYPE = 'Attest';
 export const REVOKE_PRIMARY_TYPE = 'Revoke';
 export const ATTEST_TYPE: TypedData[] = [
-  { name: 'recipient', type: 'address' },
   { name: 'schema', type: 'bytes32' },
+  { name: 'recipient', type: 'address' },
   { name: 'expirationTime', type: 'uint32' },
   { name: 'revocable', type: 'bool' },
   { name: 'refUUID', type: 'bytes32' },
@@ -51,6 +51,7 @@ export const ATTEST_TYPE: TypedData[] = [
   { name: 'nonce', type: 'uint256' }
 ];
 export const REVOKE_TYPE: TypedData[] = [
+  { name: 'recipient', type: 'address' },
   { name: 'uuid', type: 'bytes32' },
   { name: 'nonce', type: 'uint256' }
 ];
@@ -165,8 +166,8 @@ export class EIP712Utils {
 
   public async signDelegatedAttestation(
     attester: TypedDataSigner,
-    recipient: string | SignerWithAddress,
     schema: string,
+    recipient: string | SignerWithAddress,
     expirationTime: number,
     revocable: boolean,
     refUUID: string,
@@ -174,8 +175,8 @@ export class EIP712Utils {
     nonce: BigNumber
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
-      recipient: typeof recipient === 'string' ? recipient : recipient.address,
       schema,
+      recipient: typeof recipient === 'string' ? recipient : recipient.address,
       expirationTime,
       revocable,
       refUUID,
@@ -209,10 +210,12 @@ export class EIP712Utils {
 
   public async signDelegatedRevocation(
     attester: TypedDataSigner,
+    schema: string,
     uuid: string,
     nonce: BigNumber
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
+      schema,
       uuid,
       nonce: nonce.toNumber()
     };

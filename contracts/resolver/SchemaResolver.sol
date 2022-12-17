@@ -11,6 +11,7 @@ import { ISchemaResolver } from "./ISchemaResolver.sol";
  */
 abstract contract SchemaResolver is ISchemaResolver {
     error AccessDenied();
+    error InsufficientValue();
     error InvalidEAS();
     error NotPayable();
 
@@ -62,37 +63,102 @@ abstract contract SchemaResolver is ISchemaResolver {
      * @inheritdoc ISchemaResolver
      */
     function attest(Attestation calldata attestation) external payable onlyEAS returns (bool) {
-        return onAttest(attestation);
+        return onAttest(attestation, msg.value);
     }
 
     /**
-     * @dev Processes an attestation revocation and verifies if it can be revoked.
-     *
-     * @param attestation The existing attestation to be revoked.
-     *
-     * @return Whether the attestation can be revoked.
+     * @inheritdoc ISchemaResolver
+     */
+    function multiAttest(
+        Attestation[] calldata attestations,
+        uint256[] calldata values
+    ) external payable onlyEAS returns (bool) {
+        uint256 length = attestations.length;
+        uint256 remainingValue = msg.value;
+
+        for (uint256 i = 0; i < length; ) {
+            uint256 value = values[i];
+            if (value > remainingValue) {
+                revert InsufficientValue();
+            }
+
+            if (!onAttest(attestations[i], value)) {
+                return false;
+            }
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= value;
+
+                ++i;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc ISchemaResolver
      */
     function revoke(Attestation calldata attestation) external payable onlyEAS returns (bool) {
-        return onRevoke(attestation);
+        return onRevoke(attestation, msg.value);
+    }
+
+    /**
+     * @inheritdoc ISchemaResolver
+     */
+    function multiRevoke(
+        Attestation[] calldata attestations,
+        uint256[] calldata values
+    ) external payable onlyEAS returns (bool) {
+        uint256 length = attestations.length;
+        uint256 remainingValue = msg.value;
+
+        for (uint256 i = 0; i < length; ) {
+            uint256 value = values[i];
+            if (value > remainingValue) {
+                revert InsufficientValue();
+            }
+            if (!onRevoke(attestations[i], value)) {
+                return false;
+            }
+
+            unchecked {
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                remainingValue -= value;
+
+                ++i;
+            }
+        }
+
+        return true;
     }
 
     /**
      * @dev A resolver callback that should be implemented by child contracts.
      *
      * @param attestation The new attestation.
+     * @param value An explicit ETH amount that was sent to the resolver. Please note that this value is verified in
+     * both attest() and multiAttest() callbacks EAS-only callbacks and that in case of multi attestations, it'll
+     * usually hold that msg.value != value, since msg.value aggregated the sent ETH amounts for all the attestations
+     * in the batch.
      *
      * @return Whether the attestation is valid.
      */
-    function onAttest(Attestation calldata attestation) internal virtual returns (bool);
+    function onAttest(Attestation calldata attestation, uint256 value) internal virtual returns (bool);
 
     /**
      * @dev Processes an attestation revocation and verifies if it can be revoked.
      *
      * @param attestation The existing attestation to be revoked.
+     * @param value An explicit ETH amount that was sent to the resolver. Please note that this value is verified in
+     * both revoke() and multiRevoke() callbacks EAS-only callbacks and that in case of multi attestations, it'll
+     * usually hold that msg.value != value, since msg.value aggregated the sent ETH amounts for all the attestations
+     * in the batch.
      *
      * @return Whether the attestation can be revoked.
      */
-    function onRevoke(Attestation calldata attestation) internal virtual returns (bool);
+    function onRevoke(Attestation calldata attestation, uint256 value) internal virtual returns (bool);
 
     /**
      * @dev Ensures that only the EAS contract can make this call.

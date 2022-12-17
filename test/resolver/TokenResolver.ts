@@ -2,11 +2,11 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -61,16 +61,22 @@ describe('TokenResolver', () => {
   it('should revert when attesting with wrong token amount', async () => {
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data },
       { from: sender },
       'ERC20: insufficient allowance'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender },
       'ERC20: insufficient allowance'
@@ -79,17 +85,23 @@ describe('TokenResolver', () => {
     await token.connect(sender).approve(resolver.address, targetAmount - 1);
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data },
       { from: sender },
       'ERC20: insufficient allowance'
     );
 
     await token.connect(sender).approve(resolver.address, targetAmount * 2 - 1);
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender },
       'ERC20: insufficient allowance'
@@ -101,26 +113,37 @@ describe('TokenResolver', () => {
 
     const { uuid } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
     await token.connect(sender).approve(resolver.address, targetAmount * 2);
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       { from: sender }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });

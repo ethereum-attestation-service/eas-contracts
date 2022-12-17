@@ -8,7 +8,7 @@ import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
  * @title A struct representing a record for a submitted schema.
  */
 struct SchemaRecord {
-    bytes32 uuid; // A unique identifier of the schema.
+    bytes32 uuid; // The unique identifier of the schema.
     ISchemaResolver resolver; // Optional schema resolver.
     bool revocable; // Whether the schema allows revocations explicitly.
     string schema; // Custom specification of the schema (e.g., an ABI).

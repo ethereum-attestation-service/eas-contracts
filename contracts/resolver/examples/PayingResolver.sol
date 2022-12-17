@@ -26,8 +26,8 @@ contract PayingResolver is SchemaResolver {
         return true;
     }
 
-    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
-        if (msg.value > 0) {
+    function onAttest(Attestation calldata attestation, uint256 value) internal virtual override returns (bool) {
+        if (value > 0) {
             return false;
         }
 
@@ -36,13 +36,13 @@ contract PayingResolver is SchemaResolver {
         return true;
     }
 
-    function onRevoke(Attestation calldata attestation) internal virtual override returns (bool) {
-        if (msg.value < _incentive) {
+    function onRevoke(Attestation calldata attestation, uint256 value) internal virtual override returns (bool) {
+        if (value < _incentive) {
             return false;
         }
 
-        if (msg.value > _incentive) {
-            payable(address(attestation.attester)).sendValue(msg.value - _incentive);
+        if (value > _incentive) {
+            payable(address(attestation.attester)).sendValue(value - _incentive);
         }
 
         return true;

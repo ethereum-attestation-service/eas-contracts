@@ -2,11 +2,11 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   registerSchema
 } from '../helpers/EAS';
 import { duration, latest } from '../helpers/Time';
@@ -56,26 +56,37 @@ describe('ExpirationTimeResolver', () => {
   it('should revert when attesting with a wrong expiration time', async () => {
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime: validAfter - duration.days(1), data },
+      schemaId,
+      { recipient: recipient.address, expirationTime: validAfter - duration.days(1), data },
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter - duration.days(1), data },
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.seconds(1), data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime: validAfter - duration.days(1), data },
+            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.days(1), data },
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter - duration.seconds(1), data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime: validAfter + duration.days(1), data },
+            { recipient: recipient.address, expirationTime: validAfter - duration.seconds(1), data }
+          ]
+        }
       ],
       { from: sender },
       'InvalidAttestation'
@@ -85,24 +96,35 @@ describe('ExpirationTimeResolver', () => {
   it('should allow attesting with the correct expiration time', async () => {
     const { uuid } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.seconds(1), data },
+      schemaId,
+      { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.seconds(1), data },
-        { recipient: recipient.address, schema: schemaId, expirationTime: validAfter + duration.weeks(1), data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data },
+            { recipient: recipient.address, expirationTime: validAfter + duration.weeks(1), data }
+          ]
+        }
       ],
       { from: sender }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });

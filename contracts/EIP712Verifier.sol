@@ -6,7 +6,17 @@ import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import { IEIP712Verifier } from "./IEIP712Verifier.sol";
-import { AttestationRequest, DelegatedAttestationRequest, RevocationRequest, DelegatedRevocationRequest } from "./IEAS.sol";
+
+// prettier-ignore
+import {
+    AttestationRequest,
+    AttestationRequestData,
+    DelegatedAttestationRequest,
+    DelegatedRevocationRequest,
+    RevocationRequest,
+    RevocationRequestData
+} from "./IEAS.sol";
+
 import { EIP712Signature } from "./Types.sol";
 
 /**
@@ -19,12 +29,12 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     string public constant VERSION = "0.21";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(address recipient,bytes32 schema,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 private constant ATTEST_TYPEHASH = 0x227c2175d9fc17b0f2b4bea1a33eaab23cef0d6a13022dd0cd9d60facfb0d6d7;
+    // keccak256("Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
+    bytes32 private constant ATTEST_TYPEHASH = 0x790a6069414c6efe8e6aa1d915482176ee1e2e7d73c6f34d03df1813c5cb4ce9;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(bytes32 uuid,uint256 nonce)").
-    bytes32 private constant REVOKE_TYPEHASH = 0xbae0931f3a99efd1b97c2f5b6b6e79d16418246b5055d64757e16de5ad11a8ab;
+    // keccak256("Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)").
+    bytes32 private constant REVOKE_TYPEHASH = 0xf4d55e0bcbb226b4aaff947cf2f41ec6d6dcaecd1306fbe6f9b8746ad288b48e;
 
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
@@ -65,31 +75,31 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function attest(DelegatedAttestationRequest calldata delegatedRequest) external {
-        AttestationRequest calldata request = delegatedRequest.request;
-        EIP712Signature calldata signature = delegatedRequest.signature;
+    function attest(DelegatedAttestationRequest calldata request) external {
+        AttestationRequestData calldata data = request.data;
+        EIP712Signature calldata signature = request.signature;
 
         uint256 nonce;
         unchecked {
-            nonce = _nonces[signature.attester]++;
+            nonce = _nonces[request.attester]++;
         }
 
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
                     ATTEST_TYPEHASH,
-                    request.recipient,
                     request.schema,
-                    request.expirationTime,
-                    request.revocable,
-                    request.refUUID,
-                    keccak256(request.data),
+                    data.recipient,
+                    data.expirationTime,
+                    data.revocable,
+                    data.refUUID,
+                    keccak256(data.data),
                     nonce
                 )
             )
         );
 
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signature.attester) {
+        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.attester) {
             revert InvalidSignature();
         }
     }
@@ -97,18 +107,18 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     /**
      * @inheritdoc IEIP712Verifier
      */
-    function revoke(DelegatedRevocationRequest calldata delegatedRequest) external {
-        RevocationRequest calldata request = delegatedRequest.request;
-        EIP712Signature calldata signature = delegatedRequest.signature;
+    function revoke(DelegatedRevocationRequest calldata request) external {
+        RevocationRequestData calldata data = request.data;
+        EIP712Signature calldata signature = request.signature;
 
         uint256 nonce;
         unchecked {
-            nonce = _nonces[signature.attester]++;
+            nonce = _nonces[request.revoker]++;
         }
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.uuid, nonce)));
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uuid, nonce)));
 
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signature.attester) {
+        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {
             revert InvalidSignature();
         }
     }
