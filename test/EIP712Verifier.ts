@@ -9,8 +9,8 @@ const {
 } = ethers;
 
 const ATTEST_TYPED_SIGNATURE =
-  'Attest(address recipient,bytes32 schema,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)';
-const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 uuid,uint256 nonce)';
+  'Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)';
+const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)';
 
 describe('EIP712Verifier', () => {
   let verifier: EIP712Verifier;

@@ -4,13 +4,13 @@ import { ZERO_BYTES32 } from '../../utils/Constants';
 import { getTransactionCost } from '..//helpers/Transaction';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectFailedMultiRevocations,
   expectFailedRevocation,
-  expectFailedRevocations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
@@ -18,7 +18,7 @@ import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
@@ -71,7 +71,8 @@ describe('PayingResolver', () => {
 
     const { res } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data },
       {
         from: sender,
         skipBalanceCheck: true
@@ -85,11 +86,16 @@ describe('PayingResolver', () => {
     const prevResolverBalance2 = await getBalance(resolver.address);
     const prevAttesterBalance2 = await getBalance(sender.address);
 
-    const ret = await expectAttestations(
+    const { uuids, res: res2 } = await expectMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       {
         from: sender,
@@ -97,32 +103,35 @@ describe('PayingResolver', () => {
       }
     );
 
-    transactionCost = BigNumber.from(0);
-    for (const { res } of ret) {
-      transactionCost = transactionCost.add(await getTransactionCost(res));
-    }
+    transactionCost = await getTransactionCost(res2);
 
-    expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.sub(incentive * ret.length));
+    expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.sub(incentive * uuids.length));
     expect(await getBalance(sender.address)).to.equal(
-      prevAttesterBalance2.add(incentive * ret.length).sub(transactionCost)
+      prevAttesterBalance2.add(incentive * uuids.length).sub(transactionCost)
     );
   });
 
   it('should revert when attempting to send any ETH', async () => {
     await expectFailedAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data, value: 1 },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data, value: 1 },
       {
         from: sender
       },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value: 1 },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data, value: 1 },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
       ],
       {
         from: sender
@@ -130,11 +139,16 @@ describe('PayingResolver', () => {
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data, value: 1 }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data, value: 1 }
+          ]
+        }
       ],
       {
         from: sender
@@ -150,13 +164,15 @@ describe('PayingResolver', () => {
     beforeEach(async () => {
       uuid = await getUUIDFromAttestTx(
         eas.connect(sender).attest({
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime,
-          revocable: true,
-          refUUID: ZERO_BYTES32,
-          data,
-          value: 0
+          data: {
+            recipient: recipient.address,
+            expirationTime,
+            revocable: true,
+            refUUID: ZERO_BYTES32,
+            data,
+            value: 0
+          }
         })
       );
 
@@ -166,13 +182,15 @@ describe('PayingResolver', () => {
         uuids.push(
           await getUUIDFromAttestTx(
             eas.connect(sender).attest({
-              recipient: recipient.address,
               schema: schemaId,
-              expirationTime,
-              revocable: true,
-              refUUID: ZERO_BYTES32,
-              data,
-              value: 0
+              data: {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data,
+                value: 0
+              }
             })
           )
         );
@@ -180,18 +198,18 @@ describe('PayingResolver', () => {
     });
 
     it('should revert when attempting to revoke an attestation without repaying the incentive', async () => {
-      await expectFailedRevocation({ eas }, { uuid }, { from: sender }, 'InvalidRevocation');
+      await expectFailedRevocation({ eas }, schemaId, { uuid }, { from: sender }, 'InvalidRevocation');
 
-      await expectFailedRevocations(
+      await expectFailedMultiRevocations(
         { eas },
-        [{ uuid }, { uuid, value: incentive }],
+        [{ schema: schemaId, requests: [{ uuid }, { uuid, value: incentive }] }],
         { from: sender },
         'InvalidRevocation'
       );
 
-      await expectFailedRevocations(
+      await expectFailedMultiRevocations(
         { eas },
-        [{ uuid, value: incentive }, { uuid }],
+        [{ schema: schemaId, requests: [{ uuid, value: incentive }, { uuid }] }],
         { from: sender },
         'InvalidRevocation'
       );
@@ -202,7 +220,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive;
-      const res = await expectRevocation({ eas }, { uuid, value }, { from: sender });
+      const res = await expectRevocation({ eas }, schemaId, { uuid, value }, { from: sender });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -211,20 +229,22 @@ describe('PayingResolver', () => {
       const prevResolverBalance2 = await getBalance(resolver.address);
       const prevAttesterBalance2 = await getBalance(sender.address);
 
-      const ret = await expectRevocations(
+      const res2 = await expectMultiRevocations(
         { eas },
-        uuids.map((uuid) => ({ uuid, value })),
-        { from: sender }
+        [
+          {
+            schema: schemaId,
+            requests: uuids.map((uuid) => ({ uuid, value }))
+          }
+        ],
+        { from: sender, skipBalanceCheck: true }
       );
 
-      transactionCost = BigNumber.from(0);
-      for (const res of ret) {
-        transactionCost = transactionCost.add(await getTransactionCost(res));
-      }
+      transactionCost = await getTransactionCost(res2);
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * ret.length));
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * ret.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
       );
     });
 
@@ -233,7 +253,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive * 10;
-      const res = await expectRevocation({ eas }, { uuid, value }, { from: sender, skipBalanceCheck: true });
+      const res = await expectRevocation({ eas }, schemaId, { uuid, value }, { from: sender, skipBalanceCheck: true });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -242,19 +262,22 @@ describe('PayingResolver', () => {
       const prevResolverBalance2 = await getBalance(resolver.address);
       const prevAttesterBalance2 = await getBalance(sender.address);
 
-      const ret = await expectRevocations(
+      const res2 = await expectMultiRevocations(
         { eas },
-        uuids.map((uuid) => ({ uuid, value })),
+        [
+          {
+            schema: schemaId,
+            requests: uuids.map((uuid) => ({ uuid, value }))
+          }
+        ],
         { from: sender, skipBalanceCheck: true }
       );
-      transactionCost = BigNumber.from(0);
-      for (const res of ret) {
-        transactionCost = transactionCost.add(await getTransactionCost(res));
-      }
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * ret.length));
+      transactionCost = await getTransactionCost(res2);
+
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * ret.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
       );
     });
 
@@ -263,21 +286,22 @@ describe('PayingResolver', () => {
 
       await expectFailedRevocation(
         { eas },
+        schemaId,
         { uuid, value: value + 1000 },
         { from: sender, value },
         'InsufficientValue'
       );
 
-      await expectFailedRevocations(
+      await expectFailedMultiRevocations(
         { eas },
-        [{ uuid, value: value + 1000 }, { uuid }],
+        [{ schema: schemaId, requests: [{ uuid, value: value + 1000 }, { uuid }] }],
         { from: sender, value },
         'InsufficientValue'
       );
 
-      await expectFailedRevocations(
+      await expectFailedMultiRevocations(
         { eas },
-        [{ uuid }, { uuid, value: value + 1000 }],
+        [{ schema: schemaId, requests: [{ uuid }, { uuid, value: value + 1000 }] }],
         { from: sender, value },
         'InsufficientValue'
       );
@@ -290,6 +314,7 @@ describe('PayingResolver', () => {
       const value = incentive;
       const res = await expectRevocation(
         { eas },
+        schemaId,
         { uuid, value },
         {
           from: sender,
@@ -305,24 +330,22 @@ describe('PayingResolver', () => {
       const prevResolverBalance2 = await getBalance(resolver.address);
       const prevAttesterBalance2 = await getBalance(sender.address);
 
-      const ret = await expectRevocations(
+      const res2 = await expectMultiRevocations(
         { eas },
-        uuids.map((uuid) => ({ uuid, value })),
-        {
-          from: sender,
-          value: value * 10,
-          skipBalanceCheck: true
-        }
+        [
+          {
+            schema: schemaId,
+            requests: uuids.map((uuid) => ({ uuid, value }))
+          }
+        ],
+        { from: sender, value: value * 10, skipBalanceCheck: true }
       );
 
-      transactionCost = BigNumber.from(0);
-      for (const res of ret) {
-        transactionCost = transactionCost.add(await getTransactionCost(res));
-      }
+      transactionCost = await getTransactionCost(res2);
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * ret.length));
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * ret.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
       );
     });
   });

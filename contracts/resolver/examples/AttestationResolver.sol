@@ -14,12 +14,13 @@ contract AttestationResolver is SchemaResolver {
 
     constructor(IEAS eas) SchemaResolver(eas) {}
 
-    function onAttest(Attestation calldata attestation) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal virtual override returns (bool) {
         return _eas.isAttestationValid(_toBytes32(attestation.data, 0));
     }
 
     function onRevoke(
-        Attestation calldata /*attestation*/
+        Attestation calldata /*attestation*/,
+        uint256 /*value*/
     ) internal virtual override returns (bool) {
         return true;
     }

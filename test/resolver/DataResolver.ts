@@ -2,11 +2,11 @@ import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -58,9 +58,9 @@ describe('DataResolver', () => {
       {
         eas
       },
+      schemaId,
       {
         recipient: recipient.address,
-        schema: schemaId,
         expirationTime,
         data: '0x1234'
       },
@@ -72,9 +72,9 @@ describe('DataResolver', () => {
       {
         eas
       },
+      schemaId,
       {
         recipient: recipient.address,
-        schema: schemaId,
         expirationTime,
         data: '0x02'
       },
@@ -82,44 +82,50 @@ describe('DataResolver', () => {
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       {
         eas
       },
       [
         {
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime,
-          data: '0x02'
-        },
-        {
-          recipient: recipient.address,
-          schema: schemaId,
-          expirationTime,
-          data: DATA1
+          requests: [
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: '0x02'
+            },
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: DATA1
+            }
+          ]
         }
       ],
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       {
         eas
       },
       [
         {
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime,
-          data: DATA2
-        },
-        {
-          recipient: recipient.address,
-          schema: schemaId,
-          expirationTime,
-          data: '0x02'
+          requests: [
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: DATA2
+            },
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: '0x02'
+            }
+          ]
         }
       ],
       { from: sender },
@@ -132,9 +138,9 @@ describe('DataResolver', () => {
       {
         eas
       },
+      schemaId,
       {
         recipient: recipient.address,
-        schema: schemaId,
         expirationTime,
         data: DATA1
       },
@@ -143,15 +149,15 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas }, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
 
     const { uuid: uuid2 } = await expectAttestation(
       {
         eas
       },
+      schemaId,
       {
         recipient: recipient.address,
-        schema: schemaId,
         expirationTime,
         data: DATA2
       },
@@ -160,24 +166,27 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas }, { uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid: uuid2 }, { from: sender });
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       {
         eas
       },
       [
         {
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime,
-          data: DATA1
-        },
-        {
-          recipient: recipient.address,
-          schema: schemaId,
-          expirationTime,
-          data: DATA2
+          requests: [
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: DATA1
+            },
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: DATA2
+            }
+          ]
         }
       ],
       {
@@ -185,9 +194,14 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });

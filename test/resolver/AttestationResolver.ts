@@ -3,11 +3,11 @@ import { AttestationResolver, EIP712Verifier, SchemaRegistry, TestEAS } from '..
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import {
   expectAttestation,
-  expectAttestations,
   expectFailedAttestation,
-  expectFailedAttestations,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
   expectRevocation,
-  expectRevocations,
   getSchemaUUID,
   getUUIDFromAttestTx,
   registerSchema
@@ -57,13 +57,15 @@ describe('AttestationResolver', () => {
 
     uuid = await getUUIDFromAttestTx(
       eas.attest({
-        recipient: recipient.address,
         schema: schema2Id,
-        expirationTime,
-        revocable: true,
-        refUUID: ZERO_BYTES32,
-        data,
-        value: 0
+        data: {
+          recipient: recipient.address,
+          expirationTime,
+          revocable: true,
+          refUUID: ZERO_BYTES32,
+          data,
+          value: 0
+        }
       })
     );
 
@@ -78,51 +80,57 @@ describe('AttestationResolver', () => {
       {
         eas
       },
+      schemaId,
       {
         recipient: recipient.address,
-        schema: schemaId,
         expirationTime
       },
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       {
         eas
       },
       [
         {
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime
-        },
-        {
-          recipient: recipient.address,
-          schema: schemaId,
-          expirationTime,
-          data: uuid
+          requests: [
+            {
+              recipient: recipient.address,
+              expirationTime
+            },
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: uuid
+            }
+          ]
         }
       ],
       { from: sender },
       'InvalidAttestation'
     );
 
-    await expectFailedAttestations(
+    await expectFailedMultiAttestations(
       {
         eas
       },
       [
         {
-          recipient: recipient.address,
           schema: schemaId,
-          expirationTime,
-          data: uuid
-        },
-        {
-          recipient: recipient.address,
-          schema: schemaId,
-          expirationTime
+          requests: [
+            {
+              recipient: recipient.address,
+              expirationTime,
+              data: uuid
+            },
+            {
+              recipient: recipient.address,
+              expirationTime
+            }
+          ]
         }
       ],
       { from: sender },
@@ -133,24 +141,35 @@ describe('AttestationResolver', () => {
   it('should allow attesting to an existing attestation', async () => {
     const { uuid: uuid2 } = await expectAttestation(
       { eas },
-      { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
+      schemaId,
+      { recipient: recipient.address, expirationTime, data: uuid },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, { uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid: uuid2 }, { from: sender });
 
-    const res = await expectAttestations(
+    const res = await expectMultiAttestations(
       { eas },
       [
-        { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid },
-        { recipient: recipient.address, schema: schemaId, expirationTime, data: uuid }
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data: uuid },
+            { recipient: recipient.address, expirationTime, data: uuid }
+          ]
+        }
       ],
       { from: sender }
     );
 
-    await expectRevocations(
+    await expectMultiRevocations(
       { eas },
-      res.map((r) => ({ uuid: r.uuid })),
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
       { from: sender }
     );
   });

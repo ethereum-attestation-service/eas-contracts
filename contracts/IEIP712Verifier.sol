@@ -23,7 +23,7 @@ interface IEIP712Verifier {
     function getNonce(address account) external view returns (uint256);
 
     /**
-     * @dev Verifies signed attestation.
+     * @dev Verifies multiple signed attestation.
      *
      * @param delegatedRequest The arguments of the delegated attestation request.
      */

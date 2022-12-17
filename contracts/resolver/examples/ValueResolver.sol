@@ -20,14 +20,13 @@ contract ValueResolver is SchemaResolver {
         return true;
     }
 
-    function onAttest(
-        Attestation calldata /*attestation*/
-    ) internal virtual override returns (bool) {
-        return msg.value == _targetValue;
+    function onAttest(Attestation calldata /*attestation*/, uint256 value) internal virtual override returns (bool) {
+        return value == _targetValue;
     }
 
     function onRevoke(
-        Attestation calldata /*attestation*/
+        Attestation calldata /*attestation*/,
+        uint256 /*value*/
     ) internal virtual override returns (bool) {
         return true;
     }
