@@ -701,6 +701,64 @@ describe('EAS', () => {
               'NotFound'
             );
           });
+
+          it('should revert when attesting to empty schemas', async () => {
+            await expectFailedAttestation(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              ZERO_BYTES32,
+              {
+                recipient: recipient.address,
+                expirationTime,
+                data
+              },
+              { from: sender },
+              'InvalidSchema'
+            );
+
+            await expectFailedMultiAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  schema: ZERO_BYTES32,
+                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                },
+                {
+                  schema: schema1Id,
+                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                }
+              ],
+              { from: sender },
+              'InvalidSchema'
+            );
+
+            await expectFailedMultiAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  schema: schema1Id,
+                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                },
+                {
+                  schema: ZERO_BYTES32,
+                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                }
+              ],
+              { from: sender },
+              'InvalidSchema'
+            );
+          });
         });
 
         context('with an irrevocable schema', () => {
@@ -988,6 +1046,30 @@ describe('EAS', () => {
             [
               { schema: schemaId, requests: [{ uuid }] },
               { schema: schema2Id, requests: [{ uuid: uuids[0] }] }
+            ],
+            { from: sender },
+            'InvalidSchema'
+          );
+        });
+
+        it('should revert when attempting to revoke attestations while specifying an empty schema', async () => {
+          await expectFailedRevocation({ eas }, ZERO_BYTES32, { uuid }, { from: sender }, 'InvalidSchema');
+
+          await expectFailedMultiRevocations(
+            { eas },
+            [
+              { schema: ZERO_BYTES32, requests: [{ uuid }] },
+              { schema: schemaId, requests: [{ uuid: uuids[0] }] }
+            ],
+            { from: sender },
+            'InvalidSchema'
+          );
+
+          await expectFailedMultiRevocations(
+            { eas },
+            [
+              { schema: schemaId, requests: [{ uuid }] },
+              { schema: ZERO_BYTES32, requests: [{ uuid: uuids[0] }] }
             ],
             { from: sender },
             'InvalidSchema'
