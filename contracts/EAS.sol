@@ -463,6 +463,10 @@ contract EAS is IEAS {
                 revert NotFound();
             }
 
+            if (attestation.schema != schema) {
+                revert InvalidSchema();
+            }
+
             if (attestation.attester != revoker) {
                 revert AccessDenied();
             }
