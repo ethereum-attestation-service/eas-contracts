@@ -152,6 +152,7 @@ contract EAS is IEAS {
             availableValue -= res.usedValue;
 
             totalUuids[i] = res.uuids;
+
             unchecked {
                 totalUuidsCount += res.uuids.length;
             }
@@ -352,15 +353,16 @@ contract EAS is IEAS {
         uint256 availableValue,
         bool last
     ) private returns (AttestationsResult memory) {
+        uint256 length = data.length;
+
         AttestationsResult memory res;
-        res.uuids = new bytes32[](data.length);
+        res.uuids = new bytes32[](length);
 
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
         if (schemaRecord.uuid == EMPTY_UUID) {
             revert InvalidSchema();
         }
 
-        uint256 length = data.length;
         Attestation[] memory attestations = new Attestation[](length);
         uint256[] memory values = new uint256[](length);
 
@@ -414,7 +416,7 @@ contract EAS is IEAS {
             attestations[i] = attestation;
             values[i] = request.value;
 
-            res.uuids[i] == uuid;
+            res.uuids[i] = uuid;
 
             emit Attested(request.recipient, attester, uuid, schema);
 
@@ -586,6 +588,10 @@ contract EAS is IEAS {
             for (uint256 i = 0; i < length; ) {
                 if (values[i] != 0) {
                     revert NotPayable();
+                }
+
+                unchecked {
+                    ++i;
                 }
             }
 
