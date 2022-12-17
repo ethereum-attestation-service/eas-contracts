@@ -51,7 +51,7 @@ export const ATTEST_TYPE: TypedData[] = [
   { name: 'nonce', type: 'uint256' }
 ];
 export const REVOKE_TYPE: TypedData[] = [
-  { name: 'recipient', type: 'address' },
+  { name: 'schema', type: 'bytes32' },
   { name: 'uuid', type: 'bytes32' },
   { name: 'nonce', type: 'uint256' }
 ];
@@ -97,8 +97,8 @@ export interface EIP712Request<T extends EIP712MessageTypes, P extends EIP712Par
 }
 
 export type EIP712AttestationParams = EIP712Params & {
-  recipient: string;
   schema: string;
+  recipient: string;
   expirationTime: number;
   revocable: boolean;
   refUUID: string;
