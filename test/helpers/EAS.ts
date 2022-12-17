@@ -163,14 +163,16 @@ export const expectAttestation = async (
 
   switch (signatureType) {
     case SignatureType.Direct: {
-      res = await eas.connect(txSender).attest(
+      const args = [
         { schema, data: { recipient, expirationTime, revocable, refUUID, data, value } },
-        {
-          value: msgValue
-        }
-      );
+        { value: msgValue }
+      ] as const;
+
+      const returnedUuid = await eas.connect(txSender).callStatic.attest(...args);
+      res = await eas.connect(txSender).attest(...args);
 
       uuid = await getUUIDFromAttestTx(res);
+      expect(uuid).to.equal(returnedUuid);
 
       break;
     }
@@ -193,7 +195,7 @@ export const expectAttestation = async (
 
       expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, request)).to.be.true;
 
-      res = await eas.connect(txSender).attestByDelegation(
+      const args = [
         {
           schema,
           data: { recipient, expirationTime, revocable, refUUID, data, value },
@@ -207,9 +209,13 @@ export const expectAttestation = async (
         {
           value: msgValue
         }
-      );
+      ] as const;
+
+      const returnedUuid = await eas.connect(txSender).callStatic.attestByDelegation(...args);
+      res = await eas.connect(txSender).attestByDelegation(...args);
 
       uuid = await getUUIDFromAttestTx(res);
+      expect(uuid).to.equal(returnedUuid);
 
       break;
     }
@@ -354,11 +360,18 @@ export const expectMultiAttestations = async (
 
   switch (signatureType) {
     case SignatureType.Direct: {
-      res = await eas.connect(txSender).multiAttest(multiAttestationRequests, {
-        value: msgValue
-      });
+      const args = [
+        multiAttestationRequests,
+        {
+          value: msgValue
+        }
+      ] as const;
+
+      const returnedUuids = await eas.connect(txSender).callStatic.multiAttest(...args);
+      res = await eas.connect(txSender).multiAttest(...args);
 
       uuids = await getUUIDFromMultiAttestTx(res);
+      expect(uuids).to.deep.equal(returnedUuids);
 
       break;
     }
@@ -393,9 +406,13 @@ export const expectMultiAttestations = async (
         multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address });
       }
 
-      res = await eas.connect(txSender).multiAttestByDelegation(multiDelegatedAttestationRequests, { value: msgValue });
+      const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
+
+      const returnedUuids = await eas.connect(txSender).callStatic.multiAttestByDelegation(...args);
+      res = await eas.connect(txSender).multiAttestByDelegation(...args);
 
       uuids = await getUUIDFromMultiAttestTx(res);
+      expect(uuids).to.deep.equal(returnedUuids);
 
       break;
     }

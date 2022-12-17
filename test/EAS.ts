@@ -300,6 +300,13 @@ describe('EAS', () => {
                     { recipient: ZERO_ADDRESS, expirationTime, data },
                     { recipient: ZERO_ADDRESS, expirationTime, data }
                   ]
+                },
+                {
+                  schema: schema2Id,
+                  requests: [
+                    { recipient: ZERO_ADDRESS, expirationTime, data },
+                    { recipient: ZERO_ADDRESS, expirationTime, data }
+                  ]
                 }
               ],
               { from: sender }
