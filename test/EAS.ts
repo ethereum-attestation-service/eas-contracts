@@ -636,6 +636,37 @@ describe('EAS', () => {
             expect(uuid2).not.to.equal(uuid3);
           });
 
+          it('should allow multi layered attestations', async () => {
+            await expectMultiAttestations(
+              {
+                eas,
+                verifier,
+                eip712Utils
+              },
+              [
+                {
+                  schema: schema1Id,
+                  requests: [
+                    { recipient: recipient.address, expirationTime, data },
+                    { recipient: recipient.address, expirationTime, data }
+                  ]
+                },
+                {
+                  schema: schema2Id,
+                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                },
+                {
+                  schema: schema3Id,
+                  requests: [
+                    { recipient: recipient.address, expirationTime, data },
+                    { recipient: recipient.address, expirationTime, data }
+                  ]
+                }
+              ],
+              { signatureType, from: sender }
+            );
+          });
+
           it('should revert when attesting to non-existing attestations', async () => {
             await expectFailedAttestation(
               {
@@ -952,6 +983,23 @@ describe('EAS', () => {
         eas.multiAttestByDelegation([
           {
             schema: schemaId,
+            data: [],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('BAD'),
+                s: formatBytes32String('BAD')
+              }
+            ],
+            attester: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiAttestByDelegation([
+          {
+            schema: schemaId,
             data: [
               {
                 recipient: recipient.address,
@@ -974,6 +1022,34 @@ describe('EAS', () => {
                 s: formatBytes32String('4')
               }
             ],
+            attester: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: recipient.address,
+                expirationTime,
+                revocable: true,
+                refUUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [],
             attester: sender.address
           }
         ])
@@ -1410,6 +1486,23 @@ describe('EAS', () => {
         eas.multiRevokeByDelegation([
           {
             schema: schemaId,
+            data: [],
+            signatures: [
+              {
+                v: 28,
+                r: formatBytes32String('1'),
+                s: formatBytes32String('2')
+              }
+            ],
+            revoker: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiRevokeByDelegation([
+          {
+            schema: schemaId,
             data: [{ uuid, value: 0 }],
             signatures: [
               {
@@ -1423,6 +1516,20 @@ describe('EAS', () => {
                 s: formatBytes32String('4')
               }
             ],
+            revoker: sender.address
+          }
+        ])
+      ).to.be.revertedWith('InvalidLength');
+
+      await expect(
+        eas.multiRevokeByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              { uuid, value: 0 },
+              { uuid: uuid2, value: 0 }
+            ],
+            signatures: [],
             revoker: sender.address
           }
         ])
