@@ -1071,7 +1071,7 @@ describe('EAS', () => {
     });
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
-      context(`via ${signatureType} attestation`, () => {
+      context(`via ${signatureType} revocation`, () => {
         let uuid: string;
         let uuids: string[] = [];
 
