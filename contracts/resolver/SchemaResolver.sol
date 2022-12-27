@@ -51,7 +51,7 @@ abstract contract SchemaResolver is ISchemaResolver {
     }
 
     /**
-     * @dev ETH callback
+     * @dev ETH callback.
      */
     receive() external payable virtual {
         if (!isPayable()) {
@@ -74,20 +74,27 @@ abstract contract SchemaResolver is ISchemaResolver {
         uint256[] calldata values
     ) external payable onlyEAS returns (bool) {
         uint256 length = attestations.length;
+
+        // We are keeping track of the remaining ETH amount that can be sent to resolvers and will keep deducting
+        // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
+        // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
+        // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
         for (uint256 i = 0; i < length; ) {
+            // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {
                 revert InsufficientValue();
             }
 
+            // Forward the attestation to the underlying resolver and revert in case it isn't approved.
             if (!onAttest(attestations[i], value)) {
                 return false;
             }
 
             unchecked {
-                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount.
                 remainingValue -= value;
 
                 ++i;
@@ -112,19 +119,27 @@ abstract contract SchemaResolver is ISchemaResolver {
         uint256[] calldata values
     ) external payable onlyEAS returns (bool) {
         uint256 length = attestations.length;
+
+        // We are keeping track of the remaining ETH amount that can be sent to resolvers and will keep deducting
+        // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
+        // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
+        // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
         for (uint256 i = 0; i < length; ) {
+            // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {
                 revert InsufficientValue();
             }
+
+            // Forward the revocation to the underlying resolver and revert in case it isn't approved.
             if (!onRevoke(attestations[i], value)) {
                 return false;
             }
 
             unchecked {
-                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount
+                // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount.
                 remainingValue -= value;
 
                 ++i;

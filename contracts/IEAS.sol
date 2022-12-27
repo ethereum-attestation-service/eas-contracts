@@ -66,7 +66,7 @@ struct MultiAttestationRequest {
 struct MultiDelegatedAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData[] data; // The arguments of the attestation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data.
+    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address attester; // The attesting account.
 }
 
@@ -110,7 +110,7 @@ struct MultiRevocationRequest {
 struct MultiDelegatedRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData[] data; // The arguments of the revocation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data.
+    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address revoker; // The revoking account.
 }
 
