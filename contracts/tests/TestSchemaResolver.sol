@@ -12,11 +12,17 @@ import { IEAS, Attestation } from "../IEAS.sol";
 contract TestSchemaResolver is SchemaResolver {
     constructor(IEAS eas) SchemaResolver(eas) {}
 
-    function onAttest(Attestation calldata /*attestation*/) internal virtual override returns (bool) {
+    function onAttest(
+        Attestation calldata /*attestation*/,
+        uint256 /*value*/
+    ) internal virtual override returns (bool) {
         return true;
     }
 
-    function onRevoke(Attestation calldata /*attestation*/) internal virtual override returns (bool) {
+    function onRevoke(
+        Attestation calldata /*attestation*/,
+        uint256 /*value*/
+    ) internal virtual override returns (bool) {
         return true;
     }
 }

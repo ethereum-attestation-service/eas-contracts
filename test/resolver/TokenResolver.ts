@@ -1,7 +1,14 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
+import {
+  expectAttestation,
+  expectFailedAttestation,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
+  expectRevocation,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -43,7 +50,7 @@ describe('TokenResolver', () => {
     await eas.setTime(await latest());
 
     token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
-    await token.transfer(sender.address, targetAmount);
+    await token.transfer(sender.address, targetAmount * 100);
 
     resolver = await Contracts.TokenResolver.deploy(eas.address, token.address, targetAmount);
     expect(await resolver.isPayable()).to.be.false;
@@ -53,30 +60,51 @@ describe('TokenResolver', () => {
 
   it('should revert when attesting with wrong token amount', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
+      { eas },
       schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'ERC20: insufficient allowance',
-      { from: sender }
+      { recipient: recipient.address, expirationTime, data },
+      { from: sender },
+      'ERC20: insufficient allowance'
+    );
+
+    await expectFailedMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
+      ],
+      { from: sender },
+      'ERC20: insufficient allowance'
     );
 
     await token.connect(sender).approve(resolver.address, targetAmount - 1);
     await expectFailedAttestation(
-      eas,
-      recipient.address,
+      { eas },
       schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'ERC20: insufficient allowance',
-      { from: sender }
+      { recipient: recipient.address, expirationTime, data },
+      { from: sender },
+      'ERC20: insufficient allowance'
+    );
+
+    await token.connect(sender).approve(resolver.address, targetAmount * 2 - 1);
+    await expectFailedMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
+      ],
+      { from: sender },
+      'ERC20: insufficient allowance'
     );
   });
 
@@ -84,19 +112,39 @@ describe('TokenResolver', () => {
     await token.connect(sender).approve(resolver.address, targetAmount);
 
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
+      { eas },
       schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      {
-        from: sender
-      }
+      { recipient: recipient.address, expirationTime, data },
+      { from: sender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
+
+    await token.connect(sender).approve(resolver.address, targetAmount * 2);
+
+    const res = await expectMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
+      ],
+      { from: sender }
+    );
+
+    await expectMultiRevocations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
+      { from: sender }
+    );
   });
 });

@@ -23,6 +23,19 @@ interface ISchemaResolver {
     function attest(Attestation calldata attestation) external payable returns (bool);
 
     /**
+     * @dev Processes multiple attestations and verifies whether they are valid.
+     *
+     * @param attestations The new attestations.
+     * @param values Explicit ETH amounts which were sent with each attestation.
+     *
+     * @return Whether all the attestations are valid.
+     */
+    function multiAttest(
+        Attestation[] calldata attestations,
+        uint256[] calldata values
+    ) external payable returns (bool);
+
+    /**
      * @dev Processes an attestation revocation and verifies if it can be revoked.
      *
      * @param attestation The existing attestation to be revoked.
@@ -30,4 +43,17 @@ interface ISchemaResolver {
      * @return Whether the attestation can be revoked.
      */
     function revoke(Attestation calldata attestation) external payable returns (bool);
+
+    /**
+     * @dev Processes revocation of multiple attestation and verifies they can be revoked.
+     *
+     * @param attestations The existing attestations to be revoked.
+     * @param values Explicit ETH amounts which were sent with each revocation.
+     *
+     * @return Whether the attestations can be revoked.
+     */
+    function multiRevoke(
+        Attestation[] calldata attestations,
+        uint256[] calldata values
+    ) external payable returns (bool);
 }

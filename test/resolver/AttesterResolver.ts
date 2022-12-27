@@ -1,7 +1,14 @@
 import Contracts from '../../components/Contracts';
 import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
-import { expectAttestation, expectFailedAttestation, expectRevocation, registerSchema } from '../helpers/EAS';
+import {
+  expectAttestation,
+  expectFailedAttestation,
+  expectFailedMultiAttestations,
+  expectMultiAttestations,
+  expectMultiRevocations,
+  expectRevocation,
+  registerSchema
+} from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -49,38 +56,64 @@ describe('AttesterResolver', () => {
     schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
-  it('should revert when attesting to the wrong attester', async () => {
+  it('should revert when attesting via the wrong attester', async () => {
     await expectFailedAttestation(
-      eas,
-      recipient.address,
+      { eas },
       schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      'InvalidAttestation',
-      {
-        from: sender
-      }
+      { recipient: recipient.address, expirationTime, data },
+      { from: sender },
+      'InvalidAttestation'
+    );
+
+    await expectFailedMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
+      ],
+      { from: sender },
+      'InvalidAttestation'
     );
   });
 
-  it('should allow attesting to the correct attester', async () => {
+  it('should allow attesting via the correct attester', async () => {
     const { uuid } = await expectAttestation(
-      eas,
-      recipient.address,
+      { eas },
       schemaId,
-      expirationTime,
-      true,
-      ZERO_BYTES32,
-      data,
-      0,
-      {
-        from: targetSender
-      }
+      { recipient: recipient.address, expirationTime, data },
+      { from: targetSender }
     );
 
-    await expectRevocation(eas, uuid, 0, { from: targetSender });
+    await expectRevocation({ eas }, schemaId, { uuid }, { from: targetSender });
+
+    const res = await expectMultiAttestations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: [
+            { recipient: recipient.address, expirationTime, data },
+            { recipient: recipient.address, expirationTime, data }
+          ]
+        }
+      ],
+      { from: targetSender }
+    );
+
+    await expectMultiRevocations(
+      { eas },
+      [
+        {
+          schema: schemaId,
+          requests: res.uuids.map((uuid) => ({ uuid }))
+        }
+      ],
+      { from: targetSender }
+    );
   });
 });
