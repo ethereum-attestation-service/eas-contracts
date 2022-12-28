@@ -63,7 +63,7 @@ export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | Co
   return event.args?.uuid;
 };
 
-export const getUUIDFromMultiAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
+export const getUUIDsFromMultiAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
   const receipt = await (await res).wait();
   const events = receipt.events?.filter((e) => e.event === 'Attested');
   if (!events || events?.length === 0) {
@@ -370,7 +370,7 @@ export const expectMultiAttestations = async (
       const returnedUuids = await eas.connect(txSender).callStatic.multiAttest(...args);
       res = await eas.connect(txSender).multiAttest(...args);
 
-      uuids = await getUUIDFromMultiAttestTx(res);
+      uuids = await getUUIDsFromMultiAttestTx(res);
       expect(uuids).to.deep.equal(returnedUuids);
 
       break;
@@ -415,7 +415,7 @@ export const expectMultiAttestations = async (
       const returnedUuids = await eas.connect(txSender).callStatic.multiAttestByDelegation(...args);
       res = await eas.connect(txSender).multiAttestByDelegation(...args);
 
-      uuids = await getUUIDFromMultiAttestTx(res);
+      uuids = await getUUIDsFromMultiAttestTx(res);
       expect(uuids).to.deep.equal(returnedUuids);
 
       break;
