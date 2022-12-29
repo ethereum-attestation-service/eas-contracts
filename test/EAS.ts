@@ -1,5 +1,5 @@
 import Contracts from '../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, TestEAS } from '../typechain-types';
+import { SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
 import {
   expectAttestation,
@@ -14,7 +14,7 @@ import {
   getUUIDFromAttestTx,
   SignatureType
 } from './helpers/EAS';
-import { EIP712Utils } from './helpers/EIP712Utils';
+import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -23,7 +23,7 @@ import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
-  utils: { formatBytes32String }
+  utils: { formatBytes32String, keccak256, toUtf8Bytes }
 } = ethers;
 
 describe('EAS', () => {
@@ -34,7 +34,6 @@ describe('EAS', () => {
   let recipient2: SignerWithAddress;
 
   let registry: SchemaRegistry;
-  let verifier: EIP712Verifier;
   let eas: TestEAS;
   let eip712Utils: EIP712Utils;
 
@@ -49,10 +48,9 @@ describe('EAS', () => {
     sender2 = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    verifier = await Contracts.EIP712Verifier.deploy();
-    eip712Utils = await EIP712Utils.fromVerifier(verifier);
+    eas = await Contracts.TestEAS.deploy(registry.address);
 
-    eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+    eip712Utils = await EIP712Utils.fromVerifier(eas);
 
     const now = await latest();
     expect(await eas.getTime()).to.equal(now);
@@ -62,17 +60,17 @@ describe('EAS', () => {
 
   describe('construction', () => {
     it('should revert when initialized with an empty schema registry', async () => {
-      await expect(Contracts.EAS.deploy(ZERO_ADDRESS, verifier.address)).to.be.revertedWith('InvalidRegistry');
-    });
-
-    it('should revert when initialized with an empty EIP712 verifier', async () => {
-      await expect(Contracts.EAS.deploy(registry.address, ZERO_ADDRESS)).to.be.revertedWith('InvalidVerifier');
+      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWith('InvalidRegistry');
     });
 
     it('should be properly initialized', async () => {
       expect(await eas.VERSION()).to.equal('0.21');
+
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
-      expect(await eas.getEIP712Verifier()).to.equal(verifier.address);
+
+      expect(await eas.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator());
+      expect(await eas.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
+      expect(await eas.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
     });
   });
 
@@ -90,7 +88,6 @@ describe('EAS', () => {
           await expectFailedAttestation(
             {
               eas,
-              verifier,
               eip712Utils
             },
             formatBytes32String('BAD'),
@@ -107,7 +104,6 @@ describe('EAS', () => {
           await expectFailedMultiAttestations(
             {
               eas,
-              verifier,
               eip712Utils
             },
             [
@@ -154,7 +150,7 @@ describe('EAS', () => {
           it('should revert when multi attesting to multiple unregistered schemas', async () => {
             // Only one of the requests is to an unregistered schema
             await expectFailedMultiAttestations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [
                 {
                   schema: schema1Id,
@@ -201,7 +197,6 @@ describe('EAS', () => {
             await expectFailedAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema1Id,
@@ -216,7 +211,7 @@ describe('EAS', () => {
 
             // The first request is invalid
             await expectFailedMultiAttestations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [
                 {
                   schema: schema1Id,
@@ -250,7 +245,7 @@ describe('EAS', () => {
 
             // The second request is invalid
             await expectFailedMultiAttestations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [
                 {
                   schema: schema1Id,
@@ -285,14 +280,14 @@ describe('EAS', () => {
 
           it('should allow attesting to an empty recipient', async () => {
             await expectAttestation(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               schema1Id,
               { recipient: ZERO_ADDRESS, expirationTime, data },
               { signatureType, from: sender }
             );
 
             await expectMultiAttestations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [
                 {
                   schema: schema1Id,
@@ -315,14 +310,14 @@ describe('EAS', () => {
 
           it('should allow self attestations', async () => {
             await expectAttestation(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               schema2Id,
               { recipient: sender.address, expirationTime, data },
               { signatureType, from: sender }
             );
 
             await expectMultiAttestations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [
                 {
                   schema: schema1Id,
@@ -340,7 +335,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema1Id,
@@ -355,7 +349,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema1Id,
@@ -375,7 +368,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -393,7 +385,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -411,7 +402,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -432,7 +422,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema1Id,
@@ -447,7 +436,6 @@ describe('EAS', () => {
             await expectMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -475,7 +463,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -489,7 +476,6 @@ describe('EAS', () => {
             await expectMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -529,7 +515,6 @@ describe('EAS', () => {
             await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -548,7 +533,6 @@ describe('EAS', () => {
             await expectMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -581,7 +565,6 @@ describe('EAS', () => {
             const uuid1 = await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -599,7 +582,6 @@ describe('EAS', () => {
             const uuid2 = await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -617,7 +599,6 @@ describe('EAS', () => {
             const uuid3 = await expectAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -640,7 +621,6 @@ describe('EAS', () => {
             await expectMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -671,7 +651,6 @@ describe('EAS', () => {
             await expectFailedAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schema3Id,
@@ -702,7 +681,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -726,7 +704,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -752,7 +729,6 @@ describe('EAS', () => {
             await expectFailedAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               ZERO_BYTES32,
@@ -768,7 +744,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -788,7 +763,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -819,7 +793,6 @@ describe('EAS', () => {
             await expectFailedAttestation(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               schemaId,
@@ -835,7 +808,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -863,7 +835,6 @@ describe('EAS', () => {
             await expectFailedMultiAttestations(
               {
                 eas,
-                verifier,
                 eip712Utils
               },
               [
@@ -1113,7 +1084,7 @@ describe('EAS', () => {
 
         it('should revert when revoking a non-existing attestation', async () => {
           await expectFailedRevocation(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             schemaId,
             { uuid: formatBytes32String('BAD') },
             { signatureType, from: sender },
@@ -1121,14 +1092,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid: formatBytes32String('BAD') }, { uuid }] }],
             { signatureType, from: sender },
             'NotFound'
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid }, { uuid: formatBytes32String('BAD') }] }],
             { signatureType, from: sender },
             'NotFound'
@@ -1137,7 +1108,7 @@ describe('EAS', () => {
 
         it("should revert when revoking a someone's else attestation", async () => {
           await expectFailedRevocation(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             schemaId,
             { uuid },
             { signatureType, from: sender2 },
@@ -1145,14 +1116,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
@@ -1160,10 +1131,10 @@ describe('EAS', () => {
         });
 
         it('should allow to revoke existing attestations', async () => {
-          await expectRevocation({ eas, verifier, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
+          await expectRevocation({ eas, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
 
           await expectMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [
               {
                 schema: schemaId,
@@ -1175,9 +1146,9 @@ describe('EAS', () => {
         });
 
         it('should revert when revoking an already revoked attestation', async () => {
-          await expectRevocation({ eas, verifier, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
+          await expectRevocation({ eas, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
           await expectFailedRevocation(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             schemaId,
             { uuid },
             { signatureType, from: sender },
@@ -1185,14 +1156,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
             { signatureType, from: sender },
             'AlreadyRevoked'
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
             { signatureType, from: sender },
             'AlreadyRevoked'
@@ -1205,7 +1176,7 @@ describe('EAS', () => {
           await registry.register(schema2, ZERO_ADDRESS, true);
 
           await expectFailedRevocation(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             schema2Id,
             { uuid },
             { signatureType, from: sender },
@@ -1213,7 +1184,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [
               { schema: schema2Id, requests: [{ uuid }] },
               { schema: schemaId, requests: [{ uuid: uuids[0] }] }
@@ -1223,7 +1194,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [
               { schema: schemaId, requests: [{ uuid }] },
               { schema: schema2Id, requests: [{ uuid: uuids[0] }] }
@@ -1235,7 +1206,7 @@ describe('EAS', () => {
 
         it('should revert when attempting to revoke attestations while specifying an empty schema', async () => {
           await expectFailedRevocation(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             ZERO_BYTES32,
             { uuid },
             { signatureType, from: sender },
@@ -1243,7 +1214,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [
               { schema: ZERO_BYTES32, requests: [{ uuid }] },
               { schema: schemaId, requests: [{ uuid: uuids[0] }] }
@@ -1253,7 +1224,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, verifier, eip712Utils },
+            { eas, eip712Utils },
             [
               { schema: schemaId, requests: [{ uuid }] },
               { schema: ZERO_BYTES32, requests: [{ uuid: uuids[0] }] }
@@ -1302,7 +1273,7 @@ describe('EAS', () => {
 
           it('should revert when revoking', async () => {
             await expectFailedRevocation(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               schemaId,
               { uuid },
               { signatureType, from: sender },
@@ -1310,14 +1281,14 @@ describe('EAS', () => {
             );
 
             await expectFailedMultiRevocations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
               { signatureType, from: sender },
               'Irrevocable'
@@ -1369,7 +1340,7 @@ describe('EAS', () => {
 
           it('should revert when revoking', async () => {
             await expectFailedRevocation(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               schema2Id,
               { uuid },
               { signatureType, from: sender },
@@ -1377,14 +1348,14 @@ describe('EAS', () => {
             );
 
             await expectFailedMultiRevocations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [{ schema: schema2Id, requests: [{ uuid }, { uuid: uuids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
-              { eas, verifier, eip712Utils },
+              { eas, eip712Utils },
               [{ schema: schema2Id, requests: [{ uuid: uuids[1] }, { uuid }] }],
               { signatureType, from: sender },
               'Irrevocable'

@@ -1,5 +1,5 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
+import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
 import { getTransactionCost } from '..//helpers/Transaction';
 import {
@@ -31,7 +31,6 @@ describe('PayingResolver', () => {
   let sender: Wallet;
 
   let registry: SchemaRegistry;
-  let verifier: EIP712Verifier;
   let eas: TestEAS;
   let resolver: SchemaResolver;
 
@@ -52,8 +51,7 @@ describe('PayingResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    verifier = await Contracts.EIP712Verifier.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+    eas = await Contracts.TestEAS.deploy(registry.address);
 
     await eas.setTime(await latest());
 

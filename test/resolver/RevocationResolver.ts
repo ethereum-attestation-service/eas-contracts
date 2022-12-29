@@ -1,5 +1,5 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
+import { RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
 import {
   expectFailedMultiRevocations,
@@ -22,7 +22,6 @@ describe('RevocationResolver', () => {
   let sender: Wallet;
 
   let registry: SchemaRegistry;
-  let verifier: EIP712Verifier;
   let eas: TestEAS;
   let resolver: RevocationResolver;
   let uuid: string;
@@ -43,8 +42,7 @@ describe('RevocationResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    verifier = await Contracts.EIP712Verifier.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+    eas = await Contracts.TestEAS.deploy(registry.address);
 
     await eas.setTime(await latest());
 

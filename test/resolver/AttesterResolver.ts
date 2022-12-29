@@ -1,5 +1,5 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, TestEAS } from '../../typechain-types';
+import { SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -24,7 +24,6 @@ describe('AttesterResolver', () => {
   let targetSender: Wallet;
 
   let registry: SchemaRegistry;
-  let verifier: EIP712Verifier;
   let eas: TestEAS;
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
@@ -42,8 +41,7 @@ describe('AttesterResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    verifier = await Contracts.EIP712Verifier.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+    eas = await Contracts.TestEAS.deploy(registry.address);
 
     await eas.setTime(await latest());
 

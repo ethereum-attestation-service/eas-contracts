@@ -5,8 +5,6 @@ pragma solidity 0.8.17;
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import { IEIP712Verifier } from "./IEIP712Verifier.sol";
-
 // prettier-ignore
 import {
     AttestationRequest,
@@ -22,11 +20,8 @@ import { EIP712Signature } from "./Types.sol";
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
  */
-contract EIP712Verifier is IEIP712Verifier, EIP712 {
+abstract contract EIP712Verifier is EIP712 {
     error InvalidSignature();
-
-    // The version of the contract.
-    string public constant VERSION = "0.21";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
@@ -41,18 +36,24 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
 
     /**
      * @dev Creates a new EIP712Verifier instance.
+     *
+     * @param version The current major version of the signing domain
      */
-    constructor() EIP712("EAS", VERSION) {}
+    constructor(string memory version) EIP712("EAS", version) {}
 
     /**
-     * @inheritdoc IEIP712Verifier
+     * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
      */
     function getDomainSeparator() external view returns (bytes32) {
         return _domainSeparatorV4();
     }
 
     /**
-     * @inheritdoc IEIP712Verifier
+     * @dev Returns the current nonce per-account.
+     *
+     * @param account The requested account.
+     *
+     * @return The current nonce.
      */
     function getNonce(address account) external view returns (uint256) {
         return _nonces[account];
@@ -73,11 +74,13 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     }
 
     /**
-     * @inheritdoc IEIP712Verifier
+     * @dev Verifies delegated attestation request.
+     *
+     * @param request The arguments of the delegated attestation request.
      */
-    function attest(DelegatedAttestationRequest calldata request) external {
-        AttestationRequestData calldata data = request.data;
-        EIP712Signature calldata signature = request.signature;
+    function _verifyAttest(DelegatedAttestationRequest memory request) internal {
+        AttestationRequestData memory data = request.data;
+        EIP712Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {
@@ -105,11 +108,13 @@ contract EIP712Verifier is IEIP712Verifier, EIP712 {
     }
 
     /**
-     * @inheritdoc IEIP712Verifier
+     * @dev Verifies delegated revocation request.
+     *
+     * @param request The arguments of the delegated revocation request.
      */
-    function revoke(DelegatedRevocationRequest calldata request) external {
-        RevocationRequestData calldata data = request.data;
-        EIP712Signature calldata signature = request.signature;
+    function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
+        RevocationRequestData memory data = request.data;
+        EIP712Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {

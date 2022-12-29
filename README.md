@@ -82,12 +82,12 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-12-17)
+#### Latest Test Coverage Report (2022-12-29)
 
-* 100% Statements 144/144
-* 100% Branches 78/78
-* 100% Functions 31/31
-* 100% Lines 243/243
+* 100% Statements 196/196
+* 100% Branches 108/108
+* 100% Functions 70/70
+* 100% Lines 318/318
 
 ```sh
 ------------------------------|----------|----------|----------|----------|----------------|
@@ -97,7 +97,6 @@ File                          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncov
   EAS.sol                     |      100 |      100 |      100 |      100 |                |
   EIP712Verifier.sol          |      100 |      100 |      100 |      100 |                |
   IEAS.sol                    |      100 |      100 |      100 |      100 |                |
-  IEIP712Verifier.sol         |      100 |      100 |      100 |      100 |                |
   ISchemaRegistry.sol         |      100 |      100 |      100 |      100 |                |
   SchemaRegistry.sol          |      100 |      100 |      100 |      100 |                |
   Types.sol                   |      100 |      100 |      100 |      100 |                |
