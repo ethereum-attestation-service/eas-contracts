@@ -23,6 +23,8 @@ const {
   provider: { getBalance }
 } = ethers;
 
+export const NO_EXPIRATION = 0;
+
 export const getSchemaUUID = (schema: string, resolverAddress: string, revocable: boolean) =>
   solidityKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
 

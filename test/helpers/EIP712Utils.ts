@@ -1,4 +1,4 @@
-import { EAS } from '../../typechain-types';
+import { EAS, TestEIP712Verifier } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { TypedDataSigner } from '@ethersproject/abstract-signer';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -110,14 +110,14 @@ export type EIP712RevocationParams = EIP712Params & {
 };
 
 export class EIP712Utils {
-  private verifier: EAS;
+  private verifier: EAS | TestEIP712Verifier;
   private config?: TypedDataConfig;
 
-  private constructor(verifier: EAS) {
+  private constructor(verifier: EAS | TestEIP712Verifier) {
     this.verifier = verifier;
   }
 
-  public static async fromVerifier(verifier: EAS) {
+  public static async fromVerifier(verifier: EAS | TestEIP712Verifier) {
     const utils = new EIP712Utils(verifier);
     await utils.init();
 

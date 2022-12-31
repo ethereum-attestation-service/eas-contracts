@@ -14,7 +14,7 @@ import {
   getUUIDFromAttestTx,
   SignatureType
 } from './helpers/EAS';
-import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from './helpers/EIP712Utils';
+import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -23,7 +23,7 @@ import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
-  utils: { formatBytes32String, keccak256, toUtf8Bytes }
+  utils: { formatBytes32String }
 } = ethers;
 
 describe('EAS', () => {
@@ -67,10 +67,6 @@ describe('EAS', () => {
       expect(await eas.VERSION()).to.equal('0.21');
 
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
-
-      expect(await eas.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator());
-      expect(await eas.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
-      expect(await eas.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
     });
   });
 
@@ -863,54 +859,6 @@ describe('EAS', () => {
       });
     }
 
-    it('should revert when delegation attesting with a wrong signature', async () => {
-      await expect(
-        eas.attestByDelegation({
-          schema: formatBytes32String('BAD'),
-          data: {
-            recipient: recipient.address,
-            expirationTime,
-            revocable: true,
-            refUUID: ZERO_BYTES32,
-            data: ZERO_BYTES32,
-            value: 0
-          },
-          signature: {
-            v: 28,
-            r: formatBytes32String('BAD'),
-            s: formatBytes32String('BAD')
-          },
-          attester: sender.address
-        })
-      ).to.be.revertedWith('InvalidSignature');
-
-      await expect(
-        eas.multiAttestByDelegation([
-          {
-            schema: formatBytes32String('BAD'),
-            data: [
-              {
-                recipient: recipient.address,
-                expirationTime,
-                revocable: true,
-                refUUID: ZERO_BYTES32,
-                data: ZERO_BYTES32,
-                value: 0
-              }
-            ],
-            signatures: [
-              {
-                v: 28,
-                r: formatBytes32String('BAD'),
-                s: formatBytes32String('BAD')
-              }
-            ],
-            attester: sender.address
-          }
-        ])
-      ).to.be.revertedWith('InvalidSignature');
-    });
-
     it('should revert when multi delegation attesting with inconsistent input lengths', async () => {
       const schema = 'bool count, bytes32 id';
       const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
@@ -1364,46 +1312,6 @@ describe('EAS', () => {
         });
       });
     }
-
-    it('should revert when delegation revoking with a wrong signature', async () => {
-      await expect(
-        eas.revokeByDelegation({
-          schema: formatBytes32String('BAD'),
-          data: {
-            uuid: ZERO_BYTES32,
-            value: 0
-          },
-          signature: {
-            v: 28,
-            r: formatBytes32String('BAD'),
-            s: formatBytes32String('BAD')
-          },
-          revoker: sender.address
-        })
-      ).to.be.revertedWith('InvalidSignature');
-
-      await expect(
-        eas.multiRevokeByDelegation([
-          {
-            schema: formatBytes32String('BAD'),
-            data: [
-              {
-                uuid: ZERO_BYTES32,
-                value: 0
-              }
-            ],
-            signatures: [
-              {
-                v: 28,
-                r: formatBytes32String('BAD'),
-                s: formatBytes32String('BAD')
-              }
-            ],
-            revoker: sender.address
-          }
-        ])
-      ).to.be.revertedWith('InvalidSignature');
-    });
 
     it('should revert when multi delegation revoking with inconsistent input lengths', async () => {
       const uuid = await getUUIDFromAttestTx(
