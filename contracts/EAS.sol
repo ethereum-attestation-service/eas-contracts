@@ -56,7 +56,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.21";
+    string public constant VERSION = "0.22";
 
     // A zero expiration represents an non-expiring attestation.
     uint32 private constant NO_EXPIRATION_TIME = 0;
