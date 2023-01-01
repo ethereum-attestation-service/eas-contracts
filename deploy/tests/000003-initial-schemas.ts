@@ -3,7 +3,7 @@ import { describeDeployment } from '../../test/helpers/Deploy';
 import { getSchemaUUID } from '../../test/helpers/EAS';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { DeployedContracts } from '../../utils/Deploy';
-import { INITIAL_SCHEMAS } from '../scripts/000004-initial-schemas';
+import { INITIAL_SCHEMAS } from '../scripts/000003-initial-schemas';
 import { expect } from 'chai';
 
 describeDeployment(__filename, () => {

@@ -3,7 +3,6 @@
 pragma solidity 0.8.17;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
-import { IEIP712Verifier } from "./IEIP712Verifier.sol";
 import { EIP712Signature } from "./Types.sol";
 
 /**
@@ -144,13 +143,6 @@ interface IEAS {
      * @return The address of the global schema registry.
      */
     function getSchemaRegistry() external view returns (ISchemaRegistry);
-
-    /**
-     * @dev Returns the address of the EIP712 verifier used to verify signed attestations.
-     *
-     * @return The address of the EIP712 verifier used to verify signed attestations.
-     */
-    function getEIP712Verifier() external view returns (IEIP712Verifier);
 
     /**
      * @dev Attests to a specific schema.

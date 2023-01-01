@@ -1,5 +1,5 @@
 import Contracts from '../../components/Contracts';
-import { EIP712Verifier, SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
+import { SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -22,7 +22,6 @@ describe('TokenResolver', () => {
   let sender: Wallet;
 
   let registry: SchemaRegistry;
-  let verifier: EIP712Verifier;
   let eas: TestEAS;
   let resolver: SchemaResolver;
 
@@ -44,8 +43,7 @@ describe('TokenResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    verifier = await Contracts.EIP712Verifier.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address, verifier.address);
+    eas = await Contracts.TestEAS.deploy(registry.address);
 
     await eas.setTime(await latest());
 

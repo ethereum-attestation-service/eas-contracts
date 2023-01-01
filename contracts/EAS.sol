@@ -22,7 +22,7 @@ import {
     RevocationRequestData
 } from "./IEAS.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-import { IEIP712Verifier } from "./IEIP712Verifier.sol";
+import { EIP712Verifier } from "./EIP712Verifier.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
@@ -34,7 +34,7 @@ struct AttestationsResult {
 /**
  * @title EAS - Ethereum Attestation Service
  */
-contract EAS is IEAS {
+contract EAS is IEAS, EIP712Verifier {
     using Address for address payable;
 
     error AccessDenied();
@@ -64,9 +64,6 @@ contract EAS is IEAS {
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
 
-    // The EIP712 verifier used to verify signed attestations.
-    IEIP712Verifier private immutable _eip712Verifier;
-
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
 
@@ -74,19 +71,13 @@ contract EAS is IEAS {
      * @dev Creates a new EAS instance.
      *
      * @param registry The address of the global schema registry.
-     * @param verifier The address of the EIP712 verifier.
      */
-    constructor(ISchemaRegistry registry, IEIP712Verifier verifier) {
+    constructor(ISchemaRegistry registry) EIP712Verifier(VERSION) {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }
 
-        if (address(verifier) == address(0)) {
-            revert InvalidVerifier();
-        }
-
         _schemaRegistry = registry;
-        _eip712Verifier = verifier;
     }
 
     /**
@@ -94,13 +85,6 @@ contract EAS is IEAS {
      */
     function getSchemaRegistry() external view returns (ISchemaRegistry) {
         return _schemaRegistry;
-    }
-
-    /**
-     * @inheritdoc IEAS
-     */
-    function getEIP712Verifier() external view returns (IEIP712Verifier) {
-        return _eip712Verifier;
     }
 
     /**
@@ -119,7 +103,7 @@ contract EAS is IEAS {
     function attestByDelegation(
         DelegatedAttestationRequest calldata delegatedRequest
     ) public payable virtual returns (bytes32) {
-        _eip712Verifier.attest(delegatedRequest);
+        _verifyAttest(delegatedRequest);
 
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
         data[0] = delegatedRequest.data;
@@ -215,7 +199,7 @@ contract EAS is IEAS {
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; ) {
-                _eip712Verifier.attest(
+                _verifyAttest(
                     DelegatedAttestationRequest({
                         schema: multiDelegatedRequest.schema,
                         data: data[j],
@@ -270,7 +254,7 @@ contract EAS is IEAS {
      * @inheritdoc IEAS
      */
     function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
-        _eip712Verifier.revoke(delegatedRequest);
+        _verifyRevoke(delegatedRequest);
 
         RevocationRequestData[] memory data = new RevocationRequestData[](1);
         data[0] = delegatedRequest.data;
@@ -339,7 +323,7 @@ contract EAS is IEAS {
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; ) {
-                _eip712Verifier.revoke(
+                _verifyRevoke(
                     DelegatedRevocationRequest({
                         schema: multiDelegatedRequest.schema,
                         data: data[j],

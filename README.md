@@ -38,17 +38,14 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ### Goerli
 
-#### v0.19
+#### v0.21
 
 * **EAS**:
-  * Contract: [0x4369bE21Ed9002Fd4507Df254CF249feF6F8E7E2](https://goerli.etherscan.io/address/0x4369bE21Ed9002Fd4507Df254CF249feF6F8E7E2)
+  * Contract: [0x2980bc1581F1652ABe254051f8ff0647EcE05fce](https://goerli.etherscan.io/address/0x2980bc1581F1652ABe254051f8ff0647EcE05fce)
   * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x6835877d62B51C66B07ECED9E6350D866E9D9a73](https://goerli.etherscan.io/address/0x6835877d62B51C66B07ECED9E6350D866E9D9a73)
+  * Contract: [0x5b25B105b4699CF6Ac01044B2FC6eb816A488e55](https://goerli.etherscan.io/address/0x5b25B105b4699CF6Ac01044B2FC6eb816A488e55)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/goerli/SchemaRegistry.json)
-* **EIP712Verifier**:
-  * Contract: [0x0A6799ab012c5641C381A4c197cE3e80d73abC69](https://goerli.etherscan.io/address/0x0A6799ab012c5641C381A4c197cE3e80d73abC69)
-  * Deployment and ABI: [EIP712Verifier.json](./deployments/goerli/EIP712Verifier.json)
 
 ## Installation
 
@@ -82,12 +79,12 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-12-17)
+#### Latest Test Coverage Report (2022-12-29)
 
-* 100% Statements 144/144
-* 100% Branches 78/78
-* 100% Functions 31/31
-* 100% Lines 243/243
+* 100% Statements 196/196
+* 100% Branches 108/108
+* 100% Functions 70/70
+* 100% Lines 318/318
 
 ```sh
 ------------------------------|----------|----------|----------|----------|----------------|
@@ -97,7 +94,6 @@ File                          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncov
   EAS.sol                     |      100 |      100 |      100 |      100 |                |
   EIP712Verifier.sol          |      100 |      100 |      100 |      100 |                |
   IEAS.sol                    |      100 |      100 |      100 |      100 |                |
-  IEIP712Verifier.sol         |      100 |      100 |      100 |      100 |                |
   ISchemaRegistry.sol         |      100 |      100 |      100 |      100 |                |
   SchemaRegistry.sol          |      100 |      100 |      100 |      100 |                |
   Types.sol                   |      100 |      100 |      100 |      100 |                |

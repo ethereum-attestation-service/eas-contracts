@@ -1,39 +1,187 @@
 import Contracts from '../components/Contracts';
-import { EIP712Verifier } from '../typechain-types';
-import { EIP712Utils } from './helpers/EIP712Utils';
+import { TestEIP712Verifier } from '../typechain-types';
+import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
+import { NO_EXPIRATION } from './helpers/EAS';
+import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from './helpers/EIP712Utils';
+import { createWallet } from './helpers/Wallet';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
+import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const {
-  utils: { keccak256, toUtf8Bytes }
+  utils: { formatBytes32String, keccak256, toUtf8Bytes, hexlify }
 } = ethers;
 
-const ATTEST_TYPED_SIGNATURE =
-  'Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)';
-const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)';
+describe('TestEIP712Verifier', () => {
+  let accounts: SignerWithAddress[];
+  let sender: Wallet;
+  let sender2: Wallet;
+  let recipient: SignerWithAddress;
 
-describe('EIP712Verifier', () => {
-  let verifier: EIP712Verifier;
+  let verifier: TestEIP712Verifier;
+  let eip712Utils: EIP712Utils;
+
+  before(async () => {
+    accounts = await ethers.getSigners();
+
+    [recipient] = accounts;
+  });
 
   beforeEach(async () => {
-    verifier = await Contracts.EIP712Verifier.deploy();
+    sender = await createWallet();
+    sender2 = await createWallet();
+
+    verifier = await Contracts.TestEIP712Verifier.deploy();
+
+    eip712Utils = await EIP712Utils.fromVerifier(verifier);
   });
 
-  it('should report a version', async () => {
-    expect(await verifier.VERSION()).to.equal('0.21');
+  describe('construction', () => {
+    it('should revert when initialized with an empty schema registry', async () => {
+      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWith('InvalidRegistry');
+    });
+
+    it('should be properly initialized', async () => {
+      expect(await verifier.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator());
+      expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
+      expect(await verifier.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
+    });
   });
 
-  it('should return the correct domain separator', async () => {
-    const utils = await EIP712Utils.fromVerifier(verifier);
+  describe('verify attest', () => {
+    interface AttestationRequestData {
+      recipient: string;
+      expirationTime: number;
+      revocable: boolean;
+      refUUID: string;
+      data: string;
+      value: number;
+    }
 
-    expect(await verifier.getDomainSeparator()).to.equal(utils.getDomainSeparator());
+    const schema = ZERO_BYTES32;
+    let attestationRequest: AttestationRequestData;
+
+    beforeEach(async () => {
+      attestationRequest = {
+        recipient: recipient.address,
+        expirationTime: NO_EXPIRATION,
+        revocable: true,
+        refUUID: ZERO_BYTES32,
+        data: ZERO_BYTES,
+        value: 1000
+      };
+    });
+
+    it('should verify delegated attestation request', async () => {
+      for (let i = 0; i < 3; ++i) {
+        const signature = await eip712Utils.signDelegatedAttestation(
+          sender,
+          schema,
+          attestationRequest.recipient,
+          attestationRequest.expirationTime,
+          attestationRequest.revocable,
+          attestationRequest.refUUID,
+          attestationRequest.data,
+          await verifier.getNonce(sender.address)
+        );
+
+        await expect(
+          verifier.verifyAttest({
+            schema,
+            data: attestationRequest,
+            signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+            attester: sender.address
+          })
+        ).not.to.be.reverted;
+      }
+    });
+
+    it('should revert when verifying delegated attestation request with a wrong signature', async () => {
+      const signature = await eip712Utils.signDelegatedAttestation(
+        sender,
+        schema,
+        attestationRequest.recipient,
+        attestationRequest.expirationTime,
+        attestationRequest.revocable,
+        attestationRequest.refUUID,
+        attestationRequest.data,
+        await verifier.getNonce(sender.address)
+      );
+
+      await expect(
+        verifier.verifyAttest({
+          schema,
+          data: attestationRequest,
+          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          attester: sender.address
+        })
+      ).to.be.revertedWith('InvalidSignature');
+
+      await expect(
+        verifier.verifyAttest({
+          schema,
+          data: attestationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          attester: sender2.address
+        })
+      ).to.be.revertedWith('InvalidSignature');
+    });
   });
 
-  it('should return the attest type hash', async () => {
-    expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
-  });
+  describe('verify revoke', () => {
+    const schema = ZERO_BYTES32;
 
-  it('should return the revoke type hash', async () => {
-    expect(await verifier.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
+    const revocationRequest = {
+      uuid: ZERO_BYTES32,
+      value: 1000
+    };
+
+    it('should verify delegated revocation request', async () => {
+      for (let i = 0; i < 3; ++i) {
+        const signature = await eip712Utils.signDelegatedRevocation(
+          sender,
+          schema,
+          revocationRequest.uuid,
+          await verifier.getNonce(sender.address)
+        );
+
+        await expect(
+          verifier.verifyRevoke({
+            schema,
+            data: revocationRequest,
+            signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+            revoker: sender.address
+          })
+        ).not.to.be.reverted;
+      }
+    });
+
+    it('should revert when verifying delegated revocation request with a wrong signature', async () => {
+      const signature = await eip712Utils.signDelegatedRevocation(
+        sender,
+        schema,
+        revocationRequest.uuid,
+        await verifier.getNonce(sender.address)
+      );
+
+      await expect(
+        verifier.verifyRevoke({
+          schema,
+          data: revocationRequest,
+          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          revoker: sender.address
+        })
+      ).to.be.revertedWith('InvalidSignature');
+
+      await expect(
+        verifier.verifyRevoke({
+          schema,
+          data: revocationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          revoker: sender2.address
+        })
+      ).to.be.revertedWith('InvalidSignature');
+    });
   });
 });
