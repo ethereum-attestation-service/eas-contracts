@@ -38,13 +38,13 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ### Goerli
 
-#### v0.21
+#### v0.22
 
 * **EAS**:
-  * Contract: [0x2980bc1581F1652ABe254051f8ff0647EcE05fce](https://goerli.etherscan.io/address/0x2980bc1581F1652ABe254051f8ff0647EcE05fce)
+  * Contract: [0x9BB9E7B40e57057AE9A75c2b09119Ee30490d576](https://goerli.etherscan.io/address/0x9BB9E7B40e57057AE9A75c2b09119Ee30490d576)
   * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x5b25B105b4699CF6Ac01044B2FC6eb816A488e55](https://goerli.etherscan.io/address/0x5b25B105b4699CF6Ac01044B2FC6eb816A488e55)
+  * Contract: [0x4d18a7c87A906ba2DA0e211AA4DF116F9f35d108](https://goerli.etherscan.io/address/0x4d18a7c87A906ba2DA0e211AA4DF116F9f35d108)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/goerli/SchemaRegistry.json)
 
 ## Installation
