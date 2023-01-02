@@ -15,15 +15,13 @@ import {
 import { getTransactionCost } from './Transaction';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber, BigNumberish, ContractTransaction, utils, Wallet } from 'ethers';
+import { BigNumber, BigNumberish, ContractTransaction, Event, utils, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 const { solidityKeccak256, hexlify, toUtf8Bytes } = utils;
 const {
   provider: { getBalance }
 } = ethers;
-
-export const NO_EXPIRATION = 0;
 
 export const getSchemaUUID = (schema: string, resolverAddress: string, revocable: boolean) =>
   solidityKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
@@ -58,21 +56,27 @@ export const registerSchema = async (
 
 export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
   const receipt = await (await res).wait();
-  const event = receipt.events?.find((e) => e.event === 'Attested');
-  if (!event) {
-    throw new Error('Unable to process attestation event');
-  }
-  return event.args?.uuid;
+
+  return getUUIDsFromAttestEvents(receipt.events);
 };
 
 export const getUUIDsFromMultiAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
   const receipt = await (await res).wait();
-  const events = receipt.events?.filter((e) => e.event === 'Attested');
-  if (!events || events?.length === 0) {
-    throw new Error('Unable to process attestation event');
+
+  return getUUIDsFromAttestEvents(receipt.events);
+};
+
+export const getUUIDsFromAttestEvents = async (events?: Event[]) => {
+  if (!events) {
+    return [];
   }
 
-  return events.map((event) => event.args?.uuid);
+  const attestedEvents = events.filter((e) => e.event === 'Attested');
+  if (attestedEvents.length === 0) {
+    throw new Error('Unable to process attestation events');
+  }
+
+  return attestedEvents.map((event) => event.args?.uuid);
 };
 
 export enum SignatureType {
