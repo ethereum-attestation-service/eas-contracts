@@ -54,19 +54,21 @@ export const registerSchema = async (
   return getSchemaUUID(schema, address, revocable);
 };
 
-export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
+export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction): Promise<string> => {
+  const receipt = await (await res).wait();
+
+  return (await getUUIDsFromAttestEvents(receipt.events))[0];
+};
+
+export const getUUIDsFromMultiAttestTx = async (
+  res: Promise<ContractTransaction> | ContractTransaction
+): Promise<string[]> => {
   const receipt = await (await res).wait();
 
   return getUUIDsFromAttestEvents(receipt.events);
 };
 
-export const getUUIDsFromMultiAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
-  const receipt = await (await res).wait();
-
-  return getUUIDsFromAttestEvents(receipt.events);
-};
-
-export const getUUIDsFromAttestEvents = async (events?: Event[]) => {
+export const getUUIDsFromAttestEvents = async (events?: Event[]): Promise<string[]> => {
   if (!events) {
     return [];
   }
