@@ -186,7 +186,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       generator: () => {
         const params = {
           hashOfDocument: keccak256(toUtf8Bytes(chance.paragraph())),
-          string: chance.sentence()
+          note: chance.sentence()
         };
 
         return { data: defaultAbiCoder.encode(['bytes32', 'string'], Object.values(params)), params };
