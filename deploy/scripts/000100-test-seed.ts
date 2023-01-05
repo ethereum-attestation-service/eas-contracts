@@ -1,4 +1,3 @@
-import { getSchemaUUID, getUUIDsFromAttestEvents } from '../../test/helpers/EAS';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import {
   execute,
@@ -8,6 +7,7 @@ import {
   isTestnet,
   setDeploymentMetadata
 } from '../../utils/Deploy';
+import { getSchemaUUID, getUUIDsFromAttestEvents } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import Chance from 'chance';
 import { utils, Wallet } from 'ethers';

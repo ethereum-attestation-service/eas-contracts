@@ -1,6 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
+import { getUUIDFromAttestTx } from '../../utils/EAS';
 import { getTransactionCost } from '..//helpers/Transaction';
 import {
   expectAttestation,
@@ -11,7 +12,6 @@ import {
   expectMultiAttestations,
   expectMultiRevocations,
   expectRevocation,
-  getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';

@@ -1,6 +1,7 @@
 import Contracts from '../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
+import { getSchemaUUID, getUUIDFromAttestTx } from '../utils/EAS';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -10,8 +11,6 @@ import {
   expectMultiAttestations,
   expectMultiRevocations,
   expectRevocation,
-  getSchemaUUID,
-  getUUIDFromAttestTx,
   SignatureType
 } from './helpers/EAS';
 import { EIP712Utils } from './helpers/EIP712Utils';

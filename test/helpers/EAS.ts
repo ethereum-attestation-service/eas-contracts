@@ -5,6 +5,7 @@ import {
   MultiDelegatedRevocationRequestStruct
 } from '../../typechain-types/contracts/IEAS';
 import { ZERO_BYTES32 } from '../../utils/Constants';
+import { getSchemaUUID, getUUIDFromAttestTx, getUUIDsFromMultiAttestTx } from '../../utils/EAS';
 import {
   EIP712AttestationParams,
   EIP712MessageTypes,
@@ -15,32 +16,13 @@ import {
 import { getTransactionCost } from './Transaction';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber, BigNumberish, ContractTransaction, Event, utils, Wallet } from 'ethers';
+import { BigNumber, BigNumberish, ContractTransaction, utils, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
-const { solidityKeccak256, hexlify, toUtf8Bytes } = utils;
+const { hexlify } = utils;
 const {
   provider: { getBalance }
 } = ethers;
-
-export const getSchemaUUID = (schema: string, resolverAddress: string, revocable: boolean) =>
-  solidityKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
-
-export const getUUID = (
-  schema: string,
-  recipient: string,
-  attester: string,
-  time: number,
-  expirationTime: number,
-  revocable: boolean,
-  refUUID: string,
-  data: string,
-  bump: number
-) =>
-  solidityKeccak256(
-    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bool', 'bytes32', 'bytes', 'uint32'],
-    [hexlify(toUtf8Bytes(schema)), recipient, attester, time, expirationTime, revocable, refUUID, data, bump]
-  );
 
 export const registerSchema = async (
   schema: string,
@@ -52,33 +34,6 @@ export const registerSchema = async (
   await registry.register(schema, address, revocable);
 
   return getSchemaUUID(schema, address, revocable);
-};
-
-export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction): Promise<string> => {
-  const receipt = await (await res).wait();
-
-  return (await getUUIDsFromAttestEvents(receipt.events))[0];
-};
-
-export const getUUIDsFromMultiAttestTx = async (
-  res: Promise<ContractTransaction> | ContractTransaction
-): Promise<string[]> => {
-  const receipt = await (await res).wait();
-
-  return getUUIDsFromAttestEvents(receipt.events);
-};
-
-export const getUUIDsFromAttestEvents = async (events?: Event[]): Promise<string[]> => {
-  if (!events) {
-    return [];
-  }
-
-  const attestedEvents = events.filter((e) => e.event === 'Attested');
-  if (attestedEvents.length === 0) {
-    throw new Error('Unable to process attestation events');
-  }
-
-  return attestedEvents.map((event) => event.args?.uuid);
 };
 
 export enum SignatureType {

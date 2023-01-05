@@ -1,6 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { AttestationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
+import { getSchemaUUID, getUUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -8,8 +9,6 @@ import {
   expectMultiAttestations,
   expectMultiRevocations,
   expectRevocation,
-  getSchemaUUID,
-  getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
