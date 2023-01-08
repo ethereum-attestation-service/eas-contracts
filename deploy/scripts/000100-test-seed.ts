@@ -31,6 +31,19 @@ export interface TestAttestationGroup {
   data: TestAttestationData[];
 }
 
+enum LandType {
+  Residential = 0,
+  Commercial = 1,
+  Cultural = 2,
+  Educational = 3,
+  Governmental = 4
+}
+
+type Coordinate = [number, number];
+
+const polygonToSolidity = (coordinates: Coordinate[]): Coordinate[] =>
+  coordinates.map(([lat, long]: Coordinate) => [Math.floor(lat * 10 ** 8), Math.floor(long * 10 ** 8)]);
+
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
 
@@ -194,6 +207,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     }
   ];
 
+  // Generate a few random attestations.
   for (const { schema, generator } of attestationGroups) {
     const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
     const requests = [];
@@ -239,6 +253,193 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }))
     };
   }
+
+  // Generate a few specific land registry attestations.
+  const schema = 'uint8 landType,uint64 expiration,int40[2][] polygonArea';
+  const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+  const requests = [];
+  const recipients: string[] = [];
+  const parameters: Record<string, any>[] = [];
+
+  for (const params of [
+    {
+      description: 'Tower of Belem, Lisbon, Portugal',
+      landTypeValue: LandType.Cultural,
+      landType: LandType[LandType.Cultural],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [38.69146, -9.21607],
+        [38.69182, -9.21607],
+        [38.69172, -9.21574],
+        [38.69144, -9.2158]
+      ]
+    },
+    {
+      description: 'Statue of Liberty, New York, United States',
+      landTypeValue: LandType.Cultural,
+      landType: LandType[LandType.Cultural],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [40.68886, -74.04463],
+        [40.69003, -74.04721],
+        [40.69101, -74.04669],
+        [40.69065, -74.04429],
+        [40.68976, -74.04326],
+        [40.68872, -74.0436]
+      ]
+    },
+    {
+      description: 'Athens Metro Mall, Agios Dimitrios, Greece',
+      landTypeValue: LandType.Commercial,
+      landType: LandType[LandType.Commercial],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [37.93983, 23.73881],
+        [37.93885, 23.73929],
+        [37.93878, 23.74107],
+        [37.94091, 23.74025],
+        [37.94066, 23.73934]
+      ]
+    },
+    {
+      description: 'Acropolis Museum, Athens, Greece',
+      landTypeValue: LandType.Educational,
+      landType: LandType[LandType.Educational],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [37.9683, 23.72791],
+        [37.96902, 23.72815],
+        [37.96898, 23.72826],
+        [37.96866, 23.72839],
+        [37.96869, 23.7289],
+        [37.96809, 23.7291]
+      ]
+    },
+    {
+      description: 'Karamanlidika restaurant, Athens, Greece',
+      landTypeValue: LandType.Commercial,
+      landType: LandType[LandType.Commercial],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [37.98014, 23.72569],
+        [37.98015, 23.72557],
+        [37.98029, 23.7256],
+        [37.98027, 23.72573]
+      ]
+    },
+    {
+      description: 'Ermou street, Municipal unit of Polichni, Greece',
+      landTypeValue: LandType.Residential,
+      landType: LandType[LandType.Residential],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [40.65963, 22.95344],
+        [40.65999, 22.95335],
+        [40.65999, 22.95328],
+        [40.65969, 22.95336],
+        [40.65958, 22.95341],
+        [40.65923, 22.95403],
+        [40.65925, 22.95407],
+        [40.65912, 22.95417],
+        [40.65912, 22.9541],
+        [40.6593, 22.95401]
+      ]
+    },
+    {
+      description: 'Hellenic Parliament, Athens, Greece',
+      landTypeValue: LandType.Governmental,
+      landType: LandType[LandType.Governmental],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [37.97597, 23.73636],
+        [37.97462, 23.73611],
+        [37.97449, 23.73748],
+        [37.97581, 23.73787]
+      ]
+    },
+    {
+      description: 'Supreme Civil and Criminal Court of Greece, Athens, Greece',
+      landTypeValue: LandType.Governmental,
+      landType: LandType[LandType.Governmental],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [37.98905, 23.75222],
+        [37.98864, 23.7522],
+        [37.98855, 23.75269],
+        [37.98841, 23.75265],
+        [37.98835, 23.75298],
+        [37.98849, 23.75303],
+        [37.98841, 23.75347],
+        [37.98859, 23.75354],
+        [37.98862, 23.75342],
+        [37.98878, 23.75346],
+        [37.98874, 23.75369],
+        [37.98914, 23.75379],
+        [37.9893, 23.75307],
+        [37.98942, 23.75248],
+        [37.9894, 23.75234]
+      ]
+    },
+    {
+      description: 'University of Crete, Gallos, Greece',
+      landTypeValue: LandType.Educational,
+      landType: LandType[LandType.Educational],
+      expiration: NO_EXPIRATION,
+      polygonArea: [
+        [35.35284, 24.44718],
+        [35.35368, 24.44625],
+        [35.35508, 24.44724],
+        [35.35599, 24.44868],
+        [35.35587, 24.45066],
+        [35.35514, 24.45324],
+        [35.35266, 24.45269],
+        [35.35205, 24.45239],
+        [35.35157, 24.45082],
+        [35.35161, 24.44959],
+        [35.35205, 24.44861],
+        [35.35222, 24.44773]
+      ]
+    }
+  ]) {
+    const { landTypeValue, expiration, polygonArea } = params;
+    const data = defaultAbiCoder.encode(
+      ['uint8', 'uint64', 'int40[2][]'],
+      [landTypeValue, expiration, polygonToSolidity(polygonArea as Coordinate[])]
+    );
+    const recipient = Wallet.createRandom().address;
+
+    Logger.info(`${recipient} --> ${JSON.stringify({ ...params })}`);
+
+    requests.push({
+      recipient,
+      expirationTime: NO_EXPIRATION,
+      revocable: true,
+      refUUID: ZERO_BYTES32,
+      data,
+      value: 0
+    });
+
+    recipients.push(recipient);
+    parameters.push(params);
+  }
+
+  const res = await execute({
+    name: InstanceName.EAS,
+    methodName: 'multiAttest',
+    args: [[{ schema: schemaId, data: requests }]],
+    from: deployer
+  });
+
+  const uuids: string[] = await getUUIDsFromAttestEvents(res.events);
+
+  testAttestations[schemaId] = {
+    schema,
+    data: uuids.map((uuid, i) => ({
+      uuid,
+      recipient: recipients[i],
+      data: parameters[i]
+    }))
+  };
 
   fs.writeFileSync(TEST_ATTESTATIONS_OUTPUT_PATH, JSON.stringify(testAttestations, null, 2));
 

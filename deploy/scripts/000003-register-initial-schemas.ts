@@ -20,7 +20,7 @@ export const SCHEMAS = [
   { schema: 'bool hasPassedKYC', name: 'Passed KYC' },
   { schema: 'bool isAccreditedInvestor', name: 'Is an Accredited Investor' },
   { schema: 'bytes32 hashOfDocument,string note', name: 'Sign Document' },
-  { schema: 'bytes polygonArea,uint8 landType,uint64 expiration', name: 'Land Registry' }
+  { schema: 'uint8 landType,uint64 expiration,int40[2][] polygonArea', name: 'Land Registry' }
 ];
 
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
