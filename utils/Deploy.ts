@@ -56,7 +56,12 @@ export const isTenderlyFork = () => getNetworkName() === DeploymentNetwork.Tende
 export const isMainnetFork = () => isTenderlyFork();
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet || isMainnetFork();
 export const isGoerli = () => getNetworkName() === DeploymentNetwork.Goerli;
+export const isTestnet = () => isGoerli();
 export const isLive = () => (isMainnet() && !isMainnetFork()) || isGoerli();
+
+export const getDeploymentDir = () => {
+  return path.join(config.paths.deployments, getNetworkName());
+};
 
 const TEST_MINIMUM_BALANCE = toWei(10);
 const TEST_FUNDING = toWei(10);
@@ -116,7 +121,7 @@ const saveTypes = async (options: SaveTypeOptions) => {
     factoriesSrcDir = path.join(typechainDir, 'factories', contractSrcDir);
   }
 
-  const typesDir = path.join(config.paths.deployments, getNetworkName(), 'types');
+  const typesDir = path.join(getDeploymentDir(), 'types');
   const destDir = path.join(typesDir, contractSrcDir);
   const factoriesDestDir = path.join(typesDir, 'factories', contractSrcDir);
 

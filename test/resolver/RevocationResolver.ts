@@ -1,12 +1,12 @@
 import Contracts from '../../components/Contracts';
 import { RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
+import { getUUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectFailedMultiRevocations,
   expectFailedRevocation,
   expectMultiRevocations,
   expectRevocation,
-  getUUIDFromAttestTx,
   registerSchema
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';

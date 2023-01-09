@@ -1,9 +1,9 @@
 import { SchemaRegistry } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
-import { getSchemaUUID } from '../../test/helpers/EAS';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { DeployedContracts } from '../../utils/Deploy';
-import { INITIAL_SCHEMAS } from '../scripts/000003-initial-schemas';
+import { getSchemaUUID } from '../../utils/EAS';
+import { SCHEMAS } from '../scripts/000003-register-initial-schemas';
 import { expect } from 'chai';
 
 describeDeployment(__filename, () => {
@@ -14,7 +14,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should register initial schemas', async () => {
-    for (const schema of INITIAL_SCHEMAS) {
+    for (const { schema } of SCHEMAS) {
       const uuid = getSchemaUUID(schema, ZERO_ADDRESS, true);
       const schemaRecord = await registry.getSchema(uuid);
 

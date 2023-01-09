@@ -1,7 +1,6 @@
 import Contracts from '../components/Contracts';
 import { TestEIP712Verifier } from '../typechain-types';
-import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { NO_EXPIRATION } from './helpers/EAS';
+import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from './helpers/EIP712Utils';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';

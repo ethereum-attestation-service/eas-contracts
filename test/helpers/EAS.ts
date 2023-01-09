@@ -5,6 +5,7 @@ import {
   MultiDelegatedRevocationRequestStruct
 } from '../../typechain-types/contracts/IEAS';
 import { ZERO_BYTES32 } from '../../utils/Constants';
+import { getSchemaUUID, getUUIDFromAttestTx, getUUIDsFromMultiAttestTx } from '../../utils/EAS';
 import {
   EIP712AttestationParams,
   EIP712MessageTypes,
@@ -18,31 +19,10 @@ import { expect } from 'chai';
 import { BigNumber, BigNumberish, ContractTransaction, utils, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 
-const { solidityKeccak256, hexlify, toUtf8Bytes } = utils;
+const { hexlify } = utils;
 const {
   provider: { getBalance }
 } = ethers;
-
-export const NO_EXPIRATION = 0;
-
-export const getSchemaUUID = (schema: string, resolverAddress: string, revocable: boolean) =>
-  solidityKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
-
-export const getUUID = (
-  schema: string,
-  recipient: string,
-  attester: string,
-  time: number,
-  expirationTime: number,
-  revocable: boolean,
-  refUUID: string,
-  data: string,
-  bump: number
-) =>
-  solidityKeccak256(
-    ['bytes', 'address', 'address', 'uint32', 'uint32', 'bool', 'bytes32', 'bytes', 'uint32'],
-    [hexlify(toUtf8Bytes(schema)), recipient, attester, time, expirationTime, revocable, refUUID, data, bump]
-  );
 
 export const registerSchema = async (
   schema: string,
@@ -54,25 +34,6 @@ export const registerSchema = async (
   await registry.register(schema, address, revocable);
 
   return getSchemaUUID(schema, address, revocable);
-};
-
-export const getUUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
-  const receipt = await (await res).wait();
-  const event = receipt.events?.find((e) => e.event === 'Attested');
-  if (!event) {
-    throw new Error('Unable to process attestation event');
-  }
-  return event.args?.uuid;
-};
-
-export const getUUIDsFromMultiAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction) => {
-  const receipt = await (await res).wait();
-  const events = receipt.events?.filter((e) => e.event === 'Attested');
-  if (!events || events?.length === 0) {
-    throw new Error('Unable to process attestation event');
-  }
-
-  return events.map((event) => event.args?.uuid);
 };
 
 export enum SignatureType {
