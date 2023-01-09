@@ -147,7 +147,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }
     },
     {
-      schema: 'bool hasPhoneNumber, bytes32 phoneHash',
+      schema: 'bool hasPhoneNumber,bytes32 phoneHash',
       generator: () => {
         const params = {
           hasPhoneNumber: chance.bool(),
@@ -158,7 +158,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }
     },
     {
-      schema: 'uint256 eventId, uint8 voteIndex',
+      schema: 'uint256 eventId,uint8 voteIndex',
       generator: () => {
         const params = {
           eventId: chance.natural(),
@@ -169,7 +169,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }
     },
     {
-      schema: 'uint256 postId, bool like',
+      schema: 'uint256 postId,bool like',
       generator: () => {
         const params = {
           postId: chance.natural(),
@@ -200,7 +200,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }
     },
     {
-      schema: 'bytes32 hashOfDocument, string note',
+      schema: 'bytes32 hashOfDocument,string note',
       generator: () => {
         const params = {
           hashOfDocument: keccak256(toUtf8Bytes(chance.paragraph())),
