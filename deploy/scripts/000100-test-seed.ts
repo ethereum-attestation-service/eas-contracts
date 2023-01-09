@@ -31,7 +31,12 @@ export interface TestAttestationGroup {
   data: TestAttestationData[];
 }
 
-enum LandType {
+enum HoldType {
+  Free = 0,
+  Lease = 1
+}
+
+enum UseType {
   Residential = 0,
   Commercial = 1,
   Cultural = 2,
@@ -255,7 +260,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
   }
 
   // Generate a few specific land registry attestations.
-  const schema = 'uint8 landType,uint64 expiration,int40[2][] polygonArea';
+  const schema = 'uint8 holdType,uint8 useType,uint64 expiration,int40[2][] polygonArea';
   const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
   const requests = [];
   const recipients: string[] = [];
@@ -264,8 +269,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
   for (const params of [
     {
       description: 'Tower of Belem, Lisbon, Portugal',
-      landTypeValue: LandType.Cultural,
-      landType: LandType[LandType.Cultural],
+      holdType: HoldType.Lease,
+      useType: UseType.Cultural,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [38.69146, -9.21607],
@@ -276,8 +281,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Statue of Liberty, New York, United States',
-      landTypeValue: LandType.Cultural,
-      landType: LandType[LandType.Cultural],
+      holdType: HoldType.Lease,
+      useType: UseType.Cultural,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [40.68886, -74.04463],
@@ -290,8 +295,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Athens Metro Mall, Agios Dimitrios, Greece',
-      landTypeValue: LandType.Commercial,
-      landType: LandType[LandType.Commercial],
+      holdType: HoldType.Free,
+      useType: UseType.Commercial,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [37.93983, 23.73881],
@@ -303,8 +308,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Acropolis Museum, Athens, Greece',
-      landTypeValue: LandType.Educational,
-      landType: LandType[LandType.Educational],
+      holdType: HoldType.Free,
+      useType: UseType.Educational,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [37.9683, 23.72791],
@@ -317,8 +322,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Karamanlidika restaurant, Athens, Greece',
-      landTypeValue: LandType.Commercial,
-      landType: LandType[LandType.Commercial],
+      holdType: HoldType.Free,
+      useType: UseType.Commercial,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [37.98014, 23.72569],
@@ -329,8 +334,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Ermou street, Municipal unit of Polichni, Greece',
-      landTypeValue: LandType.Residential,
-      landType: LandType[LandType.Residential],
+      holdType: HoldType.Lease,
+      useType: UseType.Residential,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [40.65963, 22.95344],
@@ -347,8 +352,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Hellenic Parliament, Athens, Greece',
-      landTypeValue: LandType.Governmental,
-      landType: LandType[LandType.Governmental],
+      holdType: HoldType.Lease,
+      useType: UseType.Governmental,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [37.97597, 23.73636],
@@ -359,8 +364,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'Supreme Civil and Criminal Court of Greece, Athens, Greece',
-      landTypeValue: LandType.Governmental,
-      landType: LandType[LandType.Governmental],
+      holdType: HoldType.Lease,
+      useType: UseType.Governmental,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [37.98905, 23.75222],
@@ -382,8 +387,8 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     },
     {
       description: 'University of Crete, Gallos, Greece',
-      landTypeValue: LandType.Educational,
-      landType: LandType[LandType.Educational],
+      holdType: HoldType.Lease,
+      useType: UseType.Educational,
       expiration: NO_EXPIRATION,
       polygonArea: [
         [35.35284, 24.44718],
@@ -401,14 +406,15 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       ]
     }
   ]) {
-    const { landTypeValue, expiration, polygonArea } = params;
+    const { holdType, useType, expiration, polygonArea } = params;
     const data = defaultAbiCoder.encode(
-      ['uint8', 'uint64', 'int40[2][]'],
-      [landTypeValue, expiration, polygonToSolidity(polygonArea as Coordinate[])]
+      ['uint8', 'uint8', 'uint64', 'int40[2][]'],
+      [holdType, useType, expiration, polygonToSolidity(polygonArea as Coordinate[])]
     );
     const recipient = Wallet.createRandom().address;
 
-    Logger.info(`${recipient} --> ${JSON.stringify({ ...params })}`);
+    const extParams = { ...params, holdType: HoldType[holdType], useType: UseType[useType] };
+    Logger.info(`${recipient} --> ${JSON.stringify({ ...extParams })}`);
 
     requests.push({
       recipient,
@@ -420,7 +426,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     });
 
     recipients.push(recipient);
-    parameters.push(params);
+    parameters.push(extParams);
   }
 
   const res = await execute({
