@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
