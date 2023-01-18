@@ -74,7 +74,7 @@ describe('EAS', () => {
     const data = '0x1234';
 
     beforeEach(async () => {
-      expirationTime = (await eas.getTime()) + duration.days(30);
+      expirationTime = (await eas.getTime()).toNumber() + duration.days(30);
     });
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
@@ -187,7 +187,7 @@ describe('EAS', () => {
           });
 
           it('should revert when attesting with passed expiration time', async () => {
-            const expired = (await eas.getTime()) - duration.days(1);
+            const expired = (await eas.getTime()).toNumber() - duration.days(1);
 
             await expectFailedAttestation(
               {
@@ -985,7 +985,7 @@ describe('EAS', () => {
     beforeEach(async () => {
       await registry.register(schema, ZERO_ADDRESS, true);
 
-      expirationTime = (await eas.getTime()) + duration.days(30);
+      expirationTime = (await eas.getTime()).toNumber() + duration.days(30);
     });
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {

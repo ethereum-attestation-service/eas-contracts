@@ -11,10 +11,10 @@ import { EIP712Signature } from "./Types.sol";
 struct Attestation {
     bytes32 uuid; // A unique identifier of the attestation.
     bytes32 schema; // The unique identifier of the schema.
+    uint64 time; // The time when the attestation was created (Unix timestamp).
+    uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
+    uint64 revocationTime; // The time when the attestation was revoked (Unix timestamp).
     bytes32 refUUID; // The UUID of the related attestation.
-    uint32 time; // The time when the attestation was created (Unix timestamp).
-    uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
-    uint32 revocationTime; // The time when the attestation was revoked (Unix timestamp).
     address recipient; // The recipient of the attestation.
     address attester; // The attester/sender of the attestation.
     bool revocable; // Whether the attestation is revocable.
@@ -26,7 +26,7 @@ struct Attestation {
  */
 struct AttestationRequestData {
     address recipient; // The recipient of the attestation.
-    uint32 expirationTime; // The time when the attestation expires (Unix timestamp).
+    uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
     bool revocable; // Whether the attestation is revocable.
     bytes32 refUUID; // The UUID of the related attestation.
     bytes data; // Custom attestation data.
