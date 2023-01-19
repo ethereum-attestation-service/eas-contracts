@@ -35,7 +35,7 @@ export const getUUIDsFromMultiAttestTx = async (
   return getUUIDsFromAttestEvents(receipt.events);
 };
 
-export const getUUIDsFromAttestEvents = async (events?: Event[]): Promise<string[]> => {
+export const getUUIDsFromAttestEvents = (events?: Event[]): string[] => {
   if (!events) {
     return [];
   }

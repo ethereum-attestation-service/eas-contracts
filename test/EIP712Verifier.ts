@@ -61,7 +61,7 @@ describe('TestEIP712Verifier', () => {
     const schema = ZERO_BYTES32;
     let attestationRequest: AttestationRequestData;
 
-    beforeEach(async () => {
+    beforeEach(() => {
       attestationRequest = {
         recipient: recipient.address,
         expirationTime: NO_EXPIRATION,

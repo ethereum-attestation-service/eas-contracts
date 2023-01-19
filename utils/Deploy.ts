@@ -39,7 +39,7 @@ export const InstanceName = {
 export type InstanceName = NewInstanceName;
 
 const deployed = <F extends Contract>(name: InstanceName) => ({
-  deployed: async () => ethers.getContract<F>(name)
+  deployed: () => ethers.getContract<F>(name)
 });
 
 const DeployedNewContracts = {
@@ -368,7 +368,7 @@ export const setDeploymentMetadata = (filename: string, func: DeployFunction) =>
   return func;
 };
 
-export const runPendingDeployments = async () => {
+export const runPendingDeployments = () => {
   const { tag } = deploymentMetadata(getLatestDeploymentTag());
 
   return run(tag, {

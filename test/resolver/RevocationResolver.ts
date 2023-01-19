@@ -88,7 +88,7 @@ describe('RevocationResolver', () => {
 
   context('when revocations are allowed', () => {
     beforeEach(async () => {
-      resolver.setRevocation(true);
+      await resolver.setRevocation(true);
     });
 
     it('should allow revoking an existing attestation', async () => {
@@ -102,7 +102,7 @@ describe('RevocationResolver', () => {
 
   context('when revocations are not allowed', () => {
     beforeEach(async () => {
-      resolver.setRevocation(false);
+      await resolver.setRevocation(false);
     });
 
     it('should revert when attempting to revoke an existing attestation', async () => {

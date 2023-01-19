@@ -164,7 +164,7 @@ export class EIP712Utils {
     };
   }
 
-  public async signDelegatedAttestation(
+  public signDelegatedAttestation(
     attester: TypedDataSigner,
     schema: string,
     recipient: string | SignerWithAddress,
@@ -198,17 +198,17 @@ export class EIP712Utils {
     );
   }
 
-  public async verifyDelegatedAttestationSignature(
+  public verifyDelegatedAttestationSignature(
     attester: string | SignerWithAddress,
     request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
-  ): Promise<boolean> {
+  ): boolean {
     return EIP712Utils.verifyTypedDataRequestSignature(
       typeof attester === 'string' ? attester : attester.address,
       request
     );
   }
 
-  public async signDelegatedRevocation(
+  public signDelegatedRevocation(
     attester: TypedDataSigner,
     schema: string,
     uuid: string,
@@ -234,10 +234,10 @@ export class EIP712Utils {
     );
   }
 
-  public async verifyDelegatedRevocationSignature(
+  public verifyDelegatedRevocationSignature(
     attester: string | SignerWithAddress,
     request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
-  ): Promise<boolean> {
+  ): boolean {
     return EIP712Utils.verifyTypedDataRequestSignature(
       typeof attester === 'string' ? attester : attester.address,
       request
@@ -254,10 +254,10 @@ export class EIP712Utils {
     return { types, params, ...splitSignature(rawSignature) };
   }
 
-  private static async verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
+  private static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
     attester: string,
     request: EIP712Request<T, P>
-  ): Promise<boolean> {
+  ): boolean {
     if (attester === ZERO_ADDRESS) {
       throw new Error('Invalid address');
     }

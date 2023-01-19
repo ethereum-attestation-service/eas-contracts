@@ -96,7 +96,7 @@ describe('SchemaResolver', () => {
       context('as an EAS', () => {
         let sender: SignerWithAddress;
 
-        before(async () => {
+        before(() => {
           sender = accounts[0];
         });
 

@@ -453,6 +453,6 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
 };
 
 // Run this deployment script only during test or deployments on testnet
-func.skip = async () => !isMainnetFork() && !isTestnet();
+func.skip = async () => !isMainnetFork() && !isTestnet(); // eslint-disable-line require-await
 
 export default setDeploymentMetadata(__filename, func);

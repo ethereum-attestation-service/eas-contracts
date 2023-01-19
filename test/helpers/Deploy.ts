@@ -23,7 +23,7 @@ export const describeDeployment = (
     return describe.skip(id, fn);
   }
 
-  return describe(id, async function (this: Suite) {
+  return describe(id, function (this: Suite) {
     before(async () => {
       if (isLive()) {
         throw new Error('Unsupported network');
@@ -32,7 +32,7 @@ export const describeDeployment = (
       await beforeDeployments();
     });
 
-    beforeEach(async () => {
+    beforeEach(() => {
       if (isLive()) {
         throw new Error('Unsupported network');
       }
