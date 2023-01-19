@@ -24,8 +24,8 @@ abstract contract EIP712Verifier is EIP712 {
     error InvalidSignature();
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(bytes32 schema,address recipient,uint32 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 private constant ATTEST_TYPEHASH = 0x790a6069414c6efe8e6aa1d915482176ee1e2e7d73c6f34d03df1813c5cb4ce9;
+    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
+    bytes32 private constant ATTEST_TYPEHASH = 0x6fddd0d8bc416c66f4749c05d7b3e4dc45adc924f7eaaf3ef86c361f481e27c2;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
     // keccak256("Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)").

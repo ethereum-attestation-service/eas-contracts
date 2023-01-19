@@ -43,7 +43,7 @@ describe('ExpirationTimeResolver', () => {
 
     await eas.setTime(await latest());
 
-    validAfter = (await eas.getTime()) + duration.years(1);
+    validAfter = (await eas.getTime()).toNumber() + duration.years(1);
 
     const resolver = await Contracts.ExpirationTimeResolver.deploy(eas.address, validAfter);
     expect(await resolver.isPayable()).to.be.false;

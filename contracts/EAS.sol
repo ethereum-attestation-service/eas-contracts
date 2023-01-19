@@ -56,10 +56,10 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.22";
+    string public constant VERSION = "0.23";
 
     // A zero expiration represents an non-expiring attestation.
-    uint32 private constant NO_EXPIRATION_TIME = 0;
+    uint64 private constant NO_EXPIRATION_TIME = 0;
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -751,7 +751,7 @@ contract EAS is IEAS, EIP712Verifier {
      * @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
      * current block time.
      */
-    function _time() internal view virtual returns (uint32) {
-        return uint32(block.timestamp);
+    function _time() internal view virtual returns (uint64) {
+        return uint64(block.timestamp);
     }
 }
