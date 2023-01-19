@@ -28,6 +28,8 @@
     "arrow-body-style": "off",
     "no-loop-func": "off",
     "no-unused-expressions": "off",
+    "require-await": "error",
+    "no-return-await": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off"
