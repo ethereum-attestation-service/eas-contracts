@@ -118,7 +118,7 @@ struct MultiDelegatedRevocationRequest {
  */
 interface IEAS {
     /**
-     * @dev Triggered when an attestation has been made.
+     * @dev Emitted when an attestation has been made.
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
@@ -128,7 +128,7 @@ interface IEAS {
     event Attested(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
 
     /**
-     * @dev Triggered when an attestation has been revoked.
+     * @dev Emitted when an attestation has been revoked.
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
@@ -136,6 +136,14 @@ interface IEAS {
      * @param uuid The UUID the revoked attestation.
      */
     event Revoked(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
+
+    /**
+     * @dev Emitted when a data has been timestamped.
+     *
+     * @param data The data.
+     * @param timestamp The timestamp.
+     */
+    event Timestamped(bytes32 indexed data, uint64 indexed timestamp);
 
     /**
      * @dev Returns the address of the global schema registry.
@@ -392,6 +400,24 @@ interface IEAS {
     ) external payable;
 
     /**
+     * @dev Timestamps the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     *
+     * @return The timestamp the data was timestamped with.
+     */
+    function timestamp(bytes32 data) external returns (uint64);
+
+    /**
+     * @dev Timestamps the specified multiple bytes32 data.
+     *
+     * @param data The data to timestamp.
+     *
+     * @return The timestamp the data was timestamped with.
+     */
+    function multiTimestamp(bytes32[] calldata data) external returns (uint64);
+
+    /**
      * @dev Returns an existing attestation by UUID.
      *
      * @param uuid The UUID of the attestation to retrieve.
@@ -408,4 +434,13 @@ interface IEAS {
      * @return Whether an attestation exists.
      */
     function isAttestationValid(bytes32 uuid) external view returns (bool);
+
+    /**
+     * @dev Returns the timestamp that the specified data was timestamped with.
+     *
+     * @param data The data to query.
+     *
+     * @return The timestamp the data was timestamped with.
+     */
+    function getTimestamp(bytes32 data) external view returns (uint64);
 }

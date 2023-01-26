@@ -1414,4 +1414,54 @@ describe('EAS', () => {
       ).to.be.revertedWith('InvalidLength');
     });
   });
+
+  describe('timestamping', () => {
+    const expectTimestamp = async (data: string | string[]) => {
+      const res = Array.isArray(data) ? await eas.multiTimestamp(data) : eas.timestamp(data);
+      const timestamp = await eas.getTime();
+
+      for (const item of Array.isArray(data) ? data : [data]) {
+        await expect(res).to.emit(eas, 'Timestamped').withArgs(item, timestamp);
+
+        expect(await eas.getTimestamp(item)).to.equal(timestamp);
+      }
+    };
+
+    const data1 = formatBytes32String('0x1234');
+    const data2 = formatBytes32String('0x4567');
+    const data3 = formatBytes32String('0x6666');
+    const data4 = formatBytes32String('Hello World');
+    const data5 = formatBytes32String('0x8888');
+    console.log('data1', data1);
+
+    it('should timestamp a single data', async () => {
+      await expectTimestamp(data1);
+      await expectTimestamp(data2);
+      await expectTimestamp(ZERO_BYTES32);
+    });
+
+    it('should timestamp multiple data', async () => {
+      await expectTimestamp([data1, data2, ZERO_BYTES32]);
+      await expectTimestamp([data3, data4, data5]);
+    });
+
+    it('should revert when attempting to timestamp the same data twice', async () => {
+      const data = data1;
+      await expectTimestamp(data);
+
+      await expect(eas.timestamp(data)).to.be.revertedWith('AlreadyTimestamped');
+    });
+
+    it('should revert when attempting to timestamp the same multiple data twice', async () => {
+      const data = [data1, data4];
+      await expectTimestamp(data);
+
+      await expect(eas.multiTimestamp(data)).to.be.revertedWith('AlreadyTimestamped');
+      await expect(eas.multiTimestamp([data3, ...data])).to.be.revertedWith('AlreadyTimestamped');
+    });
+
+    it("should return 0 for any data that wasn't timestamped multiple data", async () => {
+      expect(await eas.getTimestamp(data5)).to.equal(0);
+    });
+  });
 });
