@@ -39,6 +39,7 @@ contract EAS is IEAS, EIP712Verifier {
 
     error AccessDenied();
     error AlreadyRevoked();
+    error AlreadyTimestamped();
     error InsufficientValue();
     error InvalidAttestation();
     error InvalidAttestations();
@@ -56,7 +57,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.23";
+    string public constant VERSION = "0.24";
 
     // A zero expiration represents an non-expiring attestation.
     uint64 private constant NO_EXPIRATION_TIME = 0;
@@ -66,6 +67,9 @@ contract EAS is IEAS, EIP712Verifier {
 
     // The global mapping between attestations and their UUIDs.
     mapping(bytes32 => Attestation) private _db;
+
+    // The global mapping between data and their timestamps.
+    mapping(bytes32 => uint64) private _timestamps;
 
     /**
      * @dev Creates a new EAS instance.
@@ -355,6 +359,35 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
+    function timestamp(bytes32 data) external returns (uint64) {
+        uint64 time = _time();
+
+        _timestamp(data, time);
+
+        return time;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function multiTimestamp(bytes32[] calldata data) external returns (uint64) {
+        uint64 time = _time();
+
+        uint256 length = data.length;
+        for (uint256 i = 0; i < length; ) {
+            _timestamp(data[i], time);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return time;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
     function getAttestation(bytes32 uuid) external view returns (Attestation memory) {
         return _db[uuid];
     }
@@ -364,6 +397,13 @@ contract EAS is IEAS, EIP712Verifier {
      */
     function isAttestationValid(bytes32 uuid) public view returns (bool) {
         return _db[uuid].uuid != 0;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function getTimestamp(bytes32 data) external view returns (uint64) {
+        return _timestamps[data];
     }
 
     /**
@@ -745,6 +785,22 @@ contract EAS is IEAS, EIP712Verifier {
         }
 
         return uuids;
+    }
+
+    /**
+     * @dev Timestamps the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     * @param time The timestamp.
+     */
+    function _timestamp(bytes32 data, uint64 time) private {
+        if (_timestamps[data] != 0) {
+            revert AlreadyTimestamped();
+        }
+
+        _timestamps[data] = time;
+
+        emit Timestamped(data, time);
     }
 
     /**

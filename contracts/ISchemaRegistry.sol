@@ -19,7 +19,7 @@ struct SchemaRecord {
  */
 interface ISchemaRegistry {
     /**
-     * @dev Triggered when a new schema has been registered
+     * @dev Emitted when a new schema has been registered
      *
      * @param uuid The schema UUID.
      * @param registerer The address of the account used to register the schema.

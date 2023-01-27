@@ -79,12 +79,12 @@ This will automatically be skipped on an already deployed and configured deploym
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2022-12-29)
+#### Latest Test Coverage Report (2023-01-26)
 
-* 100% Statements 196/196
-* 100% Branches 108/108
-* 100% Functions 70/70
-* 100% Lines 318/318
+* 100% Statements 207/207
+* 100% Branches 110/110
+* 100% Functions 74/74
+* 100% Lines 333/333
 
 ```sh
 ------------------------------|----------|----------|----------|----------|----------------|

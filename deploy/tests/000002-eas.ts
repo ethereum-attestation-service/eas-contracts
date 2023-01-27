@@ -13,7 +13,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy the EAS', async () => {
-    expect(await eas.VERSION()).to.equal('0.23');
+    expect(await eas.VERSION()).to.equal('0.24');
 
     expect(await eas.getSchemaRegistry()).to.equal(registry.address);
   });
