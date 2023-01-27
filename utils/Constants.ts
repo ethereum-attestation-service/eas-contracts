@@ -6,7 +6,7 @@ const {
 
 export enum DeploymentNetwork {
   Mainnet = 'mainnet',
-  Goerli = 'goerli',
+  Sepolia = 'sepolia',
   Hardhat = 'hardhat',
   Tenderly = 'tenderly'
 }

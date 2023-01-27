@@ -8,6 +8,7 @@ import type {
   BytesLike,
   CallOverrides,
   ContractTransaction,
+  Overrides,
   PayableOverrides,
   PopulatedTransaction,
   Signer,
@@ -38,14 +39,14 @@ export type AttestationRequestDataStruct = {
 
 export type AttestationRequestDataStructOutput = [
   string,
-  number,
+  BigNumber,
   boolean,
   string,
   string,
   BigNumber
 ] & {
   recipient: string;
-  expirationTime: number;
+  expirationTime: BigNumber;
   revocable: boolean;
   refUUID: string;
   data: string;
@@ -96,10 +97,10 @@ export type DelegatedAttestationRequestStructOutput = [
 export type AttestationStruct = {
   uuid: PromiseOrValue<BytesLike>;
   schema: PromiseOrValue<BytesLike>;
-  refUUID: PromiseOrValue<BytesLike>;
   time: PromiseOrValue<BigNumberish>;
   expirationTime: PromiseOrValue<BigNumberish>;
   revocationTime: PromiseOrValue<BigNumberish>;
+  refUUID: PromiseOrValue<BytesLike>;
   recipient: PromiseOrValue<string>;
   attester: PromiseOrValue<string>;
   revocable: PromiseOrValue<boolean>;
@@ -109,10 +110,10 @@ export type AttestationStruct = {
 export type AttestationStructOutput = [
   string,
   string,
+  BigNumber,
+  BigNumber,
+  BigNumber,
   string,
-  number,
-  number,
-  number,
   string,
   string,
   boolean,
@@ -120,10 +121,10 @@ export type AttestationStructOutput = [
 ] & {
   uuid: string;
   schema: string;
+  time: BigNumber;
+  expirationTime: BigNumber;
+  revocationTime: BigNumber;
   refUUID: string;
-  time: number;
-  expirationTime: number;
-  revocationTime: number;
   recipient: string;
   attester: string;
   revocable: boolean;
@@ -230,21 +231,24 @@ export type DelegatedRevocationRequestStructOutput = [
 export interface EASInterface extends utils.Interface {
   functions: {
     "VERSION()": FunctionFragment;
-    "attest((bytes32,(address,uint32,bool,bytes32,bytes,uint256)))": FunctionFragment;
-    "attestByDelegation((bytes32,(address,uint32,bool,bytes32,bytes,uint256),(uint8,bytes32,bytes32),address))": FunctionFragment;
+    "attest((bytes32,(address,uint64,bool,bytes32,bytes,uint256)))": FunctionFragment;
+    "attestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256),(uint8,bytes32,bytes32),address))": FunctionFragment;
     "getAttestTypeHash()": FunctionFragment;
     "getAttestation(bytes32)": FunctionFragment;
     "getDomainSeparator()": FunctionFragment;
     "getNonce(address)": FunctionFragment;
     "getRevokeTypeHash()": FunctionFragment;
     "getSchemaRegistry()": FunctionFragment;
+    "getTimestamp(bytes32)": FunctionFragment;
     "isAttestationValid(bytes32)": FunctionFragment;
-    "multiAttest((bytes32,(address,uint32,bool,bytes32,bytes,uint256)[])[])": FunctionFragment;
-    "multiAttestByDelegation((bytes32,(address,uint32,bool,bytes32,bytes,uint256)[],(uint8,bytes32,bytes32)[],address)[])": FunctionFragment;
+    "multiAttest((bytes32,(address,uint64,bool,bytes32,bytes,uint256)[])[])": FunctionFragment;
+    "multiAttestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256)[],(uint8,bytes32,bytes32)[],address)[])": FunctionFragment;
     "multiRevoke((bytes32,(bytes32,uint256)[])[])": FunctionFragment;
     "multiRevokeByDelegation((bytes32,(bytes32,uint256)[],(uint8,bytes32,bytes32)[],address)[])": FunctionFragment;
+    "multiTimestamp(bytes32[])": FunctionFragment;
     "revoke((bytes32,(bytes32,uint256)))": FunctionFragment;
     "revokeByDelegation((bytes32,(bytes32,uint256),(uint8,bytes32,bytes32),address))": FunctionFragment;
+    "timestamp(bytes32)": FunctionFragment;
   };
 
   getFunction(
@@ -258,13 +262,16 @@ export interface EASInterface extends utils.Interface {
       | "getNonce"
       | "getRevokeTypeHash"
       | "getSchemaRegistry"
+      | "getTimestamp"
       | "isAttestationValid"
       | "multiAttest"
       | "multiAttestByDelegation"
       | "multiRevoke"
       | "multiRevokeByDelegation"
+      | "multiTimestamp"
       | "revoke"
       | "revokeByDelegation"
+      | "timestamp"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -301,6 +308,10 @@ export interface EASInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getTimestamp",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isAttestationValid",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -321,12 +332,20 @@ export interface EASInterface extends utils.Interface {
     values: [MultiDelegatedRevocationRequestStruct[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "multiTimestamp",
+    values: [PromiseOrValue<BytesLike>[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "revoke",
     values: [RevocationRequestStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "revokeByDelegation",
     values: [DelegatedRevocationRequestStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "timestamp",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
 
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
@@ -357,6 +376,10 @@ export interface EASInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getTimestamp",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isAttestationValid",
     data: BytesLike
   ): Result;
@@ -376,19 +399,26 @@ export interface EASInterface extends utils.Interface {
     functionFragment: "multiRevokeByDelegation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "multiTimestamp",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "revoke", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "revokeByDelegation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "timestamp", data: BytesLike): Result;
 
   events: {
     "Attested(address,address,bytes32,bytes32)": EventFragment;
     "Revoked(address,address,bytes32,bytes32)": EventFragment;
+    "Timestamped(bytes32,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Attested"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Revoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Timestamped"): EventFragment;
 }
 
 export interface AttestedEventObject {
@@ -416,6 +446,17 @@ export type RevokedEvent = TypedEvent<
 >;
 
 export type RevokedEventFilter = TypedEventFilter<RevokedEvent>;
+
+export interface TimestampedEventObject {
+  data: string;
+  timestamp: BigNumber;
+}
+export type TimestampedEvent = TypedEvent<
+  [string, BigNumber],
+  TimestampedEventObject
+>;
+
+export type TimestampedEventFilter = TypedEventFilter<TimestampedEvent>;
 
 export interface EAS extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -474,6 +515,11 @@ export interface EAS extends BaseContract {
 
     getSchemaRegistry(overrides?: CallOverrides): Promise<[string]>;
 
+    getTimestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     isAttestationValid(
       uuid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -499,6 +545,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    multiTimestamp(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     revoke(
       request: RevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -507,6 +558,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    timestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
 
@@ -540,6 +596,11 @@ export interface EAS extends BaseContract {
 
   getSchemaRegistry(overrides?: CallOverrides): Promise<string>;
 
+  getTimestamp(
+    data: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   isAttestationValid(
     uuid: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -565,6 +626,11 @@ export interface EAS extends BaseContract {
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  multiTimestamp(
+    data: PromiseOrValue<BytesLike>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   revoke(
     request: RevocationRequestStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -573,6 +639,11 @@ export interface EAS extends BaseContract {
   revokeByDelegation(
     delegatedRequest: DelegatedRevocationRequestStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  timestamp(
+    data: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
@@ -606,6 +677,11 @@ export interface EAS extends BaseContract {
 
     getSchemaRegistry(overrides?: CallOverrides): Promise<string>;
 
+    getTimestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isAttestationValid(
       uuid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -631,6 +707,11 @@ export interface EAS extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    multiTimestamp(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     revoke(
       request: RevocationRequestStruct,
       overrides?: CallOverrides
@@ -640,6 +721,11 @@ export interface EAS extends BaseContract {
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    timestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -668,6 +754,15 @@ export interface EAS extends BaseContract {
       uuid?: null,
       schema?: PromiseOrValue<BytesLike> | null
     ): RevokedEventFilter;
+
+    "Timestamped(bytes32,uint64)"(
+      data?: PromiseOrValue<BytesLike> | null,
+      timestamp?: PromiseOrValue<BigNumberish> | null
+    ): TimestampedEventFilter;
+    Timestamped(
+      data?: PromiseOrValue<BytesLike> | null,
+      timestamp?: PromiseOrValue<BigNumberish> | null
+    ): TimestampedEventFilter;
   };
 
   estimateGas: {
@@ -701,6 +796,11 @@ export interface EAS extends BaseContract {
 
     getSchemaRegistry(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getTimestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isAttestationValid(
       uuid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -726,6 +826,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    multiTimestamp(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     revoke(
       request: RevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -734,6 +839,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    timestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
 
@@ -770,6 +880,11 @@ export interface EAS extends BaseContract {
 
     getSchemaRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getTimestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isAttestationValid(
       uuid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -795,6 +910,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    multiTimestamp(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     revoke(
       request: RevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -803,6 +923,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    timestamp(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }
