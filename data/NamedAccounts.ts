@@ -13,21 +13,21 @@ const mainnet = (address: string) => ({
   [DeploymentNetwork.Tenderly]: address
 });
 
-const goerli = (address: string) => ({
-  [DeploymentNetwork.Goerli]: address
+const sepolia = (address: string) => ({
+  [DeploymentNetwork.Sepolia]: address
 });
 
 const TestNamedAccounts = {
   ethWhale: {
     ...mainnet('0x00000000219ab540356cbb839cbe05303d7705fa'),
-    ...goerli('0xf97e180c050e5Ab072211Ad2C213Eb5AEE4DF134')
+    ...sepolia('0xb21c33DE1FAb3FA15499c62B59fe0cC3250020d1')
   }
 };
 
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
-    ...goerli(deployer)
+    ...sepolia(deployer)
   },
 
   ...TestNamedAccounts

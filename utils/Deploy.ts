@@ -22,9 +22,13 @@ const {
 
 interface EnvOptions {
   TEST_FORK?: boolean;
+  MAX_FEE: number;
+  MAX_PRIORITY_FEE: number;
 }
 
-const { TEST_FORK: isTestFork }: EnvOptions = process.env as any as EnvOptions;
+const { TEST_FORK: isTestFork, MAX_FEE, MAX_PRIORITY_FEE }: EnvOptions = process.env as any as EnvOptions;
+const maxFee = MAX_FEE ? BigNumber.from(MAX_FEE) : undefined;
+const maxPriorityFee = MAX_PRIORITY_FEE ? BigNumber.from(MAX_PRIORITY_FEE) : undefined;
 
 export enum NewInstanceName {
   EAS = 'EAS',
@@ -55,9 +59,9 @@ export const DeployedContracts = {
 export const isTenderlyFork = () => getNetworkName() === DeploymentNetwork.Tenderly;
 export const isMainnetFork = () => isTenderlyFork();
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet || isMainnetFork();
-export const isGoerli = () => getNetworkName() === DeploymentNetwork.Goerli;
-export const isTestnet = () => isGoerli();
-export const isLive = () => (isMainnet() && !isMainnetFork()) || isGoerli();
+export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
+export const isTestnet = () => isSepolia();
+export const isLive = () => (isMainnet() && !isMainnetFork()) || isSepolia();
 
 export const getDeploymentDir = () => {
   return path.join(config.paths.deployments, getNetworkName());
@@ -215,6 +219,8 @@ export const deploy = async (options: DeployOptions) => {
     from,
     value,
     args,
+    maxFeePerGas: maxFee,
+    maxPriorityFeePerGas: maxPriorityFee,
     waitConfirmations: WAIT_CONFIRMATIONS,
     log: true
   });
@@ -252,7 +258,14 @@ export const execute = async (options: ExecuteOptions) => {
 
   return executeTransaction(
     name,
-    { from, value, waitConfirmations: WAIT_CONFIRMATIONS, log: true },
+    {
+      from,
+      value,
+      maxFeePerGas: maxFee,
+      maxPriorityFeePerGas: maxPriorityFee,
+      waitConfirmations: WAIT_CONFIRMATIONS,
+      log: true
+    },
     methodName,
     ...(args ?? [])
   );

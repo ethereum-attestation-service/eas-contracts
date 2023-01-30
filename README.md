@@ -36,16 +36,16 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Deployments
 
-### Goerli
+### Sepolia
 
-#### v0.22
+#### v0.24
 
 * **EAS**:
-  * Contract: [0xf0273638b19877fbA1ca9282Adb7ED83ADa819F8](https://goerli.etherscan.io/address/0xf0273638b19877fbA1ca9282Adb7ED83ADa819F8)
-  * Deployment and ABI: [EAS.json](./deployments/goerli/EAS.json)
+  * Contract: [0x50DB967C805A88FAebA43a2049AAc78052ff9f8F](https://sepolia.etherscan.io/address/0x50DB967C805A88FAebA43a2049AAc78052ff9f8F)
+  * Deployment and ABI: [EAS.json](./deployments/sepolia/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x40E750bbDCC059cb5F3c24e1B5C84E2D3ea8D2Fc](https://goerli.etherscan.io/address/0x40E750bbDCC059cb5F3c24e1B5C84E2D3ea8D2Fc)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/goerli/SchemaRegistry.json)
+  * Contract: [0x16399b867877D7f59deE9f04bD79B07fa8D17f7A](https://sepolia.etherscan.io/address/0x16399b867877D7f59deE9f04bD79B07fa8D17f7A)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
 
 ## Installation
 

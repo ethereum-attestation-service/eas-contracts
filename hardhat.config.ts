@@ -16,9 +16,8 @@ import 'solidity-coverage';
 
 interface EnvOptions {
   ETHEREUM_PROVIDER_URL?: string;
-  ETHEREUM_GOERLI_PROVIDER_URL?: string;
+  ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
-  GAS_PRICE?: number | 'auto';
   PROFILE?: boolean;
   TENDERLY_FORK_ID?: string;
   TENDERLY_PROJECT?: string;
@@ -28,9 +27,8 @@ interface EnvOptions {
 
 const {
   ETHEREUM_PROVIDER_URL = '',
-  ETHEREUM_GOERLI_PROVIDER_URL = '',
+  ETHEREUM_SEPOLIA_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
-  GAS_PRICE: gasPrice,
   PROFILE: isProfiling,
   TENDERLY_FORK_ID = '',
   TENDERLY_PROJECT = '',
@@ -71,14 +69,13 @@ const config: HardhatUserConfig = {
     [DeploymentNetwork.Mainnet]: {
       chainId: 1,
       url: ETHEREUM_PROVIDER_URL,
-      gasPrice: gasPrice || 'auto',
       saveDeployments: true,
       live: true
     },
 
-    [DeploymentNetwork.Goerli]: {
-      chainId: 5,
-      url: ETHEREUM_GOERLI_PROVIDER_URL,
+    [DeploymentNetwork.Sepolia]: {
+      chainId: 11155111,
+      url: ETHEREUM_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },
