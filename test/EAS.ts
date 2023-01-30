@@ -1432,7 +1432,6 @@ describe('EAS', () => {
     const data3 = formatBytes32String('0x6666');
     const data4 = formatBytes32String('Hello World');
     const data5 = formatBytes32String('0x8888');
-    console.log('data1', data1);
 
     it('should timestamp a single data', async () => {
       await expectTimestamp(data1);
