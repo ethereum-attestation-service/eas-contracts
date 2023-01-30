@@ -19,6 +19,7 @@
       }
     ],
     "semi": ["error", "always"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
     "no-plusplus": "off",
     "no-await-in-loop": "off",
     "no-restricted-syntax": "off",
