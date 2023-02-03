@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import { EIP712Verifier } from "../EIP712Verifier.sol";
 import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "../IEAS.sol";
 
 contract TestEIP712Verifier is EIP712Verifier {
-    string public constant VERSION = "0.24";
+    string public constant VERSION = "0.25";
 
     constructor() EIP712Verifier(VERSION) {}
 

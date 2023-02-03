@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
@@ -57,7 +57,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.24";
+    string public constant VERSION = "0.25";
 
     // A zero expiration represents an non-expiring attestation.
     uint64 private constant NO_EXPIRATION_TIME = 0;
@@ -66,10 +66,10 @@ contract EAS is IEAS, EIP712Verifier {
     ISchemaRegistry private immutable _schemaRegistry;
 
     // The global mapping between attestations and their UUIDs.
-    mapping(bytes32 => Attestation) private _db;
+    mapping(bytes32 uuid => Attestation attestation) private _db;
 
     // The global mapping between data and their timestamps.
-    mapping(bytes32 => uint64) private _timestamps;
+    mapping(bytes32 data => uint64 timestamp) private _timestamps;
 
     /**
      * @dev Creates a new EAS instance.
