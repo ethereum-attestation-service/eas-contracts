@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import { EMPTY_UUID } from "./Types.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
@@ -14,10 +14,10 @@ contract SchemaRegistry is ISchemaRegistry {
     error AlreadyExists();
 
     // The version of the contract.
-    string public constant VERSION = "0.24";
+    string public constant VERSION = "0.25";
 
     // The global mapping between schema records and their IDs.
-    mapping(bytes32 => SchemaRecord) private _registry;
+    mapping(bytes32 uuid => SchemaRecord schemaRecord) private _registry;
 
     /**
      * @inheritdoc ISchemaRegistry

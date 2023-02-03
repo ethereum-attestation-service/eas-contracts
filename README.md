@@ -38,13 +38,13 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ### Sepolia
 
-#### v0.24
+#### v0.25
 
 * **EAS**:
-  * Contract: [0x50DB967C805A88FAebA43a2049AAc78052ff9f8F](https://sepolia.etherscan.io/address/0x50DB967C805A88FAebA43a2049AAc78052ff9f8F)
+  * Contract: [0x25E36ebB051ae76c0D59E6c1dD0b29A5fc520061](https://sepolia.etherscan.io/address/0x25E36ebB051ae76c0D59E6c1dD0b29A5fc520061)
   * Deployment and ABI: [EAS.json](./deployments/sepolia/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x16399b867877D7f59deE9f04bD79B07fa8D17f7A](https://sepolia.etherscan.io/address/0x16399b867877D7f59deE9f04bD79B07fa8D17f7A)
+  * Contract: [0x4dd8b988B64A4052B5f142Af845AA49D2B2cD10D](https://sepolia.etherscan.io/address/0x4dd8b988B64A4052B5f142Af845AA49D2B2cD10D)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
 
 ## Installation

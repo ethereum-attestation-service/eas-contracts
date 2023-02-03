@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import { IEAS, Attestation } from "../IEAS.sol";
 
@@ -16,7 +16,7 @@ abstract contract SchemaResolver is ISchemaResolver {
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.24";
+    string public constant VERSION = "0.25";
 
     // The global EAS contract.
     IEAS internal immutable _eas;
