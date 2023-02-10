@@ -1,7 +1,6 @@
 import { NamedAccounts } from './data/NamedAccounts';
 import { DeploymentNetwork } from './utils/Constants';
 import '@nomiclabs/hardhat-ethers';
-import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-waffle';
 import '@tenderly/hardhat-tenderly';
@@ -115,8 +114,10 @@ const config: HardhatUserConfig = {
 
   namedAccounts: NamedAccounts,
 
-  etherscan: {
-    apiKey: ETHERSCAN_API_KEY
+  verify: {
+    etherscan: {
+      apiKey: ETHERSCAN_API_KEY
+    }
   },
 
   contractSizer: {
