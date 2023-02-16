@@ -146,6 +146,15 @@ interface IEAS {
     event Timestamped(bytes32 indexed data, uint64 indexed timestamp);
 
     /**
+    * @dev Emitted when a data has been revoked.
+     *
+     * @param revoker The address of the revoker.
+     * @param data The data.
+     * @param timestamp The timestamp.
+     */
+    event RevokedOffchain(address indexed revoker, bytes32 indexed data, uint64 indexed timestamp);
+
+    /**
      * @dev Returns the address of the global schema registry.
      *
      * @return The address of the global schema registry.
@@ -418,6 +427,24 @@ interface IEAS {
     function multiTimestamp(bytes32[] calldata data) external returns (uint64);
 
     /**
+     * @dev Revokes the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     *
+     * @return The timestamp the data was revoked with.
+     */
+    function revokeOffchain(bytes32 data) external returns (uint64);
+
+    /**
+     * @dev Revokes the specified multiple bytes32 data.
+     *
+     * @param data The data to timestamp.
+     *
+     * @return The timestamp the data was revoked with.
+     */
+    function multiRevokeOffchain(bytes32[] calldata data) external returns (uint64);
+
+    /**
      * @dev Returns an existing attestation by UUID.
      *
      * @param uuid The UUID of the attestation to retrieve.
@@ -443,4 +470,13 @@ interface IEAS {
      * @return The timestamp the data was timestamped with.
      */
     function getTimestamp(bytes32 data) external view returns (uint64);
+
+    /**
+     * @dev Returns the timestamp that the specified data was timestamped with.
+     *
+     * @param data The data to query.
+     *
+     * @return The timestamp the data was timestamped with.
+     */
+    function getRevokeOffchain(address revoker, bytes32 data) external view returns (uint64);
 }
