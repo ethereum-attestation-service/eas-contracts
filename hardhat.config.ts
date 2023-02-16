@@ -16,6 +16,7 @@ import 'solidity-coverage';
 interface EnvOptions {
   ETHEREUM_PROVIDER_URL?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
+  ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
   TENDERLY_FORK_ID?: string;
@@ -27,6 +28,7 @@ interface EnvOptions {
 const {
   ETHEREUM_PROVIDER_URL = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
+  ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
   PROFILE: isProfiling,
   TENDERLY_FORK_ID = '',
@@ -71,14 +73,18 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       live: true
     },
-
     [DeploymentNetwork.Sepolia]: {
       chainId: 11155111,
       url: ETHEREUM_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },
-
+    [DeploymentNetwork.ArbitrumOne]: {
+      chainId: 42161,
+      url: ETHEREUM_ARBITRUM_ONE_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
     [DeploymentNetwork.Tenderly]: {
       chainId: 1,
       url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,

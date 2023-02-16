@@ -17,6 +17,10 @@ const sepolia = (address: string) => ({
   [DeploymentNetwork.Sepolia]: address
 });
 
+const arbitrumOne = (address: string) => ({
+  [DeploymentNetwork.ArbitrumOne]: address
+});
+
 const TestNamedAccounts = {
   ethWhale: {
     ...mainnet('0x00000000219ab540356cbb839cbe05303d7705fa'),
@@ -27,7 +31,8 @@ const TestNamedAccounts = {
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
-    ...sepolia(deployer)
+    ...sepolia(deployer),
+    ...arbitrumOne(deployer)
   },
 
   ...TestNamedAccounts
