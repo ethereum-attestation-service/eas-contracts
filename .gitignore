@@ -12,6 +12,7 @@ artifacts
 typechain-types
 
 deployments/mainnet/solcInputs/*
+deployments/arbitrum-one/solcInputs/*
 deployments/sepolia/solcInputs/*
 deployments/hardhat/*
 deployments/tenderly/*
