@@ -1500,6 +1500,13 @@ describe('EAS', () => {
       await expect(eas.connect(sender).revokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
     });
 
+    it('should not revert when attempting to revoke the same data twice with two different accounts', async () => {
+      const data = data1;
+      await expectRevoke(data);
+
+      await expect(eas.connect(sender2).revokeOffchain(data)).to.not.be.revertedWith('AlreadyRevokedOffchain');
+    });
+
     it('should revert when attempting to timestamp the same multiple data twice', async () => {
       const data = [data1, data4];
       await expectRevoke(data);
