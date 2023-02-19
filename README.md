@@ -145,7 +145,7 @@ There’s also a special deployment mode which deploys the protocol to a mainnet
 yarn deploy:fork
 ```
 
-The framework was inspired and adopted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).
+The framework was inspired and adapted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).
 
 ## License
 
