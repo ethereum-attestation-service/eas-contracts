@@ -377,7 +377,7 @@ contract EAS is IEAS, EIP712Verifier {
     function revokeOffchain(bytes32 data) external returns (uint64) {
         uint64 time = _time();
 
-        _revokeOffchain(data, time);
+        _revokeOffchain(msg.sender, data, time);
 
         return time;
     }
@@ -390,7 +390,7 @@ contract EAS is IEAS, EIP712Verifier {
 
         uint256 length = data.length;
         for (uint256 i = 0; i < length; ) {
-            _revokeOffchain(data[i], time);
+            _revokeOffchain(msg.sender, data[i], time);
 
             unchecked {
                 ++i;
@@ -849,14 +849,17 @@ contract EAS is IEAS, EIP712Verifier {
          * @param data The data to timestamp.
          * @param time The timestamp.
          */
-    function _revokeOffchain(bytes32 data, uint64 time) private {
-        if (_revocationsOffchain[msg.sender][data] != 0) {
+    function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
+        mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
+
+
+        if (revocations[data] != 0) {
             revert AlreadyRevokedOffchain();
         }
 
-        _revocationsOffchain[msg.sender][data] = time;
+        revocations[data] = time;
 
-        emit RevokedOffchain(msg.sender, data, time);
+        emit RevokedOffchain(revoker, data, time);
     }
 
     /**
