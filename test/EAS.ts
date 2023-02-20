@@ -63,7 +63,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.25');
+      expect(await eas.VERSION()).to.equal('0.26');
 
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
     });
@@ -1461,6 +1461,66 @@ describe('EAS', () => {
 
     it("should return 0 for any data that wasn't timestamped multiple data", async () => {
       expect(await eas.getTimestamp(data5)).to.equal(0);
+    });
+  });
+
+  describe('revoking offchain', () => {
+    const expectRevoke = async (data: string | string[]) => {
+      const res = Array.isArray(data)
+        ? await eas.connect(sender).multiRevokeOffchain(data)
+        : await eas.connect(sender).revokeOffchain(data);
+
+      const timestamp = await eas.getTime();
+
+      for (const item of Array.isArray(data) ? data : [data]) {
+        await expect(res).to.emit(eas, 'RevokedOffchain').withArgs(sender.address, item, timestamp);
+        expect(await eas.getRevokeOffchain(sender.address, item)).to.equal(timestamp);
+      }
+    };
+
+    const data1 = formatBytes32String('0x1234');
+    const data2 = formatBytes32String('0x4567');
+    const data3 = formatBytes32String('0x6666');
+    const data4 = formatBytes32String('Hello World');
+    const data5 = formatBytes32String('0x8888');
+
+    it('should revoke a single data', async () => {
+      await expectRevoke(data1);
+      await expectRevoke(data2);
+      await expectRevoke(ZERO_BYTES32);
+    });
+
+    it('should revoke multiple data', async () => {
+      await expectRevoke([data1, data2, ZERO_BYTES32]);
+      await expectRevoke([data3, data4, data5]);
+    });
+
+    it('should revert when attempting to revoke the same data twice', async () => {
+      const data = data1;
+      await expectRevoke(data);
+
+      await expect(eas.connect(sender).revokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
+    });
+
+    it('should not revert when attempting to revoke the same data twice with two different accounts', async () => {
+      const data = data1;
+      await expectRevoke(data);
+
+      await expect(eas.connect(sender2).revokeOffchain(data)).to.not.be.revertedWith('AlreadyRevokedOffchain');
+    });
+
+    it('should revert when attempting to timestamp the same multiple data twice', async () => {
+      const data = [data1, data4];
+      await expectRevoke(data);
+
+      await expect(eas.connect(sender).multiRevokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
+      await expect(eas.connect(sender).multiRevokeOffchain([data3, ...data])).to.be.revertedWith(
+        'AlreadyRevokedOffchain'
+      );
+    });
+
+    it("should return 0 for any data that wasn't timestamped multiple data", async () => {
+      expect(await eas.getRevokeOffchain(sender.address, data5)).to.equal(0);
     });
   });
 });

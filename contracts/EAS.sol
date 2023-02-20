@@ -39,6 +39,7 @@ contract EAS is IEAS, EIP712Verifier {
 
     error AccessDenied();
     error AlreadyRevoked();
+    error AlreadyRevokedOffchain();
     error AlreadyTimestamped();
     error InsufficientValue();
     error InvalidAttestation();
@@ -57,7 +58,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.25";
+    string public constant VERSION = "0.26";
 
     // A zero expiration represents an non-expiring attestation.
     uint64 private constant NO_EXPIRATION_TIME = 0;
@@ -70,6 +71,9 @@ contract EAS is IEAS, EIP712Verifier {
 
     // The global mapping between data and their timestamps.
     mapping(bytes32 data => uint64 timestamp) private _timestamps;
+
+    // The global mapping between data and their revocation timestamps.
+    mapping(address revoker => mapping(bytes32 data => uint64 timestamp)) private _revocationsOffchain;
 
     /**
      * @dev Creates a new EAS instance.
@@ -370,6 +374,35 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
+    function revokeOffchain(bytes32 data) external returns (uint64) {
+        uint64 time = _time();
+
+        _revokeOffchain(msg.sender, data, time);
+
+        return time;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
+    function multiRevokeOffchain(bytes32[] calldata data) external returns (uint64) {
+        uint64 time = _time();
+
+        uint256 length = data.length;
+        for (uint256 i = 0; i < length; ) {
+            _revokeOffchain(msg.sender, data[i], time);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return time;
+    }
+
+    /**
+     * @inheritdoc IEAS
+     */
     function multiTimestamp(bytes32[] calldata data) external returns (uint64) {
         uint64 time = _time();
 
@@ -404,6 +437,13 @@ contract EAS is IEAS, EIP712Verifier {
      */
     function getTimestamp(bytes32 data) external view returns (uint64) {
         return _timestamps[data];
+    }
+
+    /**
+      * @inheritdoc IEAS
+      */
+    function getRevokeOffchain(address revoker, bytes32 data) external view returns (uint64) {
+        return _revocationsOffchain[revoker][data];
     }
 
     /**
@@ -801,6 +841,25 @@ contract EAS is IEAS, EIP712Verifier {
         _timestamps[data] = time;
 
         emit Timestamped(data, time);
+    }
+
+    /**
+         * @dev Timestamps the specified bytes32 data.
+         *
+         * @param data The data to timestamp.
+         * @param time The timestamp.
+         */
+    function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
+        mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
+
+
+        if (revocations[data] != 0) {
+            revert AlreadyRevokedOffchain();
+        }
+
+        revocations[data] = time;
+
+        emit RevokedOffchain(revoker, data, time);
     }
 
     /**
