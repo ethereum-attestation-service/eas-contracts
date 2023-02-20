@@ -63,7 +63,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.25');
+      expect(await eas.VERSION()).to.equal('0.26');
 
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
     });
@@ -1466,7 +1466,9 @@ describe('EAS', () => {
 
   describe('revoking offchain', () => {
     const expectRevoke = async (data: string | string[]) => {
-      const res = Array.isArray(data) ? await eas.connect(sender).multiRevokeOffchain(data) : await eas.connect(sender).revokeOffchain(data);
+      const res = Array.isArray(data)
+        ? await eas.connect(sender).multiRevokeOffchain(data)
+        : await eas.connect(sender).revokeOffchain(data);
 
       const timestamp = await eas.getTime();
 
@@ -1512,7 +1514,9 @@ describe('EAS', () => {
       await expectRevoke(data);
 
       await expect(eas.connect(sender).multiRevokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
-      await expect(eas.connect(sender).multiRevokeOffchain([data3, ...data])).to.be.revertedWith('AlreadyRevokedOffchain');
+      await expect(eas.connect(sender).multiRevokeOffchain([data3, ...data])).to.be.revertedWith(
+        'AlreadyRevokedOffchain'
+      );
     });
 
     it("should return 0 for any data that wasn't timestamped multiple data", async () => {

@@ -14,7 +14,7 @@ contract SchemaRegistry is ISchemaRegistry {
     error AlreadyExists();
 
     // The version of the contract.
-    string public constant VERSION = "0.25";
+    string public constant VERSION = "0.26";
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 uuid => SchemaRecord schemaRecord) private _registry;

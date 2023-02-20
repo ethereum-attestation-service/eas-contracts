@@ -6,7 +6,7 @@ import { EIP712Verifier } from "../EIP712Verifier.sol";
 import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "../IEAS.sol";
 
 contract TestEIP712Verifier is EIP712Verifier {
-    string public constant VERSION = "0.25";
+    string public constant VERSION = "0.26";
 
     constructor() EIP712Verifier(VERSION) {}
 
