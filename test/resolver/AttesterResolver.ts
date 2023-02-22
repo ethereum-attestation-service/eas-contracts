@@ -80,14 +80,14 @@ describe('AttesterResolver', () => {
   });
 
   it('should allow attesting via the correct attester', async () => {
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       { eas },
       schemaId,
       { recipient: recipient.address, expirationTime, data },
       { from: targetSender }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid }, { from: targetSender });
+    await expectRevocation({ eas }, schemaId, { uid }, { from: targetSender });
 
     const res = await expectMultiAttestations(
       { eas },
@@ -108,7 +108,7 @@ describe('AttesterResolver', () => {
       [
         {
           schema: schemaId,
-          requests: res.uuids.map((uuid) => ({ uuid }))
+          requests: res.uids.map((uid) => ({ uid }))
         }
       ],
       { from: targetSender }

@@ -94,14 +94,14 @@ describe('RecipientResolver', () => {
   });
 
   it('should allow attesting to the correct recipient', async () => {
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       { eas },
       schemaId,
       { recipient: targetRecipient.address, expirationTime, data },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uid }, { from: sender });
 
     const res = await expectMultiAttestations(
       { eas },
@@ -122,7 +122,7 @@ describe('RecipientResolver', () => {
       [
         {
           schema: schemaId,
-          requests: res.uuids.map((uuid) => ({ uuid }))
+          requests: res.uids.map((uid) => ({ uid }))
         }
       ],
       { from: sender }

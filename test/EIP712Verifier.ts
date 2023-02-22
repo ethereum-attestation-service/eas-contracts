@@ -53,7 +53,7 @@ describe('TestEIP712Verifier', () => {
       recipient: string;
       expirationTime: number;
       revocable: boolean;
-      refUUID: string;
+      refUID: string;
       data: string;
       value: number;
     }
@@ -66,7 +66,7 @@ describe('TestEIP712Verifier', () => {
         recipient: recipient.address,
         expirationTime: NO_EXPIRATION,
         revocable: true,
-        refUUID: ZERO_BYTES32,
+        refUID: ZERO_BYTES32,
         data: ZERO_BYTES,
         value: 1000
       };
@@ -80,7 +80,7 @@ describe('TestEIP712Verifier', () => {
           attestationRequest.recipient,
           attestationRequest.expirationTime,
           attestationRequest.revocable,
-          attestationRequest.refUUID,
+          attestationRequest.refUID,
           attestationRequest.data,
           await verifier.getNonce(sender.address)
         );
@@ -103,7 +103,7 @@ describe('TestEIP712Verifier', () => {
         attestationRequest.recipient,
         attestationRequest.expirationTime,
         attestationRequest.revocable,
-        attestationRequest.refUUID,
+        attestationRequest.refUID,
         attestationRequest.data,
         await verifier.getNonce(sender.address)
       );
@@ -132,7 +132,7 @@ describe('TestEIP712Verifier', () => {
     const schema = ZERO_BYTES32;
 
     const revocationRequest = {
-      uuid: ZERO_BYTES32,
+      uid: ZERO_BYTES32,
       value: 1000
     };
 
@@ -141,7 +141,7 @@ describe('TestEIP712Verifier', () => {
         const signature = await eip712Utils.signDelegatedRevocation(
           sender,
           schema,
-          revocationRequest.uuid,
+          revocationRequest.uid,
           await verifier.getNonce(sender.address)
         );
 
@@ -160,7 +160,7 @@ describe('TestEIP712Verifier', () => {
       const signature = await eip712Utils.signDelegatedRevocation(
         sender,
         schema,
-        revocationRequest.uuid,
+        revocationRequest.uid,
         await verifier.getNonce(sender.address)
       );
 

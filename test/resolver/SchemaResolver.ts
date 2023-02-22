@@ -59,9 +59,9 @@ describe('SchemaResolver', () => {
 
       it('should revert when the attestation callback is invoked directly', async () => {
         const attestation = {
-          uuid: ZERO_BYTES32,
+          uid: ZERO_BYTES32,
           schema: ZERO_BYTES32,
-          refUUID: ZERO_BYTES32,
+          refUID: ZERO_BYTES32,
           time: await latest(),
           expirationTime: 0,
           revocationTime: 0,
@@ -77,9 +77,9 @@ describe('SchemaResolver', () => {
 
       it('should revert when the attestation revocation callback is invoked directly', async () => {
         const attestation = {
-          uuid: ZERO_BYTES32,
+          uid: ZERO_BYTES32,
           schema: ZERO_BYTES32,
-          refUUID: ZERO_BYTES32,
+          refUID: ZERO_BYTES32,
           time: await latest(),
           expirationTime: 0,
           revocationTime: 0,
@@ -106,9 +106,9 @@ describe('SchemaResolver', () => {
 
         it('should revert when attempting to multi attest with more value than was actually sent', async () => {
           const attestation = {
-            uuid: ZERO_BYTES32,
+            uid: ZERO_BYTES32,
             schema: ZERO_BYTES32,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             time: await latest(),
             expirationTime: 0,
             revocationTime: 0,
@@ -129,9 +129,9 @@ describe('SchemaResolver', () => {
 
         it('should revert when attempting to multi revoke with more value than was actually sent', async () => {
           const attestation = {
-            uuid: ZERO_BYTES32,
+            uid: ZERO_BYTES32,
             schema: ZERO_BYTES32,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             time: await latest(),
             expirationTime: 0,
             revocationTime: 0,

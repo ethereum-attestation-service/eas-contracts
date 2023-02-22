@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.18;
 
-// A representation of an empty/uninitialized UUID.
-bytes32 constant EMPTY_UUID = 0;
+// A representation of an empty/uninitialized UID.
+bytes32 constant EMPTY_UID = 0;
 
 /**
  * @dev A struct representing EIP712 signature data.

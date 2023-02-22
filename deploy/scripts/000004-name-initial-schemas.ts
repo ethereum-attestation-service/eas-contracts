@@ -1,6 +1,6 @@
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import { execute, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
-import { getSchemaUUID } from '../../utils/EAS';
+import { getSchemaUID } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import { SCHEMAS } from '../scripts/000003-register-initial-schemas';
 import { utils } from 'ethers';
@@ -11,10 +11,10 @@ const { defaultAbiCoder } = utils;
 
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
-  const targetSchemaId = getSchemaUUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
+  const targetSchemaId = getSchemaUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
 
   for (const { schema, name } of SCHEMAS) {
-    const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+    const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
 
     await execute({
       name: InstanceName.EAS,
@@ -26,7 +26,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
             recipient: ZERO_ADDRESS,
             expirationTime: NO_EXPIRATION,
             revocable: true,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             data: defaultAbiCoder.encode(['bytes32', 'string'], [schemaId, name]),
             value: 0
           }

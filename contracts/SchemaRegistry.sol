@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.18;
 
-import { EMPTY_UUID } from "./Types.sol";
+import { EMPTY_UID } from "./Types.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
@@ -17,47 +17,47 @@ contract SchemaRegistry is ISchemaRegistry {
     string public constant VERSION = "0.26";
 
     // The global mapping between schema records and their IDs.
-    mapping(bytes32 uuid => SchemaRecord schemaRecord) private _registry;
+    mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
 
     /**
      * @inheritdoc ISchemaRegistry
      */
     function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32) {
         SchemaRecord memory schemaRecord = SchemaRecord({
-            uuid: EMPTY_UUID,
+            uid: EMPTY_UID,
             schema: schema,
             resolver: resolver,
             revocable: revocable
         });
 
-        bytes32 uuid = _getUUID(schemaRecord);
-        if (_registry[uuid].uuid != EMPTY_UUID) {
+        bytes32 uid = _getUID(schemaRecord);
+        if (_registry[uid].uid != EMPTY_UID) {
             revert AlreadyExists();
         }
 
-        schemaRecord.uuid = uuid;
-        _registry[uuid] = schemaRecord;
+        schemaRecord.uid = uid;
+        _registry[uid] = schemaRecord;
 
-        emit Registered(uuid, msg.sender);
+        emit Registered(uid, msg.sender);
 
-        return uuid;
+        return uid;
     }
 
     /**
      * @inheritdoc ISchemaRegistry
      */
-    function getSchema(bytes32 uuid) external view returns (SchemaRecord memory) {
-        return _registry[uuid];
+    function getSchema(bytes32 uid) external view returns (SchemaRecord memory) {
+        return _registry[uid];
     }
 
     /**
-     * @dev Calculates a UUID for a given schema.
+     * @dev Calculates a UID for a given schema.
      *
      * @param schemaRecord The input schema.
      *
-     * @return schema UUID.
+     * @return schema UID.
      */
-    function _getUUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {
+    function _getUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(schemaRecord.schema, schemaRecord.resolver, schemaRecord.revocable));
     }
 }
