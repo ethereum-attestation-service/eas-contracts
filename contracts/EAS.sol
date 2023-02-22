@@ -125,8 +125,8 @@ contract EAS is IEAS, EIP712Verifier {
     function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory) {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
         // all the returned UIDs into a single list.
-        bytes32[][] memory totalUuids = new bytes32[][](multiRequests.length);
-        uint256 totalUuidsCount = 0;
+        bytes32[][] memory totalUids = new bytes32[][](multiRequests.length);
+        uint256 totalUidsCount = 0;
 
         // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
@@ -157,9 +157,9 @@ contract EAS is IEAS, EIP712Verifier {
             availableValue -= res.usedValue;
 
             // Collect UIDs (and merge them later).
-            totalUuids[i] = res.uids;
+            totalUids[i] = res.uids;
             unchecked {
-                totalUuidsCount += res.uids.length;
+                totalUidsCount += res.uids.length;
             }
 
             unchecked {
@@ -168,7 +168,7 @@ contract EAS is IEAS, EIP712Verifier {
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return _mergeUIDs(totalUuids, totalUuidsCount);
+        return _mergeUIDs(totalUids, totalUidsCount);
     }
 
     /**
@@ -179,8 +179,8 @@ contract EAS is IEAS, EIP712Verifier {
     ) external payable returns (bytes32[] memory) {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
         // all the returned UIDs into a single list.
-        bytes32[][] memory totalUuids = new bytes32[][](multiDelegatedRequests.length);
-        uint256 totalUuidsCount = 0;
+        bytes32[][] memory totalUids = new bytes32[][](multiDelegatedRequests.length);
+        uint256 totalUidsCount = 0;
 
         // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
@@ -234,9 +234,9 @@ contract EAS is IEAS, EIP712Verifier {
             availableValue -= res.usedValue;
 
             // Collect UIDs (and merge them later).
-            totalUuids[i] = res.uids;
+            totalUids[i] = res.uids;
             unchecked {
-                totalUuidsCount += res.uids.length;
+                totalUidsCount += res.uids.length;
             }
 
             unchecked {
@@ -245,7 +245,7 @@ contract EAS is IEAS, EIP712Verifier {
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return _mergeUIDs(totalUuids, totalUuidsCount);
+        return _mergeUIDs(totalUids, totalUidsCount);
     }
 
     /**
@@ -810,9 +810,9 @@ contract EAS is IEAS, EIP712Verifier {
 
         uint256 currentIndex = 0;
         for (uint256 i = 0; i < uidLists.length; ) {
-            bytes32[] memory currentUuids = uidLists[i];
-            for (uint256 j = 0; j < currentUuids.length; ) {
-                uids[currentIndex] = currentUuids[j];
+            bytes32[] memory currentUids = uidLists[i];
+            for (uint256 j = 0; j < currentUids.length; ) {
+                uids[currentIndex] = currentUids[j];
 
                 unchecked {
                     ++j;

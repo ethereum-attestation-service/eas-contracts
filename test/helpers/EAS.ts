@@ -130,11 +130,11 @@ export const expectAttestation = async (
         { value: msgValue }
       ] as const;
 
-      const returnedUuid = await eas.connect(txSender).callStatic.attest(...args);
+      const returnedUid = await eas.connect(txSender).callStatic.attest(...args);
       res = await eas.connect(txSender).attest(...args);
 
       uid = await getUIDFromAttestTx(res);
-      expect(uid).to.equal(returnedUuid);
+      expect(uid).to.equal(returnedUid);
 
       break;
     }
@@ -173,11 +173,11 @@ export const expectAttestation = async (
         }
       ] as const;
 
-      const returnedUuid = await eas.connect(txSender).callStatic.attestByDelegation(...args);
+      const returnedUid = await eas.connect(txSender).callStatic.attestByDelegation(...args);
       res = await eas.connect(txSender).attestByDelegation(...args);
 
       uid = await getUIDFromAttestTx(res);
-      expect(uid).to.equal(returnedUuid);
+      expect(uid).to.equal(returnedUid);
 
       break;
     }
@@ -329,11 +329,11 @@ export const expectMultiAttestations = async (
         }
       ] as const;
 
-      const returnedUuids = await eas.connect(txSender).callStatic.multiAttest(...args);
+      const returnedUids = await eas.connect(txSender).callStatic.multiAttest(...args);
       res = await eas.connect(txSender).multiAttest(...args);
 
       uids = await getUIDsFromMultiAttestTx(res);
-      expect(uids).to.deep.equal(returnedUuids);
+      expect(uids).to.deep.equal(returnedUids);
 
       break;
     }
@@ -374,11 +374,11 @@ export const expectMultiAttestations = async (
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
 
-      const returnedUuids = await eas.connect(txSender).callStatic.multiAttestByDelegation(...args);
+      const returnedUids = await eas.connect(txSender).callStatic.multiAttestByDelegation(...args);
       res = await eas.connect(txSender).multiAttestByDelegation(...args);
 
       uids = await getUIDsFromMultiAttestTx(res);
-      expect(uids).to.deep.equal(returnedUuids);
+      expect(uids).to.deep.equal(returnedUids);
 
       break;
     }
