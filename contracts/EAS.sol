@@ -4,7 +4,7 @@ pragma solidity 0.8.18;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
-import { EMPTY_UUID, EIP712Signature } from "./Types.sol";
+import { EMPTY_UID, EIP712Signature } from "./Types.sol";
 
 // prettier-ignore
 import {
@@ -28,7 +28,7 @@ import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 struct AttestationsResult {
     uint256 usedValue; // Total ETH amount that was sent to resolvers.
-    bytes32[] uuids; // UUIDs of the new attestations.
+    bytes32[] uids; // UIDs of the new attestations.
 }
 
 /**
@@ -66,8 +66,8 @@ contract EAS is IEAS, EIP712Verifier {
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
 
-    // The global mapping between attestations and their UUIDs.
-    mapping(bytes32 uuid => Attestation attestation) private _db;
+    // The global mapping between attestations and their UIDs.
+    mapping(bytes32 uid => Attestation attestation) private _db;
 
     // The global mapping between data and their timestamps.
     mapping(bytes32 data => uint64 timestamp) private _timestamps;
@@ -102,7 +102,7 @@ contract EAS is IEAS, EIP712Verifier {
         AttestationRequestData[] memory requests = new AttestationRequestData[](1);
         requests[0] = request.data;
 
-        return _attest(request.schema, requests, msg.sender, msg.value, true).uuids[0];
+        return _attest(request.schema, requests, msg.sender, msg.value, true).uids[0];
     }
 
     /**
@@ -116,7 +116,7 @@ contract EAS is IEAS, EIP712Verifier {
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
         data[0] = delegatedRequest.data;
 
-        return _attest(delegatedRequest.schema, data, delegatedRequest.attester, msg.value, true).uuids[0];
+        return _attest(delegatedRequest.schema, data, delegatedRequest.attester, msg.value, true).uids[0];
     }
 
     /**
@@ -124,7 +124,7 @@ contract EAS is IEAS, EIP712Verifier {
      */
     function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory) {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
-        // all the returned UUIDs into a single list.
+        // all the returned UIDs into a single list.
         bytes32[][] memory totalUuids = new bytes32[][](multiRequests.length);
         uint256 totalUuidsCount = 0;
 
@@ -156,10 +156,10 @@ contract EAS is IEAS, EIP712Verifier {
             // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
             availableValue -= res.usedValue;
 
-            // Collect UUIDs (and merge them later).
-            totalUuids[i] = res.uuids;
+            // Collect UIDs (and merge them later).
+            totalUuids[i] = res.uids;
             unchecked {
-                totalUuidsCount += res.uuids.length;
+                totalUuidsCount += res.uids.length;
             }
 
             unchecked {
@@ -167,8 +167,8 @@ contract EAS is IEAS, EIP712Verifier {
             }
         }
 
-        // Merge all the collected UUIDs and return them as a flatten array.
-        return _mergeUUIDs(totalUuids, totalUuidsCount);
+        // Merge all the collected UIDs and return them as a flatten array.
+        return _mergeUIDs(totalUuids, totalUuidsCount);
     }
 
     /**
@@ -178,7 +178,7 @@ contract EAS is IEAS, EIP712Verifier {
         MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
     ) external payable returns (bytes32[] memory) {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
-        // all the returned UUIDs into a single list.
+        // all the returned UIDs into a single list.
         bytes32[][] memory totalUuids = new bytes32[][](multiDelegatedRequests.length);
         uint256 totalUuidsCount = 0;
 
@@ -233,10 +233,10 @@ contract EAS is IEAS, EIP712Verifier {
             // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
             availableValue -= res.usedValue;
 
-            // Collect UUIDs (and merge them later).
-            totalUuids[i] = res.uuids;
+            // Collect UIDs (and merge them later).
+            totalUuids[i] = res.uids;
             unchecked {
-                totalUuidsCount += res.uuids.length;
+                totalUuidsCount += res.uids.length;
             }
 
             unchecked {
@@ -244,8 +244,8 @@ contract EAS is IEAS, EIP712Verifier {
             }
         }
 
-        // Merge all the collected UUIDs and return them as a flatten array.
-        return _mergeUUIDs(totalUuids, totalUuidsCount);
+        // Merge all the collected UIDs and return them as a flatten array.
+        return _mergeUIDs(totalUuids, totalUuidsCount);
     }
 
     /**
@@ -421,15 +421,15 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function getAttestation(bytes32 uuid) external view returns (Attestation memory) {
-        return _db[uuid];
+    function getAttestation(bytes32 uid) external view returns (Attestation memory) {
+        return _db[uid];
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function isAttestationValid(bytes32 uuid) public view returns (bool) {
-        return _db[uuid].uuid != 0;
+    function isAttestationValid(bytes32 uid) public view returns (bool) {
+        return _db[uid].uid != 0;
     }
 
     /**
@@ -455,7 +455,7 @@ contract EAS is IEAS, EIP712Verifier {
      * @param availableValue The total available ETH amount that can be sent to the resolver.
      * @param last Whether this is the last attestations/revocations set.
      *
-     * @return The UUID of the new attestations and the total sent ETH amount.
+     * @return The UID of the new attestations and the total sent ETH amount.
      */
     function _attest(
         bytes32 schema,
@@ -467,11 +467,11 @@ contract EAS is IEAS, EIP712Verifier {
         uint256 length = data.length;
 
         AttestationsResult memory res;
-        res.uuids = new bytes32[](length);
+        res.uids = new bytes32[](length);
 
         // Ensure that we aren't attempting to attest to a non-existing schema.
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
-        if (schemaRecord.uuid == EMPTY_UUID) {
+        if (schemaRecord.uid == EMPTY_UID) {
             revert InvalidSchema();
         }
 
@@ -492,9 +492,9 @@ contract EAS is IEAS, EIP712Verifier {
             }
 
             Attestation memory attestation = Attestation({
-                uuid: EMPTY_UUID,
+                uid: EMPTY_UID,
                 schema: schema,
-                refUUID: request.refUUID,
+                refUID: request.refUID,
                 time: _time(),
                 expirationTime: request.expirationTime,
                 revocationTime: 0,
@@ -504,12 +504,12 @@ contract EAS is IEAS, EIP712Verifier {
                 data: request.data
             });
 
-            // Look for the first non-existing UUID (and use a bump seed/nonce in the rare case of a conflict).
-            bytes32 uuid;
+            // Look for the first non-existing UID (and use a bump seed/nonce in the rare case of a conflict).
+            bytes32 uid;
             uint32 bump = 0;
             while (true) {
-                uuid = _getUUID(attestation, bump);
-                if (_db[uuid].uuid == EMPTY_UUID) {
+                uid = _getUID(attestation, bump);
+                if (_db[uid].uid == EMPTY_UID) {
                     break;
                 }
 
@@ -517,13 +517,13 @@ contract EAS is IEAS, EIP712Verifier {
                     ++bump;
                 }
             }
-            attestation.uuid = uuid;
+            attestation.uid = uid;
 
-            _db[uuid] = attestation;
+            _db[uid] = attestation;
 
-            if (request.refUUID != 0) {
-                // Ensure that we aren't trying to attest to a non-existing referenced UUID.
-                if (!isAttestationValid(request.refUUID)) {
+            if (request.refUID != 0) {
+                // Ensure that we aren't trying to attest to a non-existing referenced UID.
+                if (!isAttestationValid(request.refUID)) {
                     revert NotFound();
                 }
             }
@@ -531,9 +531,9 @@ contract EAS is IEAS, EIP712Verifier {
             attestations[i] = attestation;
             values[i] = request.value;
 
-            res.uuids[i] = uuid;
+            res.uids[i] = uid;
 
-            emit Attested(request.recipient, attester, uuid, schema);
+            emit Attested(request.recipient, attester, uid, schema);
 
             unchecked {
                 ++i;
@@ -565,7 +565,7 @@ contract EAS is IEAS, EIP712Verifier {
     ) private returns (uint256) {
         // Ensure that a non-existing schema ID wasn't passed by accident.
         SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
-        if (schemaRecord.uuid == EMPTY_UUID) {
+        if (schemaRecord.uid == EMPTY_UID) {
             revert InvalidSchema();
         }
 
@@ -576,10 +576,10 @@ contract EAS is IEAS, EIP712Verifier {
         for (uint256 i = 0; i < length; ) {
             RevocationRequestData memory request = data[i];
 
-            Attestation storage attestation = _db[request.uuid];
+            Attestation storage attestation = _db[request.uid];
 
             // Ensure that we aren't attempting to revoke a non-existing attestation.
-            if (attestation.uuid == EMPTY_UUID) {
+            if (attestation.uid == EMPTY_UID) {
                 revert NotFound();
             }
 
@@ -608,7 +608,7 @@ contract EAS is IEAS, EIP712Verifier {
             attestations[i] = attestation;
             values[i] = request.value;
 
-            emit Revoked(attestation.recipient, revoker, request.uuid, attestation.schema);
+            emit Revoked(attestation.recipient, revoker, request.uid, attestation.schema);
 
             unchecked {
                 ++i;
@@ -759,14 +759,14 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
-     * @dev Calculates a UUID for a given attestation.
+     * @dev Calculates a UID for a given attestation.
      *
      * @param attestation The input attestation.
-     * @param bump A bump value to use in case of a UUID conflict.
+     * @param bump A bump value to use in case of a UID conflict.
      *
-     * @return Attestation UUID.
+     * @return Attestation UID.
      */
-    function _getUUID(Attestation memory attestation, uint32 bump) private pure returns (bytes32) {
+    function _getUID(Attestation memory attestation, uint32 bump) private pure returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
@@ -776,7 +776,7 @@ contract EAS is IEAS, EIP712Verifier {
                     attestation.time,
                     attestation.expirationTime,
                     attestation.revocable,
-                    attestation.refUUID,
+                    attestation.refUID,
                     attestation.data,
                     bump
                 )
@@ -798,21 +798,21 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
-     * @dev Merges lists of UUIDs.
+     * @dev Merges lists of UIDs.
      *
-     * @param uuidLists The provided lists of UUIDs.
-     * @param uuidsCount Total UUIDs count.
+     * @param uidLists The provided lists of UIDs.
+     * @param uidsCount Total UIDs count.
      *
-     * @return A merged and flatten list of all the UUIDs.
+     * @return A merged and flatten list of all the UIDs.
      */
-    function _mergeUUIDs(bytes32[][] memory uuidLists, uint256 uuidsCount) private pure returns (bytes32[] memory) {
-        bytes32[] memory uuids = new bytes32[](uuidsCount);
+    function _mergeUIDs(bytes32[][] memory uidLists, uint256 uidsCount) private pure returns (bytes32[] memory) {
+        bytes32[] memory uids = new bytes32[](uidsCount);
 
         uint256 currentIndex = 0;
-        for (uint256 i = 0; i < uuidLists.length; ) {
-            bytes32[] memory currentUuids = uuidLists[i];
+        for (uint256 i = 0; i < uidLists.length; ) {
+            bytes32[] memory currentUuids = uidLists[i];
             for (uint256 j = 0; j < currentUuids.length; ) {
-                uuids[currentIndex] = currentUuids[j];
+                uids[currentIndex] = currentUuids[j];
 
                 unchecked {
                     ++j;
@@ -824,7 +824,7 @@ contract EAS is IEAS, EIP712Verifier {
             }
         }
 
-        return uuids;
+        return uids;
     }
 
     /**

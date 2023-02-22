@@ -21,10 +21,10 @@ describeDeployment(__filename, () => {
     for (const [schemaId, { schema, data }] of Object.entries(testAttestations)) {
       Logger.info(`Testing generated attestations for ${schemaId} "${schema}"...`);
 
-      for (const { uuid, recipient } of data) {
-        const attestation = await eas.getAttestation(uuid);
+      for (const { uid, recipient } of data) {
+        const attestation = await eas.getAttestation(uid);
 
-        expect(attestation.uuid).to.equal(uuid);
+        expect(attestation.uid).to.equal(uid);
         expect(attestation.schema).to.equal(schema);
         expect(attestation.recipient).to.equal(recipient);
       }

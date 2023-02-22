@@ -5,7 +5,7 @@ import {
   MultiDelegatedRevocationRequestStruct
 } from '../../typechain-types/contracts/IEAS';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { getSchemaUUID, getUUIDFromAttestTx, getUUIDsFromMultiAttestTx } from '../../utils/EAS';
+import { getSchemaUID, getUIDFromAttestTx, getUIDsFromMultiAttestTx } from '../../utils/EAS';
 import {
   EIP712AttestationParams,
   EIP712MessageTypes,
@@ -33,7 +33,7 @@ export const registerSchema = async (
   const address = typeof resolver === 'string' ? resolver : resolver.address;
   await registry.register(schema, address, revocable);
 
-  return getSchemaUUID(schema, address, revocable);
+  return getSchemaUID(schema, address, revocable);
 };
 
 export enum SignatureType {
@@ -58,7 +58,7 @@ export interface AttestationRequestData {
   recipient: string;
   expirationTime: number;
   revocable?: boolean;
-  refUUID?: string;
+  refUID?: string;
   data?: any;
   value?: BigNumberish;
 }
@@ -83,7 +83,7 @@ export interface RevocationOptions {
 }
 
 export interface RevocationRequestData {
-  uuid: string;
+  uid: string;
   value?: BigNumberish;
 }
 
@@ -110,7 +110,7 @@ export const expectAttestation = async (
     recipient,
     expirationTime,
     revocable = true,
-    refUUID = ZERO_BYTES32,
+    refUID = ZERO_BYTES32,
     data = ZERO_BYTES32,
     value = 0
   } = request;
@@ -119,22 +119,22 @@ export const expectAttestation = async (
   const prevBalance = await getBalance(txSender.address);
 
   const msgValue = BigNumber.from(options.value ?? value);
-  let uuid;
+  let uid;
 
   let res: ContractTransaction;
 
   switch (signatureType) {
     case SignatureType.Direct: {
       const args = [
-        { schema, data: { recipient, expirationTime, revocable, refUUID, data, value } },
+        { schema, data: { recipient, expirationTime, revocable, refUID, data, value } },
         { value: msgValue }
       ] as const;
 
       const returnedUuid = await eas.connect(txSender).callStatic.attest(...args);
       res = await eas.connect(txSender).attest(...args);
 
-      uuid = await getUUIDFromAttestTx(res);
-      expect(uuid).to.equal(returnedUuid);
+      uid = await getUIDFromAttestTx(res);
+      expect(uid).to.equal(returnedUuid);
 
       break;
     }
@@ -150,7 +150,7 @@ export const expectAttestation = async (
         recipient,
         expirationTime,
         revocable,
-        refUUID,
+        refUID,
         data,
         await eas.getNonce(txSender.address)
       );
@@ -160,7 +160,7 @@ export const expectAttestation = async (
       const args = [
         {
           schema,
-          data: { recipient, expirationTime, revocable, refUUID, data, value },
+          data: { recipient, expirationTime, revocable, refUID, data, value },
           signature: {
             v: signature.v,
             r: hexlify(signature.r),
@@ -176,8 +176,8 @@ export const expectAttestation = async (
       const returnedUuid = await eas.connect(txSender).callStatic.attestByDelegation(...args);
       res = await eas.connect(txSender).attestByDelegation(...args);
 
-      uuid = await getUUIDFromAttestTx(res);
-      expect(uuid).to.equal(returnedUuid);
+      uid = await getUIDFromAttestTx(res);
+      expect(uid).to.equal(returnedUuid);
 
       break;
     }
@@ -189,12 +189,12 @@ export const expectAttestation = async (
     expect(await getBalance(txSender.address)).to.equal(prevBalance.sub(value).sub(transactionCost));
   }
 
-  await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, uuid, schema);
+  await expect(res).to.emit(eas, 'Attested').withArgs(recipient, txSender.address, uid, schema);
 
-  expect(await eas.isAttestationValid(uuid)).to.be.true;
+  expect(await eas.isAttestationValid(uid)).to.be.true;
 
-  const attestation = await eas.getAttestation(uuid);
-  expect(attestation.uuid).to.equal(uuid);
+  const attestation = await eas.getAttestation(uid);
+  expect(attestation.uid).to.equal(uid);
   expect(attestation.schema).to.equal(schema);
   expect(attestation.recipient).to.equal(recipient);
   expect(attestation.attester).to.equal(txSender.address);
@@ -202,10 +202,10 @@ export const expectAttestation = async (
   expect(attestation.expirationTime).to.equal(expirationTime);
   expect(attestation.revocationTime).to.equal(0);
   expect(attestation.revocable).to.equal(revocable);
-  expect(attestation.refUUID).to.equal(refUUID);
+  expect(attestation.refUID).to.equal(refUID);
   expect(attestation.data).to.equal(data);
 
-  return { uuid, res };
+  return { uid, res };
 };
 
 export const expectFailedAttestation = async (
@@ -220,7 +220,7 @@ export const expectFailedAttestation = async (
     recipient,
     expirationTime,
     revocable = true,
-    refUUID = ZERO_BYTES32,
+    refUID = ZERO_BYTES32,
     data = ZERO_BYTES32,
     value = 0
   } = request;
@@ -232,7 +232,7 @@ export const expectFailedAttestation = async (
     case SignatureType.Direct: {
       await expect(
         eas.connect(txSender).attest(
-          { schema, data: { recipient, expirationTime, revocable, refUUID, data, value } },
+          { schema, data: { recipient, expirationTime, revocable, refUID, data, value } },
           {
             value: msgValue
           }
@@ -253,7 +253,7 @@ export const expectFailedAttestation = async (
         recipient,
         expirationTime,
         revocable,
-        refUUID,
+        refUID,
         data,
         await eas.getNonce(txSender.address)
       );
@@ -268,7 +268,7 @@ export const expectFailedAttestation = async (
               recipient,
               expirationTime,
               revocable,
-              refUUID,
+              refUID,
               data,
               value
             },
@@ -301,7 +301,7 @@ export const expectMultiAttestations = async (
       recipient: d.recipient,
       expirationTime: d.expirationTime,
       revocable: d.revocable ?? true,
-      refUUID: d.refUUID ?? ZERO_BYTES32,
+      refUID: d.refUID ?? ZERO_BYTES32,
       data: d.data ?? ZERO_BYTES32,
       value: d.value ?? 0
     }))
@@ -317,7 +317,7 @@ export const expectMultiAttestations = async (
   }, BigNumber.from(0));
   const msgValue = options.value ?? requestedValue;
 
-  let uuids: string[] = [];
+  let uids: string[] = [];
   let res: ContractTransaction;
 
   switch (signatureType) {
@@ -332,8 +332,8 @@ export const expectMultiAttestations = async (
       const returnedUuids = await eas.connect(txSender).callStatic.multiAttest(...args);
       res = await eas.connect(txSender).multiAttest(...args);
 
-      uuids = await getUUIDsFromMultiAttestTx(res);
-      expect(uuids).to.deep.equal(returnedUuids);
+      uids = await getUIDsFromMultiAttestTx(res);
+      expect(uids).to.deep.equal(returnedUuids);
 
       break;
     }
@@ -357,7 +357,7 @@ export const expectMultiAttestations = async (
             request.recipient,
             request.expirationTime,
             request.revocable,
-            request.refUUID,
+            request.refUID,
             request.data,
             nonce
           );
@@ -377,8 +377,8 @@ export const expectMultiAttestations = async (
       const returnedUuids = await eas.connect(txSender).callStatic.multiAttestByDelegation(...args);
       res = await eas.connect(txSender).multiAttestByDelegation(...args);
 
-      uuids = await getUUIDsFromMultiAttestTx(res);
-      expect(uuids).to.deep.equal(returnedUuids);
+      uids = await getUIDsFromMultiAttestTx(res);
+      expect(uids).to.deep.equal(returnedUuids);
 
       break;
     }
@@ -393,14 +393,14 @@ export const expectMultiAttestations = async (
   let i = 0;
   for (const { schema, data } of multiAttestationRequests) {
     for (const request of data) {
-      const uuid = uuids[i++];
+      const uid = uids[i++];
 
-      await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, txSender.address, uuid, schema);
+      await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, txSender.address, uid, schema);
 
-      expect(await eas.isAttestationValid(uuid)).to.be.true;
+      expect(await eas.isAttestationValid(uid)).to.be.true;
 
-      const attestation = await eas.getAttestation(uuid);
-      expect(attestation.uuid).to.equal(uuid);
+      const attestation = await eas.getAttestation(uid);
+      expect(attestation.uid).to.equal(uid);
       expect(attestation.schema).to.equal(schema);
       expect(attestation.recipient).to.equal(request.recipient);
       expect(attestation.attester).to.equal(txSender.address);
@@ -408,12 +408,12 @@ export const expectMultiAttestations = async (
       expect(attestation.expirationTime).to.equal(request.expirationTime);
       expect(attestation.revocationTime).to.equal(0);
       expect(attestation.revocable).to.equal(request.revocable);
-      expect(attestation.refUUID).to.equal(request.refUUID);
+      expect(attestation.refUID).to.equal(request.refUID);
       expect(attestation.data).to.equal(request.data);
     }
   }
 
-  return { uuids, res };
+  return { uids, res };
 };
 
 export const expectFailedMultiAttestations = async (
@@ -432,7 +432,7 @@ export const expectFailedMultiAttestations = async (
       recipient: d.recipient,
       expirationTime: d.expirationTime,
       revocable: d.revocable ?? true,
-      refUUID: d.refUUID ?? ZERO_BYTES32,
+      refUID: d.refUID ?? ZERO_BYTES32,
       data: d.data ?? ZERO_BYTES32,
       value: d.value ?? 0
     }))
@@ -476,7 +476,7 @@ export const expectFailedMultiAttestations = async (
             request.recipient,
             request.expirationTime,
             request.revocable,
-            request.refUUID,
+            request.refUID,
             request.data,
             nonce
           );
@@ -507,19 +507,19 @@ export const expectRevocation = async (
   options: RevocationOptions
 ) => {
   const { eas, eip712Utils } = contracts;
-  const { uuid, value = 0 } = request;
+  const { uid, value = 0 } = request;
   const { from: txSender, signatureType = SignatureType.Direct } = options;
 
   const msgValue = BigNumber.from(options.value ?? value);
 
   const prevBalance = await getBalance(txSender.address);
-  const attestation = await eas.getAttestation(uuid);
+  const attestation = await eas.getAttestation(uid);
 
   let res;
 
   switch (signatureType) {
     case SignatureType.Direct: {
-      res = await eas.connect(txSender).revoke({ schema, data: { uuid, value } }, { value: msgValue });
+      res = await eas.connect(txSender).revoke({ schema, data: { uid, value } }, { value: msgValue });
 
       break;
     }
@@ -532,14 +532,14 @@ export const expectRevocation = async (
       const signature = await eip712Utils.signDelegatedRevocation(
         txSender,
         schema,
-        uuid,
+        uid,
         await eas.getNonce(txSender.address)
       );
 
       res = await eas.connect(txSender).revokeByDelegation(
         {
           schema,
-          data: { uuid, value },
+          data: { uid, value },
           signature: {
             v: signature.v,
             r: hexlify(signature.r),
@@ -560,9 +560,9 @@ export const expectRevocation = async (
     expect(await getBalance(txSender.address)).to.equal(prevBalance.sub(value).sub(transactionCost));
   }
 
-  await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, txSender.address, uuid, attestation.schema);
+  await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, txSender.address, uid, attestation.schema);
 
-  const attestation2 = await eas.getAttestation(uuid);
+  const attestation2 = await eas.getAttestation(uid);
   expect(attestation2.revocationTime).to.equal(await eas.getTime());
 
   return res;
@@ -578,7 +578,7 @@ export const expectMultiRevocations = async (
   const multiRevocationRequests = requests.map((r) => ({
     schema: r.schema,
     data: r.requests.map((d) => ({
-      uuid: d.uuid,
+      uid: d.uid,
       value: d.value ?? 0
     }))
   }));
@@ -589,7 +589,7 @@ export const expectMultiRevocations = async (
   const attestations: Record<string, AttestationStructOutput> = {};
   for (const data of requests) {
     for (const request of data.requests) {
-      attestations[request.uuid] = await eas.getAttestation(request.uuid);
+      attestations[request.uid] = await eas.getAttestation(request.uid);
     }
   }
 
@@ -624,7 +624,7 @@ export const expectMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uuid, nonce);
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
 
@@ -650,14 +650,14 @@ export const expectMultiRevocations = async (
 
   for (const data of requests) {
     for (const request of data.requests) {
-      const attestation = attestations[request.uuid];
+      const attestation = attestations[request.uid];
       await expect(res)
         .to.emit(eas, 'Revoked')
-        .withArgs(attestation.recipient, txSender.address, request.uuid, attestation.schema);
+        .withArgs(attestation.recipient, txSender.address, request.uid, attestation.schema);
 
-      expect(await eas.isAttestationValid(request.uuid)).to.be.true;
+      expect(await eas.isAttestationValid(request.uid)).to.be.true;
 
-      const attestation2 = await eas.getAttestation(request.uuid);
+      const attestation2 = await eas.getAttestation(request.uid);
       expect(attestation2.revocationTime).to.equal(await eas.getTime());
     }
   }
@@ -673,7 +673,7 @@ export const expectFailedRevocation = async (
   err: string
 ) => {
   const { eas, eip712Utils } = contracts;
-  const { uuid, value = 0 } = request;
+  const { uid, value = 0 } = request;
   const { from: txSender, signatureType = SignatureType.Direct } = options;
 
   const msgValue = options.value ?? value;
@@ -681,7 +681,7 @@ export const expectFailedRevocation = async (
   switch (signatureType) {
     case SignatureType.Direct: {
       await expect(
-        eas.connect(txSender).revoke({ schema, data: { uuid, value } }, { value: msgValue })
+        eas.connect(txSender).revoke({ schema, data: { uid, value } }, { value: msgValue })
       ).to.be.revertedWith(err);
 
       break;
@@ -695,7 +695,7 @@ export const expectFailedRevocation = async (
       const signature = await eip712Utils.signDelegatedRevocation(
         txSender,
         schema,
-        uuid,
+        uid,
         await eas.getNonce(txSender.address)
       );
 
@@ -705,7 +705,7 @@ export const expectFailedRevocation = async (
         eas.revokeByDelegation(
           {
             schema,
-            data: { uuid, value },
+            data: { uid, value },
             signature: {
               v: signature.v,
               r: hexlify(signature.r),
@@ -734,7 +734,7 @@ export const expectFailedMultiRevocations = async (
   const multiRevocationRequests = requests.map((r) => ({
     schema: r.schema,
     data: r.requests.map((d) => ({
-      uuid: d.uuid,
+      uid: d.uid,
       value: d.value ?? 0
     }))
   }));
@@ -770,7 +770,7 @@ export const expectFailedMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uuid, nonce);
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
 

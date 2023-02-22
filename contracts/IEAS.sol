@@ -3,23 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
-import { EIP712Signature } from "./Types.sol";
-
-/**
- * @dev A struct representing a single attestation.
- */
-struct Attestation {
-    bytes32 uuid; // A unique identifier of the attestation.
-    bytes32 schema; // The unique identifier of the schema.
-    uint64 time; // The time when the attestation was created (Unix timestamp).
-    uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
-    uint64 revocationTime; // The time when the attestation was revoked (Unix timestamp).
-    bytes32 refUUID; // The UUID of the related attestation.
-    address recipient; // The recipient of the attestation.
-    address attester; // The attester/sender of the attestation.
-    bool revocable; // Whether the attestation is revocable.
-    bytes data; // Custom attestation data.
-}
+import { Attestation, EIP712Signature } from "./Types.sol";
 
 /**
  * @dev A struct representing the arguments of the attestation request.
@@ -28,7 +12,7 @@ struct AttestationRequestData {
     address recipient; // The recipient of the attestation.
     uint64 expirationTime; // The time when the attestation expires (Unix timestamp).
     bool revocable; // Whether the attestation is revocable.
-    bytes32 refUUID; // The UUID of the related attestation.
+    bytes32 refUID; // The UID of the related attestation.
     bytes data; // Custom attestation data.
     uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
 }
@@ -73,7 +57,7 @@ struct MultiDelegatedAttestationRequest {
  * @dev A struct representing the arguments of the revocation request.
  */
 struct RevocationRequestData {
-    bytes32 uuid; // The UUID of the attestation to revoke.
+    bytes32 uid; // The UID of the attestation to revoke.
     uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
 }
 
@@ -122,20 +106,20 @@ interface IEAS {
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
-     * @param uuid The UUID the revoked attestation.
-     * @param schema The UUID of the schema.
+     * @param uid The UID the revoked attestation.
+     * @param schema The UID of the schema.
      */
-    event Attested(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
+    event Attested(address indexed recipient, address indexed attester, bytes32 uid, bytes32 indexed schema);
 
     /**
      * @dev Emitted when an attestation has been revoked.
      *
      * @param recipient The recipient of the attestation.
      * @param attester The attesting account.
-     * @param schema The UUID of the schema.
-     * @param uuid The UUID the revoked attestation.
+     * @param schema The UID of the schema.
+     * @param uid The UID the revoked attestation.
      */
-    event Revoked(address indexed recipient, address indexed attester, bytes32 uuid, bytes32 indexed schema);
+    event Revoked(address indexed recipient, address indexed attester, bytes32 uid, bytes32 indexed schema);
 
     /**
      * @dev Emitted when a data has been timestamped.
@@ -146,7 +130,7 @@ interface IEAS {
     event Timestamped(bytes32 indexed data, uint64 indexed timestamp);
 
     /**
-    * @dev Emitted when a data has been revoked.
+     * @dev Emitted when a data has been revoked.
      *
      * @param revoker The address of the revoker.
      * @param data The data.
@@ -174,13 +158,13 @@ interface IEAS {
      *         recipient: "0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf",
      *         expirationTime: 0,
      *         revocable: true,
-     *         refUUID: "0x0000000000000000000000000000000000000000000000000000000000000000",
+     *         refUID: "0x0000000000000000000000000000000000000000000000000000000000000000",
      *         data: "0xF00D",
      *         value: 0
      *     }
      * })
      *
-     * @return The UUID of the new attestation.
+     * @return The UID of the new attestation.
      */
     function attest(AttestationRequest calldata request) external payable returns (bytes32);
 
@@ -197,7 +181,7 @@ interface IEAS {
      *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
      *         expirationTime: 1673891048,
      *         revocable: true,
-     *         refUUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
      *         data: '0x1234',
      *         value: 0
      *     },
@@ -209,7 +193,7 @@ interface IEAS {
      *     attester: '0xc5E8740aD971409492b1A63Db8d83025e0Fc427e'
      * })
      *
-     * @return The UUID of the new attestation.
+     * @return The UID of the new attestation.
      */
     function attestByDelegation(
         DelegatedAttestationRequest calldata delegatedRequest
@@ -229,7 +213,7 @@ interface IEAS {
      *         recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
      *         expirationTime: 1673891048,
      *         revocable: true,
-     *         refUUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
      *         data: '0x1234',
      *         value: 1000
      *     },
@@ -237,7 +221,7 @@ interface IEAS {
      *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
      *         expirationTime: 0,
      *         revocable: false,
-     *         refUUID: '0x480df4a039efc31b11bfdf491b383ca138b6bde160988222a2a3509c02cee174',
+     *         refUID: '0x480df4a039efc31b11bfdf491b383ca138b6bde160988222a2a3509c02cee174',
      *         data: '0x00',
      *         value: 0
      *     }],
@@ -248,13 +232,13 @@ interface IEAS {
      *         recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
      *         expirationTime: 0,
      *         revocable: true,
-     *         refUUID: '0x75bf2ed8dca25a8190c50c52db136664de25b2449535839008ccfdab469b214f',
+     *         refUID: '0x75bf2ed8dca25a8190c50c52db136664de25b2449535839008ccfdab469b214f',
      *         data: '0x12345678',
      *         value: 0
      *     },
      * }])
      *
-     * @return The UUIDs of the new attestations.
+     * @return The UIDs of the new attestations.
      */
     function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory);
 
@@ -272,7 +256,7 @@ interface IEAS {
      *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
      *         expirationTime: 1673891048,
      *         revocable: true,
-     *         refUUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
      *         data: '0x1234',
      *         value: 0
      *     },
@@ -280,7 +264,7 @@ interface IEAS {
      *         recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
      *         expirationTime: 0,
      *         revocable: false,
-     *         refUUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
      *         data: '0x00',
      *         value: 0
      *     }],
@@ -297,7 +281,7 @@ interface IEAS {
      *     attester: '0x1D86495b2A7B524D747d2839b3C645Bed32e8CF4'
      * }])
      *
-     * @return The UUIDs of the new attestations.
+     * @return The UIDs of the new attestations.
      */
     function multiAttestByDelegation(
         MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
@@ -311,7 +295,7 @@ interface IEAS {
      * revoke({
      *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
      *     data: {
-     *         uuid: '0x101032e487642ee04ee17049f99a70590c735b8614079fc9275f9dd57c00966d',
+     *         uid: '0x101032e487642ee04ee17049f99a70590c735b8614079fc9275f9dd57c00966d',
      *         value: 0
      *     }
      * })
@@ -328,7 +312,7 @@ interface IEAS {
      * revokeByDelegation({
      *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
      *     data: {
-     *         uuid: '0xcbbc12102578c642a0f7b34fe7111e41afa25683b6cd7b5a14caf90fa14d24ba',
+     *         uid: '0xcbbc12102578c642a0f7b34fe7111e41afa25683b6cd7b5a14caf90fa14d24ba',
      *         value: 0
      *     },
      *     signature: {
@@ -354,18 +338,18 @@ interface IEAS {
      * multiRevoke([{
      *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
      *     data: [{
-     *         uuid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
+     *         uid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
      *         value: 1000
      *     },
      *     {
-     *         uuid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
+     *         uid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
      *         value: 0
      *     }],
      * },
      * {
      *     schema: '0x5ac273ce41e3c8bfa383efe7c03e54c5f0bff29c9f11ef6ffa930fc84ca32425',
      *     data: [{
-     *         uuid: '0x053d42abce1fd7c8fcddfae21845ad34dae287b2c326220b03ba241bc5a8f019',
+     *         uid: '0x053d42abce1fd7c8fcddfae21845ad34dae287b2c326220b03ba241bc5a8f019',
      *         value: 0
      *     },
      * }])
@@ -383,11 +367,11 @@ interface IEAS {
      * multiRevokeByDelegation([{
      *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
      *     data: [{
-     *         uuid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
+     *         uid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
      *         value: 1000
      *     },
      *     {
-     *         uuid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
+     *         uid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
      *         value: 0
      *     }],
      *     signatures: [{
@@ -445,22 +429,22 @@ interface IEAS {
     function multiRevokeOffchain(bytes32[] calldata data) external returns (uint64);
 
     /**
-     * @dev Returns an existing attestation by UUID.
+     * @dev Returns an existing attestation by UID.
      *
-     * @param uuid The UUID of the attestation to retrieve.
+     * @param uid The UID of the attestation to retrieve.
      *
      * @return The attestation data members.
      */
-    function getAttestation(bytes32 uuid) external view returns (Attestation memory);
+    function getAttestation(bytes32 uid) external view returns (Attestation memory);
 
     /**
      * @dev Checks whether an attestation exists.
      *
-     * @param uuid The UUID of the attestation to retrieve.
+     * @param uid The UID of the attestation to retrieve.
      *
      * @return Whether an attestation exists.
      */
-    function isAttestationValid(bytes32 uuid) external view returns (bool);
+    function isAttestationValid(bytes32 uid) external view returns (bool);
 
     /**
      * @dev Returns the timestamp that the specified data was timestamped with.

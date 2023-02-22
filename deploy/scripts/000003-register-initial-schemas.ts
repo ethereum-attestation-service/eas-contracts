@@ -34,7 +34,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       from: deployer
     });
 
-    Logger.log(`Registered schema ${schema} with UUID ${res.events?.find((e) => e.event === 'Registered').args.uuid}`);
+    Logger.log(`Registered schema ${schema} with UID ${res.events?.find((e) => e.event === 'Registered').args.uid}`);
   }
 
   return true;

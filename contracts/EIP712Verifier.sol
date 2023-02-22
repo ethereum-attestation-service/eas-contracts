@@ -24,12 +24,12 @@ abstract contract EIP712Verifier is EIP712 {
     error InvalidSignature();
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUUID,bytes data,uint256 nonce)").
-    bytes32 private constant ATTEST_TYPEHASH = 0x6fddd0d8bc416c66f4749c05d7b3e4dc45adc924f7eaaf3ef86c361f481e27c2;
+    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)").
+    bytes32 private constant ATTEST_TYPEHASH = 0xdbfdf8dc2b135c26253e00d5b6cbe6f20457e003fd526d97cea183883570de61;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(bytes32 schema,bytes32 uuid,uint256 nonce)").
-    bytes32 private constant REVOKE_TYPEHASH = 0xf4d55e0bcbb226b4aaff947cf2f41ec6d6dcaecd1306fbe6f9b8746ad288b48e;
+    // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 nonce)").
+    bytes32 private constant REVOKE_TYPEHASH = 0xa98d02348410c9c76735e0d0bb1396f4015ac2bb9615f9c2611d19d7a8a99650;
 
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
@@ -95,7 +95,7 @@ abstract contract EIP712Verifier is EIP712 {
                     data.recipient,
                     data.expirationTime,
                     data.revocable,
-                    data.refUUID,
+                    data.refUID,
                     keccak256(data.data),
                     nonce
                 )
@@ -121,7 +121,7 @@ abstract contract EIP712Verifier is EIP712 {
             nonce = _nonces[request.revoker]++;
         }
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uuid, nonce)));
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uid, nonce)));
 
         if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {
             revert InvalidSignature();

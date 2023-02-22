@@ -132,7 +132,7 @@ describe('DataResolver', () => {
   });
 
   it('should allow attesting with correct data', async () => {
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       {
         eas
       },
@@ -147,9 +147,9 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uid }, { from: sender });
 
-    const { uuid: uuid2 } = await expectAttestation(
+    const { uid: uid2 } = await expectAttestation(
       {
         eas
       },
@@ -164,7 +164,7 @@ describe('DataResolver', () => {
       }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uid: uid2 }, { from: sender });
 
     const res = await expectMultiAttestations(
       {
@@ -197,7 +197,7 @@ describe('DataResolver', () => {
       [
         {
           schema: schemaId,
-          requests: res.uuids.map((uuid) => ({ uuid }))
+          requests: res.uids.map((uid) => ({ uid }))
         }
       ],
       { from: sender }

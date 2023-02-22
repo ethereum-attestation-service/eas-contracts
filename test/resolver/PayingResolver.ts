@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { ZERO_BYTES32 } from '../../utils/Constants';
-import { getUUIDFromAttestTx } from '../../utils/EAS';
+import { getUIDFromAttestTx } from '../../utils/EAS';
 import { getTransactionCost } from '..//helpers/Transaction';
 import {
   expectAttestation,
@@ -84,7 +84,7 @@ describe('PayingResolver', () => {
     const prevResolverBalance2 = await getBalance(resolver.address);
     const prevAttesterBalance2 = await getBalance(sender.address);
 
-    const { uuids, res: res2 } = await expectMultiAttestations(
+    const { uids, res: res2 } = await expectMultiAttestations(
       { eas },
       [
         {
@@ -103,9 +103,9 @@ describe('PayingResolver', () => {
 
     transactionCost = await getTransactionCost(res2);
 
-    expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.sub(incentive * uuids.length));
+    expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.sub(incentive * uids.length));
     expect(await getBalance(sender.address)).to.equal(
-      prevAttesterBalance2.add(incentive * uuids.length).sub(transactionCost)
+      prevAttesterBalance2.add(incentive * uids.length).sub(transactionCost)
     );
   });
 
@@ -156,36 +156,36 @@ describe('PayingResolver', () => {
   });
 
   context('with attestations', () => {
-    let uuid: string;
-    let uuids: string[] = [];
+    let uid: string;
+    let uids: string[] = [];
 
     beforeEach(async () => {
-      uuid = await getUUIDFromAttestTx(
+      uid = await getUIDFromAttestTx(
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
             recipient: recipient.address,
             expirationTime,
             revocable: true,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             data,
             value: 0
           }
         })
       );
 
-      uuids = [];
+      uids = [];
 
       for (let i = 0; i < 2; i++) {
-        uuids.push(
-          await getUUIDFromAttestTx(
+        uids.push(
+          await getUIDFromAttestTx(
             eas.connect(sender).attest({
               schema: schemaId,
               data: {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data,
                 value: 0
               }
@@ -196,18 +196,18 @@ describe('PayingResolver', () => {
     });
 
     it('should revert when attempting to revoke an attestation without repaying the incentive', async () => {
-      await expectFailedRevocation({ eas }, schemaId, { uuid }, { from: sender }, 'InvalidRevocation');
+      await expectFailedRevocation({ eas }, schemaId, { uid }, { from: sender }, 'InvalidRevocation');
 
       await expectFailedMultiRevocations(
         { eas },
-        [{ schema: schemaId, requests: [{ uuid }, { uuid, value: incentive }] }],
+        [{ schema: schemaId, requests: [{ uid }, { uid, value: incentive }] }],
         { from: sender },
         'InvalidRevocation'
       );
 
       await expectFailedMultiRevocations(
         { eas },
-        [{ schema: schemaId, requests: [{ uuid, value: incentive }, { uuid }] }],
+        [{ schema: schemaId, requests: [{ uid, value: incentive }, { uid }] }],
         { from: sender },
         'InvalidRevocation'
       );
@@ -218,7 +218,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive;
-      const res = await expectRevocation({ eas }, schemaId, { uuid, value }, { from: sender });
+      const res = await expectRevocation({ eas }, schemaId, { uid, value }, { from: sender });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -232,7 +232,7 @@ describe('PayingResolver', () => {
         [
           {
             schema: schemaId,
-            requests: uuids.map((uuid) => ({ uuid, value }))
+            requests: uids.map((uid) => ({ uid, value }))
           }
         ],
         { from: sender, skipBalanceCheck: true }
@@ -240,9 +240,9 @@ describe('PayingResolver', () => {
 
       transactionCost = await getTransactionCost(res2);
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uids.length).sub(transactionCost)
       );
     });
 
@@ -251,7 +251,7 @@ describe('PayingResolver', () => {
       const prevAttesterBalance = await getBalance(sender.address);
 
       const value = incentive * 10;
-      const res = await expectRevocation({ eas }, schemaId, { uuid, value }, { from: sender, skipBalanceCheck: true });
+      const res = await expectRevocation({ eas }, schemaId, { uid, value }, { from: sender, skipBalanceCheck: true });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(resolver.address)).to.equal(prevResolverBalance.add(incentive));
@@ -265,7 +265,7 @@ describe('PayingResolver', () => {
         [
           {
             schema: schemaId,
-            requests: uuids.map((uuid) => ({ uuid, value }))
+            requests: uids.map((uid) => ({ uid, value }))
           }
         ],
         { from: sender, skipBalanceCheck: true }
@@ -273,9 +273,9 @@ describe('PayingResolver', () => {
 
       transactionCost = await getTransactionCost(res2);
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uids.length).sub(transactionCost)
       );
     });
 
@@ -285,21 +285,21 @@ describe('PayingResolver', () => {
       await expectFailedRevocation(
         { eas },
         schemaId,
-        { uuid, value: value + 1000 },
+        { uid, value: value + 1000 },
         { from: sender, value },
         'InsufficientValue'
       );
 
       await expectFailedMultiRevocations(
         { eas },
-        [{ schema: schemaId, requests: [{ uuid, value: value + 1000 }, { uuid }] }],
+        [{ schema: schemaId, requests: [{ uid, value: value + 1000 }, { uid }] }],
         { from: sender, value },
         'InsufficientValue'
       );
 
       await expectFailedMultiRevocations(
         { eas },
-        [{ schema: schemaId, requests: [{ uuid }, { uuid, value: value + 1000 }] }],
+        [{ schema: schemaId, requests: [{ uid }, { uid, value: value + 1000 }] }],
         { from: sender, value },
         'InsufficientValue'
       );
@@ -313,7 +313,7 @@ describe('PayingResolver', () => {
       const res = await expectRevocation(
         { eas },
         schemaId,
-        { uuid, value },
+        { uid, value },
         {
           from: sender,
           value: value + 1000,
@@ -333,7 +333,7 @@ describe('PayingResolver', () => {
         [
           {
             schema: schemaId,
-            requests: uuids.map((uuid) => ({ uuid, value }))
+            requests: uids.map((uid) => ({ uid, value }))
           }
         ],
         { from: sender, value: value * 10, skipBalanceCheck: true }
@@ -341,9 +341,9 @@ describe('PayingResolver', () => {
 
       transactionCost = await getTransactionCost(res2);
 
-      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uuids.length));
+      expect(await getBalance(resolver.address)).to.equal(prevResolverBalance2.add(incentive * uids.length));
       expect(await getBalance(sender.address)).to.equal(
-        prevAttesterBalance2.sub(incentive * uuids.length).sub(transactionCost)
+        prevAttesterBalance2.sub(incentive * uids.length).sub(transactionCost)
       );
     });
   });

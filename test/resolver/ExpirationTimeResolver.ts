@@ -92,14 +92,14 @@ describe('ExpirationTimeResolver', () => {
   });
 
   it('should allow attesting with the correct expiration time', async () => {
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       { eas },
       schemaId,
       { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uid }, { from: sender });
 
     const res = await expectMultiAttestations(
       { eas },
@@ -120,7 +120,7 @@ describe('ExpirationTimeResolver', () => {
       [
         {
           schema: schemaId,
-          requests: res.uuids.map((uuid) => ({ uuid }))
+          requests: res.uids.map((uid) => ({ uid }))
         }
       ],
       { from: sender }

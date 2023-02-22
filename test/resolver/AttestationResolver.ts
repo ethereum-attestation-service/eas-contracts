@@ -1,7 +1,7 @@
 import Contracts from '../../components/Contracts';
 import { AttestationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
-import { getSchemaUUID, getUUIDFromAttestTx } from '../../utils/EAS';
+import { getSchemaUID, getUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -33,8 +33,8 @@ describe('AttestationResolver', () => {
   const data = '0x1234';
 
   const schema2 = 'bool isFriend';
-  const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
-  let uuid: string;
+  const schema2Id = getSchemaUID(schema2, ZERO_ADDRESS, true);
+  let uid: string;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -52,14 +52,14 @@ describe('AttestationResolver', () => {
 
     await registerSchema(schema2, registry, ZERO_ADDRESS, true);
 
-    uuid = await getUUIDFromAttestTx(
+    uid = await getUIDFromAttestTx(
       eas.attest({
         schema: schema2Id,
         data: {
           recipient: recipient.address,
           expirationTime,
           revocable: true,
-          refUUID: ZERO_BYTES32,
+          refUID: ZERO_BYTES32,
           data,
           value: 0
         }
@@ -101,7 +101,7 @@ describe('AttestationResolver', () => {
             {
               recipient: recipient.address,
               expirationTime,
-              data: uuid
+              data: uid
             }
           ]
         }
@@ -121,7 +121,7 @@ describe('AttestationResolver', () => {
             {
               recipient: recipient.address,
               expirationTime,
-              data: uuid
+              data: uid
             },
             {
               recipient: recipient.address,
@@ -136,14 +136,14 @@ describe('AttestationResolver', () => {
   });
 
   it('should allow attesting to an existing attestation', async () => {
-    const { uuid: uuid2 } = await expectAttestation(
+    const { uid: uid2 } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data: uuid },
+      { recipient: recipient.address, expirationTime, data: uid },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, schemaId, { uuid: uuid2 }, { from: sender });
+    await expectRevocation({ eas }, schemaId, { uid: uid2 }, { from: sender });
 
     const res = await expectMultiAttestations(
       { eas },
@@ -151,8 +151,8 @@ describe('AttestationResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data: uuid },
-            { recipient: recipient.address, expirationTime, data: uuid }
+            { recipient: recipient.address, expirationTime, data: uid },
+            { recipient: recipient.address, expirationTime, data: uid }
           ]
         }
       ],
@@ -164,7 +164,7 @@ describe('AttestationResolver', () => {
       [
         {
           schema: schemaId,
-          requests: res.uuids.map((uuid) => ({ uuid }))
+          requests: res.uids.map((uid) => ({ uid }))
         }
       ],
       { from: sender }

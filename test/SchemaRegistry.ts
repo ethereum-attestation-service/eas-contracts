@@ -1,7 +1,7 @@
 import Contracts from '../components/Contracts';
 import { SchemaRegistry } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { getSchemaUUID } from '../utils/EAS';
+import { getSchemaUID } from '../utils/EAS';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
@@ -36,15 +36,15 @@ describe('SchemaRegistry', () => {
     const testRegister = async (schema: string, resolver: string | SignerWithAddress, revocable: boolean) => {
       const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
 
-      const uuid = getSchemaUUID(schema, resolverAddress, revocable);
+      const uid = getSchemaUID(schema, resolverAddress, revocable);
 
-      const retUUID = await registry.callStatic.register(schema, resolverAddress, revocable);
+      const retUID = await registry.callStatic.register(schema, resolverAddress, revocable);
       const res = await registry.register(schema, resolverAddress, revocable);
-      expect(retUUID).to.equal(uuid);
-      await expect(res).to.emit(registry, 'Registered').withArgs(uuid, sender.address);
+      expect(retUID).to.equal(uid);
+      await expect(res).to.emit(registry, 'Registered').withArgs(uid, sender.address);
 
-      const schemaRecord = await registry.getSchema(uuid);
-      expect(schemaRecord.uuid).to.equal(uuid);
+      const schemaRecord = await registry.getSchema(uid);
+      expect(schemaRecord.uid).to.equal(uid);
       expect(schemaRecord.schema).to.equal(schema);
       expect(schemaRecord.resolver).to.equal(resolverAddress);
       expect(schemaRecord.revocable).to.equal(revocable);
@@ -80,9 +80,9 @@ describe('SchemaRegistry', () => {
 
       await registry.register(schema, resolver.address, true);
 
-      const uuid = getSchemaUUID(schema, resolver.address, true);
-      const schemaRecord = await registry.getSchema(uuid);
-      expect(schemaRecord.uuid).to.equal(uuid);
+      const uid = getSchemaUID(schema, resolver.address, true);
+      const schemaRecord = await registry.getSchema(uid);
+      expect(schemaRecord.uid).to.equal(uid);
       expect(schemaRecord.schema).to.equal(schema);
       expect(schemaRecord.resolver).to.equal(resolver.address);
       expect(schemaRecord.revocable).to.equal(true);
@@ -90,7 +90,7 @@ describe('SchemaRegistry', () => {
 
     it('should return an empty schema given non-existing id', async () => {
       const schemaRecord = await registry.getSchema(formatBytes32String('BAD'));
-      expect(schemaRecord.uuid).to.equal(ZERO_BYTES32);
+      expect(schemaRecord.uid).to.equal(ZERO_BYTES32);
       expect(schemaRecord.schema).to.equal('');
       expect(schemaRecord.resolver).to.equal(ZERO_ADDRESS);
       expect(schemaRecord.revocable).to.equal(false);

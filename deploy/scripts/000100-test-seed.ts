@@ -7,7 +7,7 @@ import {
   isTestnet,
   setDeploymentMetadata
 } from '../../utils/Deploy';
-import { getSchemaUUID, getUUIDsFromAttestEvents } from '../../utils/EAS';
+import { getSchemaUID, getUIDsFromAttestEvents } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import Chance from 'chance';
 import { utils, Wallet } from 'ethers';
@@ -21,7 +21,7 @@ const { defaultAbiCoder, formatBytes32String, keccak256, toUtf8Bytes } = utils;
 export const TEST_ATTESTATIONS_OUTPUT_PATH = path.join(getDeploymentDir(), 'test-attestations.json');
 
 export interface TestAttestationData {
-  uuid: string;
+  uid: string;
   recipient: string;
   data: Record<string, string | boolean | number>;
 }
@@ -214,7 +214,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
 
   // Generate a few random attestations.
   for (const { schema, generator } of attestationGroups) {
-    const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+    const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
     const requests = [];
     const recipients: string[] = [];
     const parameters: Record<string, string | boolean | number>[] = [];
@@ -231,7 +231,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
         recipient,
         expirationTime: NO_EXPIRATION,
         revocable: true,
-        refUUID: ZERO_BYTES32,
+        refUID: ZERO_BYTES32,
         data,
         value: 0
       });
@@ -247,12 +247,12 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       from: deployer
     });
 
-    const uuids: string[] = await getUUIDsFromAttestEvents(res.events);
+    const uids: string[] = await getUIDsFromAttestEvents(res.events);
 
     testAttestations[schemaId] = {
       schema,
-      data: uuids.map((uuid, i) => ({
-        uuid,
+      data: uids.map((uid, i) => ({
+        uid,
         recipient: recipients[i],
         data: parameters[i]
       }))
@@ -261,7 +261,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
 
   // Generate a few specific land registry attestations.
   const schema = 'uint8 holdType,uint8 useType,uint64 expiration,int40[2][] polygonArea';
-  const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+  const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
   const requests = [];
   const recipients: string[] = [];
   const parameters: Record<string, any>[] = [];
@@ -420,7 +420,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       recipient,
       expirationTime: NO_EXPIRATION,
       revocable: true,
-      refUUID: ZERO_BYTES32,
+      refUID: ZERO_BYTES32,
       data,
       value: 0
     });
@@ -436,12 +436,12 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     from: deployer
   });
 
-  const uuids: string[] = await getUUIDsFromAttestEvents(res.events);
+  const uids: string[] = await getUIDsFromAttestEvents(res.events);
 
   testAttestations[schemaId] = {
     schema,
-    data: uuids.map((uuid, i) => ({
-      uuid,
+    data: uids.map((uid, i) => ({
+      uid,
       recipient: recipients[i],
       data: parameters[i]
     }))

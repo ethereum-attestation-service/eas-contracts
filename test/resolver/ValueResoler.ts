@@ -101,16 +101,16 @@ describe('ValueResolver', () => {
 
   it('should allow attesting with the correct value', async () => {
     const value = targetValue;
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       { eas },
       schema1Id,
       { recipient: recipient.address, expirationTime, data, value },
       { from: sender }
     );
 
-    await expectRevocation({ eas }, schema1Id, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schema1Id, { uid }, { from: sender });
 
-    const { uuids } = await expectMultiAttestations(
+    const { uids } = await expectMultiAttestations(
       { eas },
       [
         {
@@ -140,15 +140,15 @@ describe('ValueResolver', () => {
       [
         {
           schema: schema1Id,
-          requests: [{ uuid: uuids[0] }, { uuid: uuids[1] }]
+          requests: [{ uid: uids[0] }, { uid: uids[1] }]
         },
         {
           schema: schema2Id,
-          requests: [{ uuid: uuids[2] }]
+          requests: [{ uid: uids[2] }]
         },
         {
           schema: schema3Id,
-          requests: [{ uuid: uuids[3] }, { uuid: uuids[4] }]
+          requests: [{ uid: uids[3] }, { uid: uids[4] }]
         }
       ],
       { from: sender }
@@ -185,16 +185,16 @@ describe('ValueResolver', () => {
 
   it('should allow attesting with the correct value when accidentally sending too much', async () => {
     const value = targetValue;
-    const { uuid } = await expectAttestation(
+    const { uid } = await expectAttestation(
       { eas },
       schema1Id,
       { recipient: recipient.address, expirationTime, data, value },
       { from: sender, value: value + 1000 }
     );
 
-    await expectRevocation({ eas }, schema1Id, { uuid }, { from: sender });
+    await expectRevocation({ eas }, schema1Id, { uid }, { from: sender });
 
-    const { uuids } = await expectMultiAttestations(
+    const { uids } = await expectMultiAttestations(
       { eas },
       [
         {
@@ -220,11 +220,11 @@ describe('ValueResolver', () => {
       [
         {
           schema: schema1Id,
-          requests: [{ uuid: uuids[0] }, { uuid: uuids[1] }]
+          requests: [{ uid: uids[0] }, { uid: uids[1] }]
         },
         {
           schema: schema2Id,
-          requests: [{ uuid: uuids[2] }, { uuid: uuids[3] }]
+          requests: [{ uid: uids[2] }, { uid: uids[3] }]
         }
       ],
       { from: sender }

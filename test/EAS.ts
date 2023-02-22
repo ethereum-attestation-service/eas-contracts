@@ -1,7 +1,7 @@
 import Contracts from '../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
-import { getSchemaUUID, getUUIDFromAttestTx } from '../utils/EAS';
+import { getSchemaUID, getUIDFromAttestTx } from '../utils/EAS';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -132,9 +132,9 @@ describe('EAS', () => {
           const schema1 = 'bool like';
           const schema2 = 'bytes32 proposalId, bool vote';
           const schema3 = 'bool hasPhoneNumber, bytes32 phoneHash';
-          const schema1Id = getSchemaUUID(schema1, ZERO_ADDRESS, true);
-          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
-          const schema3Id = getSchemaUUID(schema3, ZERO_ADDRESS, true);
+          const schema1Id = getSchemaUID(schema1, ZERO_ADDRESS, true);
+          const schema2Id = getSchemaUID(schema2, ZERO_ADDRESS, true);
+          const schema3Id = getSchemaUID(schema3, ZERO_ADDRESS, true);
 
           beforeEach(async () => {
             await registry.register(schema1, ZERO_ADDRESS, true);
@@ -493,14 +493,14 @@ describe('EAS', () => {
           });
 
           it('should store referenced attestation', async () => {
-            const uuid = await getUUIDFromAttestTx(
+            const uid = await getUIDFromAttestTx(
               eas.attest({
                 schema: schema1Id,
                 data: {
                   recipient: recipient.address,
                   expirationTime,
                   revocable: true,
-                  refUUID: ZERO_BYTES32,
+                  refUID: ZERO_BYTES32,
                   data,
                   value: 0
                 }
@@ -516,7 +516,7 @@ describe('EAS', () => {
               {
                 recipient: recipient.address,
                 expirationTime,
-                refUUID: uuid,
+                refUID: uid,
                 data
               },
               {
@@ -537,13 +537,13 @@ describe('EAS', () => {
                     {
                       recipient: recipient.address,
                       expirationTime,
-                      refUUID: uuid,
+                      refUID: uid,
                       data
                     },
                     {
                       recipient: recipient.address,
                       expirationTime,
-                      refUUID: uuid,
+                      refUID: uid,
                       data
                     }
                   ]
@@ -556,8 +556,8 @@ describe('EAS', () => {
             );
           });
 
-          it('should generate unique UUIDs for similar attestations', async () => {
-            const uuid1 = await expectAttestation(
+          it('should generate unique UIDs for similar attestations', async () => {
+            const uid1 = await expectAttestation(
               {
                 eas,
                 eip712Utils
@@ -574,7 +574,7 @@ describe('EAS', () => {
                 bump: 0
               }
             );
-            const uuid2 = await expectAttestation(
+            const uid2 = await expectAttestation(
               {
                 eas,
                 eip712Utils
@@ -591,7 +591,7 @@ describe('EAS', () => {
                 bump: 1
               }
             );
-            const uuid3 = await expectAttestation(
+            const uid3 = await expectAttestation(
               {
                 eas,
                 eip712Utils
@@ -608,8 +608,8 @@ describe('EAS', () => {
                 bump: 2
               }
             );
-            expect(uuid1).not.to.equal(uuid2);
-            expect(uuid2).not.to.equal(uuid3);
+            expect(uid1).not.to.equal(uid2);
+            expect(uid2).not.to.equal(uid3);
           });
 
           it('should allow multi layered attestations', async () => {
@@ -652,21 +652,21 @@ describe('EAS', () => {
               {
                 recipient: recipient.address,
                 expirationTime,
-                refUUID: formatBytes32String('INVALID'),
+                refUID: formatBytes32String('INVALID'),
                 data
               },
               { signatureType, from: sender },
               'NotFound'
             );
 
-            const uuid = await getUUIDFromAttestTx(
+            const uid = await getUIDFromAttestTx(
               eas.attest({
                 schema: schema1Id,
                 data: {
                   recipient: recipient.address,
                   expirationTime,
                   revocable: true,
-                  refUUID: ZERO_BYTES32,
+                  refUID: ZERO_BYTES32,
                   data,
                   value: 0
                 }
@@ -682,11 +682,11 @@ describe('EAS', () => {
                 {
                   schema: schema1Id,
                   requests: [
-                    { recipient: recipient.address, expirationTime, refUUID: formatBytes32String('INVALID'), data },
+                    { recipient: recipient.address, expirationTime, refUID: formatBytes32String('INVALID'), data },
                     {
                       recipient: recipient.address,
                       expirationTime,
-                      refUUID: uuid,
+                      refUID: uid,
                       data
                     }
                   ]
@@ -708,10 +708,10 @@ describe('EAS', () => {
                     {
                       recipient: recipient.address,
                       expirationTime,
-                      refUUID: uuid,
+                      refUID: uid,
                       data
                     },
-                    { recipient: recipient.address, expirationTime, refUUID: formatBytes32String('INVALID'), data }
+                    { recipient: recipient.address, expirationTime, refUID: formatBytes32String('INVALID'), data }
                   ]
                 }
               ],
@@ -778,7 +778,7 @@ describe('EAS', () => {
 
         context('with an irrevocable schema', () => {
           const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
-          const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, false);
+          const schemaId = getSchemaUID(schema, ZERO_ADDRESS, false);
 
           beforeEach(async () => {
             await registry.register(schema, ZERO_ADDRESS, false);
@@ -860,7 +860,7 @@ describe('EAS', () => {
 
     it('should revert when multi delegation attesting with inconsistent input lengths', async () => {
       const schema = 'bool count, bytes32 id';
-      const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+      const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
       await registry.register(schema, ZERO_ADDRESS, true);
 
       await expect(
@@ -872,7 +872,7 @@ describe('EAS', () => {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data: ZERO_BYTES32,
                 value: 0
               },
@@ -880,7 +880,7 @@ describe('EAS', () => {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data: ZERO_BYTES32,
                 value: 0
               }
@@ -923,7 +923,7 @@ describe('EAS', () => {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data: ZERO_BYTES32,
                 value: 0
               }
@@ -954,7 +954,7 @@ describe('EAS', () => {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data: ZERO_BYTES32,
                 value: 0
               },
@@ -962,7 +962,7 @@ describe('EAS', () => {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data: ZERO_BYTES32,
                 value: 0
               }
@@ -977,7 +977,7 @@ describe('EAS', () => {
 
   describe('revocation', () => {
     const schema = 'bool hasPhoneNumber, bytes32 phoneHash';
-    const schemaId = getSchemaUUID(schema, ZERO_ADDRESS, true);
+    const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
 
     let expirationTime: number;
     const data = '0x1234';
@@ -990,36 +990,36 @@ describe('EAS', () => {
 
     for (const signatureType of [SignatureType.Direct, SignatureType.Delegated]) {
       context(`via ${signatureType} revocation`, () => {
-        let uuid: string;
-        let uuids: string[] = [];
+        let uid: string;
+        let uids: string[] = [];
 
         beforeEach(async () => {
-          uuid = await getUUIDFromAttestTx(
+          uid = await getUIDFromAttestTx(
             eas.connect(sender).attest({
               schema: schemaId,
               data: {
                 recipient: recipient.address,
                 expirationTime,
                 revocable: true,
-                refUUID: ZERO_BYTES32,
+                refUID: ZERO_BYTES32,
                 data,
                 value: 0
               }
             })
           );
 
-          uuids = [];
+          uids = [];
 
           for (let i = 0; i < 2; i++) {
-            uuids.push(
-              await getUUIDFromAttestTx(
+            uids.push(
+              await getUIDFromAttestTx(
                 eas.connect(sender).attest({
                   schema: schemaId,
                   data: {
                     recipient: recipient.address,
                     expirationTime,
                     revocable: true,
-                    refUUID: ZERO_BYTES32,
+                    refUID: ZERO_BYTES32,
                     data,
                     value: 0
                   }
@@ -1033,21 +1033,21 @@ describe('EAS', () => {
           await expectFailedRevocation(
             { eas, eip712Utils },
             schemaId,
-            { uuid: formatBytes32String('BAD') },
+            { uid: formatBytes32String('BAD') },
             { signatureType, from: sender },
             'NotFound'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid: formatBytes32String('BAD') }, { uuid }] }],
+            [{ schema: schemaId, requests: [{ uid: formatBytes32String('BAD') }, { uid }] }],
             { signatureType, from: sender },
             'NotFound'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid }, { uuid: formatBytes32String('BAD') }] }],
+            [{ schema: schemaId, requests: [{ uid }, { uid: formatBytes32String('BAD') }] }],
             { signatureType, from: sender },
             'NotFound'
           );
@@ -1057,35 +1057,35 @@ describe('EAS', () => {
           await expectFailedRevocation(
             { eas, eip712Utils },
             schemaId,
-            { uuid },
+            { uid },
             { signatureType, from: sender2 },
             'AccessDenied'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
+            [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
+            [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
           );
         });
 
         it('should allow to revoke existing attestations', async () => {
-          await expectRevocation({ eas, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
+          await expectRevocation({ eas, eip712Utils }, schemaId, { uid }, { signatureType, from: sender });
 
           await expectMultiRevocations(
             { eas, eip712Utils },
             [
               {
                 schema: schemaId,
-                requests: uuids.map((uuid) => ({ uuid }))
+                requests: uids.map((uid) => ({ uid }))
               }
             ],
             { signatureType, from: sender }
@@ -1093,25 +1093,25 @@ describe('EAS', () => {
         });
 
         it('should revert when revoking an already revoked attestation', async () => {
-          await expectRevocation({ eas, eip712Utils }, schemaId, { uuid }, { signatureType, from: sender });
+          await expectRevocation({ eas, eip712Utils }, schemaId, { uid }, { signatureType, from: sender });
           await expectFailedRevocation(
             { eas, eip712Utils },
             schemaId,
-            { uuid },
+            { uid },
             { signatureType, from: sender },
             'AlreadyRevoked'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
+            [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
             { signatureType, from: sender },
             'AlreadyRevoked'
           );
 
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
-            [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
+            [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
             { signatureType, from: sender },
             'AlreadyRevoked'
           );
@@ -1119,13 +1119,13 @@ describe('EAS', () => {
 
         it('should revert when attempting to revoke attestations while specifying the wrong schema', async () => {
           const schema2 = 'bool count, bytes32 id';
-          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, true);
+          const schema2Id = getSchemaUID(schema2, ZERO_ADDRESS, true);
           await registry.register(schema2, ZERO_ADDRESS, true);
 
           await expectFailedRevocation(
             { eas, eip712Utils },
             schema2Id,
-            { uuid },
+            { uid },
             { signatureType, from: sender },
             'InvalidSchema'
           );
@@ -1133,8 +1133,8 @@ describe('EAS', () => {
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
             [
-              { schema: schema2Id, requests: [{ uuid }] },
-              { schema: schemaId, requests: [{ uuid: uuids[0] }] }
+              { schema: schema2Id, requests: [{ uid }] },
+              { schema: schemaId, requests: [{ uid: uids[0] }] }
             ],
             { signatureType, from: sender },
             'InvalidSchema'
@@ -1143,8 +1143,8 @@ describe('EAS', () => {
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
             [
-              { schema: schemaId, requests: [{ uuid }] },
-              { schema: schema2Id, requests: [{ uuid: uuids[0] }] }
+              { schema: schemaId, requests: [{ uid }] },
+              { schema: schema2Id, requests: [{ uid: uids[0] }] }
             ],
             { signatureType, from: sender },
             'InvalidSchema'
@@ -1155,7 +1155,7 @@ describe('EAS', () => {
           await expectFailedRevocation(
             { eas, eip712Utils },
             ZERO_BYTES32,
-            { uuid },
+            { uid },
             { signatureType, from: sender },
             'InvalidSchema'
           );
@@ -1163,8 +1163,8 @@ describe('EAS', () => {
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
             [
-              { schema: ZERO_BYTES32, requests: [{ uuid }] },
-              { schema: schemaId, requests: [{ uuid: uuids[0] }] }
+              { schema: ZERO_BYTES32, requests: [{ uid }] },
+              { schema: schemaId, requests: [{ uid: uids[0] }] }
             ],
             { signatureType, from: sender },
             'InvalidSchema'
@@ -1173,8 +1173,8 @@ describe('EAS', () => {
           await expectFailedMultiRevocations(
             { eas, eip712Utils },
             [
-              { schema: schemaId, requests: [{ uuid }] },
-              { schema: ZERO_BYTES32, requests: [{ uuid: uuids[0] }] }
+              { schema: schemaId, requests: [{ uid }] },
+              { schema: ZERO_BYTES32, requests: [{ uid: uids[0] }] }
             ],
             { signatureType, from: sender },
             'InvalidSchema'
@@ -1183,32 +1183,32 @@ describe('EAS', () => {
 
         context('with irrevocable attestations', () => {
           beforeEach(async () => {
-            uuid = await getUUIDFromAttestTx(
+            uid = await getUIDFromAttestTx(
               eas.connect(sender).attest({
                 schema: schemaId,
                 data: {
                   recipient: recipient.address,
                   expirationTime,
                   revocable: false,
-                  refUUID: ZERO_BYTES32,
+                  refUID: ZERO_BYTES32,
                   data,
                   value: 0
                 }
               })
             );
 
-            uuids = [];
+            uids = [];
 
             for (let i = 0; i < 2; i++) {
-              uuids.push(
-                await getUUIDFromAttestTx(
+              uids.push(
+                await getUIDFromAttestTx(
                   eas.connect(sender).attest({
                     schema: schemaId,
                     data: {
                       recipient: recipient.address,
                       expirationTime,
                       revocable: false,
-                      refUUID: ZERO_BYTES32,
+                      refUID: ZERO_BYTES32,
                       data,
                       value: 0
                     }
@@ -1222,21 +1222,21 @@ describe('EAS', () => {
             await expectFailedRevocation(
               { eas, eip712Utils },
               schemaId,
-              { uuid },
+              { uid },
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
               { eas, eip712Utils },
-              [{ schema: schemaId, requests: [{ uuid }, { uuid: uuids[0] }] }],
+              [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
               { eas, eip712Utils },
-              [{ schema: schemaId, requests: [{ uuid: uuids[1] }, { uuid }] }],
+              [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
@@ -1245,37 +1245,37 @@ describe('EAS', () => {
 
         context('with an irrevocable schema', () => {
           const schema2 = 'bool isFriend';
-          const schema2Id = getSchemaUUID(schema2, ZERO_ADDRESS, false);
+          const schema2Id = getSchemaUID(schema2, ZERO_ADDRESS, false);
 
           beforeEach(async () => {
             await registry.register(schema2, ZERO_ADDRESS, false);
 
-            uuid = await getUUIDFromAttestTx(
+            uid = await getUIDFromAttestTx(
               eas.connect(sender).attest({
                 schema: schema2Id,
                 data: {
                   recipient: recipient.address,
                   expirationTime,
                   revocable: false,
-                  refUUID: ZERO_BYTES32,
+                  refUID: ZERO_BYTES32,
                   data,
                   value: 0
                 }
               })
             );
 
-            uuids = [];
+            uids = [];
 
             for (let i = 0; i < 2; i++) {
-              uuids.push(
-                await getUUIDFromAttestTx(
+              uids.push(
+                await getUIDFromAttestTx(
                   eas.connect(sender).attest({
                     schema: schema2Id,
                     data: {
                       recipient: recipient.address,
                       expirationTime,
                       revocable: false,
-                      refUUID: ZERO_BYTES32,
+                      refUID: ZERO_BYTES32,
                       data,
                       value: 0
                     }
@@ -1289,21 +1289,21 @@ describe('EAS', () => {
             await expectFailedRevocation(
               { eas, eip712Utils },
               schema2Id,
-              { uuid },
+              { uid },
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
               { eas, eip712Utils },
-              [{ schema: schema2Id, requests: [{ uuid }, { uuid: uuids[0] }] }],
+              [{ schema: schema2Id, requests: [{ uid }, { uid: uids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
               { eas, eip712Utils },
-              [{ schema: schema2Id, requests: [{ uuid: uuids[1] }, { uuid }] }],
+              [{ schema: schema2Id, requests: [{ uid: uids[1] }, { uid }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
@@ -1313,27 +1313,27 @@ describe('EAS', () => {
     }
 
     it('should revert when multi delegation revoking with inconsistent input lengths', async () => {
-      const uuid = await getUUIDFromAttestTx(
+      const uid = await getUIDFromAttestTx(
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
             recipient: recipient.address,
             expirationTime,
             revocable: true,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             data,
             value: 0
           }
         })
       );
-      const uuid2 = await getUUIDFromAttestTx(
+      const uid2 = await getUIDFromAttestTx(
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
             recipient: recipient.address,
             expirationTime,
             revocable: true,
-            refUUID: ZERO_BYTES32,
+            refUID: ZERO_BYTES32,
             data,
             value: 0
           }
@@ -1345,8 +1345,8 @@ describe('EAS', () => {
           {
             schema: schemaId,
             data: [
-              { uuid, value: 0 },
-              { uuid: uuid2, value: 0 }
+              { uid, value: 0 },
+              { uid: uid2, value: 0 }
             ],
             signatures: [
               {
@@ -1381,7 +1381,7 @@ describe('EAS', () => {
         eas.multiRevokeByDelegation([
           {
             schema: schemaId,
-            data: [{ uuid, value: 0 }],
+            data: [{ uid, value: 0 }],
             signatures: [
               {
                 v: 28,
@@ -1404,8 +1404,8 @@ describe('EAS', () => {
           {
             schema: schemaId,
             data: [
-              { uuid, value: 0 },
-              { uuid: uuid2, value: 0 }
+              { uid, value: 0 },
+              { uid: uid2, value: 0 }
             ],
             signatures: [],
             revoker: sender.address
