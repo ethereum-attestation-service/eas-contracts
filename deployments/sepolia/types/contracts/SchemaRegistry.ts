@@ -27,14 +27,14 @@ import type {
 } from "../common";
 
 export type SchemaRecordStruct = {
-  uuid: PromiseOrValue<BytesLike>;
+  uid: PromiseOrValue<BytesLike>;
   resolver: PromiseOrValue<string>;
   revocable: PromiseOrValue<boolean>;
   schema: PromiseOrValue<string>;
 };
 
 export type SchemaRecordStructOutput = [string, string, boolean, string] & {
-  uuid: string;
+  uid: string;
   resolver: string;
   revocable: boolean;
   schema: string;
@@ -77,7 +77,7 @@ export interface SchemaRegistryInterface extends utils.Interface {
 }
 
 export interface RegisteredEventObject {
-  uuid: string;
+  uid: string;
   registerer: string;
 }
 export type RegisteredEvent = TypedEvent<
@@ -117,7 +117,7 @@ export interface SchemaRegistry extends BaseContract {
     VERSION(overrides?: CallOverrides): Promise<[string]>;
 
     getSchema(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[SchemaRecordStructOutput]>;
 
@@ -132,7 +132,7 @@ export interface SchemaRegistry extends BaseContract {
   VERSION(overrides?: CallOverrides): Promise<string>;
 
   getSchema(
-    uuid: PromiseOrValue<BytesLike>,
+    uid: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<SchemaRecordStructOutput>;
 
@@ -147,7 +147,7 @@ export interface SchemaRegistry extends BaseContract {
     VERSION(overrides?: CallOverrides): Promise<string>;
 
     getSchema(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<SchemaRecordStructOutput>;
 
@@ -161,11 +161,11 @@ export interface SchemaRegistry extends BaseContract {
 
   filters: {
     "Registered(bytes32,address)"(
-      uuid?: PromiseOrValue<BytesLike> | null,
+      uid?: PromiseOrValue<BytesLike> | null,
       registerer?: null
     ): RegisteredEventFilter;
     Registered(
-      uuid?: PromiseOrValue<BytesLike> | null,
+      uid?: PromiseOrValue<BytesLike> | null,
       registerer?: null
     ): RegisteredEventFilter;
   };
@@ -174,7 +174,7 @@ export interface SchemaRegistry extends BaseContract {
     VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
     getSchema(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -190,7 +190,7 @@ export interface SchemaRegistry extends BaseContract {
     VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getSchema(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

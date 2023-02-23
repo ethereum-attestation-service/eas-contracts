@@ -32,7 +32,7 @@ export type AttestationRequestDataStruct = {
   recipient: PromiseOrValue<string>;
   expirationTime: PromiseOrValue<BigNumberish>;
   revocable: PromiseOrValue<boolean>;
-  refUUID: PromiseOrValue<BytesLike>;
+  refUID: PromiseOrValue<BytesLike>;
   data: PromiseOrValue<BytesLike>;
   value: PromiseOrValue<BigNumberish>;
 };
@@ -48,7 +48,7 @@ export type AttestationRequestDataStructOutput = [
   recipient: string;
   expirationTime: BigNumber;
   revocable: boolean;
-  refUUID: string;
+  refUID: string;
   data: string;
   value: BigNumber;
 };
@@ -95,12 +95,12 @@ export type DelegatedAttestationRequestStructOutput = [
 };
 
 export type AttestationStruct = {
-  uuid: PromiseOrValue<BytesLike>;
+  uid: PromiseOrValue<BytesLike>;
   schema: PromiseOrValue<BytesLike>;
   time: PromiseOrValue<BigNumberish>;
   expirationTime: PromiseOrValue<BigNumberish>;
   revocationTime: PromiseOrValue<BigNumberish>;
-  refUUID: PromiseOrValue<BytesLike>;
+  refUID: PromiseOrValue<BytesLike>;
   recipient: PromiseOrValue<string>;
   attester: PromiseOrValue<string>;
   revocable: PromiseOrValue<boolean>;
@@ -119,12 +119,12 @@ export type AttestationStructOutput = [
   boolean,
   string
 ] & {
-  uuid: string;
+  uid: string;
   schema: string;
   time: BigNumber;
   expirationTime: BigNumber;
   revocationTime: BigNumber;
-  refUUID: string;
+  refUID: string;
   recipient: string;
   attester: string;
   revocable: boolean;
@@ -161,12 +161,12 @@ export type MultiDelegatedAttestationRequestStructOutput = [
 };
 
 export type RevocationRequestDataStruct = {
-  uuid: PromiseOrValue<BytesLike>;
+  uid: PromiseOrValue<BytesLike>;
   value: PromiseOrValue<BigNumberish>;
 };
 
 export type RevocationRequestDataStructOutput = [string, BigNumber] & {
-  uuid: string;
+  uid: string;
   value: BigNumber;
 };
 
@@ -237,6 +237,7 @@ export interface EASInterface extends utils.Interface {
     "getAttestation(bytes32)": FunctionFragment;
     "getDomainSeparator()": FunctionFragment;
     "getNonce(address)": FunctionFragment;
+    "getRevokeOffchain(address,bytes32)": FunctionFragment;
     "getRevokeTypeHash()": FunctionFragment;
     "getSchemaRegistry()": FunctionFragment;
     "getTimestamp(bytes32)": FunctionFragment;
@@ -245,9 +246,11 @@ export interface EASInterface extends utils.Interface {
     "multiAttestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256)[],(uint8,bytes32,bytes32)[],address)[])": FunctionFragment;
     "multiRevoke((bytes32,(bytes32,uint256)[])[])": FunctionFragment;
     "multiRevokeByDelegation((bytes32,(bytes32,uint256)[],(uint8,bytes32,bytes32)[],address)[])": FunctionFragment;
+    "multiRevokeOffchain(bytes32[])": FunctionFragment;
     "multiTimestamp(bytes32[])": FunctionFragment;
     "revoke((bytes32,(bytes32,uint256)))": FunctionFragment;
     "revokeByDelegation((bytes32,(bytes32,uint256),(uint8,bytes32,bytes32),address))": FunctionFragment;
+    "revokeOffchain(bytes32)": FunctionFragment;
     "timestamp(bytes32)": FunctionFragment;
   };
 
@@ -260,6 +263,7 @@ export interface EASInterface extends utils.Interface {
       | "getAttestation"
       | "getDomainSeparator"
       | "getNonce"
+      | "getRevokeOffchain"
       | "getRevokeTypeHash"
       | "getSchemaRegistry"
       | "getTimestamp"
@@ -268,9 +272,11 @@ export interface EASInterface extends utils.Interface {
       | "multiAttestByDelegation"
       | "multiRevoke"
       | "multiRevokeByDelegation"
+      | "multiRevokeOffchain"
       | "multiTimestamp"
       | "revoke"
       | "revokeByDelegation"
+      | "revokeOffchain"
       | "timestamp"
   ): FunctionFragment;
 
@@ -298,6 +304,10 @@ export interface EASInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getNonce",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRevokeOffchain",
+    values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "getRevokeTypeHash",
@@ -332,6 +342,10 @@ export interface EASInterface extends utils.Interface {
     values: [MultiDelegatedRevocationRequestStruct[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "multiRevokeOffchain",
+    values: [PromiseOrValue<BytesLike>[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "multiTimestamp",
     values: [PromiseOrValue<BytesLike>[]]
   ): string;
@@ -342,6 +356,10 @@ export interface EASInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "revokeByDelegation",
     values: [DelegatedRevocationRequestStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeOffchain",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "timestamp",
@@ -367,6 +385,10 @@ export interface EASInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRevokeOffchain",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getRevokeTypeHash",
     data: BytesLike
@@ -400,6 +422,10 @@ export interface EASInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "multiRevokeOffchain",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "multiTimestamp",
     data: BytesLike
   ): Result;
@@ -408,23 +434,29 @@ export interface EASInterface extends utils.Interface {
     functionFragment: "revokeByDelegation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "revokeOffchain",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "timestamp", data: BytesLike): Result;
 
   events: {
     "Attested(address,address,bytes32,bytes32)": EventFragment;
     "Revoked(address,address,bytes32,bytes32)": EventFragment;
+    "RevokedOffchain(address,bytes32,uint64)": EventFragment;
     "Timestamped(bytes32,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Attested"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Revoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RevokedOffchain"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Timestamped"): EventFragment;
 }
 
 export interface AttestedEventObject {
   recipient: string;
   attester: string;
-  uuid: string;
+  uid: string;
   schema: string;
 }
 export type AttestedEvent = TypedEvent<
@@ -437,7 +469,7 @@ export type AttestedEventFilter = TypedEventFilter<AttestedEvent>;
 export interface RevokedEventObject {
   recipient: string;
   attester: string;
-  uuid: string;
+  uid: string;
   schema: string;
 }
 export type RevokedEvent = TypedEvent<
@@ -446,6 +478,18 @@ export type RevokedEvent = TypedEvent<
 >;
 
 export type RevokedEventFilter = TypedEventFilter<RevokedEvent>;
+
+export interface RevokedOffchainEventObject {
+  revoker: string;
+  data: string;
+  timestamp: BigNumber;
+}
+export type RevokedOffchainEvent = TypedEvent<
+  [string, string, BigNumber],
+  RevokedOffchainEventObject
+>;
+
+export type RevokedOffchainEventFilter = TypedEventFilter<RevokedOffchainEvent>;
 
 export interface TimestampedEventObject {
   data: string;
@@ -500,7 +544,7 @@ export interface EAS extends BaseContract {
     getAttestTypeHash(overrides?: CallOverrides): Promise<[string]>;
 
     getAttestation(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[AttestationStructOutput]>;
 
@@ -508,6 +552,12 @@ export interface EAS extends BaseContract {
 
     getNonce(
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getRevokeOffchain(
+      revoker: PromiseOrValue<string>,
+      data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -521,7 +571,7 @@ export interface EAS extends BaseContract {
     ): Promise<[BigNumber]>;
 
     isAttestationValid(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -545,6 +595,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    multiRevokeOffchain(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     multiTimestamp(
       data: PromiseOrValue<BytesLike>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -558,6 +613,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    revokeOffchain(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     timestamp(
@@ -581,7 +641,7 @@ export interface EAS extends BaseContract {
   getAttestTypeHash(overrides?: CallOverrides): Promise<string>;
 
   getAttestation(
-    uuid: PromiseOrValue<BytesLike>,
+    uid: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<AttestationStructOutput>;
 
@@ -589,6 +649,12 @@ export interface EAS extends BaseContract {
 
   getNonce(
     account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getRevokeOffchain(
+    revoker: PromiseOrValue<string>,
+    data: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -602,7 +668,7 @@ export interface EAS extends BaseContract {
   ): Promise<BigNumber>;
 
   isAttestationValid(
-    uuid: PromiseOrValue<BytesLike>,
+    uid: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -626,6 +692,11 @@ export interface EAS extends BaseContract {
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  multiRevokeOffchain(
+    data: PromiseOrValue<BytesLike>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   multiTimestamp(
     data: PromiseOrValue<BytesLike>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -639,6 +710,11 @@ export interface EAS extends BaseContract {
   revokeByDelegation(
     delegatedRequest: DelegatedRevocationRequestStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  revokeOffchain(
+    data: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   timestamp(
@@ -662,7 +738,7 @@ export interface EAS extends BaseContract {
     getAttestTypeHash(overrides?: CallOverrides): Promise<string>;
 
     getAttestation(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<AttestationStructOutput>;
 
@@ -670,6 +746,12 @@ export interface EAS extends BaseContract {
 
     getNonce(
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRevokeOffchain(
+      revoker: PromiseOrValue<string>,
+      data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -683,7 +765,7 @@ export interface EAS extends BaseContract {
     ): Promise<BigNumber>;
 
     isAttestationValid(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -707,6 +789,11 @@ export interface EAS extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    multiRevokeOffchain(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     multiTimestamp(
       data: PromiseOrValue<BytesLike>[],
       overrides?: CallOverrides
@@ -722,6 +809,11 @@ export interface EAS extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    revokeOffchain(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     timestamp(
       data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -732,28 +824,39 @@ export interface EAS extends BaseContract {
     "Attested(address,address,bytes32,bytes32)"(
       recipient?: PromiseOrValue<string> | null,
       attester?: PromiseOrValue<string> | null,
-      uuid?: null,
+      uid?: null,
       schema?: PromiseOrValue<BytesLike> | null
     ): AttestedEventFilter;
     Attested(
       recipient?: PromiseOrValue<string> | null,
       attester?: PromiseOrValue<string> | null,
-      uuid?: null,
+      uid?: null,
       schema?: PromiseOrValue<BytesLike> | null
     ): AttestedEventFilter;
 
     "Revoked(address,address,bytes32,bytes32)"(
       recipient?: PromiseOrValue<string> | null,
       attester?: PromiseOrValue<string> | null,
-      uuid?: null,
+      uid?: null,
       schema?: PromiseOrValue<BytesLike> | null
     ): RevokedEventFilter;
     Revoked(
       recipient?: PromiseOrValue<string> | null,
       attester?: PromiseOrValue<string> | null,
-      uuid?: null,
+      uid?: null,
       schema?: PromiseOrValue<BytesLike> | null
     ): RevokedEventFilter;
+
+    "RevokedOffchain(address,bytes32,uint64)"(
+      revoker?: PromiseOrValue<string> | null,
+      data?: PromiseOrValue<BytesLike> | null,
+      timestamp?: PromiseOrValue<BigNumberish> | null
+    ): RevokedOffchainEventFilter;
+    RevokedOffchain(
+      revoker?: PromiseOrValue<string> | null,
+      data?: PromiseOrValue<BytesLike> | null,
+      timestamp?: PromiseOrValue<BigNumberish> | null
+    ): RevokedOffchainEventFilter;
 
     "Timestamped(bytes32,uint64)"(
       data?: PromiseOrValue<BytesLike> | null,
@@ -781,7 +884,7 @@ export interface EAS extends BaseContract {
     getAttestTypeHash(overrides?: CallOverrides): Promise<BigNumber>;
 
     getAttestation(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -789,6 +892,12 @@ export interface EAS extends BaseContract {
 
     getNonce(
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRevokeOffchain(
+      revoker: PromiseOrValue<string>,
+      data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -802,7 +911,7 @@ export interface EAS extends BaseContract {
     ): Promise<BigNumber>;
 
     isAttestationValid(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -826,6 +935,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    multiRevokeOffchain(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     multiTimestamp(
       data: PromiseOrValue<BytesLike>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -839,6 +953,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    revokeOffchain(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     timestamp(
@@ -863,7 +982,7 @@ export interface EAS extends BaseContract {
     getAttestTypeHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getAttestation(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -873,6 +992,12 @@ export interface EAS extends BaseContract {
 
     getNonce(
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRevokeOffchain(
+      revoker: PromiseOrValue<string>,
+      data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -886,7 +1011,7 @@ export interface EAS extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isAttestationValid(
-      uuid: PromiseOrValue<BytesLike>,
+      uid: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -910,6 +1035,11 @@ export interface EAS extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    multiRevokeOffchain(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     multiTimestamp(
       data: PromiseOrValue<BytesLike>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -923,6 +1053,11 @@ export interface EAS extends BaseContract {
     revokeByDelegation(
       delegatedRequest: DelegatedRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    revokeOffchain(
+      data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     timestamp(
