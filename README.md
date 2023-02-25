@@ -36,6 +36,17 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Deployments
 
+### Arbitrum One
+
+#### v0.26
+
+* **EAS**:
+  * Contract: [0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458](https://arbiscan.io/address/0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458)
+  * Deployment and ABI: [EAS.json](./deployments/arbitrum-one/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xA310da9c5B885E7fb3fbA9D66E9Ba6Df512b78eB](https://arbiscan.io/address/0xA310da9c5B885E7fb3fbA9D66E9Ba6Df512b78eB)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-one/SchemaRegistry.json)
+
 ### Sepolia
 
 #### v0.26
