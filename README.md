@@ -36,6 +36,17 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Deployments
 
+### Ethereum
+
+#### v0.26
+
+* **EAS**:
+  * Contract: [0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587](https://etherscan.io/address/0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587)
+  * Deployment and ABI: [EAS.json](./deployments/mainnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xA7b39296258348C78294F95B872b282326A97BDF](https://etherscan.io/address/0xA7b39296258348C78294F95B872b282326A97BDF)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/mainnet/SchemaRegistry.json)
+
 ### Arbitrum One
 
 #### v0.26
