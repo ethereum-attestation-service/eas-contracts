@@ -25,6 +25,8 @@ const {
   utils: { formatBytes32String }
 } = ethers;
 
+const EIP712_NAME = 'EAS';
+
 describe('EAS', () => {
   let accounts: SignerWithAddress[];
   let sender: Wallet;
@@ -63,9 +65,10 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.VERSION()).to.equal('0.26');
+      expect(await eas.VERSION()).to.equal('0.27');
 
       expect(await eas.getSchemaRegistry()).to.equal(registry.address);
+      expect(await eas.getName()).to.equal(EIP712_NAME);
     });
   });
 

@@ -3,6 +3,7 @@
 pragma solidity 0.8.19;
 
 import { IEAS, Attestation } from "../IEAS.sol";
+import { InvalidEAS } from "../Common.sol";
 
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
@@ -12,11 +13,10 @@ import { ISchemaResolver } from "./ISchemaResolver.sol";
 abstract contract SchemaResolver is ISchemaResolver {
     error AccessDenied();
     error InsufficientValue();
-    error InvalidEAS();
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.26";
+    string public constant VERSION = "0.27";
 
     // The global EAS contract.
     IEAS internal immutable _eas;

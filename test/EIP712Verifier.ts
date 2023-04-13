@@ -12,7 +12,9 @@ const {
   utils: { formatBytes32String, keccak256, toUtf8Bytes, hexlify }
 } = ethers;
 
-describe('TestEIP712Verifier', () => {
+const EIP712_NAME = 'EAS';
+
+describe('EIP712Verifier', () => {
   let accounts: SignerWithAddress[];
   let sender: Wallet;
   let sender2: Wallet;
@@ -31,7 +33,7 @@ describe('TestEIP712Verifier', () => {
     sender = await createWallet();
     sender2 = await createWallet();
 
-    verifier = await Contracts.TestEIP712Verifier.deploy();
+    verifier = await Contracts.TestEIP712Verifier.deploy(EIP712_NAME);
 
     eip712Utils = await EIP712Utils.fromVerifier(verifier);
   });
@@ -42,9 +44,10 @@ describe('TestEIP712Verifier', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await verifier.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator());
+      expect(await verifier.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator(EIP712_NAME));
       expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
       expect(await verifier.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_TYPED_SIGNATURE)));
+      expect(await verifier.getName()).to.equal(EIP712_NAME);
     });
   });
 

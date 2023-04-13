@@ -5,6 +5,10 @@ pragma solidity 0.8.19;
 // A representation of an empty/uninitialized UID.
 bytes32 constant EMPTY_UID = 0;
 
+error InvalidEAS();
+error InvalidLength();
+error InvalidSignature();
+
 /**
  * @dev A struct representing EIP712 signature data.
  */
@@ -28,4 +32,34 @@ struct Attestation {
     address attester; // The attester/sender of the attestation.
     bool revocable; // Whether the attestation is revocable.
     bytes data; // Custom attestation data.
+}
+
+/**
+ * @dev Merges lists of UIDs.
+ *
+ * @param uidLists The provided lists of UIDs.
+ * @param uidsCount Total UIDs count.
+ *
+ * @return A merged and flatten list of all the UIDs.
+ */
+function mergeUIDs(bytes32[][] memory uidLists, uint256 uidsCount) pure returns (bytes32[] memory) {
+    bytes32[] memory uids = new bytes32[](uidsCount);
+
+    uint256 currentIndex = 0;
+    for (uint256 i = 0; i < uidLists.length; ) {
+        bytes32[] memory currentUids = uidLists[i];
+        for (uint256 j = 0; j < currentUids.length; ) {
+            uids[currentIndex] = currentUids[j];
+
+            unchecked {
+                ++j;
+                ++currentIndex;
+            }
+        }
+        unchecked {
+            ++i;
+        }
+    }
+
+    return uids;
 }
