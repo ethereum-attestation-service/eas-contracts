@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
@@ -440,8 +440,8 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
-      * @inheritdoc IEAS
-      */
+     * @inheritdoc IEAS
+     */
     function getRevokeOffchain(address revoker, bytes32 data) external view returns (uint64) {
         return _revocationsOffchain[revoker][data];
     }
@@ -844,14 +844,13 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
-         * @dev Timestamps the specified bytes32 data.
-         *
-         * @param data The data to timestamp.
-         * @param time The timestamp.
-         */
+     * @dev Timestamps the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     * @param time The timestamp.
+     */
     function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
         mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
-
 
         if (revocations[data] != 0) {
             revert AlreadyRevokedOffchain();

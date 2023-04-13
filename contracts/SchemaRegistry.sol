@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { EMPTY_UID } from "./Types.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
