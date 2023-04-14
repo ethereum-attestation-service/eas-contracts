@@ -65,7 +65,7 @@
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-solhint": "^3.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.5",
-    "@openzeppelin/contracts": "4.8.2",
+    "@openzeppelin/contracts": "4.8.3",
     "@tenderly/hardhat-tenderly": "1.7.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/chai": "^4.3.4",
