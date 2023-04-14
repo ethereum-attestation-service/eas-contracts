@@ -96,7 +96,7 @@ contract EIP712Proxy is EIP712 {
     mapping(bytes32 uid => address attester) private _attesters;
 
     // Replay protection signatures.
-    mapping(bytes => bool) private _signatures;
+    mapping(bytes signature => bool used) private _signatures;
 
     /**
      * @dev Creates a new EIP712Verifier instance.
