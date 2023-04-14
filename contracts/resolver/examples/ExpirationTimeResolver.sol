@@ -16,14 +16,11 @@ contract ExpirationTimeResolver is SchemaResolver {
         _validAfter = validAfter;
     }
 
-    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal view override returns (bool) {
         return attestation.expirationTime >= _validAfter;
     }
 
-    function onRevoke(
-        Attestation calldata /*attestation*/,
-        uint256 /*value*/
-    ) internal virtual override returns (bool) {
+    function onRevoke(Attestation calldata /*attestation*/, uint256 /*value*/) internal pure override returns (bool) {
         return true;
     }
 }

@@ -18,17 +18,11 @@ contract RevocationResolver is SchemaResolver {
         _revocation = status;
     }
 
-    function onAttest(
-        Attestation calldata /*attestation)*/,
-        uint256 /*value*/
-    ) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata /*attestation)*/, uint256 /*value*/) internal pure override returns (bool) {
         return true;
     }
 
-    function onRevoke(
-        Attestation calldata /*attestation*/,
-        uint256 /*value*/
-    ) internal virtual override returns (bool) {
+    function onRevoke(Attestation calldata /*attestation*/, uint256 /*value*/) internal view override returns (bool) {
         return _revocation;
     }
 }

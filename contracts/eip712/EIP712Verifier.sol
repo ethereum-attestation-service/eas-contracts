@@ -13,9 +13,9 @@ import {
     DelegatedRevocationRequest,
     RevocationRequest,
     RevocationRequestData
-} from "./IEAS.sol";
+} from "../IEAS.sol";
 
-import { EIP712Signature, InvalidSignature } from "./Common.sol";
+import { EIP712Signature, InvalidSignature } from "../Common.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.

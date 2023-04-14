@@ -1,4 +1,4 @@
-import { TestEIP712Proxy } from '../../typechain-types';
+import { EIP712Proxy } from '../../typechain-types';
 import {
   DomainTypedData,
   EIP712_DOMAIN,
@@ -39,15 +39,15 @@ export const REVOKE_PROXY_TYPE: TypedData[] = [
 ];
 
 export class EIP712ProxyUtils {
-  public proxy: TestEIP712Proxy;
+  public proxy: EIP712Proxy;
   private config?: TypedDataConfig;
   private name?: string;
 
-  private constructor(proxy: TestEIP712Proxy) {
+  private constructor(proxy: EIP712Proxy) {
     this.proxy = proxy;
   }
 
-  public static async fromProxy(verifier: TestEIP712Proxy) {
+  public static async fromProxy(verifier: EIP712Proxy) {
     const utils = new EIP712ProxyUtils(verifier);
     await utils.init();
 

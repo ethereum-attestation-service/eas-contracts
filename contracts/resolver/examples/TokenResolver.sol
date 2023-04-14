@@ -23,16 +23,13 @@ contract TokenResolver is SchemaResolver {
         _targetAmount = targetAmount;
     }
 
-    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal override returns (bool) {
         _targetToken.safeTransferFrom(attestation.attester, address(this), _targetAmount);
 
         return true;
     }
 
-    function onRevoke(
-        Attestation calldata /*attestation*/,
-        uint256 /*value*/
-    ) internal virtual override returns (bool) {
+    function onRevoke(Attestation calldata /*attestation*/, uint256 /*value*/) internal pure override returns (bool) {
         return true;
     }
 }

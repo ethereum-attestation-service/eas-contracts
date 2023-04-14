@@ -1,15 +1,15 @@
-import Contracts from '../components/Contracts';
-import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../typechain-types';
-import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { getSchemaUID } from '../utils/EAS';
-import { expectAttestation, SignatureType } from './helpers/EAS';
+import Contracts from '../../../components/Contracts';
+import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../../../typechain-types';
+import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../../utils/Constants';
+import { getSchemaUID } from '../../../utils/EAS';
+import { expectAttestation, SignatureType } from '../../helpers/EAS';
 import {
   ATTEST_PROXY_TYPED_SIGNATURE,
   EIP712ProxyUtils,
   REVOKE_PROXY_TYPED_SIGNATURE
-} from './helpers/EIP712ProxyUtils';
-import { latest } from './helpers/Time';
-import { createWallet } from './helpers/Wallet';
+} from '../../helpers/EIP712ProxyUtils';
+import { latest } from '../../helpers/Time';
+import { createWallet } from '../../helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { Wallet } from 'ethers';
@@ -19,7 +19,7 @@ const {
   utils: { formatBytes32String, keccak256, toUtf8Bytes, hexlify }
 } = ethers;
 
-const EIP712_PROXY_NAME = 'EAS-Proxy';
+const EIP712_PROXY_NAME = 'EIP712Proxy';
 
 describe('EIP712Proxy', () => {
   let accounts: SignerWithAddress[];

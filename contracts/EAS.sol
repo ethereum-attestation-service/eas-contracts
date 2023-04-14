@@ -23,7 +23,8 @@ import {
 } from "./IEAS.sol";
 
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-import { EIP712Verifier } from "./EIP712Verifier.sol";
+
+import { EIP712Verifier } from "./eip712/EIP712Verifier.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
@@ -93,7 +94,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function attest(AttestationRequest calldata request) public payable virtual returns (bytes32) {
+    function attest(AttestationRequest calldata request) external payable returns (bytes32) {
         AttestationRequestData[] memory requests = new AttestationRequestData[](1);
         requests[0] = request.data;
 
@@ -105,7 +106,7 @@ contract EAS is IEAS, EIP712Verifier {
      */
     function attestByDelegation(
         DelegatedAttestationRequest calldata delegatedRequest
-    ) public payable virtual returns (bytes32) {
+    ) external payable returns (bytes32) {
         _verifyAttest(delegatedRequest);
 
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
@@ -246,7 +247,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function revoke(RevocationRequest calldata request) public payable virtual {
+    function revoke(RevocationRequest calldata request) external payable {
         RevocationRequestData[] memory requests = new RevocationRequestData[](1);
         requests[0] = request.data;
 
@@ -256,7 +257,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
+    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable {
         _verifyRevoke(delegatedRequest);
 
         RevocationRequestData[] memory data = new RevocationRequestData[](1);

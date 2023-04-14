@@ -5,7 +5,16 @@ pragma solidity 0.8.19;
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import { AccessDenied, EIP712Signature, InvalidEAS, InvalidLength, InvalidSignature, NotFound, NO_EXPIRATION_TIME } from "./Common.sol";
+// prettier-ignore
+import {
+    AccessDenied,
+    EIP712Signature,
+    InvalidEAS,
+    InvalidLength,
+    InvalidSignature,
+    NotFound,
+    NO_EXPIRATION_TIME
+} from "../../Common.sol";
 
 // prettier-ignore
 import {
@@ -20,7 +29,7 @@ import {
     MultiRevocationRequest,
     RevocationRequest,
     RevocationRequestData
-} from "./IEAS.sol";
+} from "../../IEAS.sol";
 
 /**
  * @dev A struct representing the full arguments of the full delegated attestation request.
@@ -232,7 +241,7 @@ contract EIP712Proxy is EIP712 {
      */
     function multiAttestByDelegation(
         MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
-    ) external payable returns (bytes32[] memory) {
+    ) public payable virtual returns (bytes32[] memory) {
         MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](multiDelegatedRequests.length);
 
         for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
@@ -359,7 +368,7 @@ contract EIP712Proxy is EIP712 {
      */
     function multiRevokeByDelegation(
         MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
-    ) external payable {
+    ) public payable virtual {
         MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](multiDelegatedRequests.length);
 
         for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
