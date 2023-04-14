@@ -4,28 +4,23 @@ pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
-import { InvalidLength, EMPTY_UID, EIP712Signature, mergeUIDs } from "./Common.sol";
+import { AccessDenied, EMPTY_UID, EIP712Signature, InvalidLength, NotFound, NO_EXPIRATION_TIME } from "./Common.sol";
 
 // prettier-ignore
 import {
     Attestation,
     AttestationRequest,
     AttestationRequestData,
+    DelegatedAttestationRequest,
+    DelegatedRevocationRequest,
     IEAS,
     MultiAttestationRequest,
+    MultiDelegatedAttestationRequest,
+    MultiDelegatedRevocationRequest,
     MultiRevocationRequest,
     RevocationRequest,
     RevocationRequestData
 } from "./IEAS.sol";
-
-// prettier-ignore
-import {
-    DelegatedAttestationRequest,
-    DelegatedRevocationRequest,
-    IEASDelegated,
-    MultiDelegatedAttestationRequest,
-    MultiDelegatedRevocationRequest
-} from "./IEASDelegated.sol";
 
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 import { EIP712Verifier } from "./EIP712Verifier.sol";
@@ -40,10 +35,9 @@ struct AttestationsResult {
 /**
  * @title EAS - Ethereum Attestation Service
  */
-contract EAS is IEAS, IEASDelegated, EIP712Verifier {
+contract EAS is IEAS, EIP712Verifier {
     using Address for address payable;
 
-    error AccessDenied();
     error AlreadyRevoked();
     error AlreadyRevokedOffchain();
     error AlreadyTimestamped();
@@ -58,15 +52,11 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
     error InvalidSchema();
     error InvalidVerifier();
     error Irrevocable();
-    error NotFound();
     error NotPayable();
     error WrongSchema();
 
     // The version of the contract.
     string public constant VERSION = "0.27";
-
-    // A zero expiration represents an non-expiring attestation.
-    uint64 private constant NO_EXPIRATION_TIME = 0;
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -111,7 +101,7 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @inheritdoc IEAS
      */
     function attestByDelegation(
         DelegatedAttestationRequest calldata delegatedRequest
@@ -173,11 +163,11 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return mergeUIDs(totalUids, totalUidsCount);
+        return _mergeUIDs(totalUids, totalUidsCount);
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @inheritdoc IEAS
      */
     function multiAttestByDelegation(
         MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
@@ -250,7 +240,7 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return mergeUIDs(totalUids, totalUidsCount);
+        return _mergeUIDs(totalUids, totalUidsCount);
     }
 
     /**
@@ -264,7 +254,7 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @inheritdoc IEAS
      */
     function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
         _verifyRevoke(delegatedRequest);
@@ -306,7 +296,7 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @inheritdoc IEAS
      */
     function multiRevokeByDelegation(
         MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests
@@ -842,5 +832,36 @@ contract EAS is IEAS, IEASDelegated, EIP712Verifier {
      */
     function _time() internal view virtual returns (uint64) {
         return uint64(block.timestamp);
+    }
+
+    /**
+     * @dev Merges lists of UIDs.
+     *
+     * @param uidLists The provided lists of UIDs.
+     * @param uidsCount Total UIDs count.
+     *
+     * @return A merged and flatten list of all the UIDs.
+     */
+    function _mergeUIDs(bytes32[][] memory uidLists, uint256 uidsCount) private pure returns (bytes32[] memory) {
+        bytes32[] memory uids = new bytes32[](uidsCount);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < uidLists.length; ) {
+            bytes32[] memory currentUids = uidLists[i];
+            for (uint256 j = 0; j < currentUids.length; ) {
+                uids[currentIndex] = currentUids[j];
+
+                unchecked {
+                    ++j;
+                    ++currentIndex;
+                }
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return uids;
     }
 }

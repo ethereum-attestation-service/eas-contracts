@@ -1,4 +1,4 @@
-import { EAS, TestEIP712Proxy, TestEIP712Verifier } from '../../typechain-types';
+import { EAS, TestEIP712Verifier } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { TypedDataSigner } from '@ethersproject/abstract-signer';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -128,15 +128,15 @@ export const REVOKE_PROXY_TYPE: TypedData[] = [
 ];
 
 export class EIP712Utils {
-  private verifier: EAS | TestEIP712Verifier | TestEIP712Proxy;
+  private verifier: EAS | TestEIP712Verifier;
   private config?: TypedDataConfig;
   private name?: string;
 
-  private constructor(verifier: EAS | TestEIP712Verifier | TestEIP712Proxy) {
+  private constructor(verifier: EAS | TestEIP712Verifier) {
     this.verifier = verifier;
   }
 
-  public static async fromVerifier(verifier: EAS | TestEIP712Verifier | TestEIP712Proxy) {
+  public static async fromVerifier(verifier: EAS | TestEIP712Verifier) {
     const utils = new EIP712Utils(verifier);
     await utils.init();
 
@@ -265,83 +265,7 @@ export class EIP712Utils {
     );
   }
 
-  public signProxyDelegatedAttestation(
-    attester: TypedDataSigner,
-    schema: string,
-    recipient: string | SignerWithAddress,
-    expirationTime: number,
-    revocable: boolean,
-    refUID: string,
-    data: string
-  ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
-    const params = {
-      schema,
-      recipient: typeof recipient === 'string' ? recipient : recipient.address,
-      expirationTime,
-      revocable,
-      refUID,
-      data: Buffer.from(data.slice(2), 'hex')
-    };
-
-    return EIP712Utils.signTypedDataRequest<EIP712MessageTypes, EIP712AttestationParams>(
-      params,
-      {
-        domain: this.getDomainTypedData(),
-        primaryType: ATTEST_PROXY_PRIMARY_TYPE,
-        message: params,
-        types: {
-          Attest: ATTEST_PROXY_TYPE
-        }
-      },
-      attester
-    );
-  }
-
-  public verifyProxyDelegatedAttestationSignature(
-    attester: string | SignerWithAddress,
-    request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
-  ): boolean {
-    return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
-      request
-    );
-  }
-
-  public signProxyDelegatedRevocation(
-    attester: TypedDataSigner,
-    schema: string,
-    uid: string
-  ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
-    const params = {
-      schema,
-      uid
-    };
-
-    return EIP712Utils.signTypedDataRequest<EIP712MessageTypes, EIP712RevocationParams>(
-      params,
-      {
-        domain: this.getDomainTypedData(),
-        primaryType: REVOKE_PROXY_PRIMARY_TYPE,
-        message: params,
-        types: {
-          Revoke: REVOKE_PROXY_TYPE
-        }
-      },
-      attester
-    );
-  }
-
-  public verifyProxyDelegatedRevocationSignature(
-    attester: string | SignerWithAddress,
-    request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
-  ): boolean {
-    return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
-      request
-    );
-  }
-
-  private static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
+  public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
     params: P,
     types: EIP712TypedData<T, P>,
     signer: TypedDataSigner
@@ -351,7 +275,7 @@ export class EIP712Utils {
     return { types, params, ...splitSignature(rawSignature) };
   }
 
-  private static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
+  public static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
     attester: string,
     request: EIP712Request<T, P>
   ): boolean {

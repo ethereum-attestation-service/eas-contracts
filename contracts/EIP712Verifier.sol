@@ -5,8 +5,16 @@ pragma solidity 0.8.19;
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import { AttestationRequest, AttestationRequestData, RevocationRequest, RevocationRequestData } from "./IEAS.sol";
-import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "./IEASDelegated.sol";
+// prettier-ignore
+import {
+    AttestationRequest,
+    AttestationRequestData,
+    DelegatedAttestationRequest,
+    DelegatedRevocationRequest,
+    RevocationRequest,
+    RevocationRequestData
+} from "./IEAS.sol";
+
 import { EIP712Signature, InvalidSignature } from "./Common.sol";
 
 /**

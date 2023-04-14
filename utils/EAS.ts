@@ -1,4 +1,6 @@
-import { ContractTransaction, Event, utils } from 'ethers';
+import { EAS__factory } from '../typechain-types';
+import { Interface } from '@ethersproject/abi';
+import { ContractTransaction, utils } from 'ethers';
 
 const { solidityKeccak256, hexlify, toUtf8Bytes } = utils;
 
@@ -21,12 +23,6 @@ export const getUID = (
     [hexlify(toUtf8Bytes(schema)), recipient, attester, time, expirationTime, revocable, refUID, data, bump]
   );
 
-export const getUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction): Promise<string> => {
-  const receipt = await (await res).wait();
-
-  return (await getUIDsFromAttestEvents(receipt.events))[0];
-};
-
 export const getUIDsFromMultiAttestTx = async (
   res: Promise<ContractTransaction> | ContractTransaction
 ): Promise<string[]> => {
@@ -35,7 +31,36 @@ export const getUIDsFromMultiAttestTx = async (
   return getUIDsFromAttestEvents(receipt.events);
 };
 
-export const getUIDsFromAttestEvents = (events?: Event[]): string[] => {
+export const getUIDFromAttestTx = async (res: Promise<ContractTransaction> | ContractTransaction): Promise<string> => {
+  return (await getUIDsFromMultiAttestTx(res))[0];
+};
+
+export const getUIDFromMultiDelegatedProxyAttestTx = async (
+  res: Promise<ContractTransaction> | ContractTransaction
+): Promise<string[]> => {
+  const receipt = await (await res).wait();
+
+  // eslint-disable-next-line camelcase
+  const eas = new Interface(EAS__factory.abi);
+  const events = [];
+
+  for (const event of receipt.events || []) {
+    events.push({
+      event: 'Attested',
+      args: await eas.decodeEventLog('Attested', event.data, event.topics)
+    });
+  }
+
+  return getUIDsFromAttestEvents(events);
+};
+
+export const getUIDFromDelegatedProxyAttestTx = async (
+  res: Promise<ContractTransaction> | ContractTransaction
+): Promise<string> => {
+  return (await getUIDFromMultiDelegatedProxyAttestTx(res))[0];
+};
+
+export const getUIDsFromAttestEvents = (events?: ReadonlyArray<any>): string[] => {
   if (!events) {
     return [];
   }

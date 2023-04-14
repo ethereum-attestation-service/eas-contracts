@@ -1,7 +1,13 @@
 import Contracts from '../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
-import { ATTEST_PROXY_TYPED_SIGNATURE, EIP712Utils, REVOKE_PROXY_TYPED_SIGNATURE } from './helpers/EIP712Utils';
+import { getSchemaUID } from '../utils/EAS';
+import { expectAttestation, SignatureType } from './helpers/EAS';
+import {
+  ATTEST_PROXY_TYPED_SIGNATURE,
+  EIP712ProxyUtils,
+  REVOKE_PROXY_TYPED_SIGNATURE
+} from './helpers/EIP712ProxyUtils';
 import { latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -24,7 +30,11 @@ describe('EIP712Proxy', () => {
   let registry: SchemaRegistry;
   let eas: TestEAS;
   let proxy: TestEIP712Proxy;
-  let eip712Utils: EIP712Utils;
+  let eip712ProxyUtils: EIP712ProxyUtils;
+
+  const schema = 'bool like';
+  const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
+  const deadline = NO_EXPIRATION;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -43,7 +53,9 @@ describe('EIP712Proxy', () => {
 
     proxy = await Contracts.TestEIP712Proxy.deploy(eas.address, EIP712_PROXY_NAME);
 
-    eip712Utils = await EIP712Utils.fromVerifier(proxy);
+    eip712ProxyUtils = await EIP712ProxyUtils.fromProxy(proxy);
+
+    await registry.register(schema, ZERO_ADDRESS, true);
   });
 
   describe('construction', () => {
@@ -54,7 +66,7 @@ describe('EIP712Proxy', () => {
     it('should be properly initialized', async () => {
       expect(await proxy.VERSION()).to.equal('0.1');
 
-      expect(await proxy.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator(EIP712_PROXY_NAME));
+      expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
       expect(await proxy.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_PROXY_TYPED_SIGNATURE)));
       expect(await proxy.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_PROXY_TYPED_SIGNATURE)));
       expect(await proxy.getName()).to.equal(EIP712_PROXY_NAME);
@@ -62,38 +74,36 @@ describe('EIP712Proxy', () => {
   });
 
   describe('verify attest', () => {
-    const schema = ZERO_BYTES32;
-
     it('should verify delegated attestation request', async () => {
-      for (let i = 0; i < 3; ++i) {
-        const attestationRequest = {
-          recipient: recipient.address,
-          expirationTime: NO_EXPIRATION,
-          revocable: true,
-          refUID: ZERO_BYTES32,
-          data: hexlify(i),
-          value: 1000
-        };
+      const attestationRequest = {
+        recipient: recipient.address,
+        expirationTime: NO_EXPIRATION,
+        revocable: true,
+        refUID: ZERO_BYTES32,
+        data: ZERO_BYTES,
+        value: 1000
+      };
 
-        const signature = await eip712Utils.signProxyDelegatedAttestation(
-          sender,
-          schema,
-          attestationRequest.recipient,
-          attestationRequest.expirationTime,
-          attestationRequest.revocable,
-          attestationRequest.refUID,
-          attestationRequest.data
-        );
+      const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
+        sender,
+        schemaId,
+        attestationRequest.recipient,
+        attestationRequest.expirationTime,
+        attestationRequest.revocable,
+        attestationRequest.refUID,
+        attestationRequest.data,
+        deadline
+      );
 
-        await expect(
-          proxy.verifyAttest({
-            schema,
-            data: attestationRequest,
-            signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-            attester: sender.address
-          })
-        ).not.to.be.reverted;
-      }
+      await expect(
+        proxy.verifyAttest({
+          schema: schemaId,
+          data: attestationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          attester: sender.address,
+          deadline
+        })
+      ).not.to.be.reverted;
     });
 
     it('should revert when verifying delegated attestation request with a wrong signature', async () => {
@@ -106,31 +116,34 @@ describe('EIP712Proxy', () => {
         value: 1000
       };
 
-      const signature = await eip712Utils.signProxyDelegatedAttestation(
+      const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
         sender,
-        schema,
+        schemaId,
         attestationRequest.recipient,
         attestationRequest.expirationTime,
         attestationRequest.revocable,
         attestationRequest.refUID,
-        attestationRequest.data
+        attestationRequest.data,
+        deadline
       );
 
       await expect(
         proxy.verifyAttest({
-          schema,
+          schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
-          attester: sender.address
+          attester: sender.address,
+          deadline
         })
       ).to.be.revertedWith('InvalidSignature');
 
       await expect(
         proxy.verifyAttest({
-          schema,
+          schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender2.address
+          attester: sender2.address,
+          deadline
         })
       ).to.be.revertedWith('InvalidSignature');
     });
@@ -145,110 +158,198 @@ describe('EIP712Proxy', () => {
         value: 1000
       };
 
-      const signature = await eip712Utils.signProxyDelegatedAttestation(
+      const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
         sender,
-        schema,
+        schemaId,
         attestationRequest.recipient,
         attestationRequest.expirationTime,
         attestationRequest.revocable,
         attestationRequest.refUID,
-        attestationRequest.data
+        attestationRequest.data,
+        deadline
       );
 
       await expect(
         proxy.verifyAttest({
-          schema,
+          schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address
+          attester: sender.address,
+          deadline
         })
       ).not.to.be.reverted;
 
       await expect(
         proxy.verifyAttest({
-          schema,
+          schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address
+          attester: sender.address,
+          deadline
         })
       ).to.be.revertedWith('UsedSignature');
+    });
+
+    it('should revert when verifying delegated attestation request with an expired deadline', async () => {
+      const attestationRequest = {
+        recipient: recipient.address,
+        expirationTime: NO_EXPIRATION,
+        revocable: true,
+        refUID: ZERO_BYTES32,
+        data: ZERO_BYTES,
+        value: 1000
+      };
+
+      const expiredDeadline = 1;
+      const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
+        sender,
+        schemaId,
+        attestationRequest.recipient,
+        attestationRequest.expirationTime,
+        attestationRequest.revocable,
+        attestationRequest.refUID,
+        attestationRequest.data,
+        expiredDeadline
+      );
+
+      await expect(
+        proxy.verifyAttest({
+          schema: schemaId,
+          data: attestationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          attester: sender.address,
+          deadline: expiredDeadline
+        })
+      ).to.be.revertedWith('DeadlineExpired');
     });
   });
 
   describe('verify revoke', () => {
-    const schema = ZERO_BYTES32;
+    let uid: string;
+
+    beforeEach(async () => {
+      ({ uid } = await expectAttestation(
+        { eas, eip712ProxyUtils },
+        schemaId,
+        { recipient: ZERO_ADDRESS, expirationTime: NO_EXPIRATION, data: ZERO_BYTES },
+        { signatureType: SignatureType.DelegatedProxy, from: sender }
+      ));
+    });
 
     it('should verify delegated revocation request', async () => {
-      for (let i = 0; i < 3; ++i) {
-        const revocationRequest = {
-          uid: formatBytes32String(hexlify(i)),
-          value: 1000
-        };
+      const revocationRequest = {
+        uid,
+        value: 1000
+      };
 
-        const signature = await eip712Utils.signProxyDelegatedRevocation(sender, schema, revocationRequest.uid);
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender,
+        schemaId,
+        revocationRequest.uid,
+        deadline
+      );
 
-        await expect(
-          proxy.verifyRevoke({
-            schema,
-            data: revocationRequest,
-            signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-            revoker: sender.address
-          })
-        ).not.to.be.reverted;
-      }
+      await expect(
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
+          data: revocationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          revoker: sender.address,
+          deadline
+        })
+      ).not.to.be.reverted;
     });
 
     it('should revert when verifying delegated revocation request with a wrong signature', async () => {
       const revocationRequest = {
-        uid: ZERO_BYTES32,
+        uid,
         value: 1000
       };
 
-      const signature = await eip712Utils.signProxyDelegatedRevocation(sender, schema, revocationRequest.uid);
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender,
+        schemaId,
+        revocationRequest.uid,
+        deadline
+      );
 
       await expect(
-        proxy.verifyRevoke({
-          schema,
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
-          revoker: sender.address
+          revoker: sender.address,
+          deadline
         })
       ).to.be.revertedWith('InvalidSignature');
 
       await expect(
-        proxy.verifyRevoke({
-          schema,
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender2.address
+          revoker: sender2.address,
+          deadline
         })
       ).to.be.revertedWith('InvalidSignature');
     });
 
     it('should revert when verifying delegated revocation request with a used signature', async () => {
       const revocationRequest = {
-        uid: ZERO_BYTES32,
+        uid,
         value: 1000
       };
-      const signature = await eip712Utils.signProxyDelegatedRevocation(sender, schema, revocationRequest.uid);
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender,
+        schemaId,
+        revocationRequest.uid,
+        deadline
+      );
 
       await expect(
-        proxy.verifyRevoke({
-          schema,
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address
+          revoker: sender.address,
+          deadline
         })
       ).not.to.be.reverted;
 
       await expect(
-        proxy.verifyRevoke({
-          schema,
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address
+          revoker: sender.address,
+          deadline
         })
       ).to.be.revertedWith('UsedSignature');
+    });
+
+    it('should revert when verifying delegated revocation request with an expired deadline', async () => {
+      const revocationRequest = {
+        uid,
+        value: 1000
+      };
+
+      const expiredDeadline = 1;
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender,
+        schemaId,
+        revocationRequest.uid,
+        expiredDeadline
+      );
+
+      await expect(
+        proxy.connect(sender).verifyRevoke({
+          schema: schemaId,
+          data: revocationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          revoker: sender.address,
+          deadline: expiredDeadline
+        })
+      ).to.be.revertedWith('DeadlineExpired');
     });
   });
 });

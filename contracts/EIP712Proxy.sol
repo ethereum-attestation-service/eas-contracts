@@ -5,51 +5,95 @@ pragma solidity 0.8.19;
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import { EIP712Signature, InvalidEAS, InvalidLength, InvalidSignature, mergeUIDs } from "./Common.sol";
+import { AccessDenied, EIP712Signature, InvalidEAS, InvalidLength, InvalidSignature, NotFound, NO_EXPIRATION_TIME } from "./Common.sol";
 
 // prettier-ignore
 import {
     AttestationRequest,
     AttestationRequestData,
+    DelegatedAttestationRequest,
+    DelegatedRevocationRequest,
     IEAS,
     MultiAttestationRequest,
+    MultiDelegatedAttestationRequest,
+    MultiDelegatedRevocationRequest,
     MultiRevocationRequest,
     RevocationRequest,
     RevocationRequestData
 } from "./IEAS.sol";
 
-// prettier-ignore
-import {
-    DelegatedAttestationRequest,
-    DelegatedRevocationRequest,
-    IEASDelegated,
-    MultiDelegatedAttestationRequest,
-    MultiDelegatedRevocationRequest
-} from "./IEASDelegated.sol";
+/**
+ * @dev A struct representing the full arguments of the full delegated attestation request.
+ */
+struct DelegatedProxyAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData data; // The arguments of the attestation request.
+    EIP712Signature signature; // The EIP712 signature data.
+    address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
+/**
+ * @dev A struct representing the full arguments of the delegated multi attestation request.
+ */
+struct MultiDelegatedProxyAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData[] data; // The arguments of the attestation requests.
+    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
+/**
+ * @dev A struct representing the arguments of the full delegated revocation request.
+ */
+struct DelegatedProxyRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData data; // The arguments of the revocation request.
+    EIP712Signature signature; // The EIP712 signature data.
+    address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
+/**
+ * @dev A struct representing the full arguments of the delegated multi revocation request.
+ */
+struct MultiDelegatedProxyRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData[] data; // The arguments of the revocation requests.
+    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
+}
 
 /**
  * @title This utility contract an be used to aggregate delegated attestations without requiring a specific order via
  * nonces. The contract doesn't request nonces and implements replay protection by storing ***immalleable*** signatures.
  */
-contract EIP712Proxy is IEASDelegated, EIP712 {
+contract EIP712Proxy is EIP712 {
+    error DeadlineExpired();
     error UsedSignature();
 
     // The version of the contract.
     string public constant VERSION = "0.1";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data)").
-    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0x8c11201ed552a4177c87ea675a52654f9dd32ea6ace0bbeb037d34bb611ee1fc;
+    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)").
+    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0x4120d3b28306666b714826ad7cb70744d9658ad3e6cd873411bedadcf55afda7;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(bytes32 schema,bytes32 uid)").
-    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0xdc23018b5389688383999ae597f15ae78aad1caf31fce36e306dbc7b8349ee3c;
+    // keccak256("Revoke(bytes32 schema,bytes32 uid,uint64 deadline)").
+    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0x96bdbea8fa280f8a0d0835587e1fbb1470e81d05c44514158443340cea40a05d;
 
     // The global EAS contract.
     IEAS private immutable _eas;
 
     // The user readable name of the signing domain.
     string private _name;
+
+    // The global mapping between proxy attestations and their attesters, so that we can verify that only the original
+    // attester is able to revert attestations by proxy.
+    mapping(bytes32 uid => address attester) private _attesters;
 
     // Replay protection signatures.
     mapping(bytes => bool) private _signatures;
@@ -98,40 +142,101 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * Returns the attester for a given uid.
      */
-    function attestByDelegation(
-        DelegatedAttestationRequest calldata delegatedRequest
-    ) public payable virtual returns (bytes32) {
-        _verifyAttest(delegatedRequest);
-
-        return
-            _eas.attest{ value: msg.value }(
-                AttestationRequest({ schema: delegatedRequest.schema, data: delegatedRequest.data })
-            );
+    function getAttester(bytes32 uid) external view returns (address) {
+        return _attesters[uid];
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @dev Attests to a specific schema via the provided EIP712 signature.
+     *
+     * @param delegatedRequest The arguments of the delegated attestation request.
+     *
+     * Example:
+     *
+     * attestByDelegation({
+     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+     *     data: {
+     *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+     *         expirationTime: 1673891048,
+     *         revocable: true,
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         data: '0x1234',
+     *         value: 0
+     *     },
+     *     signature: {
+     *         v: 28,
+     *         r: '0x148c...b25b',
+     *         s: '0x5a72...be22'
+     *     },
+     *     attester: '0xc5E8740aD971409492b1A63Db8d83025e0Fc427e'
+     * })
+     *
+     * @return The UID of the new attestation.
+     */
+    function attestByDelegation(
+        DelegatedProxyAttestationRequest calldata delegatedRequest
+    ) public payable virtual returns (bytes32) {
+        _verifyAttest(delegatedRequest);
+
+        bytes32 uid = _eas.attest{ value: msg.value }(
+            AttestationRequest({ schema: delegatedRequest.schema, data: delegatedRequest.data })
+        );
+
+        _attesters[uid] = delegatedRequest.attester;
+
+        return uid;
+    }
+
+    /**
+     * @dev Attests to multiple schemas using via provided EIP712 signatures.
+     *
+     * @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
+     * grouped by distinct schema ids to benefit from the best batching optimization.
+     *
+     * Example:
+     *
+     * multiAttestByDelegation([{
+     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+     *     data: [{
+     *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+     *         expirationTime: 1673891048,
+     *         revocable: true,
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         data: '0x1234',
+     *         value: 0
+     *     },
+     *     {
+     *         recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
+     *         expirationTime: 0,
+     *         revocable: false,
+     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+     *         data: '0x00',
+     *         value: 0
+     *     }],
+     *     signatures: [{
+     *         v: 28,
+     *         r: '0x148c...b25b',
+     *         s: '0x5a72...be22'
+     *     },
+     *     {
+     *         v: 28,
+     *         r: '0x487s...67bb',
+     *         s: '0x12ad...2366'
+     *     }],
+     *     attester: '0x1D86495b2A7B524D747d2839b3C645Bed32e8CF4'
+     * }])
+     *
+     * @return The UIDs of the new attestations.
      */
     function multiAttestByDelegation(
-        MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
+        MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
     ) external payable returns (bytes32[] memory) {
-        // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
-        // all the returned UIDs into a single list.
-        bytes32[][] memory totalUids = new bytes32[][](multiDelegatedRequests.length);
-        uint256 totalUidsCount = 0;
+        MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](multiDelegatedRequests.length);
 
         for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
-            // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
-            // is a remainder - it will be refunded back to the attester (something that we can only verify during the
-            // last and final batch).
-            bool last;
-            unchecked {
-                last = i == multiDelegatedRequests.length - 1;
-            }
-
-            MultiDelegatedAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
+            MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
             // Ensure that no inputs are missing.
@@ -139,48 +244,79 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
                 revert InvalidLength();
             }
 
-            MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](data.length);
-            uint256 value = 0;
-
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; ) {
-                AttestationRequestData memory requestData = data[j];
-
                 _verifyAttest(
-                    DelegatedAttestationRequest({
+                    DelegatedProxyAttestationRequest({
                         schema: multiDelegatedRequest.schema,
-                        data: requestData,
+                        data: data[j],
                         signature: multiDelegatedRequest.signatures[j],
-                        attester: multiDelegatedRequest.attester
+                        attester: multiDelegatedRequest.attester,
+                        deadline: multiDelegatedRequest.deadline
                     })
                 );
-
-                multiRequests[i] = MultiAttestationRequest({ schema: multiDelegatedRequest.schema, data: data });
-                value += requestData.value;
 
                 unchecked {
                     ++j;
                 }
             }
 
-            // Collect UIDs (and merge them later).
-            totalUids[i] = _eas.multiAttest{ value: value }(multiRequests);
+            multiRequests[i] = MultiAttestationRequest({ schema: multiDelegatedRequest.schema, data: data });
 
             unchecked {
-                totalUidsCount += totalUids[i].length;
-
                 ++i;
             }
         }
 
-        // Merge all the collected UIDs and return them as a flatten array.
-        return mergeUIDs(totalUids, totalUidsCount);
+        bytes32[] memory uids = _eas.multiAttest{ value: msg.value }(multiRequests);
+
+        // Store all attesters, according to the order of the attestation requests.
+        uint256 uidCounter = 0;
+
+        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+            MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
+            AttestationRequestData[] calldata data = multiDelegatedRequest.data;
+
+            for (uint256 j = 0; j < data.length; ) {
+                _attesters[uids[uidCounter]] = multiDelegatedRequest.attester;
+
+                unchecked {
+                    ++uidCounter;
+
+                    ++j;
+                }
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return uids;
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @dev Revokes an existing attestation to a specific schema via the provided EIP712 signature.
+     *
+     * Example:
+     *
+     * revokeByDelegation({
+     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+     *     data: {
+     *         uid: '0xcbbc12102578c642a0f7b34fe7111e41afa25683b6cd7b5a14caf90fa14d24ba',
+     *         value: 0
+     *     },
+     *     signature: {
+     *         v: 27,
+     *         r: '0xb593...7142',
+     *         s: '0x0f5b...2cce'
+     *     },
+     *     revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
+     * })
+     *
+     * @param delegatedRequest The arguments of the delegated revocation request.
      */
-    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
+    function revokeByDelegation(DelegatedProxyRevocationRequest calldata delegatedRequest) public payable virtual {
         _verifyRevoke(delegatedRequest);
 
         return
@@ -190,21 +326,44 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
     }
 
     /**
-     * @inheritdoc IEASDelegated
+     * @dev Revokes existing attestations to multiple schemas via provided EIP712 signatures.
+     *
+     * @param multiDelegatedRequests The arguments of the delegated multi revocation attestation requests. The requests should be
+     * grouped by distinct schema ids to benefit from the best batching optimization.
+     *
+     * Example:
+     *
+     * multiRevokeByDelegation([{
+     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+     *     data: [{
+     *         uid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
+     *         value: 1000
+     *     },
+     *     {
+     *         uid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
+     *         value: 0
+     *     }],
+     *     signatures: [{
+     *         v: 28,
+     *         r: '0x148c...b25b',
+     *         s: '0x5a72...be22'
+     *     },
+     *     {
+     *         v: 28,
+     *         r: '0x487s...67bb',
+     *         s: '0x12ad...2366'
+     *     }],
+     *     revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
+     * }])
+     *
      */
     function multiRevokeByDelegation(
-        MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests
+        MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
     ) external payable {
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
-            // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
-            // is a remainder - it will be refunded back to the attester (something that we can only verify during the
-            // last and final batch).
-            bool last;
-            unchecked {
-                last = i == multiDelegatedRequests.length - 1;
-            }
+        MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](multiDelegatedRequests.length);
 
-            MultiDelegatedRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
+        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+            MultiDelegatedProxyRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
             RevocationRequestData[] memory data = multiDelegatedRequest.data;
 
             // Ensure that no inputs are missing.
@@ -212,36 +371,33 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
                 revert InvalidLength();
             }
 
-            MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](data.length);
-            uint256 value = 0;
-
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; ) {
                 RevocationRequestData memory requestData = data[j];
 
                 _verifyRevoke(
-                    DelegatedRevocationRequest({
+                    DelegatedProxyRevocationRequest({
                         schema: multiDelegatedRequest.schema,
                         data: requestData,
                         signature: multiDelegatedRequest.signatures[j],
-                        revoker: multiDelegatedRequest.revoker
+                        revoker: multiDelegatedRequest.revoker,
+                        deadline: multiDelegatedRequest.deadline
                     })
                 );
-
-                multiRequests[i] = MultiRevocationRequest({ schema: multiDelegatedRequest.schema, data: data });
-                value += requestData.value;
 
                 unchecked {
                     ++j;
                 }
             }
 
-            _eas.multiRevoke{ value: value }(multiRequests);
+            multiRequests[i] = MultiRevocationRequest({ schema: multiDelegatedRequest.schema, data: data });
 
             unchecked {
                 ++i;
             }
         }
+
+        _eas.multiRevoke{ value: msg.value }(multiRequests);
     }
 
     /**
@@ -249,7 +405,11 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
      *
      * @param request The arguments of the delegated attestation request.
      */
-    function _verifyAttest(DelegatedAttestationRequest memory request) internal {
+    function _verifyAttest(DelegatedProxyAttestationRequest memory request) internal {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+            revert DeadlineExpired();
+        }
+
         AttestationRequestData memory data = request.data;
         EIP712Signature memory signature = request.signature;
 
@@ -264,7 +424,8 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
                     data.expirationTime,
                     data.revocable,
                     data.refUID,
-                    keccak256(data.data)
+                    keccak256(data.data),
+                    request.deadline
                 )
             )
         );
@@ -279,13 +440,30 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
      *
      * @param request The arguments of the delegated revocation request.
      */
-    function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
+    function _verifyRevoke(DelegatedProxyRevocationRequest memory request) internal {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+            revert DeadlineExpired();
+        }
+
         RevocationRequestData memory data = request.data;
+
+        // Allow only original attesters to revoke their attestations.
+        address attester = _attesters[data.uid];
+        if (attester == address(0)) {
+            revert NotFound();
+        }
+
+        if (attester != msg.sender) {
+            revert AccessDenied();
+        }
+
         EIP712Signature memory signature = request.signature;
 
         _verifyUnusedSignature(signature);
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_PROXY_TYPEHASH, request.schema, data.uid)));
+        bytes32 digest = _hashTypedDataV4(
+            keccak256(abi.encode(REVOKE_PROXY_TYPEHASH, request.schema, data.uid, request.deadline))
+        );
 
         if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {
             revert InvalidSignature();
@@ -305,5 +483,13 @@ contract EIP712Proxy is IEASDelegated, EIP712 {
         }
 
         _signatures[packedSignature] = true;
+    }
+
+    /**
+     * @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
+     * current block time.
+     */
+    function _time() internal view virtual returns (uint64) {
+        return uint64(block.timestamp);
     }
 }
