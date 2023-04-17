@@ -34,28 +34,6 @@ export interface TypedData {
     | 'bytes32';
 }
 
-export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
-export const EIP712_NAME = 'EAS';
-export const ATTEST_TYPED_SIGNATURE =
-  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)';
-export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 nonce)';
-export const ATTEST_PRIMARY_TYPE = 'Attest';
-export const REVOKE_PRIMARY_TYPE = 'Revoke';
-export const ATTEST_TYPE: TypedData[] = [
-  { name: 'schema', type: 'bytes32' },
-  { name: 'recipient', type: 'address' },
-  { name: 'expirationTime', type: 'uint64' },
-  { name: 'revocable', type: 'bool' },
-  { name: 'refUID', type: 'bytes32' },
-  { name: 'data', type: 'bytes' },
-  { name: 'nonce', type: 'uint256' }
-];
-export const REVOKE_TYPE: TypedData[] = [
-  { name: 'schema', type: 'bytes32' },
-  { name: 'uid', type: 'bytes32' },
-  { name: 'nonce', type: 'uint256' }
-];
-
 export interface TypedDataConfig {
   address: string;
   version: string;
@@ -109,9 +87,50 @@ export type EIP712RevocationParams = EIP712Params & {
   uid: string;
 };
 
+export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
+
+export const ATTEST_TYPED_SIGNATURE =
+  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)';
+export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 nonce)';
+export const ATTEST_PRIMARY_TYPE = 'Attest';
+export const REVOKE_PRIMARY_TYPE = 'Revoke';
+export const ATTEST_TYPE: TypedData[] = [
+  { name: 'schema', type: 'bytes32' },
+  { name: 'recipient', type: 'address' },
+  { name: 'expirationTime', type: 'uint64' },
+  { name: 'revocable', type: 'bool' },
+  { name: 'refUID', type: 'bytes32' },
+  { name: 'data', type: 'bytes' },
+  { name: 'nonce', type: 'uint256' }
+];
+export const REVOKE_TYPE: TypedData[] = [
+  { name: 'schema', type: 'bytes32' },
+  { name: 'uid', type: 'bytes32' },
+  { name: 'nonce', type: 'uint256' }
+];
+
+export const ATTEST_PROXY_TYPED_SIGNATURE =
+  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data)';
+export const REVOKE_PROXY_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid)';
+export const ATTEST_PROXY_PRIMARY_TYPE = 'Attest';
+export const REVOKE_PROXY_PRIMARY_TYPE = 'Revoke';
+export const ATTEST_PROXY_TYPE: TypedData[] = [
+  { name: 'schema', type: 'bytes32' },
+  { name: 'recipient', type: 'address' },
+  { name: 'expirationTime', type: 'uint64' },
+  { name: 'revocable', type: 'bool' },
+  { name: 'refUID', type: 'bytes32' },
+  { name: 'data', type: 'bytes' }
+];
+export const REVOKE_PROXY_TYPE: TypedData[] = [
+  { name: 'schema', type: 'bytes32' },
+  { name: 'uid', type: 'bytes32' }
+];
+
 export class EIP712Utils {
   private verifier: EAS | TestEIP712Verifier;
   private config?: TypedDataConfig;
+  private name?: string;
 
   private constructor(verifier: EAS | TestEIP712Verifier) {
     this.verifier = verifier;
@@ -130,9 +149,11 @@ export class EIP712Utils {
       version: await this.verifier.VERSION(),
       chainId: network.config.chainId!
     };
+
+    this.name = await this.verifier.getName();
   }
 
-  public getDomainSeparator() {
+  public getDomainSeparator(name: string) {
     if (!this.config) {
       throw new Error("EIP712Utils wasn't initialized");
     }
@@ -142,7 +163,7 @@ export class EIP712Utils {
         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
           keccak256(toUtf8Bytes(EIP712_DOMAIN)),
-          keccak256(toUtf8Bytes(EIP712_NAME)),
+          keccak256(toUtf8Bytes(name)),
           keccak256(toUtf8Bytes(this.config.version)),
           this.config.chainId,
           this.config.address
@@ -152,12 +173,12 @@ export class EIP712Utils {
   }
 
   public getDomainTypedData(): DomainTypedData {
-    if (!this.config) {
+    if (!this.config || !this.name) {
       throw new Error("EIP712Utils wasn't initialized");
     }
 
     return {
-      name: EIP712_NAME,
+      name: this.name,
       version: this.config.version,
       chainId: this.config.chainId,
       verifyingContract: this.config.address
@@ -244,7 +265,7 @@ export class EIP712Utils {
     );
   }
 
-  private static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
+  public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
     params: P,
     types: EIP712TypedData<T, P>,
     signer: TypedDataSigner
@@ -254,7 +275,7 @@ export class EIP712Utils {
     return { types, params, ...splitSignature(rawSignature) };
   }
 
-  private static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
+  public static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
     attester: string,
     request: EIP712Request<T, P>
   ): boolean {

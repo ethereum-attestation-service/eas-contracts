@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -13,16 +13,14 @@ import {
     DelegatedRevocationRequest,
     RevocationRequest,
     RevocationRequestData
-} from "./IEAS.sol";
+} from "../IEAS.sol";
 
-import { EIP712Signature } from "./Types.sol";
+import { EIP712Signature, InvalidSignature } from "../Common.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
  */
 abstract contract EIP712Verifier is EIP712 {
-    error InvalidSignature();
-
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)").
     bytes32 private constant ATTEST_TYPEHASH = 0xdbfdf8dc2b135c26253e00d5b6cbe6f20457e003fd526d97cea183883570de61;
@@ -30,6 +28,9 @@ abstract contract EIP712Verifier is EIP712 {
     // The hash of the data type used to relay calls to the revoke function. It's the value of
     // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 nonce)").
     bytes32 private constant REVOKE_TYPEHASH = 0xa98d02348410c9c76735e0d0bb1396f4015ac2bb9615f9c2611d19d7a8a99650;
+
+    // The user readable name of the signing domain.
+    string private _name;
 
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
@@ -39,7 +40,9 @@ abstract contract EIP712Verifier is EIP712 {
      *
      * @param version The current major version of the signing domain
      */
-    constructor(string memory version) EIP712("EAS", version) {}
+    constructor(string memory name, string memory version) EIP712(name, version) {
+        _name = name;
+    }
 
     /**
      * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
@@ -71,6 +74,13 @@ abstract contract EIP712Verifier is EIP712 {
      */
     function getRevokeTypeHash() external pure returns (bytes32) {
         return REVOKE_TYPEHASH;
+    }
+
+    /**
+     * Returns the EIP712 name.
+     */
+    function getName() external view returns (string memory) {
+        return _name;
     }
 
     /**

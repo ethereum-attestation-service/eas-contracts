@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
-import { EMPTY_UID, EIP712Signature } from "./Types.sol";
+import { AccessDenied, EMPTY_UID, EIP712Signature, InvalidLength, NotFound, NO_EXPIRATION_TIME } from "./Common.sol";
 
 // prettier-ignore
 import {
@@ -21,8 +21,10 @@ import {
     RevocationRequest,
     RevocationRequestData
 } from "./IEAS.sol";
+
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-import { EIP712Verifier } from "./EIP712Verifier.sol";
+
+import { EIP712Verifier } from "./eip712/EIP712Verifier.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
@@ -37,7 +39,6 @@ struct AttestationsResult {
 contract EAS is IEAS, EIP712Verifier {
     using Address for address payable;
 
-    error AccessDenied();
     error AlreadyRevoked();
     error AlreadyRevokedOffchain();
     error AlreadyTimestamped();
@@ -45,7 +46,6 @@ contract EAS is IEAS, EIP712Verifier {
     error InvalidAttestation();
     error InvalidAttestations();
     error InvalidExpirationTime();
-    error InvalidLength();
     error InvalidOffset();
     error InvalidRegistry();
     error InvalidRevocation();
@@ -53,15 +53,11 @@ contract EAS is IEAS, EIP712Verifier {
     error InvalidSchema();
     error InvalidVerifier();
     error Irrevocable();
-    error NotFound();
     error NotPayable();
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.26";
-
-    // A zero expiration represents an non-expiring attestation.
-    uint64 private constant NO_EXPIRATION_TIME = 0;
+    string public constant VERSION = "0.27";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -80,7 +76,7 @@ contract EAS is IEAS, EIP712Verifier {
      *
      * @param registry The address of the global schema registry.
      */
-    constructor(ISchemaRegistry registry) EIP712Verifier(VERSION) {
+    constructor(ISchemaRegistry registry) EIP712Verifier("EAS", VERSION) {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }
@@ -98,7 +94,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function attest(AttestationRequest calldata request) public payable virtual returns (bytes32) {
+    function attest(AttestationRequest calldata request) external payable returns (bytes32) {
         AttestationRequestData[] memory requests = new AttestationRequestData[](1);
         requests[0] = request.data;
 
@@ -110,7 +106,7 @@ contract EAS is IEAS, EIP712Verifier {
      */
     function attestByDelegation(
         DelegatedAttestationRequest calldata delegatedRequest
-    ) public payable virtual returns (bytes32) {
+    ) external payable returns (bytes32) {
         _verifyAttest(delegatedRequest);
 
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
@@ -251,7 +247,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function revoke(RevocationRequest calldata request) public payable virtual {
+    function revoke(RevocationRequest calldata request) external payable {
         RevocationRequestData[] memory requests = new RevocationRequestData[](1);
         requests[0] = request.data;
 
@@ -261,7 +257,7 @@ contract EAS is IEAS, EIP712Verifier {
     /**
      * @inheritdoc IEAS
      */
-    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) public payable virtual {
+    function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable {
         _verifyRevoke(delegatedRequest);
 
         RevocationRequestData[] memory data = new RevocationRequestData[](1);
@@ -440,8 +436,8 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
-      * @inheritdoc IEAS
-      */
+     * @inheritdoc IEAS
+     */
     function getRevokeOffchain(address revoker, bytes32 data) external view returns (uint64) {
         return _revocationsOffchain[revoker][data];
     }
@@ -798,6 +794,48 @@ contract EAS is IEAS, EIP712Verifier {
     }
 
     /**
+     * @dev Timestamps the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     * @param time The timestamp.
+     */
+    function _timestamp(bytes32 data, uint64 time) private {
+        if (_timestamps[data] != 0) {
+            revert AlreadyTimestamped();
+        }
+
+        _timestamps[data] = time;
+
+        emit Timestamped(data, time);
+    }
+
+    /**
+     * @dev Timestamps the specified bytes32 data.
+     *
+     * @param data The data to timestamp.
+     * @param time The timestamp.
+     */
+    function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
+        mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
+
+        if (revocations[data] != 0) {
+            revert AlreadyRevokedOffchain();
+        }
+
+        revocations[data] = time;
+
+        emit RevokedOffchain(revoker, data, time);
+    }
+
+    /**
+     * @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
+     * current block time.
+     */
+    function _time() internal view virtual returns (uint64) {
+        return uint64(block.timestamp);
+    }
+
+    /**
      * @dev Merges lists of UIDs.
      *
      * @param uidLists The provided lists of UIDs.
@@ -819,54 +857,12 @@ contract EAS is IEAS, EIP712Verifier {
                     ++currentIndex;
                 }
             }
+
             unchecked {
                 ++i;
             }
         }
 
         return uids;
-    }
-
-    /**
-     * @dev Timestamps the specified bytes32 data.
-     *
-     * @param data The data to timestamp.
-     * @param time The timestamp.
-     */
-    function _timestamp(bytes32 data, uint64 time) private {
-        if (_timestamps[data] != 0) {
-            revert AlreadyTimestamped();
-        }
-
-        _timestamps[data] = time;
-
-        emit Timestamped(data, time);
-    }
-
-    /**
-         * @dev Timestamps the specified bytes32 data.
-         *
-         * @param data The data to timestamp.
-         * @param time The timestamp.
-         */
-    function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
-        mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
-
-
-        if (revocations[data] != 0) {
-            revert AlreadyRevokedOffchain();
-        }
-
-        revocations[data] = time;
-
-        emit RevokedOffchain(revoker, data, time);
-    }
-
-    /**
-     * @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
-     * current block time.
-     */
-    function _time() internal view virtual returns (uint64) {
-        return uint64(block.timestamp);
     }
 }

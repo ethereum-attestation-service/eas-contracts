@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { SchemaResolver } from "../SchemaResolver.sol";
 
@@ -14,14 +14,11 @@ contract AttestationResolver is SchemaResolver {
 
     constructor(IEAS eas) SchemaResolver(eas) {}
 
-    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal view override returns (bool) {
         return _eas.isAttestationValid(_toBytes32(attestation.data, 0));
     }
 
-    function onRevoke(
-        Attestation calldata /*attestation*/,
-        uint256 /*value*/
-    ) internal virtual override returns (bool) {
+    function onRevoke(Attestation calldata /*attestation*/, uint256 /*value*/) internal pure override returns (bool) {
         return true;
     }
 

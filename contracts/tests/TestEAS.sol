@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { EAS } from "../EAS.sol";
 
@@ -21,7 +21,7 @@ contract TestEAS is EAS {
         return _time();
     }
 
-    function _time() internal view virtual override returns (uint64) {
+    function _time() internal view override returns (uint64) {
         return _currentTime == INITIAL_TIME ? super._time() : _currentTime;
     }
 }

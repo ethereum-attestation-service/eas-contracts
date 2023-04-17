@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
@@ -26,7 +26,7 @@ contract PayingResolver is SchemaResolver {
         return true;
     }
 
-    function onAttest(Attestation calldata attestation, uint256 value) internal virtual override returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 value) internal override returns (bool) {
         if (value > 0) {
             return false;
         }
@@ -36,7 +36,7 @@ contract PayingResolver is SchemaResolver {
         return true;
     }
 
-    function onRevoke(Attestation calldata attestation, uint256 value) internal virtual override returns (bool) {
+    function onRevoke(Attestation calldata attestation, uint256 value) internal override returns (bool) {
         if (value < _incentive) {
             return false;
         }

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import { Attestation } from "../Types.sol";
+import { Attestation } from "../Common.sol";
 
 /**
  * @title The interface of an optional schema resolver.

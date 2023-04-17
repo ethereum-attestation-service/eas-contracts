@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
-import { Attestation, EIP712Signature } from "./Types.sol";
+import { Attestation, EIP712Signature } from "./Common.sol";
 
 /**
  * @dev A struct representing the arguments of the attestation request.

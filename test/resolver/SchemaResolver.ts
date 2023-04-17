@@ -40,7 +40,7 @@ describe('SchemaResolver', () => {
     it('should be properly initialized', async () => {
       const resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
 
-      expect(await resolver.VERSION()).to.equal('0.26');
+      expect(await resolver.VERSION()).to.equal('0.27');
     });
   });
 

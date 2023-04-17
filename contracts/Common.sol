@@ -1,9 +1,18 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.19;
 
 // A representation of an empty/uninitialized UID.
 bytes32 constant EMPTY_UID = 0;
+
+// A zero expiration represents an non-expiring attestation.
+uint64 constant NO_EXPIRATION_TIME = 0;
+
+error AccessDenied();
+error InvalidEAS();
+error InvalidLength();
+error InvalidSignature();
+error NotFound();
 
 /**
  * @dev A struct representing EIP712 signature data.
