@@ -122,6 +122,13 @@ contract EIP712Proxy is EIP712 {
         _name = name;
     }
 
+     /**
+     * @dev Returns the EAS.
+     */
+    function getEAS() external view returns (IEAS) {
+        return _eas;
+    }
+
     /**
      * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
      */
