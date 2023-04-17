@@ -9,9 +9,10 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 const { defaultAbiCoder } = utils;
 
+const NAME_SCHEMA_UID = getSchemaUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
+
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
-  const targetSchemaId = getSchemaUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
 
   for (const { schema, name } of SCHEMAS) {
     const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
@@ -21,7 +22,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       methodName: 'attest',
       args: [
         {
-          schema: targetSchemaId,
+          schema: NAME_SCHEMA_UID,
           data: {
             recipient: ZERO_ADDRESS,
             expirationTime: NO_EXPIRATION,
