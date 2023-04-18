@@ -100,13 +100,6 @@ export interface MultiRevocationRequest {
   requests: RevocationRequestData[];
 }
 
-export interface MultiDelegateRevocationRequest {
-  schema: string;
-  data: RevocationRequestData[];
-  signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[];
-  attester: string;
-}
-
 export const expectAttestation = async (
   contracts: RequestContracts,
   schema: string,
