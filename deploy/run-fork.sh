@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 dotenv=$(dirname $0)/../.env
 if [ -f "${dotenv}" ]; then

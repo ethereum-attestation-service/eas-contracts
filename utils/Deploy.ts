@@ -1,4 +1,4 @@
-import { EAS, EIP712Verifier, SchemaRegistry } from '../components/Contracts';
+import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 import { toWei } from './Types';
@@ -33,7 +33,7 @@ const maxPriorityFee = MAX_PRIORITY_FEE ? BigNumber.from(MAX_PRIORITY_FEE) : und
 export enum NewInstanceName {
   EAS = 'EAS',
   SchemaRegistry = 'SchemaRegistry',
-  EIP712Verifier = 'EIP712Verifier'
+  EIP712Proxy = 'EIP712Proxy'
 }
 
 export const InstanceName = {
@@ -49,7 +49,7 @@ const deployed = <F extends Contract>(name: InstanceName) => ({
 const DeployedNewContracts = {
   EAS: deployed<EAS>(InstanceName.EAS),
   SchemaRegistry: deployed<SchemaRegistry>(InstanceName.SchemaRegistry),
-  EIP712Verifier: deployed<EIP712Verifier>(InstanceName.EIP712Verifier)
+  EIP712Proxy: deployed<EIP712Proxy>(InstanceName.EIP712Proxy)
 };
 
 export const DeployedContracts = {
@@ -317,7 +317,7 @@ const verifyTenderlyFork = async (deployment: Deployment) => {
   for (const contract of contracts) {
     Logger.log('  verifying on tenderly', contract.name, 'at', contract.address);
 
-    await tenderly.network().verify(contract);
+    await tenderly.verify(contract);
   }
 };
 
