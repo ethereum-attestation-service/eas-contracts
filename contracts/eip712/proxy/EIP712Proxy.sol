@@ -122,7 +122,7 @@ contract EIP712Proxy is EIP712 {
         _name = name;
     }
 
-     /**
+    /**
      * @dev Returns the EAS.
      */
     function getEAS() external view returns (IEAS) {
