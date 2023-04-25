@@ -53,7 +53,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
   const { deployer } = await getNamedAccounts();
 
   const testAttestations: Record<string, TestAttestationGroup> = {};
-  const testAttestationsPerSchema = 100;
+  const testAttestationsPerSchema = 20;
 
   const chance = new Chance();
   const attestationGroups = [
