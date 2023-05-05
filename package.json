@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.27.1",
+  "version": "0.27.2",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
     "!/dist/typechain-types/factories/contracts/tests/**/*",
     "/deployments/mainnet/**/*",
     "/deployments/arbitrum-one/**/*",
-    "/deployments/sepolia/**/*"
+    "/deployments/sepolia/**/*",
+    "/deployments/optimism-goerli/**/*"
   ],
   "scripts": {
     "compile": "hardhat compile",
@@ -34,10 +35,12 @@
     "deploy:mainnet": "HARDHAT_NETWORK=mainnet hardhat deploy",
     "deploy:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat deploy",
     "deploy:sepolia": "HARDHAT_NETWORK=sepolia hardhat deploy",
+    "deploy:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat deploy",
     "deploy:fork": "yarn deploy:prepare:fork && HARDHAT_NETWORK=tenderly hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat etherscan-verify --license MIT",
     "verify:sepolia": "HARDHAT_NETWORK=sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.etherscan.io/",
+    "verify:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli-optimism.etherscan.io",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",
     "lint:ts": "yarn eslint components deploy test utils",
