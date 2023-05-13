@@ -36,6 +36,8 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 ## Deployments
 
+Please note that you can also import and use the addresses directly in your code using the `@ethereum-attestation-service/eas-contracts/deployments` deployment artifacts corresponding to your desired network.
+
 ### Ethereum
 
 #### v0.26
@@ -68,6 +70,17 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 * **SchemaRegistry**:
   * Contract: [0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0](https://sepolia.etherscan.io/address/0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
+
+### Optimism Goerli
+
+#### v0.27
+
+* **EAS**:
+  * Contract: [0xC2679fBD37d54388Ce493F1DB75320D236e1815e](https://goerli-optimism.etherscan.io/address/0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84)
+  * Deployment and ABI: [EAS.json](./deployments/optimism-goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f](https://goerli-optimism.etherscan.io/address/0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism-goerli/SchemaRegistry.json)
 
 ## Installation
 
