@@ -85,7 +85,7 @@ Please note that you can also import and use the addresses directly in your code
 ## Installation
 
 ```sh
-yarn install @ethereum-attestation-service/eas-contracts
+yarn add @ethereum-attestation-service/eas-contracts
 ```
 
 ## Testing
