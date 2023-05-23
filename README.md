@@ -82,6 +82,17 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f](https://goerli-optimism.etherscan.io/address/0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f)
   * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism-goerli/SchemaRegistry.json)
 
+### Base Goerli
+
+#### v0.27
+
+* **EAS**:
+  * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https://goerli.basescan.org//address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
+  * Deployment and ABI: [EAS.json](./deployments/base-goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https://goerli.basescan.org//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments//base-goerli/SchemaRegistry.json)
+
 ## Installation
 
 ```sh
