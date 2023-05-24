@@ -61,7 +61,8 @@ export const isMainnetFork = () => isTenderlyFork();
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet || isMainnetFork();
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
-export const isTestnet = () => isSepolia() || isOptimismGoerli;
+export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
+export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli();
 export const isLive = () => (isMainnet() && !isMainnetFork()) || isSepolia();
 
 export const getDeploymentDir = () => {

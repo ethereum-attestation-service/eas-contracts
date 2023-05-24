@@ -9,6 +9,7 @@ export enum DeploymentNetwork {
   ArbitrumOne = 'arbitrum-one',
   Sepolia = 'sepolia',
   OptimismGoerli = 'optimism-goerli',
+  BaseGoerli = 'base-goerli',
   Hardhat = 'hardhat',
   Tenderly = 'tenderly'
 }

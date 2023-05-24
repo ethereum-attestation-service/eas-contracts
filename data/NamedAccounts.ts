@@ -25,11 +25,16 @@ const optimismGoerli = (address: string) => ({
   [DeploymentNetwork.OptimismGoerli]: address
 });
 
+const baseGoerli = (address: string) => ({
+  [DeploymentNetwork.BaseGoerli]: address
+});
+
 const TestNamedAccounts = {
   ethWhale: {
     ...mainnet('0x00000000219ab540356cbb839cbe05303d7705fa'),
     ...sepolia('0xb21c33DE1FAb3FA15499c62B59fe0cC3250020d1'),
-    ...optimismGoerli('0x4200000000000000000000000000000000000006')
+    ...optimismGoerli('0x4200000000000000000000000000000000000006'),
+    ...baseGoerli('0x4200000000000000000000000000000000000016')
   }
 };
 
@@ -38,7 +43,8 @@ export const NamedAccounts = {
     ...mainnet(deployer),
     ...sepolia(deployer),
     ...arbitrumOne(deployer),
-    ...optimismGoerli(deployer)
+    ...optimismGoerli(deployer),
+    ...baseGoerli(deployer)
   },
 
   ...TestNamedAccounts

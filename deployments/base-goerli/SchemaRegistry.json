@@ -1,0 +1,255 @@
+{
+  "address": "0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AlreadyExists",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "uid",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "registerer",
+          "type": "address"
+        }
+      ],
+      "name": "Registered",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "VERSION",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getSchema",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "uid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "contract ISchemaResolver",
+              "name": "resolver",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "revocable",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "schema",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct SchemaRecord",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "schema",
+          "type": "string"
+        },
+        {
+          "internalType": "contract ISchemaResolver",
+          "name": "resolver",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "revocable",
+          "type": "bool"
+        }
+      ],
+      "name": "register",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xab5c8431a85c4f972aef4a1e3d7de8d4c5420e0c6b5597baa02430e56f251efb",
+  "receipt": {
+    "to": null,
+    "from": "0xAd4A7C88D9404d92669134b4197eABC7F05a30dc",
+    "contractAddress": "0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E",
+    "transactionIndex": 1,
+    "gasUsed": "486272",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x2b4bd4479d0761fb555d514729026236350a6f0a18f8c35b1d953aec2bca1e0e",
+    "transactionHash": "0xab5c8431a85c4f972aef4a1e3d7de8d4c5420e0c6b5597baa02430e56f251efb",
+    "logs": [],
+    "blockNumber": 4843433,
+    "cumulativeGasUsed": "533173",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "d83b35e9073b87e3a3bddfe022bd63a3",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"AlreadyExists\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"uid\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"registerer\",\"type\":\"address\"}],\"name\":\"Registered\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uid\",\"type\":\"bytes32\"}],\"name\":\"getSchema\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"uid\",\"type\":\"bytes32\"},{\"internalType\":\"contract ISchemaResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"revocable\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"schema\",\"type\":\"string\"}],\"internalType\":\"struct SchemaRecord\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"schema\",\"type\":\"string\"},{\"internalType\":\"contract ISchemaResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"revocable\",\"type\":\"bool\"}],\"name\":\"register\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"Registered(bytes32,address)\":{\"details\":\"Emitted when a new schema has been registered\",\"params\":{\"registerer\":\"The address of the account used to register the schema.\",\"uid\":\"The schema UID.\"}}},\"kind\":\"dev\",\"methods\":{\"getSchema(bytes32)\":{\"details\":\"Returns an existing schema by UID\",\"params\":{\"uid\":\"The UID of the schema to retrieve.\"},\"returns\":{\"_0\":\"The schema data members.\"}},\"register(string,address,bool)\":{\"details\":\"Submits and reserves a new schema\",\"params\":{\"resolver\":\"An optional schema resolver.\",\"revocable\":\"Whether the schema allows revocations explicitly.\",\"schema\":\"The schema data schema.\"},\"returns\":{\"_0\":\"The UID of the new schema.\"}}},\"title\":\"The global schema registry.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/SchemaRegistry.sol\":\"SchemaRegistry\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"none\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":1000000},\"remappings\":[]},\"sources\":{\"contracts/Common.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n// A representation of an empty/uninitialized UID.\\nbytes32 constant EMPTY_UID = 0;\\n\\n// A zero expiration represents an non-expiring attestation.\\nuint64 constant NO_EXPIRATION_TIME = 0;\\n\\nerror AccessDenied();\\nerror InvalidEAS();\\nerror InvalidLength();\\nerror InvalidSignature();\\nerror NotFound();\\n\\n/**\\n * @dev A struct representing EIP712 signature data.\\n */\\nstruct EIP712Signature {\\n    uint8 v; // The recovery ID.\\n    bytes32 r; // The x-coordinate of the nonce R.\\n    bytes32 s; // The signature data.\\n}\\n\\n/**\\n * @dev A struct representing a single attestation.\\n */\\nstruct Attestation {\\n    bytes32 uid; // A unique identifier of the attestation.\\n    bytes32 schema; // The unique identifier of the schema.\\n    uint64 time; // The time when the attestation was created (Unix timestamp).\\n    uint64 expirationTime; // The time when the attestation expires (Unix timestamp).\\n    uint64 revocationTime; // The time when the attestation was revoked (Unix timestamp).\\n    bytes32 refUID; // The UID of the related attestation.\\n    address recipient; // The recipient of the attestation.\\n    address attester; // The attester/sender of the attestation.\\n    bool revocable; // Whether the attestation is revocable.\\n    bytes data; // Custom attestation data.\\n}\\n\",\"keccak256\":\"0x2d12c2b6a44431eb32d93baa8bb9b322e64bf5c15cb39a8b7cf34f6034bf1636\",\"license\":\"MIT\"},\"contracts/ISchemaRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport { ISchemaResolver } from \\\"./resolver/ISchemaResolver.sol\\\";\\n\\n/**\\n * @title A struct representing a record for a submitted schema.\\n */\\nstruct SchemaRecord {\\n    bytes32 uid; // The unique identifier of the schema.\\n    ISchemaResolver resolver; // Optional schema resolver.\\n    bool revocable; // Whether the schema allows revocations explicitly.\\n    string schema; // Custom specification of the schema (e.g., an ABI).\\n}\\n\\n/**\\n * @title The global schema registry interface.\\n */\\ninterface ISchemaRegistry {\\n    /**\\n     * @dev Emitted when a new schema has been registered\\n     *\\n     * @param uid The schema UID.\\n     * @param registerer The address of the account used to register the schema.\\n     */\\n    event Registered(bytes32 indexed uid, address registerer);\\n\\n    /**\\n     * @dev Submits and reserves a new schema\\n     *\\n     * @param schema The schema data schema.\\n     * @param resolver An optional schema resolver.\\n     * @param revocable Whether the schema allows revocations explicitly.\\n     *\\n     * @return The UID of the new schema.\\n     */\\n    function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32);\\n\\n    /**\\n     * @dev Returns an existing schema by UID\\n     *\\n     * @param uid The UID of the schema to retrieve.\\n     *\\n     * @return The schema data members.\\n     */\\n    function getSchema(bytes32 uid) external view returns (SchemaRecord memory);\\n}\\n\",\"keccak256\":\"0xef47e449dd02bd034e26b1dea505ce533906f8462fc674c938ed0e872a68d640\",\"license\":\"MIT\"},\"contracts/SchemaRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.19;\\n\\nimport { EMPTY_UID } from \\\"./Common.sol\\\";\\nimport { ISchemaRegistry, SchemaRecord } from \\\"./ISchemaRegistry.sol\\\";\\n\\nimport { ISchemaResolver } from \\\"./resolver/ISchemaResolver.sol\\\";\\n\\n/**\\n * @title The global schema registry.\\n */\\ncontract SchemaRegistry is ISchemaRegistry {\\n    error AlreadyExists();\\n\\n    // The version of the contract.\\n    string public constant VERSION = \\\"0.27\\\";\\n\\n    // The global mapping between schema records and their IDs.\\n    mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;\\n\\n    /**\\n     * @inheritdoc ISchemaRegistry\\n     */\\n    function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32) {\\n        SchemaRecord memory schemaRecord = SchemaRecord({\\n            uid: EMPTY_UID,\\n            schema: schema,\\n            resolver: resolver,\\n            revocable: revocable\\n        });\\n\\n        bytes32 uid = _getUID(schemaRecord);\\n        if (_registry[uid].uid != EMPTY_UID) {\\n            revert AlreadyExists();\\n        }\\n\\n        schemaRecord.uid = uid;\\n        _registry[uid] = schemaRecord;\\n\\n        emit Registered(uid, msg.sender);\\n\\n        return uid;\\n    }\\n\\n    /**\\n     * @inheritdoc ISchemaRegistry\\n     */\\n    function getSchema(bytes32 uid) external view returns (SchemaRecord memory) {\\n        return _registry[uid];\\n    }\\n\\n    /**\\n     * @dev Calculates a UID for a given schema.\\n     *\\n     * @param schemaRecord The input schema.\\n     *\\n     * @return schema UID.\\n     */\\n    function _getUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {\\n        return keccak256(abi.encodePacked(schemaRecord.schema, schemaRecord.resolver, schemaRecord.revocable));\\n    }\\n}\\n\",\"keccak256\":\"0x1770439123792021687c0cdee53f4c620469af39bb69479fa5b1f615901bfe6f\",\"license\":\"MIT\"},\"contracts/resolver/ISchemaResolver.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport { Attestation } from \\\"../Common.sol\\\";\\n\\n/**\\n * @title The interface of an optional schema resolver.\\n */\\ninterface ISchemaResolver {\\n    /**\\n     * @dev Returns whether the resolver supports ETH transfers.\\n     */\\n    function isPayable() external pure returns (bool);\\n\\n    /**\\n     * @dev Processes an attestation and verifies whether it's valid.\\n     *\\n     * @param attestation The new attestation.\\n     *\\n     * @return Whether the attestation is valid.\\n     */\\n    function attest(Attestation calldata attestation) external payable returns (bool);\\n\\n    /**\\n     * @dev Processes multiple attestations and verifies whether they are valid.\\n     *\\n     * @param attestations The new attestations.\\n     * @param values Explicit ETH amounts which were sent with each attestation.\\n     *\\n     * @return Whether all the attestations are valid.\\n     */\\n    function multiAttest(\\n        Attestation[] calldata attestations,\\n        uint256[] calldata values\\n    ) external payable returns (bool);\\n\\n    /**\\n     * @dev Processes an attestation revocation and verifies if it can be revoked.\\n     *\\n     * @param attestation The existing attestation to be revoked.\\n     *\\n     * @return Whether the attestation can be revoked.\\n     */\\n    function revoke(Attestation calldata attestation) external payable returns (bool);\\n\\n    /**\\n     * @dev Processes revocation of multiple attestation and verifies they can be revoked.\\n     *\\n     * @param attestations The existing attestations to be revoked.\\n     * @param values Explicit ETH amounts which were sent with each revocation.\\n     *\\n     * @return Whether the attestations can be revoked.\\n     */\\n    function multiRevoke(\\n        Attestation[] calldata attestations,\\n        uint256[] calldata values\\n    ) external payable returns (bool);\\n}\\n\",\"keccak256\":\"0xc628c6540da258f76192eaa34c21699c9cbcc4a4029d7ee04e88dc9c18c981fd\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506107df806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806360d7a27814610046578063a2ea7c6e1461006c578063ffa1ad741461008c575b600080fd5b6100596100543660046103e6565b6100d5565b6040519081526020015b60405180910390f35b61007f61007a366004610498565b61027e565b604051610063919061051f565b6100c86040518060400160405280600481526020017f302e32370000000000000000000000000000000000000000000000000000000081525081565b6040516100639190610578565b60008060405180608001604052806000801b81526020018573ffffffffffffffffffffffffffffffffffffffff168152602001841515815260200187878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920182905250939094525092935091506101579050826103a6565b600081815260208190526040902054909150156101a0576040517f23369fa600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b80825260008181526020818152604091829020845181559084015160018201805493860151151574010000000000000000000000000000000000000000027fffffffffffffffffffffff00000000000000000000000000000000000000000090941673ffffffffffffffffffffffffffffffffffffffff90921691909117929092179091556060830151839190600282019061023c9082610663565b50506040513381528291507f7d917fcbc9a29a9705ff9936ffa599500e4fd902e4486bae317414fe967b307c9060200160405180910390a29695505050505050565b604080516080810182526000808252602082018190529181019190915260608082015260008281526020818152604091829020825160808101845281548152600182015473ffffffffffffffffffffffffffffffffffffffff8116938201939093527401000000000000000000000000000000000000000090920460ff1615159282019290925260028201805491929160608401919061031d906105c1565b80601f0160208091040260200160405190810160405280929190818152602001828054610349906105c1565b80156103965780601f1061036b57610100808354040283529160200191610396565b820191906000526020600020905b81548152906001019060200180831161037957829003601f168201915b5050505050815250509050919050565b60008160600151826020015183604001516040516020016103c99392919061077d565b604051602081830303815290604052805190602001209050919050565b600080600080606085870312156103fc57600080fd5b843567ffffffffffffffff8082111561041457600080fd5b818701915087601f83011261042857600080fd5b81358181111561043757600080fd5b88602082850101111561044957600080fd5b6020928301965094505085013573ffffffffffffffffffffffffffffffffffffffff8116811461047857600080fd5b91506040850135801515811461048d57600080fd5b939692955090935050565b6000602082840312156104aa57600080fd5b5035919050565b60005b838110156104cc5781810151838201526020016104b4565b50506000910152565b600081518084526104ed8160208601602086016104b1565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b602081528151602082015273ffffffffffffffffffffffffffffffffffffffff60208301511660408201526040820151151560608201526000606083015160808084015261057060a08401826104d5565b949350505050565b60208152600061058b60208301846104d5565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600181811c908216806105d557607f821691505b60208210810361060e577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f82111561065e57600081815260208120601f850160051c8101602086101561063b5750805b601f850160051c820191505b8181101561065a57828155600101610647565b5050505b505050565b815167ffffffffffffffff81111561067d5761067d610592565b6106918161068b84546105c1565b84610614565b602080601f8311600181146106e457600084156106ae5750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b17855561065a565b6000858152602081207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08616915b8281101561073157888601518255948401946001909101908401610712565b508582101561076d57878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b01905550565b6000845161078f8184602089016104b1565b60609490941b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000169190930190815290151560f81b60148201526015019291505056fea164736f6c6343000813000a",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c806360d7a27814610046578063a2ea7c6e1461006c578063ffa1ad741461008c575b600080fd5b6100596100543660046103e6565b6100d5565b6040519081526020015b60405180910390f35b61007f61007a366004610498565b61027e565b604051610063919061051f565b6100c86040518060400160405280600481526020017f302e32370000000000000000000000000000000000000000000000000000000081525081565b6040516100639190610578565b60008060405180608001604052806000801b81526020018573ffffffffffffffffffffffffffffffffffffffff168152602001841515815260200187878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920182905250939094525092935091506101579050826103a6565b600081815260208190526040902054909150156101a0576040517f23369fa600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b80825260008181526020818152604091829020845181559084015160018201805493860151151574010000000000000000000000000000000000000000027fffffffffffffffffffffff00000000000000000000000000000000000000000090941673ffffffffffffffffffffffffffffffffffffffff90921691909117929092179091556060830151839190600282019061023c9082610663565b50506040513381528291507f7d917fcbc9a29a9705ff9936ffa599500e4fd902e4486bae317414fe967b307c9060200160405180910390a29695505050505050565b604080516080810182526000808252602082018190529181019190915260608082015260008281526020818152604091829020825160808101845281548152600182015473ffffffffffffffffffffffffffffffffffffffff8116938201939093527401000000000000000000000000000000000000000090920460ff1615159282019290925260028201805491929160608401919061031d906105c1565b80601f0160208091040260200160405190810160405280929190818152602001828054610349906105c1565b80156103965780601f1061036b57610100808354040283529160200191610396565b820191906000526020600020905b81548152906001019060200180831161037957829003601f168201915b5050505050815250509050919050565b60008160600151826020015183604001516040516020016103c99392919061077d565b604051602081830303815290604052805190602001209050919050565b600080600080606085870312156103fc57600080fd5b843567ffffffffffffffff8082111561041457600080fd5b818701915087601f83011261042857600080fd5b81358181111561043757600080fd5b88602082850101111561044957600080fd5b6020928301965094505085013573ffffffffffffffffffffffffffffffffffffffff8116811461047857600080fd5b91506040850135801515811461048d57600080fd5b939692955090935050565b6000602082840312156104aa57600080fd5b5035919050565b60005b838110156104cc5781810151838201526020016104b4565b50506000910152565b600081518084526104ed8160208601602086016104b1565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b602081528151602082015273ffffffffffffffffffffffffffffffffffffffff60208301511660408201526040820151151560608201526000606083015160808084015261057060a08401826104d5565b949350505050565b60208152600061058b60208301846104d5565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600181811c908216806105d557607f821691505b60208210810361060e577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f82111561065e57600081815260208120601f850160051c8101602086101561063b5750805b601f850160051c820191505b8181101561065a57828155600101610647565b5050505b505050565b815167ffffffffffffffff81111561067d5761067d610592565b6106918161068b84546105c1565b84610614565b602080601f8311600181146106e457600084156106ae5750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b17855561065a565b6000858152602081207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08616915b8281101561073157888601518255948401946001909101908401610712565b508582101561076d57878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b01905550565b6000845161078f8184602089016104b1565b60609490941b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000169190930190815290151560f81b60148201526015019291505056fea164736f6c6343000813000a",
+  "devdoc": {
+    "events": {
+      "Registered(bytes32,address)": {
+        "details": "Emitted when a new schema has been registered",
+        "params": {
+          "registerer": "The address of the account used to register the schema.",
+          "uid": "The schema UID."
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "getSchema(bytes32)": {
+        "details": "Returns an existing schema by UID",
+        "params": {
+          "uid": "The UID of the schema to retrieve."
+        },
+        "returns": {
+          "_0": "The schema data members."
+        }
+      },
+      "register(string,address,bool)": {
+        "details": "Submits and reserves a new schema",
+        "params": {
+          "resolver": "An optional schema resolver.",
+          "revocable": "Whether the schema allows revocations explicitly.",
+          "schema": "The schema data schema."
+        },
+        "returns": {
+          "_0": "The UID of the new schema."
+        }
+      }
+    },
+    "title": "The global schema registry.",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 5296,
+        "contract": "contracts/SchemaRegistry.sol:SchemaRegistry",
+        "label": "_registry",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_bytes32,t_struct(SchemaRecord)5243_storage)"
+      }
+    ],
+    "types": {
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_contract(ISchemaResolver)6607": {
+        "encoding": "inplace",
+        "label": "contract ISchemaResolver",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_bytes32,t_struct(SchemaRecord)5243_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct SchemaRecord)",
+        "numberOfBytes": "32",
+        "value": "t_struct(SchemaRecord)5243_storage"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(SchemaRecord)5243_storage": {
+        "encoding": "inplace",
+        "label": "struct SchemaRecord",
+        "members": [
+          {
+            "astId": 5235,
+            "contract": "contracts/SchemaRegistry.sol:SchemaRegistry",
+            "label": "uid",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bytes32"
+          },
+          {
+            "astId": 5238,
+            "contract": "contracts/SchemaRegistry.sol:SchemaRegistry",
+            "label": "resolver",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(ISchemaResolver)6607"
+          },
+          {
+            "astId": 5240,
+            "contract": "contracts/SchemaRegistry.sol:SchemaRegistry",
+            "label": "revocable",
+            "offset": 20,
+            "slot": "1",
+            "type": "t_bool"
+          },
+          {
+            "astId": 5242,
+            "contract": "contracts/SchemaRegistry.sol:SchemaRegistry",
+            "label": "schema",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_string_storage"
+          }
+        ],
+        "numberOfBytes": "96"
+      }
+    }
+  }
+}

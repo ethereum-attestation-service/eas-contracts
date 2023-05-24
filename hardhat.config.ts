@@ -18,6 +18,7 @@ interface EnvOptions {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
+  ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
   TENDERLY_FORK_ID?: string;
@@ -31,6 +32,7 @@ const {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
+  ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
   PROFILE: isProfiling,
   TENDERLY_FORK_ID = '',
@@ -93,6 +95,12 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       live: true
     },
+    [DeploymentNetwork.BaseGoerli]: {
+      chainId: 84531,
+      url: ETHEREUM_BASE_GOERLI_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
     [DeploymentNetwork.Tenderly]: {
       chainId: 1,
       url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
@@ -119,7 +127,6 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 1000000
       },
-      viaIR: true,
       metadata: {
         bytecodeHash: 'none'
       }
