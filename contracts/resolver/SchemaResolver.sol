@@ -3,7 +3,7 @@
 pragma solidity 0.8.19;
 
 import { IEAS, Attestation } from "../IEAS.sol";
-import { InvalidEAS } from "../Common.sol";
+import { InvalidEAS, uncheckedInc } from "../Common.sol";
 
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
@@ -81,7 +81,7 @@ abstract contract SchemaResolver is ISchemaResolver {
         // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {
@@ -96,8 +96,6 @@ abstract contract SchemaResolver is ISchemaResolver {
             unchecked {
                 // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount.
                 remainingValue -= value;
-
-                ++i;
             }
         }
 
@@ -126,7 +124,7 @@ abstract contract SchemaResolver is ISchemaResolver {
         // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {
@@ -141,8 +139,6 @@ abstract contract SchemaResolver is ISchemaResolver {
             unchecked {
                 // Subtract the ETH amount, that was provided to this attestation, from the global remaining ETH amount.
                 remainingValue -= value;
-
-                ++i;
             }
         }
 
