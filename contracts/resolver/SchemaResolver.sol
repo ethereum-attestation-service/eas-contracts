@@ -16,7 +16,7 @@ abstract contract SchemaResolver is ISchemaResolver {
     error NotPayable();
 
     // The version of the contract.
-    string public constant VERSION = "0.27";
+    string public constant VERSION = "0.28";
 
     // The global EAS contract.
     IEAS internal immutable _eas;
