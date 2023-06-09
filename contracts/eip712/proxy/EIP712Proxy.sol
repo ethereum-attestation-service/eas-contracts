@@ -13,7 +13,8 @@ import {
     InvalidLength,
     InvalidSignature,
     NotFound,
-    NO_EXPIRATION_TIME
+    NO_EXPIRATION_TIME,
+    uncheckedInc
 } from "../../Common.sol";
 
 // prettier-ignore
@@ -251,7 +252,7 @@ contract EIP712Proxy is EIP712 {
     ) public payable virtual returns (bytes32[] memory) {
         MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](multiDelegatedRequests.length);
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
@@ -261,7 +262,7 @@ contract EIP712Proxy is EIP712 {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; ) {
+            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyAttest(
                     DelegatedProxyAttestationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -271,17 +272,9 @@ contract EIP712Proxy is EIP712 {
                         deadline: multiDelegatedRequest.deadline
                     })
                 );
-
-                unchecked {
-                    ++j;
-                }
             }
 
             multiRequests[i] = MultiAttestationRequest({ schema: multiDelegatedRequest.schema, data: data });
-
-            unchecked {
-                ++i;
-            }
         }
 
         bytes32[] memory uids = _eas.multiAttest{ value: msg.value }(multiRequests);
@@ -289,22 +282,16 @@ contract EIP712Proxy is EIP712 {
         // Store all attesters, according to the order of the attestation requests.
         uint256 uidCounter = 0;
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
-            for (uint256 j = 0; j < data.length; ) {
+            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _attesters[uids[uidCounter]] = multiDelegatedRequest.attester;
 
                 unchecked {
                     ++uidCounter;
-
-                    ++j;
                 }
-            }
-
-            unchecked {
-                ++i;
             }
         }
 
@@ -378,7 +365,7 @@ contract EIP712Proxy is EIP712 {
     ) public payable virtual {
         MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](multiDelegatedRequests.length);
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             MultiDelegatedProxyRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
             RevocationRequestData[] memory data = multiDelegatedRequest.data;
 
@@ -388,7 +375,7 @@ contract EIP712Proxy is EIP712 {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; ) {
+            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 RevocationRequestData memory requestData = data[j];
 
                 _verifyRevoke(
@@ -400,17 +387,9 @@ contract EIP712Proxy is EIP712 {
                         deadline: multiDelegatedRequest.deadline
                     })
                 );
-
-                unchecked {
-                    ++j;
-                }
             }
 
             multiRequests[i] = MultiRevocationRequest({ schema: multiDelegatedRequest.schema, data: data });
-
-            unchecked {
-                ++i;
-            }
         }
 
         _eas.multiRevoke{ value: msg.value }(multiRequests);

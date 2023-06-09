@@ -4,7 +4,16 @@ pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
-import { AccessDenied, EMPTY_UID, EIP712Signature, InvalidLength, NotFound, NO_EXPIRATION_TIME } from "./Common.sol";
+// prettier-ignore
+import {
+    AccessDenied,
+    EMPTY_UID,
+    EIP712Signature,
+    InvalidLength,
+    NotFound,
+    NO_EXPIRATION_TIME,
+    uncheckedInc
+} from "./Common.sol";
 
 // prettier-ignore
 import {
@@ -57,7 +66,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.27";
+    string public constant VERSION = "0.28";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
@@ -130,7 +139,7 @@ contract EAS is IEAS, EIP712Verifier {
         // possible to send too much ETH anyway.
         uint availableValue = msg.value;
 
-        for (uint256 i = 0; i < multiRequests.length; ) {
+        for (uint256 i = 0; i < multiRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -157,10 +166,6 @@ contract EAS is IEAS, EIP712Verifier {
             unchecked {
                 totalUidsCount += res.uids.length;
             }
-
-            unchecked {
-                ++i;
-            }
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
@@ -184,7 +189,7 @@ contract EAS is IEAS, EIP712Verifier {
         // possible to send too much ETH anyway.
         uint availableValue = msg.value;
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -202,7 +207,7 @@ contract EAS is IEAS, EIP712Verifier {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; ) {
+            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyAttest(
                     DelegatedAttestationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -211,10 +216,6 @@ contract EAS is IEAS, EIP712Verifier {
                         attester: multiDelegatedRequest.attester
                     })
                 );
-
-                unchecked {
-                    ++j;
-                }
             }
 
             // Process the current batch of attestations.
@@ -233,10 +234,6 @@ contract EAS is IEAS, EIP712Verifier {
             totalUids[i] = res.uids;
             unchecked {
                 totalUidsCount += res.uids.length;
-            }
-
-            unchecked {
-                ++i;
             }
         }
 
@@ -276,7 +273,7 @@ contract EAS is IEAS, EIP712Verifier {
         // possible to send too much ETH anyway.
         uint availableValue = msg.value;
 
-        for (uint256 i = 0; i < multiRequests.length; ) {
+        for (uint256 i = 0; i < multiRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -289,10 +286,6 @@ contract EAS is IEAS, EIP712Verifier {
 
             // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
             availableValue -= _revoke(multiRequest.schema, multiRequest.data, msg.sender, availableValue, last);
-
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -308,7 +301,7 @@ contract EAS is IEAS, EIP712Verifier {
         // possible to send too much ETH anyway.
         uint availableValue = msg.value;
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; ) {
+        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -326,7 +319,7 @@ contract EAS is IEAS, EIP712Verifier {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; ) {
+            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyRevoke(
                     DelegatedRevocationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -335,10 +328,6 @@ contract EAS is IEAS, EIP712Verifier {
                         revoker: multiDelegatedRequest.revoker
                     })
                 );
-
-                unchecked {
-                    ++j;
-                }
             }
 
             // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
@@ -349,10 +338,6 @@ contract EAS is IEAS, EIP712Verifier {
                 availableValue,
                 last
             );
-
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -385,12 +370,8 @@ contract EAS is IEAS, EIP712Verifier {
         uint64 time = _time();
 
         uint256 length = data.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             _revokeOffchain(msg.sender, data[i], time);
-
-            unchecked {
-                ++i;
-            }
         }
 
         return time;
@@ -403,12 +384,8 @@ contract EAS is IEAS, EIP712Verifier {
         uint64 time = _time();
 
         uint256 length = data.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             _timestamp(data[i], time);
-
-            unchecked {
-                ++i;
-            }
         }
 
         return time;
@@ -474,7 +451,7 @@ contract EAS is IEAS, EIP712Verifier {
         Attestation[] memory attestations = new Attestation[](length);
         uint256[] memory values = new uint256[](length);
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             AttestationRequestData memory request = data[i];
 
             // Ensure that either no expiration time was set or that it was set in the future.
@@ -530,10 +507,6 @@ contract EAS is IEAS, EIP712Verifier {
             res.uids[i] = uid;
 
             emit Attested(request.recipient, attester, uid, schema);
-
-            unchecked {
-                ++i;
-            }
         }
 
         res.usedValue = _resolveAttestations(schemaRecord, attestations, values, false, availableValue, last);
@@ -569,7 +542,7 @@ contract EAS is IEAS, EIP712Verifier {
         Attestation[] memory attestations = new Attestation[](length);
         uint256[] memory values = new uint256[](length);
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             RevocationRequestData memory request = data[i];
 
             Attestation storage attestation = _db[request.uid];
@@ -605,10 +578,6 @@ contract EAS is IEAS, EIP712Verifier {
             values[i] = request.value;
 
             emit Revoked(attestation.recipient, revoker, request.uid, attestation.schema);
-
-            unchecked {
-                ++i;
-            }
         }
 
         return _resolveAttestations(schemaRecord, attestations, values, true, availableValue, last);
@@ -702,13 +671,9 @@ contract EAS is IEAS, EIP712Verifier {
         ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) == address(0)) {
             // Ensure that we don't accept payments if there is no resolver.
-            for (uint256 i = 0; i < length; ) {
+            for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
                 if (values[i] != 0) {
                     revert NotPayable();
-                }
-
-                unchecked {
-                    ++i;
                 }
             }
 
@@ -717,7 +682,7 @@ contract EAS is IEAS, EIP712Verifier {
 
         uint256 totalUsedValue = 0;
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             uint256 value = values[i];
 
             // Ensure that we don't accept payments which can't be forwarded to the resolver.
@@ -734,8 +699,6 @@ contract EAS is IEAS, EIP712Verifier {
             unchecked {
                 availableValue -= value;
                 totalUsedValue += value;
-
-                ++i;
             }
         }
 
@@ -847,19 +810,14 @@ contract EAS is IEAS, EIP712Verifier {
         bytes32[] memory uids = new bytes32[](uidsCount);
 
         uint256 currentIndex = 0;
-        for (uint256 i = 0; i < uidLists.length; ) {
+        for (uint256 i = 0; i < uidLists.length; i = uncheckedInc(i)) {
             bytes32[] memory currentUids = uidLists[i];
-            for (uint256 j = 0; j < currentUids.length; ) {
+            for (uint256 j = 0; j < currentUids.length; j = uncheckedInc(j)) {
                 uids[currentIndex] = currentUids[j];
 
                 unchecked {
-                    ++j;
                     ++currentIndex;
                 }
-            }
-
-            unchecked {
-                ++i;
             }
         }
 

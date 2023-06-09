@@ -115,7 +115,7 @@ describe('PermissionedEIP712Proxy', () => {
         schemaId,
         { recipient: recipient.address, expirationTime, data: hexlify(0) },
         { signatureType: SignatureType.DelegatedProxy, from: nonOwner },
-        'Ownable: caller is not the owner'
+        'AccessDenied'
       );
 
       await expectFailedMultiAttestations(
@@ -130,7 +130,7 @@ describe('PermissionedEIP712Proxy', () => {
           }
         ],
         { signatureType: SignatureType.DelegatedProxy, from: nonOwner },
-        'Ownable: caller is not the owner'
+        'AccessDenied'
       );
     });
   });
@@ -187,7 +187,7 @@ describe('PermissionedEIP712Proxy', () => {
         schemaId,
         { uid },
         { signatureType: SignatureType.DelegatedProxy, from: nonOwner },
-        'Ownable: caller is not the owner'
+        'AccessDenied'
       );
 
       await expectFailedMultiRevocations(
@@ -199,7 +199,7 @@ describe('PermissionedEIP712Proxy', () => {
           }
         ],
         { signatureType: SignatureType.DelegatedProxy, from: nonOwner },
-        'Ownable: caller is not the owner'
+        'AccessDenied'
       );
     });
   });
