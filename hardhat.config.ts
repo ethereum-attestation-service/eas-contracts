@@ -16,6 +16,7 @@ import 'solidity-coverage';
 interface EnvOptions {
   ETHEREUM_PROVIDER_URL?: string;
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
+  ETHEREUM_OPTIMISM_PROVIDER_URL?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
@@ -30,6 +31,7 @@ interface EnvOptions {
 const {
   ETHEREUM_PROVIDER_URL = '',
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
+  ETHEREUM_OPTIMISM_PROVIDER_URL = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
@@ -80,6 +82,12 @@ const config: HardhatUserConfig = {
     [DeploymentNetwork.ArbitrumOne]: {
       chainId: 42161,
       url: ETHEREUM_ARBITRUM_ONE_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+    [DeploymentNetwork.Optimism]: {
+      chainId: 10,
+      url: ETHEREUM_OPTIMISM_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },
