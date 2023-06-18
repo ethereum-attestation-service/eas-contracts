@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "!/dist/typechain-types/factories/contracts/tests/**/*",
     "/deployments/mainnet/**/*",
     "/deployments/arbitrum-one/**/*",
+    "/deployments/optimism/**/*",
     "/deployments/sepolia/**/*",
     "/deployments/optimism-goerli/**/*",
     "/deployments/base-goerli/**/*"
@@ -35,13 +36,15 @@
     "deploy:prepare:fork": "rm -rf deployments/tenderly && cp -rf deployments/mainnet/. deployments/tenderly",
     "deploy:mainnet": "HARDHAT_NETWORK=mainnet hardhat deploy",
     "deploy:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat deploy",
+    "deploy:optimism": "HARDHAT_NETWORK=optimism hardhat deploy",
     "deploy:sepolia": "HARDHAT_NETWORK=sepolia hardhat deploy",
     "deploy:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat deploy",
     "deploy:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat deploy",
     "deploy:fork": "yarn deploy:prepare:fork && HARDHAT_NETWORK=tenderly hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat etherscan-verify --license MIT",
-    "verify:sepolia": "HARDHAT_NETWORK=sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.etherscan.io/",
+    "verify:optimism": "HARDHAT_NETWORK=optimism hardhat etherscan-verify --license MIT --api-url https://api-optimistic.etherscan.io",
+    "verify:sepolia": "HARDHAT_NETWORK=sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.etherscan.io",
     "verify:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli-optimism.etherscan.io",
     "verify:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.basescan.org",
     "lint": "yarn lint:sol && yarn lint:ts",
@@ -56,7 +59,7 @@
     "export-types": "yarn delete-test-types && tsc -p tsconfig.release.json && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && yarn restore-test-types",
     "delete-test-types": "sed -i.bak '/tests/d' typechain-types/index.ts typechain-types/contracts/index.ts typechain-types/factories/contracts/index.ts",
     "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/contracts/index.ts.bak typechain-types/contracts/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts",
-    "prepare-release": "yarn prepare && yarn export-types && yarn lint && yarn test"
+    "prepare:release": "yarn prepare && yarn export-types && yarn lint && yarn test"
   },
   "dependencies": {
     "@typechain/ethers-v5": "^10.2.0",

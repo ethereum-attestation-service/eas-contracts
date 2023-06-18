@@ -7,6 +7,7 @@ const {
 export enum DeploymentNetwork {
   Mainnet = 'mainnet',
   ArbitrumOne = 'arbitrum-one',
+  Optimism = 'optimism',
   Sepolia = 'sepolia',
   OptimismGoerli = 'optimism-goerli',
   BaseGoerli = 'base-goerli',

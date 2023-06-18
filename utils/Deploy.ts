@@ -59,11 +59,13 @@ export const DeployedContracts = {
 export const isTenderlyFork = () => getNetworkName() === DeploymentNetwork.Tenderly;
 export const isMainnetFork = () => isTenderlyFork();
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet || isMainnetFork();
+export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
+export const isOptimism = () => getNetworkName() === DeploymentNetwork.Optimism;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli();
-export const isLive = () => (isMainnet() && !isMainnetFork()) || isSepolia();
+export const isLive = () => (isMainnet() && !isMainnetFork()) || isTestnet();
 
 export const getDeploymentDir = () => {
   return path.join(config.paths.deployments, getNetworkName());
