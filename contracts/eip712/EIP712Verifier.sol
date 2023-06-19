@@ -29,6 +29,8 @@ abstract contract EIP712Verifier is EIP712 {
     // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 nonce)").
     bytes32 private constant REVOKE_TYPEHASH = 0xa98d02348410c9c76735e0d0bb1396f4015ac2bb9615f9c2611d19d7a8a99650;
 
+    bytes4 public constant ERC1271_RETURN_VALID_SIGNATURE = 0x20c13b0b;
+
     // The user readable name of the signing domain.
     string private _name;
 
@@ -112,9 +114,7 @@ abstract contract EIP712Verifier is EIP712 {
             )
         );
 
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.attester) {
-            revert InvalidSignature();
-        }
+        _verifySignature(digest, signature, request.attester);
     }
 
     /**
@@ -132,9 +132,30 @@ abstract contract EIP712Verifier is EIP712 {
         }
 
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uid, nonce)));
+        _verifySignature(digest, signature, request.revoker);
+    }
 
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {
-            revert InvalidSignature();
+    function _verifySignature(bytes32 digest, EIP712Signature memory signature, address signer) internal view {
+        // check if signer is EOA or contract
+
+        if (_isContract(signer)) {
+            // check if contract implements EIP-1271
+            bytes4 magicValue = IERC1271(signer).isValidSignature(digest, abi.encode(signature));
+            if (magicValue != ERC1271_RETURN_VALID_SIGNATURE) {
+                revert InvalidSignature();
+            }
+        } else {
+            if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signer) {
+                revert InvalidSignature();
+            }
         }
+    }
+
+    function _isContract(address account) internal view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
     }
 }
