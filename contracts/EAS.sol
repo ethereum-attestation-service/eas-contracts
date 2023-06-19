@@ -66,7 +66,7 @@ contract EAS is IEAS, EIP712Verifier {
     error WrongSchema();
 
     // The version of the contract.
-    string public constant VERSION = "0.28";
+    string public constant VERSION = "0.29";
 
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
