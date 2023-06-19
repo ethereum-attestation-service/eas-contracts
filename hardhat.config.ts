@@ -9,6 +9,7 @@ import 'dotenv/config';
 import 'hardhat-contract-sizer';
 import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
+import 'hardhat-storage-layout';
 import { HardhatUserConfig } from 'hardhat/config';
 import { MochaOptions } from 'mocha';
 import 'solidity-coverage';
