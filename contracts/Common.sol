@@ -54,3 +54,49 @@ function uncheckedInc(uint256 i) pure returns (uint256 j) {
         j = i + 1;
     }
 }
+
+/**
+ * @dev A helper function that converts a string to a bytes32.
+ *
+ * @param str The string to convert.
+ *
+ * @return The converted bytes32.
+ */
+function stringToBytes32(string memory str) pure returns (bytes32) {
+    bytes32 result;
+
+    assembly {
+        result := mload(add(str, 32))
+    }
+
+    return result;
+}
+
+/**
+ * @dev A helper function that converts a bytes32 to a string.
+ *
+ * @param data The bytes32 data to convert.
+ *
+ * @return The converted string.
+ */
+function bytes32ToString(bytes32 data) pure returns (string memory) {
+    bytes memory byteArray = new bytes(32);
+
+    uint256 length = 0;
+    for (uint256 i = 0; i < 32; i = uncheckedInc(i)) {
+        bytes1 char = data[i];
+        if (char == 0x00) {
+            break;
+        }
+
+        byteArray[length] = char;
+        length = uncheckedInc(length);
+    }
+
+    bytes memory terminatedBytes = new bytes(length);
+    for (uint256 j = 0; j < length; j = uncheckedInc(j)) {
+        terminatedBytes[j] = byteArray[j];
+    }
+
+    return string(terminatedBytes);
+}

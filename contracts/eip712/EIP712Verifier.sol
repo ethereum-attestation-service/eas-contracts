@@ -15,7 +15,7 @@ import {
     RevocationRequestData
 } from "../IEAS.sol";
 
-import { EIP712Signature, InvalidSignature, MAX_GAP } from "../Common.sol";
+import { EIP712Signature, InvalidSignature, MAX_GAP, stringToBytes32, bytes32ToString } from "../Common.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
@@ -30,7 +30,7 @@ abstract contract EIP712Verifier is EIP712 {
     bytes32 private constant REVOKE_TYPEHASH = 0xa98d02348410c9c76735e0d0bb1396f4015ac2bb9615f9c2611d19d7a8a99650;
 
     // The user readable name of the signing domain.
-    string private _name;
+    bytes32 private immutable _name;
 
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
@@ -44,7 +44,7 @@ abstract contract EIP712Verifier is EIP712 {
      * @param version The current major version of the signing domain
      */
     constructor(string memory name, string memory version) EIP712(name, version) {
-        _name = name;
+        _name = stringToBytes32(name);
     }
 
     /**
@@ -83,7 +83,7 @@ abstract contract EIP712Verifier is EIP712 {
      * Returns the EIP712 name.
      */
     function getName() external view returns (string memory) {
-        return _name;
+        return bytes32ToString(_name);
     }
 
     /**
