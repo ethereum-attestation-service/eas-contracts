@@ -30,7 +30,7 @@ abstract contract EIP712Verifier is EIP712 {
     // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 nonce)").
     bytes32 private constant REVOKE_TYPEHASH = 0xa98d02348410c9c76735e0d0bb1396f4015ac2bb9615f9c2611d19d7a8a99650;
 
-    bytes4 public constant ERC1271_RETURN_VALID_SIGNATURE = 0x20c13b0b;
+    bytes4 private constant ERC1271_RETURN_VALID_SIGNATURE = 0x20c13b0b;
 
     // The user readable name of the signing domain.
     string private _name;
