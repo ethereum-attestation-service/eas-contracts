@@ -39,8 +39,15 @@ struct Attestation {
     bytes data; // Custom attestation data.
 }
 
+// Maximum upgrade forward-compatibility storage gap.
+uint32 constant MAX_GAP = 50;
+
 /**
  * @dev A helper function to work with unchecked iterators in loops.
+ *
+ * @param i The index to increment.
+ *
+ * @return j The incremented index.
  */
 function uncheckedInc(uint256 i) pure returns (uint256 j) {
     unchecked {

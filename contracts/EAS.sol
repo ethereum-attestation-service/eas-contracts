@@ -10,6 +10,7 @@ import {
     EMPTY_UID,
     EIP712Signature,
     InvalidLength,
+    MAX_GAP,
     NotFound,
     NO_EXPIRATION_TIME,
     uncheckedInc
@@ -79,6 +80,9 @@ contract EAS is IEAS, EIP712Verifier {
 
     // The global mapping between data and their revocation timestamps.
     mapping(address revoker => mapping(bytes32 data => uint64 timestamp)) private _revocationsOffchain;
+
+    // upgrade forward-compatibility storage gap
+    uint256[MAX_GAP - 3] private __gap;
 
     /**
      * @dev Creates a new EAS instance.

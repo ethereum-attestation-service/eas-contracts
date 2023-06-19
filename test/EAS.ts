@@ -15,6 +15,7 @@ import {
 } from './helpers/EAS';
 import { EIP712ProxyUtils } from './helpers/EIP712ProxyUtils';
 import { EIP712Utils } from './helpers/EIP712Utils';
+import { shouldHaveGap } from './helpers/Proxy';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -66,6 +67,8 @@ describe('EAS', () => {
     await eas.setTime(now);
     expect(await eas.getTime()).to.equal(now);
   });
+
+  shouldHaveGap('EAS', '_db');
 
   describe('construction', () => {
     it('should revert when initialized with an empty schema registry', async () => {

@@ -2,6 +2,7 @@ import Contracts from '../components/Contracts';
 import { SchemaRegistry } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUID } from '../utils/EAS';
+import { shouldHaveGap } from './helpers/Proxy';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
@@ -25,6 +26,8 @@ describe('SchemaRegistry', () => {
   beforeEach(async () => {
     registry = await Contracts.SchemaRegistry.deploy();
   });
+
+  shouldHaveGap('SchemaRegistry', '_registry');
 
   describe('construction', () => {
     it('should report a version', async () => {

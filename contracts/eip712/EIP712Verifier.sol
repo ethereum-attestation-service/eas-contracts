@@ -15,7 +15,7 @@ import {
     RevocationRequestData
 } from "../IEAS.sol";
 
-import { EIP712Signature, InvalidSignature } from "../Common.sol";
+import { EIP712Signature, InvalidSignature, MAX_GAP } from "../Common.sol";
 
 /**
  * @title EIP712 typed signatures verifier for EAS delegated attestations.
@@ -34,6 +34,9 @@ abstract contract EIP712Verifier is EIP712 {
 
     // Replay protection nonces.
     mapping(address => uint256) private _nonces;
+
+    // upgrade forward-compatibility storage gap
+    uint256[MAX_GAP - 1] private __gap;
 
     /**
      * @dev Creates a new EIP712Verifier instance.

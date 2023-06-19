@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.19;
 
-import { EMPTY_UID } from "./Common.sol";
+import { EMPTY_UID, MAX_GAP } from "./Common.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
@@ -18,6 +18,9 @@ contract SchemaRegistry is ISchemaRegistry {
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
+
+    // upgrade forward-compatibility storage gap
+    uint256[MAX_GAP - 1] private __gap;
 
     /**
      * @inheritdoc ISchemaRegistry

@@ -109,7 +109,7 @@ contract EIP712Proxy is EIP712 {
     mapping(bytes signature => bool used) private _signatures;
 
     /**
-     * @dev Creates a new EIP712Verifier instance.
+     * @dev Creates a new EIP712Proxy instance.
      *
      * @param eas The address of the global EAS contract.
      * @param name The user readable name of the signing domain.
