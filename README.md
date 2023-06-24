@@ -87,7 +87,7 @@ Please note that you can also import and use the addresses directly in your code
 #### v0.27
 
 * **EAS**:
-  * Contract: [0xC2679fBD37d54388Ce493F1DB75320D236e1815e](https://goerli-optimism.etherscan.io/address/0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84)
+  * Contract: [0x1a5650d0ecbca349dd84bafa85790e3e6955eb84](https://goerli-optimism.etherscan.io/address/0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84)
   * Deployment and ABI: [EAS.json](./deployments/optimism-goerli/EAS.json)
 * **SchemaRegistry**:
   * Contract: [0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f](https://goerli-optimism.etherscan.io/address/0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f)
