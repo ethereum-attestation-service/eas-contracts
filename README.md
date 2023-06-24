@@ -49,6 +49,8 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0xA7b39296258348C78294F95B872b282326A97BDF](https://etherscan.io/address/0xA7b39296258348C78294F95B872b282326A97BDF)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/mainnet/SchemaRegistry.json)
 
+### Optimism
+
 #### v0.28
 
 * **EAS**:
