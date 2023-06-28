@@ -49,17 +49,6 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0xA7b39296258348C78294F95B872b282326A97BDF](https://etherscan.io/address/0xA7b39296258348C78294F95B872b282326A97BDF)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/mainnet/SchemaRegistry.json)
 
-### Optimism
-
-#### v0.28
-
-* **EAS**:
-  * Contract: [0xd64059A36EdC1e278BDAB1256bB887668Fe33151](https://optimistic.etherscan.io/address/0xd64059A36EdC1e278BDAB1256bB887668Fe33151)
-  * Deployment and ABI: [EAS.json](./deployments/optimism/EAS.json)
-* **SchemaRegistry**:
-  * Contract: [0x8889039Ce46B259d6E6ee761330faBf4ccC9Ea51](https://optimistic.etherscan.io/address/0x8889039Ce46B259d6E6ee761330faBf4ccC9Ea51)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism-goerli/SchemaRegistry.json)
-
 ### Arbitrum One
 
 #### v0.26
