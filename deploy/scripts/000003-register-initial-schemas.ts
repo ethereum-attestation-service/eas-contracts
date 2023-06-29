@@ -113,8 +113,8 @@ export const SCHEMAS = [
     schema: 'bool passedAudit',
     name: 'Contract Audit'
   },
-  { schema: 'bool metIRL', name: 'Met in real life' },
-  { schema: 'bytes32 privateData', name: 'Private data' },
+  { schema: 'bool metIRL', name: 'Met in Real Life' },
+  { schema: 'bytes32 privateData', name: 'Private Data' },
   { schema: 'bool isTrue', name: 'True' },
   { schema: 'string post', name: 'Post' },
   { schema: 'bool gm', name: 'GM' }
