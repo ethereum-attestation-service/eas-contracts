@@ -20,10 +20,10 @@ export const SCHEMAS = [
   { schema: 'bool isFriend', name: 'Is a Friend' },
   { schema: 'bool hasPhoneNumber,bytes32 phoneHash', name: 'Has Phone Number' },
   { schema: 'uint256 eventId,uint8 voteIndex', name: 'Vote' },
-  { schema: 'uint256 postId,bool like', name: 'Like a Post' },
   { schema: 'bool hasPassedKYC', name: 'Passed KYC' },
   { schema: 'bool isAccreditedInvestor', name: 'Is an Accredited Investor' },
   { schema: 'bytes32 hashOfDocument,string note', name: 'Sign Document' },
+  { schema: 'bytes32 contentHash', name: 'Content Hash' },
   {
     schema:
       'uint8 holdType,uint8 useType,uint64 expiration,int40[2][] polygonArea',
@@ -118,10 +118,14 @@ export const SCHEMAS = [
     name: 'Community Authorization',
   },
   {
-    schema: 'address contractAddress,bool passedAudit',
+    schema: 'bool passedAudit',
     name: 'Contract Audit',
   },
-  { schema: 'bool like,string something', name: 'Like Something' },
+  { schema: 'bool metIRL', name: 'Met in real life' },
+  { schema: 'bytes32 privateData', name: 'Private data' },
+  { schema: 'bool isTrue', name: 'True' },
+  { schema: 'string post', name: 'Post' },
+  { schema: 'bool gm', name: 'GM' }
 ];
 
 const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironment) => {
