@@ -50,7 +50,7 @@
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",
     "lint:ts": "yarn eslint components deploy test utils",
-    "format": "prettier --check --write contracts/**/*.sol *.ts test/**/*.ts --config .prettierrc",
+    "format": "prettier --check --write contracts/**/*.sol *.ts components/**/*.ts data/**/*.ts deploy/**/*.ts test/**/*.ts utils/**/*.ts --config .prettierrc",
     "size": "hardhat size-contracts",
     "verify": "hardhat verify",
     "flatten": "hardhat flatten",
