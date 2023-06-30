@@ -57,7 +57,7 @@ export class EIP712ProxyUtils {
   public async init() {
     this.config = {
       address: this.proxy.address,
-      version: await this.proxy.VERSION(),
+      version: await this.proxy.version(),
       chainId: network.config.chainId!
     };
 

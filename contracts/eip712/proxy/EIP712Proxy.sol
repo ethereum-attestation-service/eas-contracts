@@ -32,6 +32,8 @@ import {
     RevocationRequestData
 } from "../../IEAS.sol";
 
+import { Semver } from "../../Semver.sol";
+
 /**
  * @dev A struct representing the full arguments of the full delegated attestation request.
  */
@@ -80,12 +82,9 @@ struct MultiDelegatedProxyRevocationRequest {
  * @title This utility contract an be used to aggregate delegated attestations without requiring a specific order via
  * nonces. The contract doesn't request nonces and implements replay protection by storing ***immalleable*** signatures.
  */
-contract EIP712Proxy is EIP712 {
+contract EIP712Proxy is Semver, EIP712 {
     error DeadlineExpired();
     error UsedSignature();
-
-    // The version of the contract.
-    string public constant VERSION = "0.1";
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)").
@@ -114,7 +113,7 @@ contract EIP712Proxy is EIP712 {
      * @param eas The address of the global EAS contract.
      * @param name The user readable name of the signing domain.
      */
-    constructor(IEAS eas, string memory name) EIP712(name, VERSION) {
+    constructor(IEAS eas, string memory name) Semver(0, 1, 0) EIP712(name, "0.1.0") {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }

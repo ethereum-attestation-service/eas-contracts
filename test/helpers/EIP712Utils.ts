@@ -146,7 +146,7 @@ export class EIP712Utils {
   public async init() {
     this.config = {
       address: this.verifier.address,
-      version: await this.verifier.VERSION(),
+      version: await this.verifier.version(),
       chainId: network.config.chainId!
     };
 

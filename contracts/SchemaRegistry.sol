@@ -2,22 +2,25 @@
 
 pragma solidity 0.8.19;
 
-import { EMPTY_UID } from "./Common.sol";
-import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
+
+import { EMPTY_UID } from "./Common.sol";
+import { Semver } from "./Semver.sol";
+import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
 /**
  * @title The global schema registry.
  */
-contract SchemaRegistry is ISchemaRegistry {
+contract SchemaRegistry is ISchemaRegistry, Semver {
     error AlreadyExists();
-
-    // The version of the contract.
-    string public constant VERSION = "0.28";
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
+
+    /**
+     * @dev Creates a new SchemaRegistry instance.
+     */
+    constructor() Semver(0, 29, 0) {}
 
     /**
      * @inheritdoc ISchemaRegistry
