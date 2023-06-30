@@ -2,7 +2,7 @@ import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import {
   MultiDelegatedProxyAttestationRequestStruct,
   MultiDelegatedProxyRevocationRequestStruct
-} from '../../typechain-types/contracts/EIP712Proxy';
+} from '../../typechain-types/contracts/eip712/proxy/EIP712Proxy';
 import {
   AttestationStructOutput,
   MultiDelegatedAttestationRequestStruct,
