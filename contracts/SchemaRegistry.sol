@@ -20,7 +20,7 @@ contract SchemaRegistry is ISchemaRegistry, Semver {
     /**
      * @dev Creates a new SchemaRegistry instance.
      */
-    constructor() Semver(0, 29, 0) {}
+    constructor() Semver(1, 0, 0) {}
 
     /**
      * @inheritdoc ISchemaRegistry

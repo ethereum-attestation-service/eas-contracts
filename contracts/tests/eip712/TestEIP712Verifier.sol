@@ -7,7 +7,7 @@ import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "../../I
 import { Semver } from "../../Semver.sol";
 
 contract TestEIP712Verifier is Semver, EIP712Verifier {
-    constructor(string memory name) Semver(0, 29, 0) EIP712Verifier(name, "0.29.0") {}
+    constructor(string memory name) Semver(1, 0, 0) EIP712Verifier(name, "1.0.0") {}
 
     function verifyAttest(DelegatedAttestationRequest memory request) external {
         _verifyAttest(request);

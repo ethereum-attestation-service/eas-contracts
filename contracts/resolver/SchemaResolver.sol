@@ -24,7 +24,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
      *
      * @param eas The address of the global EAS contract.
      */
-    constructor(IEAS eas) Semver(0, 29, 0) {
+    constructor(IEAS eas) Semver(1, 0, 0) {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
