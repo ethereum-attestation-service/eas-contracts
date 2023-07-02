@@ -4,6 +4,10 @@ pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
+import { EIP712Verifier } from "./eip712/EIP712Verifier.sol";
+
+import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
+
 // prettier-ignore
 import {
     AccessDenied,
@@ -31,11 +35,8 @@ import {
     RevocationRequestData
 } from "./IEAS.sol";
 
+import { Semver } from "./Semver.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
-
-import { EIP712Verifier } from "./eip712/EIP712Verifier.sol";
-
-import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 struct AttestationsResult {
     uint256 usedValue; // Total ETH amount that was sent to resolvers.
@@ -45,7 +46,7 @@ struct AttestationsResult {
 /**
  * @title EAS - Ethereum Attestation Service
  */
-contract EAS is IEAS, EIP712Verifier {
+contract EAS is IEAS, Semver, EIP712Verifier {
     using Address for address payable;
 
     error AlreadyRevoked();
@@ -65,9 +66,6 @@ contract EAS is IEAS, EIP712Verifier {
     error NotPayable();
     error WrongSchema();
 
-    // The version of the contract.
-    string public constant VERSION = "0.28";
-
     // The global schema registry.
     ISchemaRegistry private immutable _schemaRegistry;
 
@@ -85,7 +83,7 @@ contract EAS is IEAS, EIP712Verifier {
      *
      * @param registry The address of the global schema registry.
      */
-    constructor(ISchemaRegistry registry) EIP712Verifier("EAS", VERSION) {
+    constructor(ISchemaRegistry registry) Semver(1, 0, 0) EIP712Verifier("EAS", "1.0.0") {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }

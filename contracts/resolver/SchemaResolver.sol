@@ -4,19 +4,17 @@ pragma solidity 0.8.19;
 
 import { IEAS, Attestation } from "../IEAS.sol";
 import { InvalidEAS, uncheckedInc } from "../Common.sol";
+import { Semver } from "../Semver.sol";
 
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /**
  * @title A base resolver contract
  */
-abstract contract SchemaResolver is ISchemaResolver {
+abstract contract SchemaResolver is ISchemaResolver, Semver {
     error AccessDenied();
     error InsufficientValue();
     error NotPayable();
-
-    // The version of the contract.
-    string public constant VERSION = "0.28";
 
     // The global EAS contract.
     IEAS internal immutable _eas;
@@ -26,7 +24,7 @@ abstract contract SchemaResolver is ISchemaResolver {
      *
      * @param eas The address of the global EAS contract.
      */
-    constructor(IEAS eas) {
+    constructor(IEAS eas) Semver(1, 0, 0) {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
