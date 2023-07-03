@@ -55,8 +55,8 @@ jobs:
       - name: Compile (Hardhat)
         run: yarn compile
 
-      - name: Compile (Foundry)
-        run: forge build
-
       - name: Test
         run: yarn test
+
+      - name: Compile (Foundry)
+        run: forge build
