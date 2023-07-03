@@ -44,11 +44,19 @@ jobs:
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
       - name: Lint
         run: yarn lint
 
-      - name: Compile
+      - name: Compile (Hardhat)
         run: yarn compile
+
+       - name: Compile (Foundry)
+        run: forge build
 
       - name: Test
         run: yarn test
