@@ -1,0 +1,5 @@
+[fuzz]
+solc = "0.8.19"
+bytecode_hash = "none"
+optimizer = true
+optimizer_runs = 1000000
