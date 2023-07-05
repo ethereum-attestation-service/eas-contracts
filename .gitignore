@@ -10,6 +10,7 @@ dist
 cache
 artifacts
 typechain-types
+out
 
 deployments/mainnet/solcInputs/*
 deployments/arbitrum-one/solcInputs/*
