@@ -1,6 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_BYTES32 } from '../../utils/Constants';
 import { getUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectFailedMultiRevocations,
@@ -11,15 +11,15 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('RevocationResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: HardhatEthersSigner[];
+  let recipient: HardhatEthersSigner;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -30,7 +30,7 @@ describe('RevocationResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -42,11 +42,11 @@ describe('RevocationResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    resolver = await Contracts.RevocationResolver.deploy(eas.address);
+    resolver = await Contracts.RevocationResolver.deploy(await eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);

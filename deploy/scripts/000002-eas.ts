@@ -7,7 +7,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
 
   const registry = await DeployedContracts.SchemaRegistry.deployed();
 
-  await deploy({ name: InstanceName.EAS, from: deployer, args: [registry.address] });
+  await deploy({ name: InstanceName.EAS, from: deployer, args: [await registry.getAddress()] });
 
   return true;
 };

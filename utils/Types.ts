@@ -1,14 +1,13 @@
 import Decimal from 'decimal.js';
-import { BigNumber, BigNumberish } from 'ethers';
 
-type ToWeiInput = Decimal | BigNumberish;
+type Input = Decimal | number | bigint;
 
-const DEFAULT_DECIMALS = 18;
+const DEFAULT_DECIMALS = 18n;
 
-export const toWei = <T extends ToWeiInput>(v: T, decimals = DEFAULT_DECIMALS): BigNumber => {
+export const toWei = <T extends Input>(v: T, decimals = DEFAULT_DECIMALS): bigint => {
   if (Decimal.isDecimal(v)) {
-    return BigNumber.from((v as Decimal).mul(new Decimal(10).pow(decimals)).toFixed());
+    return BigInt((v as Decimal).mul(new Decimal(10).pow(new Decimal(decimals.toString()))).toFixed());
   }
 
-  return BigNumber.from(v).mul(BigNumber.from(10).pow(decimals));
+  return BigInt(v) * 10n ** decimals;
 };

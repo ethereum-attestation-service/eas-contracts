@@ -1,18 +1,18 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
-import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { expectFailedAttestation, expectFailedMultiAttestations, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('SchemaResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: HardhatEthersSigner[];
+  let recipient: HardhatEthersSigner;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -27,7 +27,7 @@ describe('SchemaResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
   });
@@ -38,7 +38,7 @@ describe('SchemaResolver', () => {
     });
 
     it('should be properly initialized', async () => {
-      const resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
+      const resolver = await Contracts.TestSchemaResolver.deploy(await eas.getAddress());
 
       expect(await resolver.version()).to.equal('1.0.0');
     });
@@ -47,13 +47,13 @@ describe('SchemaResolver', () => {
   describe('resolution', () => {
     const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
     let schemaId: string;
-    const expirationTime = 0;
+    const expirationTime = NO_EXPIRATION;
     const data = '0x1234';
     let resolver: SchemaResolver;
 
     context('with a standard resolver', () => {
       beforeEach(async () => {
-        resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
+        resolver = await Contracts.TestSchemaResolver.deploy(await eas.getAddress());
         schemaId = await registerSchema(schema, registry, resolver, true);
       });
 
@@ -94,7 +94,7 @@ describe('SchemaResolver', () => {
       });
 
       context('as an EAS', () => {
-        let sender: SignerWithAddress;
+        let sender: HardhatEthersSigner;
 
         before(() => {
           sender = accounts[0];
@@ -154,16 +154,18 @@ describe('SchemaResolver', () => {
 
     context('with a non-payable resolver', () => {
       beforeEach(async () => {
-        resolver = await Contracts.TestSchemaResolver.deploy(eas.address);
+        resolver = await Contracts.TestSchemaResolver.deploy(await eas.getAddress());
         expect(await resolver.isPayable()).to.be.false;
 
         schemaId = await registerSchema(schema, registry, resolver, true);
       });
 
       it('should revert when sending', async () => {
-        const value = 1;
+        const value = 1n;
 
-        await expect(sender.sendTransaction({ to: resolver.address, value })).to.be.revertedWith('NotPayable');
+        await expect(sender.sendTransaction({ to: await resolver.getAddress(), value })).to.be.revertedWith(
+          'NotPayable'
+        );
 
         await expectFailedAttestation(
           { eas },
@@ -196,7 +198,7 @@ describe('SchemaResolver', () => {
       });
 
       it('should revert when sending', async () => {
-        const value = 1;
+        const value = 1n;
 
         await expectFailedAttestation(
           { eas },

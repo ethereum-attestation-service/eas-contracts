@@ -11,15 +11,15 @@ import {
 } from '../helpers/EAS';
 import { duration, latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('ExpirationTimeResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: HardhatEthersSigner[];
+  let recipient: HardhatEthersSigner;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -27,7 +27,7 @@ describe('ExpirationTimeResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
-  let validAfter: number;
+  let validAfter: bigint;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -39,13 +39,13 @@ describe('ExpirationTimeResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    validAfter = (await eas.getTime()).toNumber() + duration.years(1);
+    validAfter = (await eas.getTime()) + duration.years(1n);
 
-    const resolver = await Contracts.ExpirationTimeResolver.deploy(eas.address, validAfter);
+    const resolver = await Contracts.ExpirationTimeResolver.deploy(await eas.getAddress(), validAfter);
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
@@ -55,7 +55,7 @@ describe('ExpirationTimeResolver', () => {
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime: validAfter - duration.days(1), data },
+      { recipient: recipient.address, expirationTime: validAfter - duration.days(1n), data },
       { from: sender },
       'InvalidAttestation'
     );
@@ -66,8 +66,8 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter - duration.days(1), data },
-            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data }
+            { recipient: recipient.address, expirationTime: validAfter - duration.days(1n), data },
+            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data }
           ]
         }
       ],
@@ -81,8 +81,8 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter + duration.days(1), data },
-            { recipient: recipient.address, expirationTime: validAfter - duration.seconds(1), data }
+            { recipient: recipient.address, expirationTime: validAfter + duration.days(1n), data },
+            { recipient: recipient.address, expirationTime: validAfter - duration.seconds(1n), data }
           ]
         }
       ],
@@ -95,7 +95,7 @@ describe('ExpirationTimeResolver', () => {
     const { uid } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data },
+      { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data },
       { from: sender }
     );
 
@@ -107,8 +107,8 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1), data },
-            { recipient: recipient.address, expirationTime: validAfter + duration.weeks(1), data }
+            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data },
+            { recipient: recipient.address, expirationTime: validAfter + duration.weeks(1n), data }
           ]
         }
       ],

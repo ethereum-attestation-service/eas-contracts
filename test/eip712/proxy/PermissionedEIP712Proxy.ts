@@ -20,22 +20,18 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, encodeBytes32String, keccak256, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
-
-const {
-  utils: { keccak256, toUtf8Bytes, hexlify }
-} = ethers;
 
 const PERMISSIONED_EIP712_PROXY_NAME = 'PermissionedEIP712Proxy';
 
 describe('PermissionedEIP712Proxy', () => {
-  let accounts: SignerWithAddress[];
-  let owner: Wallet;
-  let nonOwner: Wallet;
-  let recipient: SignerWithAddress;
+  let accounts: HardhatEthersSigner[];
+  let owner: BaseWallet;
+  let nonOwner: BaseWallet;
+  let recipient: HardhatEthersSigner;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -57,11 +53,14 @@ describe('PermissionedEIP712Proxy', () => {
     nonOwner = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    proxy = await Contracts.connect(owner).PermissionedEIP712Proxy.deploy(eas.address, PERMISSIONED_EIP712_PROXY_NAME);
+    proxy = await Contracts.connect(owner).PermissionedEIP712Proxy.deploy(
+      await eas.getAddress(),
+      PERMISSIONED_EIP712_PROXY_NAME
+    );
 
     eip712ProxyUtils = await EIP712ProxyUtils.fromProxy(proxy);
 
@@ -90,7 +89,7 @@ describe('PermissionedEIP712Proxy', () => {
       await expectAttestation(
         { eas, eip712ProxyUtils },
         schemaId,
-        { recipient: recipient.address, expirationTime, data: hexlify(0) },
+        { recipient: recipient.address, expirationTime, data: encodeBytes32String('0') },
         { signatureType: SignatureType.DelegatedProxy, from: owner }
       );
 
@@ -100,8 +99,8 @@ describe('PermissionedEIP712Proxy', () => {
           {
             schema: schemaId,
             requests: [
-              { recipient: recipient.address, expirationTime, data: hexlify(1) },
-              { recipient: recipient.address, expirationTime, data: hexlify(2) }
+              { recipient: recipient.address, expirationTime, data: encodeBytes32String('1') },
+              { recipient: recipient.address, expirationTime, data: encodeBytes32String('2') }
             ]
           }
         ],
@@ -113,7 +112,7 @@ describe('PermissionedEIP712Proxy', () => {
       await expectFailedAttestation(
         { eas, eip712ProxyUtils },
         schemaId,
-        { recipient: recipient.address, expirationTime, data: hexlify(0) },
+        { recipient: recipient.address, expirationTime, data: encodeBytes32String('0') },
         { signatureType: SignatureType.DelegatedProxy, from: nonOwner },
         'AccessDenied'
       );
@@ -124,8 +123,8 @@ describe('PermissionedEIP712Proxy', () => {
           {
             schema: schemaId,
             requests: [
-              { recipient: recipient.address, expirationTime, data: hexlify(1) },
-              { recipient: recipient.address, expirationTime, data: hexlify(2) }
+              { recipient: recipient.address, expirationTime, data: encodeBytes32String('1') },
+              { recipient: recipient.address, expirationTime, data: encodeBytes32String('2') }
             ]
           }
         ],
@@ -153,7 +152,7 @@ describe('PermissionedEIP712Proxy', () => {
         const { uid: newUid } = await expectAttestation(
           { eas, eip712ProxyUtils },
           schemaId,
-          { recipient: recipient.address, expirationTime, data: hexlify(i + 1) },
+          { recipient: recipient.address, expirationTime, data: encodeBytes32String((i + 1).toString()) },
           { signatureType: SignatureType.DelegatedProxy, from: owner }
         );
 

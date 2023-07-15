@@ -1,6 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { AttestationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import { getSchemaUID, getUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectAttestation,
@@ -13,15 +13,15 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('AttestationResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: HardhatEthersSigner[];
+  let recipient: HardhatEthersSigner;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -29,7 +29,7 @@ describe('AttestationResolver', () => {
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
   const data = '0x1234';
 
   const schema2 = 'bool isFriend';
@@ -46,7 +46,7 @@ describe('AttestationResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(registry.getAddress());
 
     await eas.setTime(await latest());
 
@@ -66,7 +66,7 @@ describe('AttestationResolver', () => {
       })
     );
 
-    resolver = await Contracts.AttestationResolver.deploy(eas.address);
+    resolver = await Contracts.AttestationResolver.deploy(eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);

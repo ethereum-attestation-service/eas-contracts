@@ -10,22 +10,18 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
-
-const {
-  utils: { formatBytes32String, keccak256, toUtf8Bytes, hexlify }
-} = ethers;
 
 const EIP712_PROXY_NAME = 'EIP712Proxy';
 
 describe('EIP712Proxy', () => {
-  let accounts: SignerWithAddress[];
-  let sender: Wallet;
-  let sender2: Wallet;
-  let recipient: SignerWithAddress;
+  let accounts: HardhatEthersSigner[];
+  let sender: BaseWallet;
+  let sender2: BaseWallet;
+  let recipient: HardhatEthersSigner;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -47,11 +43,11 @@ describe('EIP712Proxy', () => {
     sender2 = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    proxy = await Contracts.TestEIP712Proxy.deploy(eas.address, EIP712_PROXY_NAME);
+    proxy = await Contracts.TestEIP712Proxy.deploy(await eas.getAddress(), EIP712_PROXY_NAME);
 
     eip712ProxyUtils = await EIP712ProxyUtils.fromProxy(proxy);
 
@@ -66,7 +62,7 @@ describe('EIP712Proxy', () => {
     it('should be properly initialized', async () => {
       expect(await proxy.version()).to.equal('0.1.0');
 
-      expect(await proxy.getEAS()).to.equal(eas.address);
+      expect(await proxy.getEAS()).to.equal(await eas.getAddress());
       expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
       expect(await proxy.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_PROXY_TYPED_SIGNATURE)));
       expect(await proxy.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_PROXY_TYPED_SIGNATURE)));
@@ -132,7 +128,7 @@ describe('EIP712Proxy', () => {
         proxy.verifyAttest({
           schema: schemaId,
           data: attestationRequest,
-          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           attester: sender.address,
           deadline
         })
@@ -201,7 +197,7 @@ describe('EIP712Proxy', () => {
         value: 1000
       };
 
-      const expiredDeadline = 1;
+      const expiredDeadline = 1n;
       const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
         sender,
         schemaId,
@@ -278,7 +274,7 @@ describe('EIP712Proxy', () => {
         proxy.connect(sender).verifyRevoke({
           schema: schemaId,
           data: revocationRequest,
-          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           revoker: sender.address,
           deadline
         })
@@ -334,7 +330,7 @@ describe('EIP712Proxy', () => {
         value: 1000
       };
 
-      const expiredDeadline = 1;
+      const expiredDeadline = 1n;
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
         sender,
         schemaId,

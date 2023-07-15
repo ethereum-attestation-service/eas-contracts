@@ -1,11 +1,14 @@
-import { BigNumber, Wallet } from 'ethers';
-import { ethers, waffle } from 'hardhat';
+import { Wallet } from 'ethers';
+import { ethers } from 'hardhat';
+
+// eslint-disable-next-line require-await
+export const getBalance = async (address: string) => ethers.provider.getBalance(address);
 
 export const createWallet = async () => {
-  const wallet = Wallet.createRandom().connect(waffle.provider);
+  const wallet = Wallet.createRandom().connect(ethers.provider);
   const deployer = (await ethers.getSigners())[0];
   await deployer.sendTransaction({
-    value: BigNumber.from(10_000_000).mul(BigNumber.from(10).pow(18)),
+    value: 10_000_000n * 10n ** 18n,
     to: await wallet.getAddress()
   });
 

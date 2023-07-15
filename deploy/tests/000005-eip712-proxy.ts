@@ -8,11 +8,7 @@ import {
 import { DeployedContracts } from '../../utils/Deploy';
 import { EIP712_PROXY_NAME } from '../scripts/000005-eip712-proxy';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
-
-const {
-  utils: { keccak256, toUtf8Bytes }
-} = ethers;
+import { keccak256, toUtf8Bytes } from 'ethers';
 
 describeDeployment(__filename, () => {
   let eas: EAS;
@@ -29,7 +25,7 @@ describeDeployment(__filename, () => {
   it('should deploy the EIP712 proxy', async () => {
     expect(await proxy.version()).to.equal('0.1.0');
 
-    expect(await proxy.getEAS()).to.equal(eas.address);
+    expect(await proxy.getEAS()).to.equal(await eas.getAddress());
     expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
     expect(await proxy.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_PROXY_TYPED_SIGNATURE)));
     expect(await proxy.getRevokeTypeHash()).to.equal(keccak256(toUtf8Bytes(REVOKE_PROXY_TYPED_SIGNATURE)));

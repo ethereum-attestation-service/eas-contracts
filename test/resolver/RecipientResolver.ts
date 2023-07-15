@@ -1,5 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../../typechain-types';
+import { NO_EXPIRATION } from '../../utils/Constants';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -11,25 +12,25 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('RecipientResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: HardhatEthersSigner[];
+  let recipient: HardhatEthersSigner;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
   const data = '0x1234';
 
-  let targetRecipient: SignerWithAddress;
+  let targetRecipient: HardhatEthersSigner;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -41,13 +42,13 @@ describe('RecipientResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
     targetRecipient = accounts[5];
 
-    const resolver = await Contracts.RecipientResolver.deploy(eas.address, targetRecipient.address);
+    const resolver = await Contracts.RecipientResolver.deploy(await eas.getAddress(), targetRecipient.address);
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);

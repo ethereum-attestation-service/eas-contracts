@@ -3,22 +3,18 @@ import { TestEIP712Verifier } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from '../helpers/EIP712Utils';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
-
-const {
-  utils: { formatBytes32String, keccak256, toUtf8Bytes, hexlify }
-} = ethers;
 
 const EIP712_NAME = 'EAS';
 
 describe('EIP712Verifier', () => {
-  let accounts: SignerWithAddress[];
-  let sender: Wallet;
-  let sender2: Wallet;
-  let recipient: SignerWithAddress;
+  let accounts: HardhatEthersSigner[];
+  let sender: BaseWallet;
+  let sender2: BaseWallet;
+  let recipient: HardhatEthersSigner;
 
   let verifier: TestEIP712Verifier;
   let eip712Utils: EIP712Utils;
@@ -54,7 +50,7 @@ describe('EIP712Verifier', () => {
   describe('verify attest', () => {
     interface AttestationRequestData {
       recipient: string;
-      expirationTime: number;
+      expirationTime: bigint;
       revocable: boolean;
       refUID: string;
       data: string;
@@ -115,7 +111,7 @@ describe('EIP712Verifier', () => {
         verifier.verifyAttest({
           schema,
           data: attestationRequest,
-          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           attester: sender.address
         })
       ).to.be.revertedWith('InvalidSignature');
@@ -171,7 +167,7 @@ describe('EIP712Verifier', () => {
         verifier.verifyRevoke({
           schema,
           data: revocationRequest,
-          signature: { v: signature.v, r: formatBytes32String('BAD'), s: hexlify(signature.s) },
+          signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           revoker: sender.address
         })
       ).to.be.revertedWith('InvalidSignature');
