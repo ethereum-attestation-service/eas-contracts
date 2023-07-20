@@ -1431,7 +1431,7 @@ describe('EAS', () => {
 
   describe('timestamping', () => {
     const expectTimestamp = async (data: string | string[]) => {
-      Array.isArray(data) ? await eas.multiTimestamp(data) : eas.timestamp(data);
+      Array.isArray(data) ? await eas.multiTimestamp(data) : await eas.timestamp(data);
       const timestamp = await eas.getTime();
 
       for (const item of Array.isArray(data) ? data : [data]) {
@@ -1474,7 +1474,7 @@ describe('EAS', () => {
       await expect(eas.multiTimestamp([data3, ...data])).to.be.revertedWith('AlreadyTimestamped');
     });
 
-    it("should return 0 for any data that wasn't timestamped multiple data", async () => {
+    it("should return 0 for any data that wasn't timestamped", async () => {
       expect(await eas.getTimestamp(data5)).to.equal(0);
     });
   });
@@ -1535,7 +1535,7 @@ describe('EAS', () => {
       );
     });
 
-    it("should return 0 for any data that wasn't timestamped multiple data", async () => {
+    it("should return 0 for any data that wasn't timestamped", async () => {
       expect(await eas.getRevokeOffchain(sender.address, data5)).to.equal(0);
     });
   });
