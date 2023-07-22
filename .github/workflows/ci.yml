@@ -54,7 +54,7 @@ jobs:
         with:
           version: nightly
 
-      - name: lint
+      - name: Lint
         run: pnpm lint
 
       - name: Compile (Hardhat)
