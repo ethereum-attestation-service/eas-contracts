@@ -25,21 +25,21 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install pnpm
+      - name: Install PNPM
         uses: pnpm/action-setup@v2
         id: pnpm-install
         with:
           version: 8
           run_install: false
 
-      - name: Get pnpm store directory
+      - name: Get PNPM store directory
         id: pnpm-cache
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
-        name: Setup pnpm cache
+        name: Setup PNPM cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
