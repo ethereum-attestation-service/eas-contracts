@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install foundry
+      - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
