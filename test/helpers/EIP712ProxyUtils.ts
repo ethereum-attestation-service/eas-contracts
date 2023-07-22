@@ -10,8 +10,7 @@ import {
   TypedData,
   TypedDataConfig
 } from './EIP712Utils';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { AbiCoder, BaseWallet, keccak256, toUtf8Bytes } from 'ethers';
+import { AbiCoder, BaseWallet, keccak256, toUtf8Bytes, Signer } from 'ethers';
 import { network } from 'hardhat';
 
 export const ATTEST_PROXY_TYPED_SIGNATURE =
@@ -92,10 +91,10 @@ export class EIP712ProxyUtils {
     };
   }
 
-  public signDelegatedProxyAttestation(
+  public async signDelegatedProxyAttestation(
     attester: BaseWallet,
     schema: string,
-    recipient: string | HardhatEthersSigner,
+    recipient: string | Signer,
     expirationTime: bigint,
     revocable: boolean,
     refUID: string,
@@ -104,7 +103,7 @@ export class EIP712ProxyUtils {
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
       schema,
-      recipient: typeof recipient === 'string' ? recipient : recipient.address,
+      recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
       revocable,
       refUID,
@@ -126,12 +125,12 @@ export class EIP712ProxyUtils {
     );
   }
 
-  public verifyDelegatedProxyAttestationSignature(
-    attester: string | HardhatEthersSigner,
+  public async verifyDelegatedProxyAttestationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }
@@ -162,12 +161,12 @@ export class EIP712ProxyUtils {
     );
   }
 
-  public verifyDelegatedProxyRevocationSignature(
-    attester: string | HardhatEthersSigner,
+  public async verifyDelegatedProxyRevocationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }

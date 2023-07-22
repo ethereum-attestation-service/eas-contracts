@@ -13,14 +13,13 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('AttestationResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
 
   let registry: SchemaRegistry;
@@ -56,7 +55,7 @@ describe('AttestationResolver', () => {
       eas.attest({
         schema: schema2Id,
         data: {
-          recipient: recipient.address,
+          recipient: await recipient.getAddress(),
           expirationTime,
           revocable: true,
           refUID: ZERO_BYTES32,
@@ -79,7 +78,7 @@ describe('AttestationResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime
       },
       { from: sender },
@@ -95,11 +94,11 @@ describe('AttestationResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: uid
             }
@@ -107,7 +106,7 @@ describe('AttestationResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -119,19 +118,19 @@ describe('AttestationResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: uid
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime
             }
           ]
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -139,7 +138,7 @@ describe('AttestationResolver', () => {
     const { uid: uid2 } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data: uid },
+      { recipient: await recipient.getAddress(), expirationTime, data: uid },
       { from: sender }
     );
 
@@ -151,8 +150,8 @@ describe('AttestationResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data: uid },
-            { recipient: recipient.address, expirationTime, data: uid }
+            { recipient: await recipient.getAddress(), expirationTime, data: uid },
+            { recipient: await recipient.getAddress(), expirationTime, data: uid }
           ]
         }
       ],
@@ -172,6 +171,6 @@ describe('AttestationResolver', () => {
   });
 
   it('should revert on invalid input', async () => {
-    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWith('OutOfBounds');
+    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWithCustomError(resolver, 'OutOfBounds');
   });
 });

@@ -2,8 +2,7 @@ import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 import { toWei } from './Types';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { BaseContract, Interface } from 'ethers';
+import { BaseContract, Interface, Signer } from 'ethers';
 import fs from 'fs';
 import glob from 'glob';
 import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
@@ -72,8 +71,8 @@ export const getDeploymentDir = () => {
 const TEST_MINIMUM_BALANCE = toWei(10);
 const TEST_FUNDING = toWei(10);
 
-export const getNamedSigners = async (): Promise<Record<string, HardhatEthersSigner>> => {
-  const signers: Record<string, HardhatEthersSigner> = {};
+export const getNamedSigners = async (): Promise<Record<string, Signer>> => {
+  const signers: Record<string, Signer> = {};
 
   for (const [name, address] of Object.entries(await getNamedAccounts())) {
     signers[name] = await ethers.getSigner(address);
@@ -82,7 +81,7 @@ export const getNamedSigners = async (): Promise<Record<string, HardhatEthersSig
   return signers;
 };
 
-export const fundAccount = async (account: string | HardhatEthersSigner) => {
+export const fundAccount = async (account: string | Signer) => {
   const address = typeof account === 'string' ? account : account.address;
 
   const balance = await ethers.provider.getBalance(address);

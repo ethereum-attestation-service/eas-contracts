@@ -12,14 +12,13 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('AttesterResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
   let sender2: BaseWallet;
   let targetSender: BaseWallet;
@@ -59,7 +58,7 @@ describe('AttesterResolver', () => {
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       { from: sender },
       'InvalidAttestation'
     );
@@ -70,13 +69,13 @@ describe('AttesterResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -84,7 +83,7 @@ describe('AttesterResolver', () => {
     const { uid } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       { from: targetSender }
     );
 
@@ -96,8 +95,8 @@ describe('AttesterResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],

@@ -10,18 +10,17 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes } from 'ethers';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 const EIP712_PROXY_NAME = 'EIP712Proxy';
 
 describe('EIP712Proxy', () => {
-  let accounts: HardhatEthersSigner[];
+  let accounts: Signer[];
   let sender: BaseWallet;
   let sender2: BaseWallet;
-  let recipient: HardhatEthersSigner;
+  let recipient: Signer;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -55,10 +54,6 @@ describe('EIP712Proxy', () => {
   });
 
   describe('construction', () => {
-    it('should revert when initialized with an empty schema registry', async () => {
-      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWith('InvalidRegistry');
-    });
-
     it('should be properly initialized', async () => {
       expect(await proxy.version()).to.equal('0.1.0');
 
@@ -73,7 +68,7 @@ describe('EIP712Proxy', () => {
   describe('verify attest', () => {
     it('should verify delegated attestation request', async () => {
       const attestationRequest = {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: ZERO_BYTES32,
@@ -105,7 +100,7 @@ describe('EIP712Proxy', () => {
 
     it('should revert when verifying delegated attestation request with a wrong signature', async () => {
       const attestationRequest = {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: ZERO_BYTES32,
@@ -132,7 +127,7 @@ describe('EIP712Proxy', () => {
           attester: sender.address,
           deadline
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
 
       await expect(
         proxy.verifyAttest({
@@ -142,12 +137,12 @@ describe('EIP712Proxy', () => {
           attester: sender2.address,
           deadline
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
     });
 
     it('should revert when verifying delegated attestation request with a used signature', async () => {
       const attestationRequest = {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: ZERO_BYTES32,
@@ -184,12 +179,12 @@ describe('EIP712Proxy', () => {
           attester: sender.address,
           deadline
         })
-      ).to.be.revertedWith('UsedSignature');
+      ).to.be.revertedWithCustomError(proxy, 'UsedSignature');
     });
 
     it('should revert when verifying delegated attestation request with an expired deadline', async () => {
       const attestationRequest = {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: ZERO_BYTES32,
@@ -217,7 +212,7 @@ describe('EIP712Proxy', () => {
           attester: sender.address,
           deadline: expiredDeadline
         })
-      ).to.be.revertedWith('DeadlineExpired');
+      ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
     });
   });
 
@@ -278,7 +273,7 @@ describe('EIP712Proxy', () => {
           revoker: sender.address,
           deadline
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
 
       await expect(
         proxy.connect(sender).verifyRevoke({
@@ -288,7 +283,7 @@ describe('EIP712Proxy', () => {
           revoker: sender2.address,
           deadline
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
     });
 
     it('should revert when verifying delegated revocation request with a used signature', async () => {
@@ -321,7 +316,7 @@ describe('EIP712Proxy', () => {
           revoker: sender.address,
           deadline
         })
-      ).to.be.revertedWith('UsedSignature');
+      ).to.be.revertedWithCustomError(proxy, 'UsedSignature');
     });
 
     it('should revert when verifying delegated revocation request with an expired deadline', async () => {
@@ -346,7 +341,7 @@ describe('EIP712Proxy', () => {
           revoker: sender.address,
           deadline: expiredDeadline
         })
-      ).to.be.revertedWith('DeadlineExpired');
+      ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
     });
   });
 });

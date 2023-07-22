@@ -12,14 +12,13 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('DataResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
 
   let registry: SchemaRegistry;
@@ -59,7 +58,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: '0x1234'
       },
@@ -73,7 +72,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: '0x02'
       },
@@ -90,12 +89,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: '0x02'
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA1
             }
@@ -103,7 +102,7 @@ describe('DataResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -115,12 +114,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA2
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: '0x02'
             }
@@ -128,7 +127,7 @@ describe('DataResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -139,7 +138,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: DATA1
       },
@@ -156,7 +155,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: DATA2
       },
@@ -176,12 +175,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA1
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA2
             }

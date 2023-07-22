@@ -11,14 +11,13 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('RevocationResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
 
   let registry: SchemaRegistry;
@@ -55,7 +54,7 @@ describe('RevocationResolver', () => {
       eas.connect(sender).attest({
         schema: schemaId,
         data: {
-          recipient: recipient.address,
+          recipient: await recipient.getAddress(),
           expirationTime,
           revocable: true,
           refUID: ZERO_BYTES32,
@@ -73,7 +72,7 @@ describe('RevocationResolver', () => {
           eas.connect(sender).attest({
             schema: schemaId,
             data: {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               revocable: true,
               refUID: ZERO_BYTES32,
@@ -112,7 +111,7 @@ describe('RevocationResolver', () => {
         { eas },
         [{ schema: schemaId, requests: uids.map((uid) => ({ uid })) }],
         { from: sender },
-        'InvalidRevocation'
+        'InvalidRevocations'
       );
     });
   });

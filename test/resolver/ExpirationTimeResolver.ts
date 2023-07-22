@@ -11,14 +11,13 @@ import {
 } from '../helpers/EAS';
 import { duration, latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('ExpirationTimeResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
 
   let registry: SchemaRegistry;
@@ -55,7 +54,7 @@ describe('ExpirationTimeResolver', () => {
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime: validAfter - duration.days(1n), data },
+      { recipient: await recipient.getAddress(), expirationTime: validAfter - duration.days(1n), data },
       { from: sender },
       'InvalidAttestation'
     );
@@ -66,13 +65,13 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter - duration.days(1n), data },
-            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data }
+            { recipient: await recipient.getAddress(), expirationTime: validAfter - duration.days(1n), data },
+            { recipient: await recipient.getAddress(), expirationTime: validAfter + duration.seconds(1n), data }
           ]
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -81,13 +80,13 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter + duration.days(1n), data },
-            { recipient: recipient.address, expirationTime: validAfter - duration.seconds(1n), data }
+            { recipient: await recipient.getAddress(), expirationTime: validAfter + duration.days(1n), data },
+            { recipient: await recipient.getAddress(), expirationTime: validAfter - duration.seconds(1n), data }
           ]
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -95,7 +94,7 @@ describe('ExpirationTimeResolver', () => {
     const { uid } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data },
+      { recipient: await recipient.getAddress(), expirationTime: validAfter + duration.seconds(1n), data },
       { from: sender }
     );
 
@@ -107,8 +106,8 @@ describe('ExpirationTimeResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime: validAfter + duration.seconds(1n), data },
-            { recipient: recipient.address, expirationTime: validAfter + duration.weeks(1n), data }
+            { recipient: await recipient.getAddress(), expirationTime: validAfter + duration.seconds(1n), data },
+            { recipient: await recipient.getAddress(), expirationTime: validAfter + duration.weeks(1n), data }
           ]
         }
       ],

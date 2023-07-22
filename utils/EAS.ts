@@ -1,6 +1,5 @@
 import { EAS__factory } from '../typechain-types';
-import { Interface } from '@ethersproject/abi';
-import { hexlify, solidityPackedKeccak256, toUtf8Bytes, TransactionResponse } from 'ethers';
+import { hexlify, solidityPackedKeccak256, toUtf8Bytes, TransactionResponse, Interface } from 'ethers';
 
 export const getSchemaUID = (schema: string, resolverAddress: string, revocable: boolean) =>
   solidityPackedKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);

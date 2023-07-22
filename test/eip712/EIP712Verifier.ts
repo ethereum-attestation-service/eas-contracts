@@ -1,20 +1,19 @@
 import Contracts from '../../components/Contracts';
 import { TestEIP712Verifier } from '../../typechain-types';
-import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from '../helpers/EIP712Utils';
 import { createWallet } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes } from 'ethers';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 const EIP712_NAME = 'EAS';
 
 describe('EIP712Verifier', () => {
-  let accounts: HardhatEthersSigner[];
+  let accounts: Signer[];
   let sender: BaseWallet;
   let sender2: BaseWallet;
-  let recipient: HardhatEthersSigner;
+  let recipient: Signer;
 
   let verifier: TestEIP712Verifier;
   let eip712Utils: EIP712Utils;
@@ -35,10 +34,6 @@ describe('EIP712Verifier', () => {
   });
 
   describe('construction', () => {
-    it('should revert when initialized with an empty schema registry', async () => {
-      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWith('InvalidRegistry');
-    });
-
     it('should be properly initialized', async () => {
       expect(await verifier.getDomainSeparator()).to.equal(eip712Utils.getDomainSeparator(EIP712_NAME));
       expect(await verifier.getAttestTypeHash()).to.equal(keccak256(toUtf8Bytes(ATTEST_TYPED_SIGNATURE)));
@@ -60,9 +55,9 @@ describe('EIP712Verifier', () => {
     const schema = ZERO_BYTES32;
     let attestationRequest: AttestationRequestData;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       attestationRequest = {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: ZERO_BYTES32,
@@ -114,7 +109,7 @@ describe('EIP712Verifier', () => {
           signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           attester: sender.address
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
 
       await expect(
         verifier.verifyAttest({
@@ -123,7 +118,7 @@ describe('EIP712Verifier', () => {
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
           attester: sender2.address
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
     });
   });
 
@@ -170,7 +165,7 @@ describe('EIP712Verifier', () => {
           signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
           revoker: sender.address
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
 
       await expect(
         verifier.verifyRevoke({
@@ -179,7 +174,7 @@ describe('EIP712Verifier', () => {
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
           revoker: sender2.address
         })
-      ).to.be.revertedWith('InvalidSignature');
+      ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
     });
   });
 });

@@ -3,12 +3,11 @@ import { SchemaRegistry } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUID } from '../utils/EAS';
 import { expect } from './helpers/Chai';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { encodeBytes32String } from 'ethers';
+import { encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('SchemaRegistry', () => {
-  let accounts: HardhatEthersSigner[];
+  let accounts: Signer[];
 
   let registry: SchemaRegistry;
 
@@ -27,17 +26,19 @@ describe('SchemaRegistry', () => {
   });
 
   describe('registration', () => {
-    const testRegister = async (schema: string, resolver: string | HardhatEthersSigner, revocable: boolean) => {
-      const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
+    const testRegister = async (schema: string, resolver: string | Signer, revocable: boolean) => {
+      const resolverAddress = typeof resolver === 'string' ? resolver : await resolver.getAddress();
 
       const uid = getSchemaUID(schema, resolverAddress, revocable);
 
       const retUID = await registry.register.staticCall(schema, resolverAddress, revocable);
-      await registry.register(schema, resolverAddress, revocable);
+      const res = await registry.register(schema, resolverAddress, revocable);
       expect(retUID).to.equal(uid);
-      // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-      // const sender = accounts[0];
-      // await expect(res).to.emit(registry, 'Registered').withArgs(uid, sender.address);
+
+      const sender = accounts[0];
+      await expect(res)
+        .to.emit(registry, 'Registered')
+        .withArgs(uid, await sender.getAddress());
 
       const schemaRecord = await registry.getSchema(uid);
       expect(schemaRecord.uid).to.equal(uid);
@@ -64,8 +65,12 @@ describe('SchemaRegistry', () => {
     });
 
     it('should not allow to register the same schema and resolver twice', async () => {
-      await testRegister('bool isFriend', ZERO_ADDRESS, true);
-      await expect(testRegister('bool isFriend', ZERO_ADDRESS, true)).to.be.revertedWith('AlreadyExists');
+      const schema = 'bool isFriend';
+      await registry.register(schema, ZERO_ADDRESS, true);
+      await expect(registry.register(schema, ZERO_ADDRESS, true)).to.be.revertedWithCustomError(
+        registry,
+        'AlreadyExists'
+      );
     });
   });
 
@@ -74,13 +79,13 @@ describe('SchemaRegistry', () => {
       const schema = 'bool isFriend';
       const resolver = accounts[5];
 
-      await registry.register(schema, resolver.address, true);
+      await registry.register(schema, await resolver.getAddress(), true);
 
-      const uid = getSchemaUID(schema, resolver.address, true);
+      const uid = getSchemaUID(schema, await resolver.getAddress(), true);
       const schemaRecord = await registry.getSchema(uid);
       expect(schemaRecord.uid).to.equal(uid);
       expect(schemaRecord.schema).to.equal(schema);
-      expect(schemaRecord.resolver).to.equal(resolver.address);
+      expect(schemaRecord.resolver).to.equal(await resolver.getAddress());
       expect(schemaRecord.revocable).to.equal(true);
     });
 

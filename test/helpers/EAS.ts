@@ -27,7 +27,7 @@ import {
 import { getTransactionCost } from './Transaction';
 import { getBalance } from './Wallet';
 import { expect } from 'chai';
-import { BaseWallet, hexlify, TransactionResponse } from 'ethers';
+import { BaseWallet, BaseContract, hexlify, TransactionResponse } from 'ethers';
 
 export const registerSchema = async (
   schema: string,
@@ -232,8 +232,7 @@ export const expectAttestation = async (
   const attester =
     signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
 
-  // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-  // await expect(res).to.emit(eas, 'Attested').withArgs(recipient, attester, uid, schema);
+  await expect(res).to.emit(eas, 'Attested').withArgs(recipient, attester, uid, schema);
 
   expect(await eas.isAttestationValid(uid)).to.be.true;
 
@@ -257,7 +256,8 @@ export const expectFailedAttestation = async (
   schema: string,
   request: AttestationRequestData,
   options: AttestationOptions,
-  err: string
+  err: string,
+  contract?: BaseContract
 ) => {
   const { eas, eip712Utils, eip712ProxyUtils } = contracts;
   const {
@@ -281,7 +281,7 @@ export const expectFailedAttestation = async (
             value: msgValue
           }
         )
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -325,7 +325,7 @@ export const expectFailedAttestation = async (
           },
           { value: msgValue }
         )
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -370,7 +370,7 @@ export const expectFailedAttestation = async (
           },
           { value: msgValue }
         )
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -533,8 +533,7 @@ export const expectMultiAttestations = async (
       const attester =
         signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
 
-      // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-      // await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, attester, uid, schema);
+      await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, attester, uid, schema);
 
       expect(await eas.isAttestationValid(uid)).to.be.true;
 
@@ -559,7 +558,8 @@ export const expectFailedMultiAttestations = async (
   contracts: RequestContracts,
   requests: MultiAttestationRequest[],
   options: AttestationOptions,
-  err: string
+  err: string,
+  contract?: BaseContract
 ) => {
   const { eas, eip712Utils, eip712ProxyUtils } = contracts;
 
@@ -591,7 +591,7 @@ export const expectFailedMultiAttestations = async (
         eas.connect(txSender).multiAttest(multiAttestationRequests, {
           value: msgValue
         })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -632,7 +632,7 @@ export const expectFailedMultiAttestations = async (
 
       await expect(
         eas.connect(txSender).multiAttestByDelegation(multiDelegatedAttestationRequests, { value: msgValue })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -672,7 +672,7 @@ export const expectFailedMultiAttestations = async (
         eip712ProxyUtils.proxy
           .connect(txSender)
           .multiAttestByDelegation(multiDelegatedAttestationRequests, { value: msgValue })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -693,8 +693,7 @@ export const expectRevocation = async (
 
   const prevBalance: bigint = await getBalance(txSender.address);
 
-  // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-  // const attestation = await eas.getAttestation(uid);
+  const attestation = await eas.getAttestation(uid);
 
   let res;
 
@@ -770,10 +769,9 @@ export const expectRevocation = async (
     expect(await getBalance(txSender.address)).to.equal(prevBalance - value - transactionCost);
   }
 
-  // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-  // const attester =
-  // signatureType !== SignatureType.DelegatedProxy ? txSender.address : eip712ProxyUtils?.proxy.getAddress();
-  // await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, attester, uid, attestation.schema);
+  const attester =
+    signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+  await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, attester, uid, attestation.schema);
 
   const attestation2 = await eas.getAttestation(uid);
   expect(attestation2.revocationTime).to.equal(await eas.getTime());
@@ -895,17 +893,15 @@ export const expectMultiRevocations = async (
     expect(await getBalance(txSender.address)).to.equal(prevBalance - requestedValue - transactionCost);
   }
 
-  // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-  // const attester =
-  //   signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+  const attester =
+    signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
 
   for (const data of requests) {
     for (const request of data.requests) {
-      // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-      // const attestation = attestations[request.uid];
-      // await expect(res)
-      //   .to.emit(eas, 'Revoked')
-      //   .withArgs(attestation.recipient, attester, request.uid, attestation.schema);
+      const attestation = attestations[request.uid];
+      await expect(res)
+        .to.emit(eas, 'Revoked')
+        .withArgs(attestation.recipient, attester, request.uid, attestation.schema);
 
       expect(await eas.isAttestationValid(request.uid)).to.be.true;
 
@@ -922,7 +918,8 @@ export const expectFailedRevocation = async (
   schema: string,
   request: RevocationRequestData,
   options: RevocationOptions,
-  err: string
+  err: string,
+  contract?: BaseContract
 ) => {
   const { eas, eip712Utils, eip712ProxyUtils } = contracts;
   const { uid, value = 0 } = request;
@@ -934,7 +931,7 @@ export const expectFailedRevocation = async (
     case SignatureType.Direct: {
       await expect(
         eas.connect(txSender).revoke({ schema, data: { uid, value } }, { value: msgValue })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -967,7 +964,7 @@ export const expectFailedRevocation = async (
           },
           { value: msgValue }
         )
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -996,7 +993,7 @@ export const expectFailedRevocation = async (
           },
           { value: msgValue }
         )
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -1007,7 +1004,8 @@ export const expectFailedMultiRevocations = async (
   contracts: RequestContracts,
   requests: MultiRevocationRequest[],
   options: RevocationOptions,
-  err: string
+  err: string,
+  contract?: BaseContract
 ) => {
   const { eas, eip712Utils, eip712ProxyUtils } = contracts;
   const { from: txSender, signatureType = SignatureType.Direct, deadline = NO_EXPIRATION } = options;
@@ -1033,7 +1031,7 @@ export const expectFailedMultiRevocations = async (
         eas.connect(txSender).multiRevoke(multiRevocationRequests, {
           value: msgValue
         })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -1065,7 +1063,7 @@ export const expectFailedMultiRevocations = async (
 
       await expect(
         eas.connect(txSender).multiRevokeByDelegation(multiDelegatedRevocationRequests, { value: msgValue })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }
@@ -1101,7 +1099,7 @@ export const expectFailedMultiRevocations = async (
         eip712ProxyUtils.proxy
           .connect(txSender)
           .multiRevokeByDelegation(multiDelegatedRevocationRequests, { value: msgValue })
-      ).to.be.revertedWith(err);
+      ).to.be.revertedWithCustomError(contract ?? eas, err);
 
       break;
     }

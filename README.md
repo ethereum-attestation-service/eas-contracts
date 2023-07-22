@@ -96,7 +96,7 @@ Please note that you can also import and use the addresses directly in your code
 ## Installation
 
 ```sh
-yarn add @ethereum-attestation-service/eas-contracts
+pnpm add @ethereum-attestation-service/eas-contracts
 ```
 
 ## Testing
@@ -108,7 +108,7 @@ Testing the protocol is possible via multiple approaches:
 You can run the full test suite via:
 
 ```sh
-yarn test
+pnpm test
 ```
 
 ### Deployment Tests
@@ -116,7 +116,7 @@ yarn test
 You can test new deployments (and the health of the network) against a mainnet fork via:
 
 ```sh
-yarn test:deploy
+pnpm test:deploy
 ```
 
 Please make sure to properly configure your Tenderly settings via `.env`.
@@ -166,7 +166,7 @@ All files                     |      100 |      100 |      100 |      100 |     
 In order to audit the test coverage of the full test suite, run:
 
 ```sh
-yarn test:coverage
+pnpm test:coverage
 ```
 
 ## Profiling
@@ -174,7 +174,7 @@ yarn test:coverage
 You can profile the gas costs of all of the user-focused flows via:
 
 ```sh
-yarn test:profile
+pnpm test:profile
 ```
 
 ## Deploying
@@ -182,13 +182,13 @@ yarn test:profile
 The contracts have built-in support for deployments on different chains and mainnet forks. You can deploy the project by:
 
 ```sh
-yarn deploy
+pnpm deploy
 ```
 
 There’s also a special deployment mode which deploys the protocol to a mainnet fork, with additional goodies. It can be run via:
 
 ```sh
-yarn deploy:fork
+pnpm deploy:fork
 ```
 
 The framework was inspired and adopted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).

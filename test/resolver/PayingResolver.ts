@@ -16,14 +16,13 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet, getBalance } from '../helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BaseWallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('PayingResolver', () => {
-  let accounts: HardhatEthersSigner[];
-  let recipient: HardhatEthersSigner;
+  let accounts: Signer[];
+  let recipient: Signer;
   let sender: BaseWallet;
 
   let registry: SchemaRegistry;
@@ -66,7 +65,7 @@ describe('PayingResolver', () => {
     const { res } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       {
         from: sender,
         skipBalanceCheck: true
@@ -86,8 +85,8 @@ describe('PayingResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],
@@ -111,7 +110,7 @@ describe('PayingResolver', () => {
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data, value: 1n },
+      { recipient: await recipient.getAddress(), expirationTime, data, value: 1n },
       {
         from: sender
       },
@@ -124,15 +123,15 @@ describe('PayingResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data, value: 1n },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data, value: 1n },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],
       {
         from: sender
       },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -141,15 +140,15 @@ describe('PayingResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data, value: 1n }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data, value: 1n }
           ]
         }
       ],
       {
         from: sender
       },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -162,7 +161,7 @@ describe('PayingResolver', () => {
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
-            recipient: recipient.address,
+            recipient: await recipient.getAddress(),
             expirationTime,
             revocable: true,
             refUID: ZERO_BYTES32,
@@ -180,7 +179,7 @@ describe('PayingResolver', () => {
             eas.connect(sender).attest({
               schema: schemaId,
               data: {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,

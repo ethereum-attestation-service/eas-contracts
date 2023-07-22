@@ -18,19 +18,18 @@ import { EIP712ProxyUtils } from './helpers/EIP712ProxyUtils';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { BaseWallet, encodeBytes32String } from 'ethers';
+import { BaseWallet, encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 const EIP712_NAME = 'EAS';
 const EIP712_PROXY_NAME = 'EAS-Proxy';
 
 describe('EAS', () => {
-  let accounts: HardhatEthersSigner[];
+  let accounts: Signer[];
   let sender: BaseWallet;
   let sender2: BaseWallet;
-  let recipient: HardhatEthersSigner;
-  let recipient2: HardhatEthersSigner;
+  let recipient: Signer;
+  let recipient2: Signer;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -64,7 +63,7 @@ describe('EAS', () => {
 
   describe('construction', () => {
     it('should revert when initialized with an empty schema registry', async () => {
-      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWith('InvalidRegistry');
+      await expect(Contracts.EAS.deploy(ZERO_ADDRESS)).to.be.revertedWithCustomError(eas, 'InvalidRegistry');
     });
 
     it('should be properly initialized', async () => {
@@ -94,7 +93,7 @@ describe('EAS', () => {
             },
             encodeBytes32String('BAD'),
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data
             },
@@ -114,7 +113,7 @@ describe('EAS', () => {
                 schema: encodeBytes32String('BAD'),
                 requests: [
                   {
-                    recipient: recipient.address,
+                    recipient: await recipient.getAddress(),
                     expirationTime,
                     data
                   }
@@ -124,7 +123,7 @@ describe('EAS', () => {
                 schema: encodeBytes32String('BAD2'),
                 requests: [
                   {
-                    recipient: recipient.address,
+                    recipient: await recipient.getAddress(),
                     expirationTime,
                     data
                   }
@@ -159,7 +158,7 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
 
                       expirationTime,
                       data
@@ -170,7 +169,7 @@ describe('EAS', () => {
                   schema: schema2Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
 
                       expirationTime,
                       data
@@ -181,7 +180,7 @@ describe('EAS', () => {
                   schema: encodeBytes32String('BAD'),
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
 
                       expirationTime,
                       data
@@ -205,7 +204,7 @@ describe('EAS', () => {
               },
               schema1Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime: expired,
                 data
               },
@@ -221,12 +220,12 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime: expired,
                       data
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     }
@@ -236,7 +235,7 @@ describe('EAS', () => {
                   schema: schema2Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     }
@@ -255,7 +254,7 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     }
@@ -265,12 +264,12 @@ describe('EAS', () => {
                   schema: schema2Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime: expired,
                       data
                     }
@@ -344,7 +343,7 @@ describe('EAS', () => {
               },
               schema1Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('0')
               },
@@ -359,7 +358,7 @@ describe('EAS', () => {
               },
               schema1Id,
               {
-                recipient: recipient2.address,
+                recipient: await recipient2.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('1')
               },
@@ -379,7 +378,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('0')
               },
@@ -396,7 +395,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('1')
               },
@@ -413,7 +412,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('2')
               },
@@ -433,7 +432,7 @@ describe('EAS', () => {
               },
               schema1Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime: NO_EXPIRATION,
                 data: encodeBytes32String('0')
               },
@@ -451,12 +450,12 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime: NO_EXPIRATION,
                       data: encodeBytes32String('1')
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime: NO_EXPIRATION,
                       data: encodeBytes32String('2')
                     }
@@ -476,7 +475,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data: encodeBytes32String('0')
               },
@@ -494,12 +493,12 @@ describe('EAS', () => {
                   schema: schema2Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data: encodeBytes32String('1')
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data: encodeBytes32String('2')
                     }
@@ -515,7 +514,7 @@ describe('EAS', () => {
               eas.attest({
                 schema: schema1Id,
                 data: {
-                  recipient: recipient.address,
+                  recipient: await recipient.getAddress(),
                   expirationTime,
                   revocable: true,
                   refUID: ZERO_BYTES32,
@@ -533,7 +532,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 refUID: uid,
                 data
@@ -555,13 +554,13 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       refUID: uid,
                       data: encodeBytes32String('1')
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       refUID: uid,
                       data: encodeBytes32String('2')
@@ -586,7 +585,7 @@ describe('EAS', () => {
                 },
                 schema3Id,
                 {
-                  recipient: recipient.address,
+                  recipient: await recipient.getAddress(),
                   expirationTime,
                   data
                 },
@@ -604,7 +603,7 @@ describe('EAS', () => {
                 },
                 schema3Id,
                 {
-                  recipient: recipient.address,
+                  recipient: await recipient.getAddress(),
                   expirationTime,
                   data
                 },
@@ -622,7 +621,7 @@ describe('EAS', () => {
                 },
                 schema3Id,
                 {
-                  recipient: recipient.address,
+                  recipient: await recipient.getAddress(),
                   expirationTime,
                   data
                 },
@@ -648,19 +647,21 @@ describe('EAS', () => {
                 {
                   schema: schema1Id,
                   requests: [
-                    { recipient: recipient.address, expirationTime, data: encodeBytes32String('0') },
-                    { recipient: recipient.address, expirationTime, data: encodeBytes32String('1') }
+                    { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String('0') },
+                    { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String('1') }
                   ]
                 },
                 {
                   schema: schema2Id,
-                  requests: [{ recipient: recipient.address, expirationTime, data: encodeBytes32String('2') }]
+                  requests: [
+                    { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String('2') }
+                  ]
                 },
                 {
                   schema: schema3Id,
                   requests: [
-                    { recipient: recipient.address, expirationTime, data: encodeBytes32String('3') },
-                    { recipient: recipient.address, expirationTime, data: encodeBytes32String('4') }
+                    { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String('3') },
+                    { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String('4') }
                   ]
                 }
               ],
@@ -677,7 +678,7 @@ describe('EAS', () => {
               },
               schema3Id,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 refUID: encodeBytes32String('INVALID'),
                 data
@@ -690,7 +691,7 @@ describe('EAS', () => {
               eas.attest({
                 schema: schema1Id,
                 data: {
-                  recipient: recipient.address,
+                  recipient: await recipient.getAddress(),
                   expirationTime,
                   revocable: true,
                   refUID: ZERO_BYTES32,
@@ -710,9 +711,14 @@ describe('EAS', () => {
                 {
                   schema: schema1Id,
                   requests: [
-                    { recipient: recipient.address, expirationTime, refUID: encodeBytes32String('INVALID'), data },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
+                      expirationTime,
+                      refUID: encodeBytes32String('INVALID'),
+                      data
+                    },
+                    {
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       refUID: uid,
                       data
@@ -735,12 +741,17 @@ describe('EAS', () => {
                   schema: schema1Id,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       refUID: uid,
                       data
                     },
-                    { recipient: recipient.address, expirationTime, refUID: encodeBytes32String('INVALID'), data }
+                    {
+                      recipient: await recipient.getAddress(),
+                      expirationTime,
+                      refUID: encodeBytes32String('INVALID'),
+                      data
+                    }
                   ]
                 }
               ],
@@ -758,7 +769,7 @@ describe('EAS', () => {
               },
               ZERO_BYTES32,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data
               },
@@ -775,11 +786,11 @@ describe('EAS', () => {
               [
                 {
                   schema: ZERO_BYTES32,
-                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
                 },
                 {
                   schema: schema1Id,
-                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
                 }
               ],
               { signatureType, from: sender },
@@ -795,11 +806,11 @@ describe('EAS', () => {
               [
                 {
                   schema: schema1Id,
-                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
                 },
                 {
                   schema: ZERO_BYTES32,
-                  requests: [{ recipient: recipient.address, expirationTime, data }]
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
                 }
               ],
               { signatureType, from: sender },
@@ -825,7 +836,7 @@ describe('EAS', () => {
               },
               schemaId,
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 data
               },
@@ -844,12 +855,12 @@ describe('EAS', () => {
                   schema: schemaId,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       revocable: false,
                       data
@@ -872,13 +883,13 @@ describe('EAS', () => {
                   schema: schemaId,
                   requests: [
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       revocable: false,
                       data
                     },
                     {
-                      recipient: recipient.address,
+                      recipient: await recipient.getAddress(),
                       expirationTime,
                       data
                     }
@@ -904,7 +915,7 @@ describe('EAS', () => {
             schema: schemaId,
             data: [
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,
@@ -912,7 +923,7 @@ describe('EAS', () => {
                 value: 0
               },
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,
@@ -930,7 +941,7 @@ describe('EAS', () => {
             attester: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiAttestByDelegation([
@@ -947,7 +958,7 @@ describe('EAS', () => {
             attester: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiAttestByDelegation([
@@ -955,7 +966,7 @@ describe('EAS', () => {
             schema: schemaId,
             data: [
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,
@@ -978,7 +989,7 @@ describe('EAS', () => {
             attester: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiAttestByDelegation([
@@ -986,7 +997,7 @@ describe('EAS', () => {
             schema: schemaId,
             data: [
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,
@@ -994,7 +1005,7 @@ describe('EAS', () => {
                 value: 0
               },
               {
-                recipient: recipient.address,
+                recipient: await recipient.getAddress(),
                 expirationTime,
                 revocable: true,
                 refUID: ZERO_BYTES32,
@@ -1006,7 +1017,7 @@ describe('EAS', () => {
             attester: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
     });
   });
 
@@ -1331,7 +1342,7 @@ describe('EAS', () => {
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
-            recipient: recipient.address,
+            recipient: await recipient.getAddress(),
             expirationTime,
             revocable: true,
             refUID: ZERO_BYTES32,
@@ -1344,7 +1355,7 @@ describe('EAS', () => {
         eas.connect(sender).attest({
           schema: schemaId,
           data: {
-            recipient: recipient.address,
+            recipient: await recipient.getAddress(),
             expirationTime,
             revocable: true,
             refUID: ZERO_BYTES32,
@@ -1372,7 +1383,7 @@ describe('EAS', () => {
             revoker: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiRevokeByDelegation([
@@ -1389,7 +1400,7 @@ describe('EAS', () => {
             revoker: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiRevokeByDelegation([
@@ -1411,7 +1422,7 @@ describe('EAS', () => {
             revoker: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
 
       await expect(
         eas.multiRevokeByDelegation([
@@ -1425,18 +1436,17 @@ describe('EAS', () => {
             revoker: sender.address
           }
         ])
-      ).to.be.revertedWith('InvalidLength');
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
     });
   });
 
   describe('timestamping', () => {
     const expectTimestamp = async (data: string | string[]) => {
-      Array.isArray(data) ? await eas.multiTimestamp(data) : await eas.timestamp(data);
+      const res = Array.isArray(data) ? await eas.multiTimestamp(data) : await eas.timestamp(data);
       const timestamp = await eas.getTime();
 
       for (const item of Array.isArray(data) ? data : [data]) {
-        // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-        // await expect(res).to.emit(eas, 'Timestamped').withArgs(item, timestamp);
+        await expect(res).to.emit(eas, 'Timestamped').withArgs(item, timestamp);
 
         expect(await eas.getTimestamp(item)).to.equal(timestamp);
       }
@@ -1463,15 +1473,15 @@ describe('EAS', () => {
       const data = data1;
       await expectTimestamp(data);
 
-      await expect(eas.timestamp(data)).to.be.revertedWith('AlreadyTimestamped');
+      await expect(eas.timestamp(data)).to.be.revertedWithCustomError(eas, 'AlreadyTimestamped');
     });
 
     it('should revert when attempting to timestamp the same multiple data twice', async () => {
       const data = [data1, data4];
       await expectTimestamp(data);
 
-      await expect(eas.multiTimestamp(data)).to.be.revertedWith('AlreadyTimestamped');
-      await expect(eas.multiTimestamp([data3, ...data])).to.be.revertedWith('AlreadyTimestamped');
+      await expect(eas.multiTimestamp(data)).to.be.revertedWithCustomError(eas, 'AlreadyTimestamped');
+      await expect(eas.multiTimestamp([data3, ...data])).to.be.revertedWithCustomError(eas, 'AlreadyTimestamped');
     });
 
     it("should return 0 for any data that wasn't timestamped", async () => {
@@ -1481,15 +1491,14 @@ describe('EAS', () => {
 
   describe('revoking offchain', () => {
     const expectRevoke = async (data: string | string[]) => {
-      Array.isArray(data)
+      const res = Array.isArray(data)
         ? await eas.connect(sender).multiRevokeOffchain(data)
         : await eas.connect(sender).revokeOffchain(data);
 
       const timestamp = await eas.getTime();
 
       for (const item of Array.isArray(data) ? data : [data]) {
-        // TODO: restore the test as soon as hardhat-waffle supports ethers v6
-        // await expect(res).to.emit(eas, 'RevokedOffchain').withArgs(sender.address, item, timestamp);
+        await expect(res).to.emit(eas, 'RevokedOffchain').withArgs(sender.address, item, timestamp);
         expect(await eas.getRevokeOffchain(sender.address, item)).to.equal(timestamp);
       }
     };
@@ -1515,22 +1524,32 @@ describe('EAS', () => {
       const data = data1;
       await expectRevoke(data);
 
-      await expect(eas.connect(sender).revokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
+      await expect(eas.connect(sender).revokeOffchain(data)).to.be.revertedWithCustomError(
+        eas,
+        'AlreadyRevokedOffchain'
+      );
     });
 
     it('should not revert when attempting to revoke the same data twice with two different accounts', async () => {
       const data = data1;
       await expectRevoke(data);
 
-      await expect(eas.connect(sender2).revokeOffchain(data)).to.not.be.revertedWith('AlreadyRevokedOffchain');
+      await expect(eas.connect(sender2).revokeOffchain(data)).to.not.be.revertedWithCustomError(
+        eas,
+        'AlreadyRevokedOffchain'
+      );
     });
 
     it('should revert when attempting to timestamp the same multiple data twice', async () => {
       const data = [data1, data4];
       await expectRevoke(data);
 
-      await expect(eas.connect(sender).multiRevokeOffchain(data)).to.be.revertedWith('AlreadyRevokedOffchain');
-      await expect(eas.connect(sender).multiRevokeOffchain([data3, ...data])).to.be.revertedWith(
+      await expect(eas.connect(sender).multiRevokeOffchain(data)).to.be.revertedWithCustomError(
+        eas,
+        'AlreadyRevokedOffchain'
+      );
+      await expect(eas.connect(sender).multiRevokeOffchain([data3, ...data])).to.be.revertedWithCustomError(
+        eas,
         'AlreadyRevokedOffchain'
       );
     });
