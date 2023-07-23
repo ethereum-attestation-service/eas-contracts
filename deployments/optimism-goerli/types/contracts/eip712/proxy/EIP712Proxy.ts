@@ -160,7 +160,6 @@ export type DelegatedProxyRevocationRequestStructOutput = [
 
 export interface EIP712ProxyInterface extends utils.Interface {
   functions: {
-    "VERSION()": FunctionFragment;
     "attestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256),(uint8,bytes32,bytes32),address,uint64))": FunctionFragment;
     "getAttestTypeHash()": FunctionFragment;
     "getAttester(bytes32)": FunctionFragment;
@@ -171,11 +170,11 @@ export interface EIP712ProxyInterface extends utils.Interface {
     "multiAttestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256)[],(uint8,bytes32,bytes32)[],address,uint64)[])": FunctionFragment;
     "multiRevokeByDelegation((bytes32,(bytes32,uint256)[],(uint8,bytes32,bytes32)[],address,uint64)[])": FunctionFragment;
     "revokeByDelegation((bytes32,(bytes32,uint256),(uint8,bytes32,bytes32),address,uint64))": FunctionFragment;
+    "version()": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "VERSION"
       | "attestByDelegation"
       | "getAttestTypeHash"
       | "getAttester"
@@ -186,9 +185,9 @@ export interface EIP712ProxyInterface extends utils.Interface {
       | "multiAttestByDelegation"
       | "multiRevokeByDelegation"
       | "revokeByDelegation"
+      | "version"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "attestByDelegation",
     values: [DelegatedProxyAttestationRequestStruct]
@@ -223,8 +222,8 @@ export interface EIP712ProxyInterface extends utils.Interface {
     functionFragment: "revokeByDelegation",
     values: [DelegatedProxyRevocationRequestStruct]
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "attestByDelegation",
     data: BytesLike
@@ -259,6 +258,7 @@ export interface EIP712ProxyInterface extends utils.Interface {
     functionFragment: "revokeByDelegation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {};
 }
@@ -290,8 +290,6 @@ export interface EIP712Proxy extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    VERSION(overrides?: CallOverrides): Promise<[string]>;
-
     attestByDelegation(
       delegatedRequest: DelegatedProxyAttestationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -326,9 +324,9 @@ export interface EIP712Proxy extends BaseContract {
       delegatedRequest: DelegatedProxyRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-  };
 
-  VERSION(overrides?: CallOverrides): Promise<string>;
+    version(overrides?: CallOverrides): Promise<[string]>;
+  };
 
   attestByDelegation(
     delegatedRequest: DelegatedProxyAttestationRequestStruct,
@@ -365,9 +363,9 @@ export interface EIP712Proxy extends BaseContract {
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  callStatic: {
-    VERSION(overrides?: CallOverrides): Promise<string>;
+  version(overrides?: CallOverrides): Promise<string>;
 
+  callStatic: {
     attestByDelegation(
       delegatedRequest: DelegatedProxyAttestationRequestStruct,
       overrides?: CallOverrides
@@ -402,13 +400,13 @@ export interface EIP712Proxy extends BaseContract {
       delegatedRequest: DelegatedProxyRevocationRequestStruct,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    version(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-
     attestByDelegation(
       delegatedRequest: DelegatedProxyAttestationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -443,11 +441,11 @@ export interface EIP712Proxy extends BaseContract {
       delegatedRequest: DelegatedProxyRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     attestByDelegation(
       delegatedRequest: DelegatedProxyAttestationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -484,5 +482,7 @@ export interface EIP712Proxy extends BaseContract {
       delegatedRequest: DelegatedProxyRevocationRequestStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
