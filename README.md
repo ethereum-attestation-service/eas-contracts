@@ -73,13 +73,13 @@ Please note that you can also import and use the addresses directly in your code
 
 ### Optimism Goerli
 
-#### v0.27
+#### v1.0.1
 
 * **EAS**:
-  * Contract: [0x1a5650d0ecbca349dd84bafa85790e3e6955eb84](https://goerli-optimism.etherscan.io/address/0x1a5650D0EcbCa349DD84bAFa85790E3e6955eb84)
+  * Contract: [0x4200000000000000000000000000000000000021](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000021)
   * Deployment and ABI: [EAS.json](./deployments/optimism-goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f](https://goerli-optimism.etherscan.io/address/0x7b24C7f8AF365B4E308b6acb0A7dfc85d034Cb3f)
+  * Contract: [0x4200000000000000000000000000000000000020](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism-goerli/SchemaRegistry.json)
 
 ### Base Goerli
