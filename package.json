@@ -54,8 +54,8 @@
     "clean": "rm -rf artifacts cache dist coverage typechain-types out",
     "prepare": "pnpm compile",
     "export-types": "pnpm delete-test-types && tsc -p tsconfig.release.json && copyfiles -u 1 \"typechain-types/**/*.d.ts\" dist/typechain-types && pnpm restore-test-types",
-    "delete-test-types": "sed -i.bak '/tests/d' typechain-types/index.ts typechain-types/contracts/index.ts typechain-types/factories/contracts/index.ts",
-    "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/contracts/index.ts.bak typechain-types/contracts/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts",
+    "delete-test-types": "sed -i.bak '/tests/d' typechain-types/index.ts typechain-types/contracts/index.ts typechain-types/factories/contracts/index.ts && mv typechain-types/hardhat.d.ts typechain-types/hardhat.d.ts.bak",
+    "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/contracts/index.ts.bak typechain-types/contracts/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts && mv typechain-types/hardhat.d.ts.bak typechain-types/hardhat.d.ts",
     "prepare:release": "pnpm prepare && pnpm export-types && pnpm lint && pnpm test"
   },
   "dependencies": {
