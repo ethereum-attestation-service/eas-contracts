@@ -33,19 +33,10 @@ contract Semver {
      *
      * @return Semver contract version as a string.
      */
-    function version() public view returns (string memory) {
+    function version() external view returns (string memory) {
         return
             string(
                 abi.encodePacked(Strings.toString(_major), ".", Strings.toString(_minor), ".", Strings.toString(_path))
             );
-    }
-
-    /**
-     * @notice Returns the full semver contract version (for backward compatibility).
-     *
-     * @return Semver contract version as a string.
-     */
-    function VERSION() external view returns (string memory) {
-        return version();
     }
 }

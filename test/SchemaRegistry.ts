@@ -22,7 +22,6 @@ describe('SchemaRegistry', () => {
   describe('construction', () => {
     it('should report a version', async () => {
       expect(await registry.version()).to.equal('1.0.0');
-      expect(await registry.VERSION()).to.equal(await registry.version());
     });
   });
 
