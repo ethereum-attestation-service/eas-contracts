@@ -68,6 +68,7 @@ describe('EAS', () => {
 
     it('should be properly initialized', async () => {
       expect(await eas.version()).to.equal('1.0.0');
+      expect(await eas.VERSION()).to.equal(await eas.version());
 
       expect(await eas.getSchemaRegistry()).to.equal(await registry.getAddress());
       expect(await eas.getName()).to.equal(EIP712_NAME);
