@@ -2,24 +2,17 @@ import Contracts from '../components/Contracts';
 import { SchemaRegistry } from '../typechain-types';
 import { ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUID } from '../utils/EAS';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { expect } from 'chai';
+import { expect } from './helpers/Chai';
+import { encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
-const {
-  utils: { formatBytes32String }
-} = ethers;
-
 describe('SchemaRegistry', () => {
-  let accounts: SignerWithAddress[];
-  let sender: SignerWithAddress;
+  let accounts: Signer[];
 
   let registry: SchemaRegistry;
 
   before(async () => {
     accounts = await ethers.getSigners();
-
-    [sender] = accounts;
   });
 
   beforeEach(async () => {
@@ -33,15 +26,19 @@ describe('SchemaRegistry', () => {
   });
 
   describe('registration', () => {
-    const testRegister = async (schema: string, resolver: string | SignerWithAddress, revocable: boolean) => {
-      const resolverAddress = typeof resolver === 'string' ? resolver : resolver.address;
+    const testRegister = async (schema: string, resolver: string | Signer, revocable: boolean) => {
+      const resolverAddress = typeof resolver === 'string' ? resolver : await resolver.getAddress();
 
       const uid = getSchemaUID(schema, resolverAddress, revocable);
 
-      const retUID = await registry.callStatic.register(schema, resolverAddress, revocable);
+      const retUID = await registry.register.staticCall(schema, resolverAddress, revocable);
       const res = await registry.register(schema, resolverAddress, revocable);
       expect(retUID).to.equal(uid);
-      await expect(res).to.emit(registry, 'Registered').withArgs(uid, sender.address);
+
+      const sender = accounts[0];
+      await expect(res)
+        .to.emit(registry, 'Registered')
+        .withArgs(uid, await sender.getAddress());
 
       const schemaRecord = await registry.getSchema(uid);
       expect(schemaRecord.uid).to.equal(uid);
@@ -68,8 +65,12 @@ describe('SchemaRegistry', () => {
     });
 
     it('should not allow to register the same schema and resolver twice', async () => {
-      await testRegister('bool isFriend', ZERO_ADDRESS, true);
-      await expect(testRegister('bool isFriend', ZERO_ADDRESS, true)).to.be.revertedWith('AlreadyExists');
+      const schema = 'bool isFriend';
+      await registry.register(schema, ZERO_ADDRESS, true);
+      await expect(registry.register(schema, ZERO_ADDRESS, true)).to.be.revertedWithCustomError(
+        registry,
+        'AlreadyExists'
+      );
     });
   });
 
@@ -78,18 +79,18 @@ describe('SchemaRegistry', () => {
       const schema = 'bool isFriend';
       const resolver = accounts[5];
 
-      await registry.register(schema, resolver.address, true);
+      await registry.register(schema, await resolver.getAddress(), true);
 
-      const uid = getSchemaUID(schema, resolver.address, true);
+      const uid = getSchemaUID(schema, await resolver.getAddress(), true);
       const schemaRecord = await registry.getSchema(uid);
       expect(schemaRecord.uid).to.equal(uid);
       expect(schemaRecord.schema).to.equal(schema);
-      expect(schemaRecord.resolver).to.equal(resolver.address);
+      expect(schemaRecord.resolver).to.equal(await resolver.getAddress());
       expect(schemaRecord.revocable).to.equal(true);
     });
 
     it('should return an empty schema given non-existing id', async () => {
-      const schemaRecord = await registry.getSchema(formatBytes32String('BAD'));
+      const schemaRecord = await registry.getSchema(encodeBytes32String('BAD'));
       expect(schemaRecord.uid).to.equal(ZERO_BYTES32);
       expect(schemaRecord.schema).to.equal('');
       expect(schemaRecord.resolver).to.equal(ZERO_ADDRESS);

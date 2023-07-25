@@ -2,8 +2,11 @@ import { ethers } from 'hardhat';
 
 export * from '../../utils/Time';
 
-export const latest = async () => {
-  const { timestamp } = await ethers.provider.getBlock('latest');
+export const latest = async (): Promise<bigint> => {
+  const block = await ethers.provider.getBlock('latest');
+  if (!block) {
+    throw new Error('Unable to get the latest block');
+  }
 
-  return timestamp;
+  return BigInt(block.timestamp);
 };

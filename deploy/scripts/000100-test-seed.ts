@@ -10,13 +10,11 @@ import {
 import { getSchemaUID, getUIDsFromAttestEvents } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import Chance from 'chance';
-import { utils, Wallet } from 'ethers';
+import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, Wallet } from 'ethers';
 import fs from 'fs';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import path from 'path';
-
-const { defaultAbiCoder, formatBytes32String, keccak256, toUtf8Bytes } = utils;
 
 export const TEST_ATTESTATIONS_OUTPUT_PATH = path.join(getDeploymentDir(), 'test-attestations.json');
 
@@ -64,7 +62,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           like: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool'], Object.values(params)), params };
       }
     },
     {
@@ -76,7 +74,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
         };
 
         return {
-          data: defaultAbiCoder.encode(['address', 'bool'], Object.values(params)),
+          data: AbiCoder.defaultAbiCoder().encode(['address', 'bool'], Object.values(params)),
           params
         };
       }
@@ -85,13 +83,13 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       schema: 'bytes32 eventId,uint8 ticketType,uint32 ticketNum',
       generator: () => {
         const params = {
-          eventId: formatBytes32String(chance.string({ length: 31 })),
+          eventId: encodeBytes32String(chance.string({ length: 31 })),
           ticketType: chance.natural({ max: 2 ** 8 - 1 }),
           ticketNum: chance.natural({ max: 2 ** 32 - 1 })
         };
 
         return {
-          data: defaultAbiCoder.encode(['bytes32', 'uint8', 'uint32'], Object.values(params)),
+          data: AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint8', 'uint32'], Object.values(params)),
           params
         };
       }
@@ -103,17 +101,17 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           isHuman: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool'], Object.values(params)), params };
       }
     },
     {
       schema: 'bytes32 name',
       generator: () => {
         const params = {
-          name: formatBytes32String(chance.name())
+          name: encodeBytes32String(chance.name())
         };
 
-        return { data: defaultAbiCoder.encode(['bytes32'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bytes32'], Object.values(params)), params };
       }
     },
     {
@@ -123,17 +121,17 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           message: chance.sentence()
         };
 
-        return { data: defaultAbiCoder.encode(['string'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['string'], Object.values(params)), params };
       }
     },
     {
       schema: 'bytes32 username',
       generator: () => {
         const params = {
-          username: formatBytes32String(chance.email())
+          username: encodeBytes32String(chance.email())
         };
 
-        return { data: defaultAbiCoder.encode(['bytes32'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bytes32'], Object.values(params)), params };
       }
     },
     {
@@ -143,7 +141,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           isFriend: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool'], Object.values(params)), params };
       }
     },
     {
@@ -154,7 +152,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           phoneHash: keccak256(toUtf8Bytes(chance.phone({ formatted: false })))
         };
 
-        return { data: defaultAbiCoder.encode(['bool', 'bytes32'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool', 'bytes32'], Object.values(params)), params };
       }
     },
     {
@@ -165,7 +163,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           voteIndex: chance.natural({ max: 2 ** 8 - 1 })
         };
 
-        return { data: defaultAbiCoder.encode(['uint256', 'uint8'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['uint256', 'uint8'], Object.values(params)), params };
       }
     },
     {
@@ -176,7 +174,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           like: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['uint256', 'bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['uint256', 'bool'], Object.values(params)), params };
       }
     },
     {
@@ -186,7 +184,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           hasPassedKYC: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool'], Object.values(params)), params };
       }
     },
     {
@@ -196,7 +194,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           isAccreditedInvestor: chance.bool()
         };
 
-        return { data: defaultAbiCoder.encode(['bool'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bool'], Object.values(params)), params };
       }
     },
     {
@@ -207,7 +205,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
           note: chance.sentence()
         };
 
-        return { data: defaultAbiCoder.encode(['bytes32', 'string'], Object.values(params)), params };
+        return { data: AbiCoder.defaultAbiCoder().encode(['bytes32', 'string'], Object.values(params)), params };
       }
     }
   ];
@@ -407,7 +405,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     }
   ]) {
     const { holdType, useType, expiration, polygonArea } = params;
-    const data = defaultAbiCoder.encode(
+    const data = AbiCoder.defaultAbiCoder().encode(
       ['uint8', 'uint8', 'uint64', 'int40[2][]'],
       [holdType, useType, expiration, polygonToSolidity(polygonArea as Coordinate[])]
     );

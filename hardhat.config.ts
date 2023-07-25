@@ -1,17 +1,12 @@
 import { NamedAccounts } from './data/NamedAccounts';
 import { DeploymentNetwork } from './utils/Constants';
-import '@nomiclabs/hardhat-ethers';
+import '@nomicfoundation/hardhat-toolbox';
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-waffle';
-import '@tenderly/hardhat-tenderly';
-import '@typechain/hardhat';
 import 'dotenv/config';
 import 'hardhat-contract-sizer';
 import 'hardhat-deploy';
-import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
 import { MochaOptions } from 'mocha';
-import 'solidity-coverage';
 
 interface EnvOptions {
   ETHEREUM_PROVIDER_URL?: string;
@@ -22,10 +17,6 @@ interface EnvOptions {
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
-  TENDERLY_FORK_ID?: string;
-  TENDERLY_PROJECT?: string;
-  TENDERLY_TEST_PROJECT?: string;
-  TENDERLY_USERNAME?: string;
 }
 
 const {
@@ -36,11 +27,7 @@ const {
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
-  PROFILE: isProfiling,
-  TENDERLY_FORK_ID = '',
-  TENDERLY_PROJECT = '',
-  TENDERLY_TEST_PROJECT = '',
-  TENDERLY_USERNAME = ''
+  PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
 
 const mochaOptions = (): MochaOptions => {
@@ -108,24 +95,11 @@ const config: HardhatUserConfig = {
       url: ETHEREUM_BASE_GOERLI_PROVIDER_URL,
       saveDeployments: true,
       live: true
-    },
-    [DeploymentNetwork.Tenderly]: {
-      chainId: 1,
-      url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
-      autoImpersonate: true,
-      saveDeployments: true,
-      live: true
     }
   },
 
   paths: {
     deploy: ['deploy/scripts']
-  },
-
-  tenderly: {
-    forkNetwork: '1',
-    project: TENDERLY_PROJECT || TENDERLY_TEST_PROJECT,
-    username: TENDERLY_USERNAME
   },
 
   solidity: {
@@ -139,6 +113,10 @@ const config: HardhatUserConfig = {
         bytecodeHash: 'none'
       }
     }
+  },
+
+  typechain: {
+    target: 'ethers-v6'
   },
 
   namedAccounts: NamedAccounts,

@@ -1,6 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { AttestationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import { getSchemaUID, getUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectAttestation,
@@ -13,15 +13,14 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('AttestationResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: Signer[];
+  let recipient: Signer;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -29,7 +28,7 @@ describe('AttestationResolver', () => {
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
   const data = '0x1234';
 
   const schema2 = 'bool isFriend';
@@ -46,7 +45,7 @@ describe('AttestationResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(registry.getAddress());
 
     await eas.setTime(await latest());
 
@@ -56,7 +55,7 @@ describe('AttestationResolver', () => {
       eas.attest({
         schema: schema2Id,
         data: {
-          recipient: recipient.address,
+          recipient: await recipient.getAddress(),
           expirationTime,
           revocable: true,
           refUID: ZERO_BYTES32,
@@ -66,7 +65,7 @@ describe('AttestationResolver', () => {
       })
     );
 
-    resolver = await Contracts.AttestationResolver.deploy(eas.address);
+    resolver = await Contracts.AttestationResolver.deploy(eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
@@ -79,7 +78,7 @@ describe('AttestationResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime
       },
       { from: sender },
@@ -95,11 +94,11 @@ describe('AttestationResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: uid
             }
@@ -107,7 +106,7 @@ describe('AttestationResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -119,19 +118,19 @@ describe('AttestationResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: uid
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime
             }
           ]
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -139,7 +138,7 @@ describe('AttestationResolver', () => {
     const { uid: uid2 } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data: uid },
+      { recipient: await recipient.getAddress(), expirationTime, data: uid },
       { from: sender }
     );
 
@@ -151,8 +150,8 @@ describe('AttestationResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data: uid },
-            { recipient: recipient.address, expirationTime, data: uid }
+            { recipient: await recipient.getAddress(), expirationTime, data: uid },
+            { recipient: await recipient.getAddress(), expirationTime, data: uid }
           ]
         }
       ],
@@ -172,6 +171,6 @@ describe('AttestationResolver', () => {
   });
 
   it('should revert on invalid input', async () => {
-    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWith('OutOfBounds');
+    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWithCustomError(resolver, 'OutOfBounds');
   });
 });

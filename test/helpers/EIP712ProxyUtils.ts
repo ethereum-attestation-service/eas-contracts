@@ -10,13 +10,8 @@ import {
   TypedData,
   TypedDataConfig
 } from './EIP712Utils';
-import { TypedDataSigner } from '@ethersproject/abstract-signer';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ethers, network } from 'hardhat';
-
-const {
-  utils: { keccak256, toUtf8Bytes, defaultAbiCoder }
-} = ethers;
+import { AbiCoder, BaseWallet, keccak256, toUtf8Bytes, Signer } from 'ethers';
+import { network } from 'hardhat';
 
 export const ATTEST_PROXY_TYPED_SIGNATURE =
   'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)';
@@ -56,7 +51,7 @@ export class EIP712ProxyUtils {
 
   public async init() {
     this.config = {
-      address: this.proxy.address,
+      address: await this.proxy.getAddress(),
       version: await this.proxy.version(),
       chainId: network.config.chainId!
     };
@@ -70,7 +65,7 @@ export class EIP712ProxyUtils {
     }
 
     return keccak256(
-      defaultAbiCoder.encode(
+      AbiCoder.defaultAbiCoder().encode(
         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
           keccak256(toUtf8Bytes(EIP712_DOMAIN)),
@@ -96,19 +91,19 @@ export class EIP712ProxyUtils {
     };
   }
 
-  public signDelegatedProxyAttestation(
-    attester: TypedDataSigner,
+  public async signDelegatedProxyAttestation(
+    attester: BaseWallet,
     schema: string,
-    recipient: string | SignerWithAddress,
-    expirationTime: number,
+    recipient: string | Signer,
+    expirationTime: bigint,
     revocable: boolean,
     refUID: string,
     data: string,
-    deadline: number
+    deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
       schema,
-      recipient: typeof recipient === 'string' ? recipient : recipient.address,
+      recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
       revocable,
       refUID,
@@ -130,21 +125,21 @@ export class EIP712ProxyUtils {
     );
   }
 
-  public verifyDelegatedProxyAttestationSignature(
-    attester: string | SignerWithAddress,
+  public async verifyDelegatedProxyAttestationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }
 
   public signDelegatedProxyRevocation(
-    attester: TypedDataSigner,
+    attester: BaseWallet,
     schema: string,
     uid: string,
-    deadline: number
+    deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
       schema,
@@ -166,12 +161,12 @@ export class EIP712ProxyUtils {
     );
   }
 
-  public verifyDelegatedProxyRevocationSignature(
-    attester: string | SignerWithAddress,
+  public async verifyDelegatedProxyRevocationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }

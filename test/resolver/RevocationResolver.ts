@@ -1,6 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
-import { ZERO_BYTES32 } from '../../utils/Constants';
+import { NO_EXPIRATION, ZERO_BYTES32 } from '../../utils/Constants';
 import { getUIDFromAttestTx } from '../../utils/EAS';
 import {
   expectFailedMultiRevocations,
@@ -11,15 +11,14 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('RevocationResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: Signer[];
+  let recipient: Signer;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -30,7 +29,7 @@ describe('RevocationResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -42,11 +41,11 @@ describe('RevocationResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    resolver = await Contracts.RevocationResolver.deploy(eas.address);
+    resolver = await Contracts.RevocationResolver.deploy(await eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
@@ -55,7 +54,7 @@ describe('RevocationResolver', () => {
       eas.connect(sender).attest({
         schema: schemaId,
         data: {
-          recipient: recipient.address,
+          recipient: await recipient.getAddress(),
           expirationTime,
           revocable: true,
           refUID: ZERO_BYTES32,
@@ -73,7 +72,7 @@ describe('RevocationResolver', () => {
           eas.connect(sender).attest({
             schema: schemaId,
             data: {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               revocable: true,
               refUID: ZERO_BYTES32,
@@ -112,7 +111,7 @@ describe('RevocationResolver', () => {
         { eas },
         [{ schema: schemaId, requests: uids.map((uid) => ({ uid })) }],
         { from: sender },
-        'InvalidRevocation'
+        'InvalidRevocations'
       );
     });
   });

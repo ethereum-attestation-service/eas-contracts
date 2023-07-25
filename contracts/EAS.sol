@@ -76,7 +76,7 @@ contract EAS is IEAS, Semver, EIP712Verifier {
     mapping(bytes32 data => uint64 timestamp) private _timestamps;
 
     // The global mapping between data and their revocation timestamps.
-    mapping(address revoker => mapping(bytes32 data => uint64 timestamp)) private _revocationsOffchain;
+    mapping(address revoker => mapping(bytes32 data => uint64 timestamp) timestamps) private _revocationsOffchain;
 
     /**
      * @dev Creates a new EAS instance.

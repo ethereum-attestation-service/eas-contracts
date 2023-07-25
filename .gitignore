@@ -3,8 +3,6 @@
 */**/.DS_Store
 
 /node_modules
-yarn-debug.log*
-yarn-error.log*
 
 dist
 cache
@@ -19,7 +17,6 @@ deployments/sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
 deployments/base-goerli/solcInputs/*
 deployments/hardhat/*
-deployments/tenderly/*
 
 .coverage_artifacts
 .coverage_contracts

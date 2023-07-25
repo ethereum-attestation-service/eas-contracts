@@ -1,5 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS, TestERC20Token } from '../../typechain-types';
+import { NO_EXPIRATION } from '../../utils/Constants';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -11,15 +12,14 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('TokenResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: Signer[];
+  let recipient: Signer;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -31,7 +31,7 @@ describe('TokenResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const data = '0x1234';
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -43,26 +43,27 @@ describe('TokenResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
     token = await Contracts.TestERC20Token.deploy('TKN', 'TKN', 9999999999);
     await token.transfer(sender.address, targetAmount * 100);
 
-    resolver = await Contracts.TokenResolver.deploy(eas.address, token.address, targetAmount);
+    resolver = await Contracts.TokenResolver.deploy(await eas.getAddress(), await token.getAddress(), targetAmount);
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
-  it('should revert when attesting with wrong token amount', async () => {
+  it('should revert when attesting with the wrong token amount', async () => {
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       { from: sender },
-      'ERC20: insufficient allowance'
+      'InvalidAllowance',
+      resolver
     );
 
     await expectFailedMultiAttestations(
@@ -71,54 +72,40 @@ describe('TokenResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],
       { from: sender },
-      'ERC20: insufficient allowance'
+      'InvalidAllowance',
+      resolver
     );
 
-    await token.connect(sender).approve(resolver.address, targetAmount - 1);
+    await token.connect(sender).approve(await resolver.getAddress(), targetAmount - 1);
     await expectFailedAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       { from: sender },
-      'ERC20: insufficient allowance'
-    );
-
-    await token.connect(sender).approve(resolver.address, targetAmount * 2 - 1);
-    await expectFailedMultiAttestations(
-      { eas },
-      [
-        {
-          schema: schemaId,
-          requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
-          ]
-        }
-      ],
-      { from: sender },
-      'ERC20: insufficient allowance'
+      'InvalidAllowance',
+      resolver
     );
   });
 
-  it('should allow attesting with correct token amount', async () => {
-    await token.connect(sender).approve(resolver.address, targetAmount);
+  it('should allow attesting with the correct token amount', async () => {
+    await token.connect(sender).approve(await resolver.getAddress(), targetAmount);
 
     const { uid } = await expectAttestation(
       { eas },
       schemaId,
-      { recipient: recipient.address, expirationTime, data },
+      { recipient: await recipient.getAddress(), expirationTime, data },
       { from: sender }
     );
 
     await expectRevocation({ eas }, schemaId, { uid }, { from: sender });
 
-    await token.connect(sender).approve(resolver.address, targetAmount * 2);
+    await token.connect(sender).approve(await resolver.getAddress(), targetAmount * 2);
 
     const res = await expectMultiAttestations(
       { eas },
@@ -126,8 +113,8 @@ describe('TokenResolver', () => {
         {
           schema: schemaId,
           requests: [
-            { recipient: recipient.address, expirationTime, data },
-            { recipient: recipient.address, expirationTime, data }
+            { recipient: await recipient.getAddress(), expirationTime, data },
+            { recipient: await recipient.getAddress(), expirationTime, data }
           ]
         }
       ],

@@ -1,22 +1,17 @@
 import { EAS, TestEIP712Verifier } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
-import { TypedDataSigner } from '@ethersproject/abstract-signer';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, BigNumberish, Signature } from 'ethers';
-import { ethers, network } from 'hardhat';
-
-const {
-  utils: {
-    keccak256,
-    getAddress,
-    verifyTypedData,
-    toUtf8Bytes,
-    splitSignature,
-    joinSignature,
-    hexlify,
-    defaultAbiCoder
-  }
-} = ethers;
+import {
+  AbiCoder,
+  BaseWallet,
+  getAddress,
+  hexlify,
+  keccak256,
+  Signature as Sig,
+  toUtf8Bytes,
+  verifyTypedData,
+  Signer
+} from 'ethers';
+import { network } from 'hardhat';
 
 export interface TypedData {
   name: string;
@@ -59,7 +54,7 @@ export interface EIP712MessageTypes {
 }
 
 export type EIP712Params = {
-  nonce?: BigNumberish;
+  nonce?: bigint;
 };
 
 export interface EIP712TypedData<T extends EIP712MessageTypes, P extends EIP712Params> {
@@ -67,6 +62,12 @@ export interface EIP712TypedData<T extends EIP712MessageTypes, P extends EIP712P
   primaryType: keyof T;
   types: T;
   message: P;
+}
+
+export interface Signature {
+  r: string;
+  s: string;
+  v: number;
 }
 
 export interface EIP712Request<T extends EIP712MessageTypes, P extends EIP712Params> extends Signature {
@@ -77,7 +78,7 @@ export interface EIP712Request<T extends EIP712MessageTypes, P extends EIP712Par
 export type EIP712AttestationParams = EIP712Params & {
   schema: string;
   recipient: string;
-  expirationTime: number;
+  expirationTime: bigint;
   revocable: boolean;
   refUID: string;
   data: Buffer;
@@ -145,7 +146,7 @@ export class EIP712Utils {
 
   public async init() {
     this.config = {
-      address: this.verifier.address,
+      address: await this.verifier.getAddress(),
       version: await this.verifier.version(),
       chainId: network.config.chainId!
     };
@@ -159,7 +160,7 @@ export class EIP712Utils {
     }
 
     return keccak256(
-      defaultAbiCoder.encode(
+      AbiCoder.defaultAbiCoder().encode(
         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
           keccak256(toUtf8Bytes(EIP712_DOMAIN)),
@@ -170,6 +171,8 @@ export class EIP712Utils {
         ]
       )
     );
+
+    // return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
   }
 
   public getDomainTypedData(): DomainTypedData {
@@ -185,24 +188,24 @@ export class EIP712Utils {
     };
   }
 
-  public signDelegatedAttestation(
-    attester: TypedDataSigner,
+  public async signDelegatedAttestation(
+    attester: BaseWallet,
     schema: string,
-    recipient: string | SignerWithAddress,
-    expirationTime: number,
+    recipient: string | Signer,
+    expirationTime: bigint,
     revocable: boolean,
     refUID: string,
     data: string,
-    nonce: BigNumber
+    nonce: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
       schema,
-      recipient: typeof recipient === 'string' ? recipient : recipient.address,
+      recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
       revocable,
       refUID,
       data: Buffer.from(data.slice(2), 'hex'),
-      nonce: nonce.toNumber()
+      nonce
     };
 
     return EIP712Utils.signTypedDataRequest<EIP712MessageTypes, EIP712AttestationParams>(
@@ -219,26 +222,26 @@ export class EIP712Utils {
     );
   }
 
-  public verifyDelegatedAttestationSignature(
-    attester: string | SignerWithAddress,
+  public async verifyDelegatedAttestationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }
 
   public signDelegatedRevocation(
-    attester: TypedDataSigner,
+    attester: BaseWallet,
     schema: string,
     uid: string,
-    nonce: BigNumber
+    nonce: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
       schema,
       uid,
-      nonce: nonce.toNumber()
+      nonce
     };
 
     return EIP712Utils.signTypedDataRequest<EIP712MessageTypes, EIP712RevocationParams>(
@@ -255,12 +258,12 @@ export class EIP712Utils {
     );
   }
 
-  public verifyDelegatedRevocationSignature(
-    attester: string | SignerWithAddress,
+  public async verifyDelegatedRevocationSignature(
+    attester: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
-  ): boolean {
+  ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : attester.address,
+      typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
   }
@@ -268,11 +271,11 @@ export class EIP712Utils {
   public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
     params: P,
     types: EIP712TypedData<T, P>,
-    signer: TypedDataSigner
+    signer: BaseWallet
   ): Promise<EIP712Request<T, P>> {
-    const rawSignature = await signer._signTypedData(types.domain, types.types, params);
-
-    return { types, params, ...splitSignature(rawSignature) };
+    const rawSignature = await signer.signTypedData(types.domain, types.types, params);
+    const signature = Sig.from(rawSignature);
+    return { types, params, v: signature.v, r: signature.r, s: signature.s };
   }
 
   public static verifyTypedDataRequestSignature<T extends EIP712MessageTypes, P extends EIP712Params>(
@@ -283,7 +286,7 @@ export class EIP712Utils {
       throw new Error('Invalid address');
     }
 
-    const sig = joinSignature({ v: request.v, r: hexlify(request.r), s: hexlify(request.s) });
+    const sig = Sig.from({ v: request.v, r: hexlify(request.r), s: hexlify(request.s) }).serialized;
     const recoveredAddress = verifyTypedData(request.types.domain, request.types.types, request.params, sig);
 
     return getAddress(attester) === getAddress(recoveredAddress);

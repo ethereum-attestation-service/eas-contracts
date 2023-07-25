@@ -2,11 +2,10 @@ import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 import { toWei } from './Types';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract, ContractInterface, utils } from 'ethers';
+import { BaseContract, Interface, Signer } from 'ethers';
 import fs from 'fs';
 import glob from 'glob';
-import { config, deployments, ethers, getNamedAccounts, tenderly } from 'hardhat';
+import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
 import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
 import path from 'path';
 
@@ -22,13 +21,13 @@ const {
 
 interface EnvOptions {
   TEST_FORK?: boolean;
-  MAX_FEE: number;
-  MAX_PRIORITY_FEE: number;
+  MAX_FEE: bigint;
+  MAX_PRIORITY_FEE: bigint;
 }
 
-const { TEST_FORK: isTestFork, MAX_FEE, MAX_PRIORITY_FEE }: EnvOptions = process.env as any as EnvOptions;
-const maxFee = MAX_FEE ? BigNumber.from(MAX_FEE) : undefined;
-const maxPriorityFee = MAX_PRIORITY_FEE ? BigNumber.from(MAX_PRIORITY_FEE) : undefined;
+const { MAX_FEE, MAX_PRIORITY_FEE }: EnvOptions = process.env as any as EnvOptions;
+const maxFee = MAX_FEE ? BigInt(MAX_FEE) : undefined;
+const maxPriorityFee = MAX_PRIORITY_FEE ? BigInt(MAX_PRIORITY_FEE) : undefined;
 
 export enum NewInstanceName {
   EAS = 'EAS',
@@ -42,8 +41,8 @@ export const InstanceName = {
 
 export type InstanceName = NewInstanceName;
 
-const deployed = <F extends Contract>(name: InstanceName) => ({
-  deployed: () => ethers.getContract<F>(name)
+const deployed = <F extends BaseContract>(name: InstanceName) => ({
+  deployed: () => ethers.getContract(name) as any as F
 });
 
 const DeployedNewContracts = {
@@ -56,16 +55,14 @@ export const DeployedContracts = {
   ...DeployedNewContracts
 };
 
-export const isTenderlyFork = () => getNetworkName() === DeploymentNetwork.Tenderly;
-export const isMainnetFork = () => isTenderlyFork();
-export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet || isMainnetFork();
+export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet;
 export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
 export const isOptimism = () => getNetworkName() === DeploymentNetwork.Optimism;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli();
-export const isLive = () => (isMainnet() && !isMainnetFork()) || isTestnet();
+export const isLive = () => isMainnet() || isTestnet();
 
 export const getDeploymentDir = () => {
   return path.join(config.paths.deployments, getNetworkName());
@@ -74,8 +71,8 @@ export const getDeploymentDir = () => {
 const TEST_MINIMUM_BALANCE = toWei(10);
 const TEST_FUNDING = toWei(10);
 
-export const getNamedSigners = async (): Promise<Record<string, SignerWithAddress>> => {
-  const signers: Record<string, SignerWithAddress> = {};
+export const getNamedSigners = async (): Promise<Record<string, Signer>> => {
+  const signers: Record<string, Signer> = {};
 
   for (const [name, address] of Object.entries(await getNamedAccounts())) {
     signers[name] = await ethers.getSigner(address);
@@ -84,15 +81,11 @@ export const getNamedSigners = async (): Promise<Record<string, SignerWithAddres
   return signers;
 };
 
-export const fundAccount = async (account: string | SignerWithAddress) => {
-  if (!isMainnetFork()) {
-    return;
-  }
-
+export const fundAccount = async (account: string | Signer) => {
   const address = typeof account === 'string' ? account : account.address;
 
   const balance = await ethers.provider.getBalance(address);
-  if (balance.gte(TEST_MINIMUM_BALANCE)) {
+  if (balance >= TEST_MINIMUM_BALANCE) {
     return;
   }
 
@@ -161,7 +154,7 @@ interface DeployOptions {
   contract?: string;
   args?: any[];
   from: string;
-  value?: BigNumber;
+  value?: bigint;
   contractArtifactData?: ArtifactData;
   legacy?: boolean;
 }
@@ -183,17 +176,20 @@ const logParams = async (params: FunctionParams) => {
     throw new Error('Either name, contractArtifactData, or contractName must be provided!');
   }
 
-  let contractInterface: ContractInterface;
+  let contractInterface: Interface;
 
   if (name) {
     ({ interface: contractInterface } = await ethers.getContract(name));
   } else if (contractArtifactData) {
-    contractInterface = new utils.Interface(contractArtifactData!.abi);
+    contractInterface = new Interface(contractArtifactData!.abi);
   } else {
     ({ interface: contractInterface } = await ethers.getContractFactory(contractName!));
   }
 
   const fragment = methodName ? contractInterface.getFunction(methodName) : contractInterface.deploy;
+  if (!fragment) {
+    throw new Error(`Unable to get fragment for ${methodName}`);
+  }
 
   Logger.log(`  ${methodName ?? 'constructor'} params: ${args.length === 0 ? '[]' : ''}`);
   if (args.length === 0) {
@@ -221,10 +217,10 @@ export const deploy = async (options: DeployOptions) => {
   const res = await deployContract(name, {
     contract: contractArtifactData ?? contractName,
     from,
-    value,
+    value: (value ?? 0).toString(),
     args,
-    maxFeePerGas: maxFee,
-    maxPriorityFeePerGas: maxPriorityFee,
+    maxFeePerGas: maxFee?.toString(),
+    maxPriorityFeePerGas: maxPriorityFee?.toString(),
     waitConfirmations: WAIT_CONFIRMATIONS,
     log: true
   });
@@ -232,12 +228,6 @@ export const deploy = async (options: DeployOptions) => {
   const data = { name, contract: contractName };
 
   await saveTypes(data);
-
-  await verifyTenderlyFork({
-    address: res.address,
-    implementation: res.implementation,
-    ...data
-  });
 
   return res.address;
 };
@@ -247,14 +237,14 @@ interface ExecuteOptions {
   methodName: string;
   args?: any[];
   from: string;
-  value?: BigNumber;
+  value?: bigint;
 }
 
 export const execute = async (options: ExecuteOptions) => {
   const { name, methodName, from, value, args } = options;
   const contract = await ethers.getContract(name);
 
-  Logger.info(`  executing ${name}.${methodName} (${contract.address})`);
+  Logger.info(`  executing ${name}.${methodName} (${await contract.getAddress()})`);
 
   await fundAccount(from);
 
@@ -264,9 +254,9 @@ export const execute = async (options: ExecuteOptions) => {
     name,
     {
       from,
-      value,
-      maxFeePerGas: maxFee,
-      maxPriorityFeePerGas: maxPriorityFee,
+      value: (value ?? 0).toString(),
+      maxFeePerGas: maxFee?.toString(),
+      maxPriorityFeePerGas: maxPriorityFee?.toString(),
       waitConfirmations: WAIT_CONFIRMATIONS,
       log: true
     },
@@ -280,49 +270,16 @@ interface Deployment {
   contract?: string;
   address: Address;
   implementation?: Address;
-  skipVerification?: boolean;
 }
 
 export const save = async (deployment: Deployment) => {
-  const { name, contract, address, skipVerification } = deployment;
+  const { name, contract, address } = deployment;
 
   const contractName = contract ?? name;
   const { abi } = await getExtendedArtifact(contractName);
 
   // save the deployment json data in the deployments folder
   await saveContract(name, { abi, address });
-
-  // publish the contract to a Tenderly fork
-  if (!skipVerification) {
-    await verifyTenderlyFork(deployment);
-  }
-};
-
-interface ContractData {
-  name: string;
-  address: Address;
-}
-
-const verifyTenderlyFork = async (deployment: Deployment) => {
-  // verify contracts on Tenderly only for mainnet or tenderly mainnet forks deployments
-  if (!isTenderlyFork() || isTestFork) {
-    return;
-  }
-
-  const { name, contract, address } = deployment;
-
-  const contracts: ContractData[] = [];
-
-  contracts.push({
-    name: contract ?? name,
-    address
-  });
-
-  for (const contract of contracts) {
-    Logger.log('  verifying on tenderly', contract.name, 'at', contract.address);
-
-    await tenderly.verify(contract);
-  }
 };
 
 export const deploymentTagExists = (tag: string) => {

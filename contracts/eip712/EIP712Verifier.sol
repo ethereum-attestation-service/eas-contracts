@@ -33,7 +33,7 @@ abstract contract EIP712Verifier is EIP712 {
     string private _name;
 
     // Replay protection nonces.
-    mapping(address => uint256) private _nonces;
+    mapping(address attester => uint256 nonce) private _nonces;
 
     /**
      * @dev Creates a new EIP712Verifier instance.

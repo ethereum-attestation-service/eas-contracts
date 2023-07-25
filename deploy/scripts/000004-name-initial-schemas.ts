@@ -3,11 +3,9 @@ import { execute, InstanceName, setDeploymentMetadata } from '../../utils/Deploy
 import { getSchemaUID } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import { SCHEMAS } from '../scripts/000003-register-initial-schemas';
-import { utils } from 'ethers';
+import { AbiCoder } from 'ethers';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-
-const { defaultAbiCoder } = utils;
 
 const NAME_SCHEMA_UID = getSchemaUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
 
@@ -28,7 +26,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
             expirationTime: NO_EXPIRATION,
             revocable: true,
             refUID: ZERO_BYTES32,
-            data: defaultAbiCoder.encode(['bytes32', 'string'], [schemaId, name]),
+            data: AbiCoder.defaultAbiCoder().encode(['bytes32', 'string'], [schemaId, name]),
             value: 0
           }
         }

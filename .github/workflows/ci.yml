@@ -17,32 +17,37 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
+
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        id: yarn-cache
+      - name: Install PNPM
+        uses: pnpm/action-setup@v2
+        id: pnpm-install
         with:
-          path: |
-            **/node_modules
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          version: 8
+          run_install: false
+
+      - name: Get PNPM store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup PNPM cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-store-
 
-      - name: Install Packages
-        run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
-
-      - name: Install NPM Dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -50,13 +55,13 @@ jobs:
           version: nightly
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Compile (Hardhat)
-        run: yarn compile
+        run: pnpm compile
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: Compile (Foundry)
         run: forge build

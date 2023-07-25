@@ -15,6 +15,8 @@ import { IEAS, Attestation } from "../../IEAS.sol";
 contract TokenResolver is SchemaResolver {
     using SafeERC20 for IERC20;
 
+    error InvalidAllowance();
+
     IERC20 private immutable _targetToken;
     uint256 private immutable _targetAmount;
 
@@ -23,8 +25,10 @@ contract TokenResolver is SchemaResolver {
         _targetAmount = targetAmount;
     }
 
-    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal override returns (bool) {
-        _targetToken.safeTransferFrom(attestation.attester, address(this), _targetAmount);
+    function onAttest(Attestation calldata attestation, uint256 /*value*/) internal view override returns (bool) {
+        if (_targetToken.allowance(attestation.attester, address(this)) < _targetAmount) {
+            revert InvalidAllowance();
+        }
 
         return true;
     }

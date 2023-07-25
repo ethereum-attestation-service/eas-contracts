@@ -1,5 +1,6 @@
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../../typechain-types';
+import { NO_EXPIRATION } from '../../utils/Constants';
 import {
   expectAttestation,
   expectFailedAttestation,
@@ -11,22 +12,21 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Wallet } from 'ethers';
+import { BaseWallet, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 describe('DataResolver', () => {
-  let accounts: SignerWithAddress[];
-  let recipient: SignerWithAddress;
-  let sender: Wallet;
+  let accounts: Signer[];
+  let recipient: Signer;
+  let sender: BaseWallet;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
 
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
-  const expirationTime = 0;
+  const expirationTime = NO_EXPIRATION;
 
   const DATA1 = '0x00';
   const DATA2 = '0x01';
@@ -41,11 +41,11 @@ describe('DataResolver', () => {
     sender = await createWallet();
 
     registry = await Contracts.SchemaRegistry.deploy();
-    eas = await Contracts.TestEAS.deploy(registry.address);
+    eas = await Contracts.TestEAS.deploy(await registry.getAddress());
 
     await eas.setTime(await latest());
 
-    const resolver = await Contracts.DataResolver.deploy(eas.address);
+    const resolver = await Contracts.DataResolver.deploy(await eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
@@ -58,7 +58,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: '0x1234'
       },
@@ -72,7 +72,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: '0x02'
       },
@@ -89,12 +89,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: '0x02'
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA1
             }
@@ -102,7 +102,7 @@ describe('DataResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
 
     await expectFailedMultiAttestations(
@@ -114,12 +114,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA2
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: '0x02'
             }
@@ -127,7 +127,7 @@ describe('DataResolver', () => {
         }
       ],
       { from: sender },
-      'InvalidAttestation'
+      'InvalidAttestations'
     );
   });
 
@@ -138,7 +138,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: DATA1
       },
@@ -155,7 +155,7 @@ describe('DataResolver', () => {
       },
       schemaId,
       {
-        recipient: recipient.address,
+        recipient: await recipient.getAddress(),
         expirationTime,
         data: DATA2
       },
@@ -175,12 +175,12 @@ describe('DataResolver', () => {
           schema: schemaId,
           requests: [
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA1
             },
             {
-              recipient: recipient.address,
+              recipient: await recipient.getAddress(),
               expirationTime,
               data: DATA2
             }
