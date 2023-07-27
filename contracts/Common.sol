@@ -14,18 +14,14 @@ error InvalidLength();
 error InvalidSignature();
 error NotFound();
 
-/**
- * @dev A struct representing EIP712 signature data.
- */
+/// @notice A struct representing EIP712 signature data.
 struct EIP712Signature {
     uint8 v; // The recovery ID.
     bytes32 r; // The x-coordinate of the nonce R.
     bytes32 s; // The signature data.
 }
 
-/**
- * @dev A struct representing a single attestation.
- */
+/// @notice A struct representing a single attestation.
 struct Attestation {
     bytes32 uid; // A unique identifier of the attestation.
     bytes32 schema; // The unique identifier of the schema.
@@ -39,9 +35,7 @@ struct Attestation {
     bytes data; // Custom attestation data.
 }
 
-/**
- * @dev A helper function to work with unchecked iterators in loops.
- */
+/// @notice A helper function to work with unchecked iterators in loops.
 function uncheckedInc(uint256 i) pure returns (uint256 j) {
     unchecked {
         j = i + 1;

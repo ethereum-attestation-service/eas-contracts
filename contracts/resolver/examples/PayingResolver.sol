@@ -8,9 +8,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that pays attesters (and expects the payment to be returned during revocations)
- */
+/// @title PayingResolver
+/// @notice A sample schema resolver that pays attesters (and expects the payment to be returned during revocations).
 contract PayingResolver is SchemaResolver {
     using Address for address payable;
 

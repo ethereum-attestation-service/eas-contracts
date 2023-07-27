@@ -8,23 +8,18 @@ import { EMPTY_UID } from "./Common.sol";
 import { Semver } from "./Semver.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
-/**
- * @title The global schema registry.
- */
+/// @title SchemaRegistry
+/// @notice The global schema registry.
 contract SchemaRegistry is ISchemaRegistry, Semver {
     error AlreadyExists();
 
     // The global mapping between schema records and their IDs.
     mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
 
-    /**
-     * @dev Creates a new SchemaRegistry instance.
-     */
+    /// @notice Creates a new SchemaRegistry instance.
     constructor() Semver(1, 0, 0) {}
 
-    /**
-     * @inheritdoc ISchemaRegistry
-     */
+    /// @inheritdoc ISchemaRegistry
     function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32) {
         SchemaRecord memory schemaRecord = SchemaRecord({
             uid: EMPTY_UID,
@@ -46,20 +41,14 @@ contract SchemaRegistry is ISchemaRegistry, Semver {
         return uid;
     }
 
-    /**
-     * @inheritdoc ISchemaRegistry
-     */
+    /// @inheritdoc ISchemaRegistry
     function getSchema(bytes32 uid) external view returns (SchemaRecord memory) {
         return _registry[uid];
     }
 
-    /**
-     * @dev Calculates a UID for a given schema.
-     *
-     * @param schemaRecord The input schema.
-     *
-     * @return schema UID.
-     */
+    /// @notice Calculates a UID for a given schema.
+    /// @param schemaRecord The input schema.
+    /// @return schema UID.
     function _getUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(schemaRecord.schema, schemaRecord.resolver, schemaRecord.revocable));
     }

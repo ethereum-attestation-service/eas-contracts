@@ -6,9 +6,6 @@ import { SchemaResolver } from "../resolver/SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../IEAS.sol";
 
-/**
- * @title A sample schema resolver
- */
 contract TestSchemaResolver is SchemaResolver {
     constructor(IEAS eas) SchemaResolver(eas) {}
 

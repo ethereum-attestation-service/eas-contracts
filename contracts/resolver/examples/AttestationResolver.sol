@@ -6,9 +6,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that checks whether an attestations attest to an existing attestation.
- */
+/// @title AttestationResolver
+/// @notice A sample schema resolver that checks whether an attestations attest to an existing attestation.
 contract AttestationResolver is SchemaResolver {
     error OutOfBounds();
 
