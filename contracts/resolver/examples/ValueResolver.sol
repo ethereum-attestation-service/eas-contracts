@@ -6,9 +6,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that checks whether a specific amount of ETH was sent with an attestation.
- */
+/// @title ValueResolver
+/// @notice A sample schema resolver that checks whether a specific amount of ETH was sent with an attestation.
 contract ValueResolver is SchemaResolver {
     uint256 private immutable _targetValue;
 

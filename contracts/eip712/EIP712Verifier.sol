@@ -17,9 +17,8 @@ import {
 
 import { EIP712Signature, InvalidSignature } from "../Common.sol";
 
-/**
- * @title EIP712 typed signatures verifier for EAS delegated attestations.
- */
+/// @title EIP712
+/// @notice EIP712 typed signatures verifier for EAS delegated attestations.
 abstract contract EIP712Verifier is EIP712 {
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)").
@@ -35,59 +34,45 @@ abstract contract EIP712Verifier is EIP712 {
     // Replay protection nonces.
     mapping(address attester => uint256 nonce) private _nonces;
 
-    /**
-     * @dev Creates a new EIP712Verifier instance.
-     *
-     * @param version The current major version of the signing domain
-     */
+    /// @notice Creates a new EIP712Verifier instance.
+    /// @param version The current major version of the signing domain
     constructor(string memory name, string memory version) EIP712(name, version) {
         _name = name;
     }
 
-    /**
-     * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
-     */
+    /// @notice Returns the domain separator used in the encoding of the signatures for attest, and revoke.
+    /// @return The domain separator used in the encoding of the signatures for attest, and revoke.
     function getDomainSeparator() external view returns (bytes32) {
         return _domainSeparatorV4();
     }
 
-    /**
-     * @dev Returns the current nonce per-account.
-     *
-     * @param account The requested account.
-     *
-     * @return The current nonce.
-     */
+    /// @notice Returns the current nonce per-account.
+    /// @param account The requested account.
+    /// @return The current nonce.
     function getNonce(address account) external view returns (uint256) {
         return _nonces[account];
     }
 
-    /**
-     * Returns the EIP712 type hash for the attest function.
-     */
+    /// @notice Returns the EIP712 type hash for the attest function.
+    /// @return The EIP712 type hash for the attest function.
     function getAttestTypeHash() external pure returns (bytes32) {
         return ATTEST_TYPEHASH;
     }
 
-    /**
-     * Returns the EIP712 type hash for the revoke function.
-     */
+    /// @notice Returns the EIP712 type hash for the revoke function.
+    /// @return The EIP712 type hash for the revoke function.
     function getRevokeTypeHash() external pure returns (bytes32) {
         return REVOKE_TYPEHASH;
     }
 
-    /**
-     * Returns the EIP712 name.
-     */
+    /// @notice Returns the EIP712 name.
+    /// @return The EIP712 name.
     function getName() external view returns (string memory) {
         return _name;
     }
 
-    /**
-     * @dev Verifies delegated attestation request.
-     *
-     * @param request The arguments of the delegated attestation request.
-     */
+    /// @notice Verifies delegated attestation request.
+    /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedAttestationRequest memory request) internal {
         AttestationRequestData memory data = request.data;
         EIP712Signature memory signature = request.signature;
@@ -117,11 +102,8 @@ abstract contract EIP712Verifier is EIP712 {
         }
     }
 
-    /**
-     * @dev Verifies delegated revocation request.
-     *
-     * @param request The arguments of the delegated revocation request.
-     */
+    /// @notice Verifies delegated revocation request.
+    /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
         RevocationRequestData memory data = request.data;
         EIP712Signature memory signature = request.signature;

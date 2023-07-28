@@ -6,9 +6,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that checks whether the expiration time is later than a specific timestamp.
- */
+/// @title ExpirationTimeResolver
+/// @notice A sample schema resolver that checks whether the expiration time is later than a specific timestamp.
 contract ExpirationTimeResolver is SchemaResolver {
     uint256 private immutable _validAfter;
 

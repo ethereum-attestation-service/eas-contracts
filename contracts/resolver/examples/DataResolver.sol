@@ -6,9 +6,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that checks whether an attestation data is either \x00 or \x01.
- */
+/// @title DataResolver
+/// @notice A sample schema resolver that checks whether an attestation data is either \x00 or \x01.
 contract DataResolver is SchemaResolver {
     bytes1 private constant DATA1 = "\x00";
     bytes1 private constant DATA2 = "\x01";

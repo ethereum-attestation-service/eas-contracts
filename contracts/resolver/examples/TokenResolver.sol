@@ -9,9 +9,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that checks whether a specific amount of tokens was approved to be included in an attestation.
- */
+/// @title TokenResolver
+/// @notice A sample schema resolver that checks whether a specific amount of tokens was approved to be included in an attestation.
 contract TokenResolver is SchemaResolver {
     using SafeERC20 for IERC20;
 

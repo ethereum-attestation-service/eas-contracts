@@ -6,9 +6,8 @@ import { SchemaResolver } from "../SchemaResolver.sol";
 
 import { IEAS, Attestation } from "../../IEAS.sol";
 
-/**
- * @title A sample schema resolver that controls revocations.
- */
+/// @title RevocationResolver
+/// @notice A sample schema resolver that controls revocations.
 contract RevocationResolver is SchemaResolver {
     bool private _revocation;
 

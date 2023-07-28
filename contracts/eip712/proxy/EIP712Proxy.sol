@@ -34,9 +34,7 @@ import {
 
 import { Semver } from "../../Semver.sol";
 
-/**
- * @dev A struct representing the full arguments of the full delegated attestation request.
- */
+/// @notice A struct representing the full arguments of the full delegated attestation request.
 struct DelegatedProxyAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData data; // The arguments of the attestation request.
@@ -45,9 +43,7 @@ struct DelegatedProxyAttestationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
-/**
- * @dev A struct representing the full arguments of the delegated multi attestation request.
- */
+/// @notice A struct representing the full arguments of the delegated multi attestation request.
 struct MultiDelegatedProxyAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData[] data; // The arguments of the attestation requests.
@@ -56,9 +52,7 @@ struct MultiDelegatedProxyAttestationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
-/**
- * @dev A struct representing the arguments of the full delegated revocation request.
- */
+/// @notice A struct representing the arguments of the full delegated revocation request.
 struct DelegatedProxyRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData data; // The arguments of the revocation request.
@@ -67,9 +61,7 @@ struct DelegatedProxyRevocationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
-/**
- * @dev A struct representing the full arguments of the delegated multi revocation request.
- */
+/// @notice A struct representing the full arguments of the delegated multi revocation request.
 struct MultiDelegatedProxyRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData[] data; // The arguments of the revocation requests.
@@ -78,10 +70,10 @@ struct MultiDelegatedProxyRevocationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
-/**
- * @title This utility contract an be used to aggregate delegated attestations without requiring a specific order via
- * nonces. The contract doesn't request nonces and implements replay protection by storing ***immalleable*** signatures.
- */
+/// @title EIP712Proxy
+/// @notice This utility contract an be used to aggregate delegated attestations without requiring a specific order via
+///     nonces. The contract doesn't request nonces and implements replay protection by storing ***immalleable***
+///     signatures.
 contract EIP712Proxy is Semver, EIP712 {
     error DeadlineExpired();
     error UsedSignature();
@@ -107,12 +99,9 @@ contract EIP712Proxy is Semver, EIP712 {
     // Replay protection signatures.
     mapping(bytes signature => bool used) private _signatures;
 
-    /**
-     * @dev Creates a new EIP712Verifier instance.
-     *
-     * @param eas The address of the global EAS contract.
-     * @param name The user readable name of the signing domain.
-     */
+    /// @notice Creates a new EIP712Verifier instance.
+    /// @param eas The address of the global EAS contract.
+    /// @param name The user readable name of the signing domain.
     constructor(IEAS eas, string memory name) Semver(0, 1, 0) EIP712(name, "0.1.0") {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
@@ -122,75 +111,58 @@ contract EIP712Proxy is Semver, EIP712 {
         _name = name;
     }
 
-    /**
-     * @dev Returns the EAS.
-     */
+    /// @notice Returns the EAS.
     function getEAS() external view returns (IEAS) {
         return _eas;
     }
 
-    /**
-     * @dev Returns the domain separator used in the encoding of the signatures for attest, and revoke.
-     */
+    /// @notice Returns the domain separator used in the encoding of the signatures for attest, and revoke.
     function getDomainSeparator() external view returns (bytes32) {
         return _domainSeparatorV4();
     }
 
-    /**
-     * Returns the EIP712 type hash for the attest function.
-     */
+    /// Returns the EIP712 type hash for the attest function.
     function getAttestTypeHash() external pure returns (bytes32) {
         return ATTEST_PROXY_TYPEHASH;
     }
 
-    /**
-     * Returns the EIP712 type hash for the revoke function.
-     */
+    /// Returns the EIP712 type hash for the revoke function.
     function getRevokeTypeHash() external pure returns (bytes32) {
         return REVOKE_PROXY_TYPEHASH;
     }
 
-    /**
-     * Returns the EIP712 name.
-     */
+    /// Returns the EIP712 name.
     function getName() external view returns (string memory) {
         return _name;
     }
 
-    /**
-     * Returns the attester for a given uid.
-     */
+    /// Returns the attester for a given uid.
     function getAttester(bytes32 uid) external view returns (address) {
         return _attesters[uid];
     }
 
-    /**
-     * @dev Attests to a specific schema via the provided EIP712 signature.
-     *
-     * @param delegatedRequest The arguments of the delegated attestation request.
-     *
-     * Example:
-     *
-     * attestByDelegation({
-     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
-     *     data: {
-     *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-     *         expirationTime: 1673891048,
-     *         revocable: true,
-     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-     *         data: '0x1234',
-     *         value: 0
-     *     },
-     *     signature: {
-     *         v: 28,
-     *         r: '0x148c...b25b',
-     *         s: '0x5a72...be22'
-     *     },
-     *     attester: '0xc5E8740aD971409492b1A63Db8d83025e0Fc427e'
-     * })
-     *
-     * @return The UID of the new attestation.
-     */
+    /// @notice Attests to a specific schema via the provided EIP712 signature.
+    /// @param delegatedRequest The arguments of the delegated attestation request.
+    /// @return The UID of the new attestation.
+    ///
+    /// Example:
+    ///     attestByDelegation({
+    ///         schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+    ///         data: {
+    ///             recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    ///             expirationTime: 1673891048,
+    ///             revocable: true,
+    ///             refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    ///             data: '0x1234',
+    ///             value: 0
+    ///         },
+    ///         signature: {
+    ///             v: 28,
+    ///             r: '0x148c...b25b',
+    ///             s: '0x5a72...be22'
+    ///         },
+    ///         attester: '0xc5E8740aD971409492b1A63Db8d83025e0Fc427e'
+    ///     })
     function attestByDelegation(
         DelegatedProxyAttestationRequest calldata delegatedRequest
     ) public payable virtual returns (bytes32) {
@@ -205,47 +177,42 @@ contract EIP712Proxy is Semver, EIP712 {
         return uid;
     }
 
-    /**
-     * @dev Attests to multiple schemas using via provided EIP712 signatures.
-     *
-     * @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
-     * grouped by distinct schema ids to benefit from the best batching optimization.
-     *
-     * Example:
-     *
-     * multiAttestByDelegation([{
-     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
-     *     data: [{
-     *         recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-     *         expirationTime: 1673891048,
-     *         revocable: true,
-     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-     *         data: '0x1234',
-     *         value: 0
-     *     },
-     *     {
-     *         recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
-     *         expirationTime: 0,
-     *         revocable: false,
-     *         refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-     *         data: '0x00',
-     *         value: 0
-     *     }],
-     *     signatures: [{
-     *         v: 28,
-     *         r: '0x148c...b25b',
-     *         s: '0x5a72...be22'
-     *     },
-     *     {
-     *         v: 28,
-     *         r: '0x487s...67bb',
-     *         s: '0x12ad...2366'
-     *     }],
-     *     attester: '0x1D86495b2A7B524D747d2839b3C645Bed32e8CF4'
-     * }])
-     *
-     * @return The UIDs of the new attestations.
-     */
+    /// @notice Attests to multiple schemas using via provided EIP712 signatures.
+    /// @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
+    ///     grouped by distinct schema ids to benefit from the best batching optimization.
+    /// @return The UIDs of the new attestations.
+    ///
+    /// Example:
+    ///     multiAttestByDelegation([{
+    ///         schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+    ///         data: [{
+    ///             recipient: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    ///             expirationTime: 1673891048,
+    ///             revocable: true,
+    ///             refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    ///             data: '0x1234',
+    ///             value: 0
+    ///         },
+    ///         {
+    ///             recipient: '0xdEADBeAFdeAdbEafdeadbeafDeAdbEAFdeadbeaf',
+    ///             expirationTime: 0,
+    ///             revocable: false,
+    ///             refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    ///             data: '0x00',
+    ///             value: 0
+    ///         }],
+    ///         signatures: [{
+    ///             v: 28,
+    ///             r: '0x148c...b25b',
+    ///             s: '0x5a72...be22'
+    ///         },
+    ///         {
+    ///             v: 28,
+    ///             r: '0x487s...67bb',
+    ///             s: '0x12ad...2366'
+    ///         }],
+    ///         attester: '0x1D86495b2A7B524D747d2839b3C645Bed32e8CF4'
+    ///     }])
     function multiAttestByDelegation(
         MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
     ) public payable virtual returns (bytes32[] memory) {
@@ -297,27 +264,23 @@ contract EIP712Proxy is Semver, EIP712 {
         return uids;
     }
 
-    /**
-     * @dev Revokes an existing attestation to a specific schema via the provided EIP712 signature.
-     *
-     * Example:
-     *
-     * revokeByDelegation({
-     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
-     *     data: {
-     *         uid: '0xcbbc12102578c642a0f7b34fe7111e41afa25683b6cd7b5a14caf90fa14d24ba',
-     *         value: 0
-     *     },
-     *     signature: {
-     *         v: 27,
-     *         r: '0xb593...7142',
-     *         s: '0x0f5b...2cce'
-     *     },
-     *     revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
-     * })
-     *
-     * @param delegatedRequest The arguments of the delegated revocation request.
-     */
+    /// @notice Revokes an existing attestation to a specific schema via the provided EIP712 signature.
+    /// @param delegatedRequest The arguments of the delegated revocation request.
+    ///
+    /// Example:
+    ///     revokeByDelegation({
+    ///         schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+    ///         data: {
+    ///             uid: '0xcbbc12102578c642a0f7b34fe7111e41afa25683b6cd7b5a14caf90fa14d24ba',
+    ///             value: 0
+    ///         },
+    ///         signature: {
+    ///             v: 27,
+    ///             r: '0xb593...7142',
+    ///             s: '0x0f5b...2cce'
+    ///         },
+    ///         revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
+    ///     })
     function revokeByDelegation(DelegatedProxyRevocationRequest calldata delegatedRequest) public payable virtual {
         _verifyRevoke(delegatedRequest);
 
@@ -327,38 +290,33 @@ contract EIP712Proxy is Semver, EIP712 {
             );
     }
 
-    /**
-     * @dev Revokes existing attestations to multiple schemas via provided EIP712 signatures.
-     *
-     * @param multiDelegatedRequests The arguments of the delegated multi revocation attestation requests. The requests should be
-     * grouped by distinct schema ids to benefit from the best batching optimization.
-     *
-     * Example:
-     *
-     * multiRevokeByDelegation([{
-     *     schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
-     *     data: [{
-     *         uid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
-     *         value: 1000
-     *     },
-     *     {
-     *         uid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
-     *         value: 0
-     *     }],
-     *     signatures: [{
-     *         v: 28,
-     *         r: '0x148c...b25b',
-     *         s: '0x5a72...be22'
-     *     },
-     *     {
-     *         v: 28,
-     *         r: '0x487s...67bb',
-     *         s: '0x12ad...2366'
-     *     }],
-     *     revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
-     * }])
-     *
-     */
+    /// @notice Revokes existing attestations to multiple schemas via provided EIP712 signatures.
+    /// @param multiDelegatedRequests The arguments of the delegated multi revocation attestation requests. The requests
+    ///     should be grouped by distinct schema ids to benefit from the best batching optimization.
+    ///
+    /// Example:
+    ///     multiRevokeByDelegation([{
+    ///         schema: '0x8e72f5bc0a8d4be6aa98360baa889040c50a0e51f32dbf0baa5199bd93472ebc',
+    ///         data: [{
+    ///             uid: '0x211296a1ca0d7f9f2cfebf0daaa575bea9b20e968d81aef4e743d699c6ac4b25',
+    ///             value: 1000
+    ///         },
+    ///         {
+    ///             uid: '0xe160ac1bd3606a287b4d53d5d1d6da5895f65b4b4bab6d93aaf5046e48167ade',
+    ///             value: 0
+    ///         }],
+    ///         signatures: [{
+    ///             v: 28,
+    ///             r: '0x148c...b25b',
+    ///             s: '0x5a72...be22'
+    ///         },
+    ///         {
+    ///             v: 28,
+    ///             r: '0x487s...67bb',
+    ///             s: '0x12ad...2366'
+    ///         }],
+    ///         revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992'
+    ///     }])
     function multiRevokeByDelegation(
         MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
     ) public payable virtual {
@@ -394,11 +352,8 @@ contract EIP712Proxy is Semver, EIP712 {
         _eas.multiRevoke{ value: msg.value }(multiRequests);
     }
 
-    /**
-     * @dev Verifies delegated attestation request.
-     *
-     * @param request The arguments of the delegated attestation request.
-     */
+    /// @notice Verifies delegated attestation request.
+    /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedProxyAttestationRequest memory request) internal {
         if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
             revert DeadlineExpired();
@@ -429,11 +384,8 @@ contract EIP712Proxy is Semver, EIP712 {
         }
     }
 
-    /**
-     * @dev Verifies delegated revocation request.
-     *
-     * @param request The arguments of the delegated revocation request.
-     */
+    /// @notice Verifies delegated revocation request.
+    /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedProxyRevocationRequest memory request) internal {
         if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
             revert DeadlineExpired();
@@ -464,11 +416,8 @@ contract EIP712Proxy is Semver, EIP712 {
         }
     }
 
-    /**
-     * @dev Ensures that the provided EIP712 signature wasn't already used.
-     *
-     * @param signature The EIP712 signature data.
-     */
+    /// @notice Ensures that the provided EIP712 signature wasn't already used.
+    /// @param signature The EIP712 signature data.
     function _verifyUnusedSignature(EIP712Signature memory signature) internal {
         bytes memory packedSignature = abi.encodePacked(signature.v, signature.r, signature.s);
 
@@ -479,10 +428,8 @@ contract EIP712Proxy is Semver, EIP712 {
         _signatures[packedSignature] = true;
     }
 
-    /**
-     * @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
-     * current block time.
-     */
+    /// @notice Returns the current's block timestamp. This method is overridden during tests and used to simulate the
+    ///     current block time.
     function _time() internal view virtual returns (uint64) {
         return uint64(block.timestamp);
     }
