@@ -1,13 +1,15 @@
+import fs from 'fs';
+import glob from 'glob';
+import 'hardhat-deploy';
+import 'hardhat-deploy-ethers';
+import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
+import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
+import { BaseContract, Interface, Signer } from 'ethers';
+import path from 'path';
 import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 import { toWei } from './Types';
-import { BaseContract, Interface, Signer } from 'ethers';
-import fs from 'fs';
-import glob from 'glob';
-import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
-import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
-import path from 'path';
 
 const {
   deploy: deployContract,
@@ -68,9 +70,6 @@ export const getDeploymentDir = () => {
   return path.join(config.paths.deployments, getNetworkName());
 };
 
-const TEST_MINIMUM_BALANCE = toWei(10);
-const TEST_FUNDING = toWei(10);
-
 export const getNamedSigners = async (): Promise<Record<string, Signer>> => {
   const signers: Record<string, Signer> = {};
 
@@ -79,22 +78,6 @@ export const getNamedSigners = async (): Promise<Record<string, Signer>> => {
   }
 
   return signers;
-};
-
-export const fundAccount = async (account: string | Signer) => {
-  const address = typeof account === 'string' ? account : account.address;
-
-  const balance = await ethers.provider.getBalance(address);
-  if (balance >= TEST_MINIMUM_BALANCE) {
-    return;
-  }
-
-  const { ethWhale } = await getNamedSigners();
-
-  return ethWhale.sendTransaction({
-    value: TEST_FUNDING,
-    to: address
-  });
 };
 
 interface SaveTypeOptions {
@@ -206,8 +189,6 @@ export const deploy = async (options: DeployOptions) => {
   const { name, contract, from, value, args, contractArtifactData } = options;
   const contractName = contract ?? name;
 
-  await fundAccount(from);
-
   const customAlias = contractName === name ? '' : ` as ${name};`;
 
   Logger.log(`  deploying ${contractName}${customAlias}`);
@@ -245,8 +226,6 @@ export const execute = async (options: ExecuteOptions) => {
   const contract = await ethers.getContract(name);
 
   Logger.info(`  executing ${name}.${methodName} (${await contract.getAddress()})`);
-
-  await fundAccount(from);
 
   await logParams({ name, args, methodName });
 
