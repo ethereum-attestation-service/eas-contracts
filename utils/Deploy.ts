@@ -9,7 +9,6 @@ import path from 'path';
 import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
-import { toWei } from './Types';
 
 const {
   deploy: deployContract,
