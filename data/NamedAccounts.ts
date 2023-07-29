@@ -33,6 +33,10 @@ const baseGoerli = (address: string) => ({
   [DeploymentNetwork.BaseGoerli]: address
 });
 
+const artheraTestnet = (address: string) => ({
+  [DeploymentNetwork.ArtheraTestnet]: address
+});
+
 const TestNamedAccounts = {
   ethWhale: {
     ...mainnet('0x00000000219ab540356cbb839cbe05303d7705fa'),
@@ -50,7 +54,8 @@ export const NamedAccounts = {
     ...optimism(deployer),
     ...sepolia(deployer),
     ...optimismGoerli(deployer),
-    ...baseGoerli(deployer)
+    ...baseGoerli(deployer),
+    ...artheraTestnet(deployer)
   },
 
   ...TestNamedAccounts
