@@ -71,6 +71,17 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0](https://sepolia.etherscan.io/address/0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
 
+### Optimism
+
+#### v1.0.1
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https:/optimistic.etherscan.io/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/optimism/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https:/optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism/SchemaRegistry.json)
+
 ### Optimism Goerli
 
 #### v1.0.1
@@ -110,18 +121,6 @@ You can run the full test suite via:
 ```sh
 pnpm test
 ```
-
-### Deployment Tests
-
-You can test new deployments (and the health of the network) against a mainnet fork via:
-
-```sh
-pnpm test:deploy
-```
-
-Please make sure to properly configure your Tenderly settings via `.env`.
-
-This will automatically be skipped on an already deployed and configured deployment scripts and will only test the additional changeset resulting by running any new/pending deployment scripts and perform an e2e test against the up to date state. This is especially useful to verify that any future deployments and upgrades, suggested by the DAO, work correctly and preserve the integrity of the system.
 
 ### Test Coverage
 
