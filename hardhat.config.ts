@@ -1,10 +1,11 @@
 import { NamedAccounts } from './data/NamedAccounts';
 import { DeploymentNetwork } from './utils/Constants';
+import 'hardhat-deploy';
+import 'hardhat-deploy-ethers';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomiclabs/hardhat-solhint';
 import 'dotenv/config';
 import 'hardhat-contract-sizer';
-import 'hardhat-deploy';
 import { HardhatUserConfig } from 'hardhat/config';
 import { MochaOptions } from 'mocha';
 

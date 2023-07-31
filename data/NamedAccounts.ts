@@ -9,8 +9,7 @@ const { DEPLOYER: deployer = 'ledger://0x000000000000000000000000000000000000000
   process.env as any as EnvOptions;
 
 const mainnet = (address: string) => ({
-  [DeploymentNetwork.Mainnet]: address,
-  [DeploymentNetwork.Tenderly]: address
+  [DeploymentNetwork.Mainnet]: address
 });
 
 const arbitrumOne = (address: string) => ({
@@ -37,16 +36,6 @@ const artheraTestnet = (address: string) => ({
   [DeploymentNetwork.ArtheraTestnet]: address
 });
 
-const TestNamedAccounts = {
-  ethWhale: {
-    ...mainnet('0x00000000219ab540356cbb839cbe05303d7705fa'),
-    ...optimism('0x4200000000000000000000000000000000000006'),
-    ...sepolia('0xb21c33DE1FAb3FA15499c62B59fe0cC3250020d1'),
-    ...optimismGoerli('0x4200000000000000000000000000000000000006'),
-    ...baseGoerli('0x4200000000000000000000000000000000000016')
-  }
-};
-
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
@@ -56,7 +45,5 @@ export const NamedAccounts = {
     ...optimismGoerli(deployer),
     ...baseGoerli(deployer),
     ...artheraTestnet(deployer)
-  },
-
-  ...TestNamedAccounts
+  }
 };
