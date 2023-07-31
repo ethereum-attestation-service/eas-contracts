@@ -76,10 +76,10 @@ Please note that you can also import and use the addresses directly in your code
 #### v1.0.1
 
 * **EAS**:
-  * Contract: [0x4200000000000000000000000000000000000021](https:/optimistic.etherscan.io/address/0x4200000000000000000000000000000000000021)
+  * Contract: [0x4200000000000000000000000000000000000021](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000021)
   * Deployment and ABI: [EAS.json](./deployments/optimism/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x4200000000000000000000000000000000000020](https:/optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
+  * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism/SchemaRegistry.json)
 
 ### Optimism Goerli
