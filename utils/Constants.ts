@@ -8,8 +8,7 @@ export enum DeploymentNetwork {
   OptimismGoerli = 'optimism-goerli',
   BaseGoerli = 'base-goerli',
   Hardhat = 'hardhat',
-  ArtheraTestnet = 'arthera-testnet',
-  Tenderly = 'tenderly'
+  ArtheraTestnet = 'arthera-testnet'
 }
 
 export const ZERO_ADDRESS = ZeroAddress;

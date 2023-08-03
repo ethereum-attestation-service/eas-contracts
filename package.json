@@ -38,6 +38,7 @@
     "deploy:sepolia": "HARDHAT_NETWORK=sepolia hardhat deploy",
     "deploy:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat deploy",
     "deploy:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat deploy",
+    "deploy:arthera-testnet": "HARDHAT_NETWORK=arthera-testnet hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat etherscan-verify --license MIT",
     "verify:optimism": "HARDHAT_NETWORK=optimism hardhat etherscan-verify --license MIT --api-url https://api-optimistic.etherscan.io",
