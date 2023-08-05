@@ -1,12 +1,12 @@
+import { expect } from 'chai';
+import { BaseWallet, Signer } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { expectFailedAttestation, expectFailedMultiAttestations, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 describe('SchemaResolver', () => {
   let accounts: Signer[];

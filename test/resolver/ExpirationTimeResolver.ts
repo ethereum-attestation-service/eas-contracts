@@ -1,3 +1,6 @@
+import { expect } from 'chai';
+import { BaseWallet, Signer } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../../typechain-types';
 import {
@@ -11,9 +14,6 @@ import {
 } from '../helpers/EAS';
 import { duration, latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 describe('ExpirationTimeResolver', () => {
   let accounts: Signer[];

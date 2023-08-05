@@ -1,3 +1,5 @@
+import { AbiCoder, BaseWallet, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { network } from 'hardhat';
 import { EIP712Proxy } from '../../typechain-types';
 import {
   DomainTypedData,
@@ -10,8 +12,6 @@ import {
   TypedData,
   TypedDataConfig
 } from './EIP712Utils';
-import { AbiCoder, BaseWallet, keccak256, toUtf8Bytes, Signer } from 'ethers';
-import { network } from 'hardhat';
 
 export const ATTEST_PROXY_TYPED_SIGNATURE =
   'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)';

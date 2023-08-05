@@ -1,6 +1,6 @@
-import { deploymentMetadata, deploymentTagExists, isLive } from '../../utils/Deploy';
 import { deployments } from 'hardhat';
 import { Suite } from 'mocha';
+import { deploymentMetadata, deploymentTagExists, isLive } from '../../utils/Deploy';
 
 const { run } = deployments;
 

@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+import { keccak256, toUtf8Bytes } from 'ethers';
 import { EAS, EIP712Proxy } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import {
@@ -7,8 +9,6 @@ import {
 } from '../../test/helpers/EIP712ProxyUtils';
 import { DeployedContracts } from '../../utils/Deploy';
 import { EIP712_PROXY_NAME } from '../scripts/000005-eip712-proxy';
-import { expect } from 'chai';
-import { keccak256, toUtf8Bytes } from 'ethers';
 
 describeDeployment(__filename, () => {
   let eas: EAS;

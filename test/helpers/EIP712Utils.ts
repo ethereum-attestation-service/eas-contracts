@@ -1,5 +1,3 @@
-import { EAS, TestEIP712Verifier } from '../../typechain-types';
-import { ZERO_ADDRESS } from '../../utils/Constants';
 import {
   AbiCoder,
   BaseWallet,
@@ -7,11 +5,13 @@ import {
   hexlify,
   keccak256,
   Signature as Sig,
+  Signer,
   toUtf8Bytes,
-  verifyTypedData,
-  Signer
+  verifyTypedData
 } from 'ethers';
 import { network } from 'hardhat';
+import { EAS, TestEIP712Verifier } from '../../typechain-types';
+import { ZERO_ADDRESS } from '../../utils/Constants';
 
 export interface TypedData {
   name: string;

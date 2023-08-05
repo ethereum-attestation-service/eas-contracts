@@ -7,11 +7,9 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 // prettier-ignore
 import {
-    AttestationRequest,
     AttestationRequestData,
     DelegatedAttestationRequest,
     DelegatedRevocationRequest,
-    RevocationRequest,
     RevocationRequestData
 } from "../IEAS.sol";
 

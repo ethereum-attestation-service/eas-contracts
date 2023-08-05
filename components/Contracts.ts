@@ -1,3 +1,6 @@
+import { ContractFactory, Signer } from 'ethers';
+import { ethers } from 'hardhat';
+import { ABI } from 'hardhat-deploy/types';
 import {
   AttestationResolver__factory,
   AttesterResolver__factory,
@@ -17,9 +20,6 @@ import {
   TokenResolver__factory,
   ValueResolver__factory
 } from '../typechain-types';
-import { ContractFactory, Signer } from 'ethers';
-import { ethers } from 'hardhat';
-import { ABI } from 'hardhat-deploy/types';
 
 export * from '../typechain-types';
 

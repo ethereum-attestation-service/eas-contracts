@@ -8,6 +8,8 @@
     "no-empty-blocks": "off",
     "mark-callable-contracts": "off",
     "func-visibility": ["error", { "ignoreConstructors": true }],
+    "func-named-parameters": "off",
+    "immutable-vars-naming": "off",
     "compiler-version": ["error", "^0.8.0"]
   }
 }

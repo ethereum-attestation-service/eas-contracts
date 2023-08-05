@@ -1,11 +1,11 @@
+import { AbiCoder } from 'ethers';
+import { DeployFunction } from 'hardhat-deploy/types';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import { execute, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
 import { getSchemaUID } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 import { SCHEMAS } from '../scripts/000003-register-initial-schemas';
-import { AbiCoder } from 'ethers';
-import { DeployFunction } from 'hardhat-deploy/types';
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 const NAME_SCHEMA_UID = getSchemaUID('bytes32 schemaId,string name', ZERO_ADDRESS, true);
 

@@ -1,4 +1,5 @@
 {
+  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-package-json", "prettier-plugin-solidity"],
   "overrides": [
     {
       "files": "*.sol",
@@ -16,6 +17,5 @@
   "trailingComma": "none",
   "arrowParens": "always",
   "bracketSpacing": true,
-  "importOrderSortSpecifiers": true,
-  "importOrderCaseInsensitive": true
+  "importOrderTypeScriptVersion": "5.0.0"
 }

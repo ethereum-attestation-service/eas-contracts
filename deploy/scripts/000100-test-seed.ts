@@ -1,3 +1,9 @@
+import fs from 'fs';
+import path from 'path';
+import Chance from 'chance';
+import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, Wallet } from 'ethers';
+import { DeployFunction } from 'hardhat-deploy/types';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
 import {
   execute,
@@ -9,12 +15,6 @@ import {
 } from '../../utils/Deploy';
 import { getSchemaUID, getUIDsFromAttestEvents } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
-import Chance from 'chance';
-import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, Wallet } from 'ethers';
-import fs from 'fs';
-import { DeployFunction } from 'hardhat-deploy/types';
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import path from 'path';
 
 export const TEST_ATTESTATIONS_OUTPUT_PATH = path.join(getDeploymentDir(), 'test-attestations.json');
 

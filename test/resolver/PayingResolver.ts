@@ -1,3 +1,6 @@
+import { expect } from 'chai';
+import { BaseWallet, Signer } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_BYTES32 } from '../../utils/Constants';
@@ -16,9 +19,6 @@ import {
 } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
 import { createWallet, getBalance } from '../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 describe('PayingResolver', () => {
   let accounts: Signer[];

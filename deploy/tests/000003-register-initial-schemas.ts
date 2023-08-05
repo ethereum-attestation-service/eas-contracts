@@ -1,10 +1,10 @@
+import { expect } from 'chai';
 import { SchemaRegistry } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { DeployedContracts } from '../../utils/Deploy';
 import { getSchemaUID } from '../../utils/EAS';
 import { SCHEMAS } from '../scripts/000003-register-initial-schemas';
-import { expect } from 'chai';
 
 describeDeployment(__filename, () => {
   let registry: SchemaRegistry;

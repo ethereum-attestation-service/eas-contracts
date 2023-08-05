@@ -1,6 +1,6 @@
-import { deploy, DeployedContracts, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { deploy, DeployedContracts, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
 
 export const EIP712_PROXY_NAME = 'EIP712Proxy';
 

@@ -1,11 +1,11 @@
+import { expect } from 'chai';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { TestEIP712Verifier } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from '../helpers/EIP712Utils';
 import { createWallet } from '../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 const EIP712_NAME = 'EAS';
 

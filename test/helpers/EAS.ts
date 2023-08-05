@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+import { BaseContract, BaseWallet, hexlify, TransactionResponse } from 'ethers';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import {
   MultiDelegatedProxyAttestationRequestStruct,
@@ -26,8 +28,6 @@ import {
 } from './EIP712Utils';
 import { getTransactionCost } from './Transaction';
 import { getBalance } from './Wallet';
-import { expect } from 'chai';
-import { BaseWallet, BaseContract, hexlify, TransactionResponse } from 'ethers';
 
 export const registerSchema = async (
   schema: string,

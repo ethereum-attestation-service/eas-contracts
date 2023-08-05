@@ -1,7 +1,7 @@
+import { expect } from 'chai';
 import { EAS, SchemaRegistry } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import { DeployedContracts } from '../../utils/Deploy';
-import { expect } from 'chai';
 
 describeDeployment(__filename, () => {
   let registry: SchemaRegistry;

@@ -1,10 +1,10 @@
+import fs from 'fs';
+import { expect } from 'chai';
 import { EAS } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import { DeployedContracts } from '../../utils/Deploy';
 import Logger from '../../utils/Logger';
 import { TEST_ATTESTATIONS_OUTPUT_PATH, TestAttestationGroup } from '../scripts/000100-test-seed';
-import { expect } from 'chai';
-import fs from 'fs';
 
 describeDeployment(__filename, () => {
   let eas: EAS;
