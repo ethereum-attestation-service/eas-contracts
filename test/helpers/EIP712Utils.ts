@@ -7,6 +7,7 @@ import {
   Signature as Sig,
   Signer,
   toUtf8Bytes,
+  TypedDataEncoder,
   verifyTypedData
 } from 'ethers';
 import { network } from 'hardhat';
@@ -171,8 +172,6 @@ export class EIP712Utils {
         ]
       )
     );
-
-    // return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
   }
 
   public getDomainTypedData(): DomainTypedData {
@@ -232,6 +231,35 @@ export class EIP712Utils {
     );
   }
 
+  public async hashDelegatedAttestation(
+    schema: string,
+    recipient: string | Signer,
+    expirationTime: bigint,
+    revocable: boolean,
+    refUID: string,
+    data: string,
+    nonce: bigint
+  ): Promise<string> {
+    const params = {
+      schema,
+      recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
+      expirationTime,
+      revocable,
+      refUID,
+      data: Buffer.from(data.slice(2), 'hex'),
+      nonce
+    };
+
+    return EIP712Utils.hashTypedData<EIP712MessageTypes, EIP712AttestationParams>(params, {
+      domain: this.getDomainTypedData(),
+      primaryType: ATTEST_PRIMARY_TYPE,
+      message: params,
+      types: {
+        Attest: ATTEST_TYPE
+      }
+    });
+  }
+
   public signDelegatedRevocation(
     attester: BaseWallet,
     schema: string,
@@ -266,6 +294,30 @@ export class EIP712Utils {
       typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
+  }
+
+  public hashDelegatedRevocation(schema: string, uid: string, nonce: bigint): string {
+    const params = {
+      schema,
+      uid,
+      nonce
+    };
+
+    return EIP712Utils.hashTypedData<EIP712MessageTypes, EIP712RevocationParams>(params, {
+      domain: this.getDomainTypedData(),
+      primaryType: REVOKE_PRIMARY_TYPE,
+      message: params,
+      types: {
+        Revoke: REVOKE_TYPE
+      }
+    });
+  }
+
+  public static hashTypedData<T extends EIP712MessageTypes, P extends EIP712Params>(
+    params: P,
+    types: EIP712TypedData<T, P>
+  ): string {
+    return TypedDataEncoder.hash(types.domain, types.types, params);
   }
 
   public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
