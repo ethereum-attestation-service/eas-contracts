@@ -198,7 +198,7 @@ describe('EIP1271Verifier', () => {
               const hash = await eip712Utils.hashDelegatedRevocation(schema, revocationRequest.uid, nonce);
 
               // Just a dummy signature
-              const signature = { s: hexlify(`${hash}dummy${hash}`), r: hexlify(hash), v: 27 };
+              const signature = { s: hexlify(keccak256(`${hash}${await latest()}`)), r: hexlify(hash), v: 27 };
               await (signer as TestEIP1271Signer).mockSignature(
                 hash,
                 AbiCoder.defaultAbiCoder().encode(
