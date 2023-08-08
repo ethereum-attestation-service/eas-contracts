@@ -80,7 +80,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @notice Creates a new EAS instance.
     /// @param registry The address of the global schema registry.
-    constructor(ISchemaRegistry registry) Semver(1, 0, 0) EIP1271Verifier("EAS", "1.0.0") {
+    constructor(ISchemaRegistry registry) Semver(1, 1, 0) EIP1271Verifier("EAS", "1.1.0") {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }

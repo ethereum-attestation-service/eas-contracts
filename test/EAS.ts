@@ -1,3 +1,5 @@
+import { BaseWallet, encodeBytes32String, Signer } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
@@ -18,8 +20,6 @@ import { EIP712ProxyUtils } from './helpers/EIP712ProxyUtils';
 import { EIP712Utils } from './helpers/EIP712Utils';
 import { duration, latest } from './helpers/Time';
 import { createWallet } from './helpers/Wallet';
-import { BaseWallet, encodeBytes32String, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 const EIP712_NAME = 'EAS';
 const EIP712_PROXY_NAME = 'EAS-Proxy';
@@ -67,7 +67,7 @@ describe('EAS', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await eas.version()).to.equal('1.0.0');
+      expect(await eas.version()).to.equal('1.1.0');
 
       expect(await eas.getSchemaRegistry()).to.equal(await registry.getAddress());
       expect(await eas.getName()).to.equal(EIP712_NAME);
