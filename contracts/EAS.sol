@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
-import { EIP712Verifier } from "./eip712/EIP712Verifier.sol";
+import { EIP1271Verifier } from "./eip1271/EIP1271Verifier.sol";
 
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
@@ -12,7 +12,7 @@ import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 import {
     AccessDenied,
     EMPTY_UID,
-    EIP712Signature,
+    Signature,
     InvalidLength,
     NotFound,
     NO_EXPIRATION_TIME,
@@ -40,7 +40,7 @@ import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
 /// @title EAS
 /// @notice EAS - Ethereum Attestation Service
-contract EAS is IEAS, Semver, EIP712Verifier {
+contract EAS is IEAS, Semver, EIP1271Verifier {
     using Address for address payable;
 
     error AlreadyRevoked();
@@ -80,7 +80,7 @@ contract EAS is IEAS, Semver, EIP712Verifier {
 
     /// @notice Creates a new EAS instance.
     /// @param registry The address of the global schema registry.
-    constructor(ISchemaRegistry registry) Semver(1, 0, 0) EIP712Verifier("EAS", "1.0.0") {
+    constructor(ISchemaRegistry registry) Semver(1, 0, 0) EIP1271Verifier("EAS", "1.0.0") {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }
@@ -191,7 +191,7 @@ contract EAS is IEAS, Semver, EIP712Verifier {
                 revert InvalidLength();
             }
 
-            // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            // Verify EIP1271 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyAttest(
                     DelegatedAttestationRequest({
@@ -295,7 +295,7 @@ contract EAS is IEAS, Semver, EIP712Verifier {
                 revert InvalidLength();
             }
 
-            // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            // Verify EIP1271 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyRevoke(
                     DelegatedRevocationRequest({

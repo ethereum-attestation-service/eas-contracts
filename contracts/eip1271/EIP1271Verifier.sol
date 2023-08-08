@@ -13,11 +13,11 @@ import {
     RevocationRequestData
 } from "../IEAS.sol";
 
-import { EIP712Signature, InvalidSignature } from "../Common.sol";
+import { Signature, InvalidSignature } from "../Common.sol";
 
-/// @title EIP712
-/// @notice EIP712 typed signatures verifier for EAS delegated attestations.
-abstract contract EIP712Verifier is EIP712 {
+/// @title EIP1271Verifier
+/// @notice EIP1271Verifier typed signatures verifier for EAS delegated attestations.
+abstract contract EIP1271Verifier is EIP712 {
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)").
     bytes32 private constant ATTEST_TYPEHASH = 0xdbfdf8dc2b135c26253e00d5b6cbe6f20457e003fd526d97cea183883570de61;
@@ -32,7 +32,7 @@ abstract contract EIP712Verifier is EIP712 {
     // Replay protection nonces.
     mapping(address attester => uint256 nonce) private _nonces;
 
-    /// @notice Creates a new EIP712Verifier instance.
+    /// @notice Creates a new EIP1271Verifier instance.
     /// @param version The current major version of the signing domain
     constructor(string memory name, string memory version) EIP712(name, version) {
         _name = name;
@@ -73,7 +73,7 @@ abstract contract EIP712Verifier is EIP712 {
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedAttestationRequest memory request) internal {
         AttestationRequestData memory data = request.data;
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {
@@ -104,7 +104,7 @@ abstract contract EIP712Verifier is EIP712 {
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
         RevocationRequestData memory data = request.data;
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {

@@ -10,7 +10,7 @@ import {
   verifyTypedData
 } from 'ethers';
 import { network } from 'hardhat';
-import { EAS, TestEIP712Verifier } from '../../typechain-types';
+import { EAS, TestEIP1271Verifier } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 
 export interface TypedData {
@@ -129,15 +129,15 @@ export const REVOKE_PROXY_TYPE: TypedData[] = [
 ];
 
 export class EIP712Utils {
-  private verifier: EAS | TestEIP712Verifier;
+  private verifier: EAS | TestEIP1271Verifier;
   private config?: TypedDataConfig;
   private name?: string;
 
-  private constructor(verifier: EAS | TestEIP712Verifier) {
+  private constructor(verifier: EAS | TestEIP1271Verifier) {
     this.verifier = verifier;
   }
 
-  public static async fromVerifier(verifier: EAS | TestEIP712Verifier) {
+  public static async fromVerifier(verifier: EAS | TestEIP1271Verifier) {
     const utils = new EIP712Utils(verifier);
     await utils.init();
 

@@ -2,20 +2,20 @@ import { expect } from 'chai';
 import { BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
-import { TestEIP712Verifier } from '../../typechain-types';
+import { TestEIP1271Verifier } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from '../helpers/EIP712Utils';
 import { createWallet } from '../helpers/Wallet';
 
 const EIP712_NAME = 'EAS';
 
-describe('EIP712Verifier', () => {
+describe('EIP1271Verifier', () => {
   let accounts: Signer[];
   let sender: BaseWallet;
   let sender2: BaseWallet;
   let recipient: Signer;
 
-  let verifier: TestEIP712Verifier;
+  let verifier: TestEIP1271Verifier;
   let eip712Utils: EIP712Utils;
 
   before(async () => {
@@ -28,7 +28,7 @@ describe('EIP712Verifier', () => {
     sender = await createWallet();
     sender2 = await createWallet();
 
-    verifier = await Contracts.TestEIP712Verifier.deploy(EIP712_NAME);
+    verifier = await Contracts.TestEIP1271Verifier.deploy(EIP712_NAME);
 
     eip712Utils = await EIP712Utils.fromVerifier(verifier);
   });
