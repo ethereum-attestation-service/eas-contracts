@@ -1,3 +1,6 @@
+import { expect } from 'chai';
+import { BaseWallet, encodeBytes32String, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../../components/Contracts';
 import { PermissionedEIP712Proxy, SchemaRegistry, TestEAS } from '../../../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES } from '../../../utils/Constants';
@@ -20,9 +23,6 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, keccak256, toUtf8Bytes, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 const PERMISSIONED_EIP712_PROXY_NAME = 'PermissionedEIP712Proxy';
 
@@ -68,7 +68,7 @@ describe('PermissionedEIP712Proxy', () => {
 
   describe('construction', () => {
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('0.1.0');
+      expect(await proxy.version()).to.equal('1.1.0');
 
       expect(await proxy.getDomainSeparator()).to.equal(
         eip712ProxyUtils.getDomainSeparator(PERMISSIONED_EIP712_PROXY_NAME)

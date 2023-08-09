@@ -1,3 +1,6 @@
+import { expect } from 'chai';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../../../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../../utils/Constants';
@@ -10,9 +13,6 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 const EIP712_PROXY_NAME = 'EIP712Proxy';
 
@@ -54,8 +54,15 @@ describe('EIP712Proxy', () => {
   });
 
   describe('construction', () => {
+    it('should revert when initialized with an empty schema registry', async () => {
+      await expect(Contracts.TestEIP712Proxy.deploy(ZERO_ADDRESS, EIP712_PROXY_NAME)).to.be.revertedWithCustomError(
+        proxy,
+        'InvalidEAS'
+      );
+    });
+
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('0.1.0');
+      expect(await proxy.version()).to.equal('1.1.0');
 
       expect(await proxy.getEAS()).to.equal(await eas.getAddress());
       expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
