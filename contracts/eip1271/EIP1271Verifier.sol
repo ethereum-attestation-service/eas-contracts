@@ -118,7 +118,7 @@ abstract contract EIP1271Verifier is EIP712 {
 
     /// @notice Verifies EIP712 signatures (with EIP1271 support).
     /// @param digest The typed-data digest to verify.
-    /// @param signature The signature to verify (either a "real" ECDSA signature or a EIP1271 signature).
+    /// @param signature The signature to verify (either a "real" ECDSA signature or an EIP1271-aware signature).
     /// @param signer The signer to verify the signature against.
     function _verifySignature(bytes32 digest, Signature memory signature, address signer) private view {
         // If the signer is a contract, check if it's EIP1271 compliant.

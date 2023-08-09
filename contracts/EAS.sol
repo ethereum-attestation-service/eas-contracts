@@ -191,7 +191,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
                 revert InvalidLength();
             }
 
-            // Verify EIP1271 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyAttest(
                     DelegatedAttestationRequest({
@@ -295,7 +295,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
                 revert InvalidLength();
             }
 
-            // Verify EIP1271 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
             for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
                 _verifyRevoke(
                     DelegatedRevocationRequest({
