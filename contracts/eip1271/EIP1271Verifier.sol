@@ -15,7 +15,7 @@ import {
     RevocationRequestData
 } from "../IEAS.sol";
 
-import { Signature, InvalidSignature, EIP1271_MAGIC_VALUE } from "../Common.sol";
+import { Signature, InvalidSignature } from "../Common.sol";
 
 /// @title EIP1271Verifier
 /// @notice EIP1271Verifier typed signatures verifier for EAS delegated attestations.
@@ -124,7 +124,7 @@ abstract contract EIP1271Verifier is EIP712 {
         // If the signer is a contract, check if it's EIP1271 compliant.
         if (signer.isContract()) {
             bytes4 magicValue = IERC1271(signer).isValidSignature(digest, abi.encode(signature));
-            if (magicValue != EIP1271_MAGIC_VALUE) {
+            if (magicValue != IERC1271.isValidSignature.selector) {
                 revert InvalidSignature();
             }
 

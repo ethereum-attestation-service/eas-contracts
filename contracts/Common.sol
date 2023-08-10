@@ -8,10 +8,6 @@ bytes32 constant EMPTY_UID = 0;
 // A zero expiration represents an non-expiring attestation.
 uint64 constant NO_EXPIRATION_TIME = 0;
 
-// The EIP1271 "magic value" we are expecting for an EIP1271 compliant contract to return on valid signatures.
-// bytes4(keccak256("isValidSignature(bytes32,bytes)")
-bytes4 constant EIP1271_MAGIC_VALUE = 0x1626ba7e;
-
 error AccessDenied();
 error InvalidEAS();
 error InvalidLength();
