@@ -1,3 +1,6 @@
+import { expect } from 'chai';
+import { BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { ethers } from 'hardhat';
 import Contracts from '../../../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../../../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../../utils/Constants';
@@ -10,9 +13,6 @@ import {
 } from '../../helpers/EIP712ProxyUtils';
 import { latest } from '../../helpers/Time';
 import { createWallet } from '../../helpers/Wallet';
-import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, toUtf8Bytes, Signer } from 'ethers';
-import { ethers } from 'hardhat';
 
 const EIP712_PROXY_NAME = 'EIP712Proxy';
 
@@ -54,8 +54,15 @@ describe('EIP712Proxy', () => {
   });
 
   describe('construction', () => {
+    it('should revert when initialized with an empty schema registry', async () => {
+      await expect(Contracts.TestEIP712Proxy.deploy(ZERO_ADDRESS, EIP712_PROXY_NAME)).to.be.revertedWithCustomError(
+        proxy,
+        'InvalidEAS'
+      );
+    });
+
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('0.1.0');
+      expect(await proxy.version()).to.equal('1.1.0');
 
       expect(await proxy.getEAS()).to.equal(await eas.getAddress());
       expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
@@ -214,6 +221,122 @@ describe('EIP712Proxy', () => {
         })
       ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
     });
+
+    it('should revert when multi delegation attesting with inconsistent input lengths', async () => {
+      await expect(
+        proxy.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime: NO_EXPIRATION,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime: NO_EXPIRATION,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [
+              {
+                v: 28,
+                r: encodeBytes32String('BAD'),
+                s: encodeBytes32String('BAD')
+              }
+            ],
+            attester: sender.address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        proxy.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [],
+            signatures: [
+              {
+                v: 28,
+                r: encodeBytes32String('BAD'),
+                s: encodeBytes32String('BAD')
+              }
+            ],
+            attester: sender.address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        proxy.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime: NO_EXPIRATION,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [
+              {
+                v: 28,
+                r: encodeBytes32String('1'),
+                s: encodeBytes32String('2')
+              },
+              {
+                v: 28,
+                r: encodeBytes32String('3'),
+                s: encodeBytes32String('4')
+              }
+            ],
+            attester: sender.address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        proxy.multiAttestByDelegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime: NO_EXPIRATION,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime: NO_EXPIRATION,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [],
+            attester: sender.address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+    });
   });
 
   describe('verify revoke', () => {
@@ -343,5 +466,86 @@ describe('EIP712Proxy', () => {
         })
       ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
     });
+  });
+
+  it('should revert when multi delegation revoking with inconsistent input lengths', async () => {
+    const uid = ZERO_BYTES32;
+    const uid2 = ZERO_BYTES32;
+
+    await expect(
+      proxy.multiRevokeByDelegation([
+        {
+          schema: schemaId,
+          data: [
+            { uid, value: 0 },
+            { uid: uid2, value: 0 }
+          ],
+          signatures: [
+            {
+              v: 28,
+              r: encodeBytes32String('1'),
+              s: encodeBytes32String('2')
+            }
+          ],
+          revoker: sender.address,
+          deadline: NO_EXPIRATION
+        }
+      ])
+    ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+    await expect(
+      proxy.multiRevokeByDelegation([
+        {
+          schema: schemaId,
+          data: [],
+          signatures: [
+            {
+              v: 28,
+              r: encodeBytes32String('1'),
+              s: encodeBytes32String('2')
+            }
+          ],
+          revoker: sender.address,
+          deadline: NO_EXPIRATION
+        }
+      ])
+    ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+    await expect(
+      proxy.multiRevokeByDelegation([
+        {
+          schema: schemaId,
+          data: [{ uid, value: 0 }],
+          signatures: [
+            {
+              v: 28,
+              r: encodeBytes32String('1'),
+              s: encodeBytes32String('2')
+            },
+            {
+              v: 28,
+              r: encodeBytes32String('3'),
+              s: encodeBytes32String('4')
+            }
+          ],
+          revoker: sender.address,
+          deadline: NO_EXPIRATION
+        }
+      ])
+    ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+    await expect(
+      eas.multiRevokeByDelegation([
+        {
+          schema: schemaId,
+          data: [
+            { uid, value: 0 },
+            { uid: uid2, value: 0 }
+          ],
+          signatures: [],
+          revoker: sender.address
+        }
+      ])
+    ).to.be.revertedWithCustomError(eas, 'InvalidLength');
   });
 });

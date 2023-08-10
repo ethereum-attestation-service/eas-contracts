@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
-import { Attestation, EIP712Signature } from "./Common.sol";
+import { Attestation, Signature } from "./Common.sol";
 
 /// @notice A struct representing the arguments of the attestation request.
 struct AttestationRequestData {
@@ -25,7 +25,7 @@ struct AttestationRequest {
 struct DelegatedAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData data; // The arguments of the attestation request.
-    EIP712Signature signature; // The EIP712 signature data.
+    Signature signature; // The ECDSA signature data.
     address attester; // The attesting account.
 }
 
@@ -39,7 +39,7 @@ struct MultiAttestationRequest {
 struct MultiDelegatedAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData[] data; // The arguments of the attestation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address attester; // The attesting account.
 }
 
@@ -59,7 +59,7 @@ struct RevocationRequest {
 struct DelegatedRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData data; // The arguments of the revocation request.
-    EIP712Signature signature; // The EIP712 signature data.
+    Signature signature; // The ECDSA signature data.
     address revoker; // The revoking account.
 }
 
@@ -73,7 +73,7 @@ struct MultiRevocationRequest {
 struct MultiDelegatedRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData[] data; // The arguments of the revocation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address revoker; // The revoking account.
 }
 
@@ -127,7 +127,7 @@ interface IEAS {
     ///     })
     function attest(AttestationRequest calldata request) external payable returns (bytes32);
 
-    /// @notice Attests to a specific schema via the provided EIP712 signature.
+    /// @notice Attests to a specific schema via the provided ECDSA signature.
     /// @param delegatedRequest The arguments of the delegated attestation request.
     /// @return The UID of the new attestation.
     ///
@@ -191,7 +191,7 @@ interface IEAS {
     ///     }])
     function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory);
 
-    /// @notice Attests to multiple schemas using via provided EIP712 signatures.
+    /// @notice Attests to multiple schemas using via provided ECDSA signatures.
     /// @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
     ///     grouped by distinct schema ids to benefit from the best batching optimization.
     /// @return The UIDs of the new attestations.
@@ -244,7 +244,7 @@ interface IEAS {
     ///     })
     function revoke(RevocationRequest calldata request) external payable;
 
-    /// @notice Revokes an existing attestation to a specific schema via the provided EIP712 signature.
+    /// @notice Revokes an existing attestation to a specific schema via the provided ECDSA signature.
     /// @param delegatedRequest The arguments of the delegated revocation request.
     ///
     /// Example:
@@ -288,7 +288,7 @@ interface IEAS {
     ///     }])
     function multiRevoke(MultiRevocationRequest[] calldata multiRequests) external payable;
 
-    /// @notice Revokes existing attestations to multiple schemas via provided EIP712 signatures.
+    /// @notice Revokes existing attestations to multiple schemas via provided ECDSA signatures.
     /// @param multiDelegatedRequests The arguments of the delegated multi revocation attestation requests. The requests
     ///     should be grouped by distinct schema ids to benefit from the best batching optimization.
     ///

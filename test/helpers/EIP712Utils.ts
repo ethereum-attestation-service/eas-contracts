@@ -7,10 +7,11 @@ import {
   Signature as Sig,
   Signer,
   toUtf8Bytes,
+  TypedDataEncoder,
   verifyTypedData
 } from 'ethers';
 import { network } from 'hardhat';
-import { EAS, TestEIP712Verifier } from '../../typechain-types';
+import { EAS, TestEIP1271Verifier } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 
 export interface TypedData {
@@ -129,15 +130,15 @@ export const REVOKE_PROXY_TYPE: TypedData[] = [
 ];
 
 export class EIP712Utils {
-  private verifier: EAS | TestEIP712Verifier;
+  private verifier: EAS | TestEIP1271Verifier;
   private config?: TypedDataConfig;
   private name?: string;
 
-  private constructor(verifier: EAS | TestEIP712Verifier) {
+  private constructor(verifier: EAS | TestEIP1271Verifier) {
     this.verifier = verifier;
   }
 
-  public static async fromVerifier(verifier: EAS | TestEIP712Verifier) {
+  public static async fromVerifier(verifier: EAS | TestEIP1271Verifier) {
     const utils = new EIP712Utils(verifier);
     await utils.init();
 
@@ -171,8 +172,6 @@ export class EIP712Utils {
         ]
       )
     );
-
-    // return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
   }
 
   public getDomainTypedData(): DomainTypedData {
@@ -232,6 +231,35 @@ export class EIP712Utils {
     );
   }
 
+  public async hashDelegatedAttestation(
+    schema: string,
+    recipient: string | Signer,
+    expirationTime: bigint,
+    revocable: boolean,
+    refUID: string,
+    data: string,
+    nonce: bigint
+  ): Promise<string> {
+    const params = {
+      schema,
+      recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
+      expirationTime,
+      revocable,
+      refUID,
+      data: Buffer.from(data.slice(2), 'hex'),
+      nonce
+    };
+
+    return EIP712Utils.hashTypedData<EIP712MessageTypes, EIP712AttestationParams>(params, {
+      domain: this.getDomainTypedData(),
+      primaryType: ATTEST_PRIMARY_TYPE,
+      message: params,
+      types: {
+        Attest: ATTEST_TYPE
+      }
+    });
+  }
+
   public signDelegatedRevocation(
     attester: BaseWallet,
     schema: string,
@@ -266,6 +294,30 @@ export class EIP712Utils {
       typeof attester === 'string' ? attester : await attester.getAddress(),
       request
     );
+  }
+
+  public hashDelegatedRevocation(schema: string, uid: string, nonce: bigint): string {
+    const params = {
+      schema,
+      uid,
+      nonce
+    };
+
+    return EIP712Utils.hashTypedData<EIP712MessageTypes, EIP712RevocationParams>(params, {
+      domain: this.getDomainTypedData(),
+      primaryType: REVOKE_PRIMARY_TYPE,
+      message: params,
+      types: {
+        Revoke: REVOKE_TYPE
+      }
+    });
+  }
+
+  public static hashTypedData<T extends EIP712MessageTypes, P extends EIP712Params>(
+    params: P,
+    types: EIP712TypedData<T, P>
+  ): string {
+    return TypedDataEncoder.hash(types.domain, types.types, params);
   }
 
   public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(

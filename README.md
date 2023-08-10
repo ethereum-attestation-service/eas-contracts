@@ -124,40 +124,46 @@ pnpm test
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2023-01-26)
+#### Latest Test Coverage Report (2023-08-08)
 
-* 100% Statements 207/207
-* 100% Branches 110/110
-* 100% Functions 74/74
-* 100% Lines 333/333
+* 100% Statements 290/290
+* 100% Branches 142/142
+* 100% Functions 105/105
+* 100% Lines 419/419
 
 ```sh
-------------------------------|----------|----------|----------|----------|----------------|
-File                          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
-------------------------------|----------|----------|----------|----------|----------------|
- contracts/                   |      100 |      100 |      100 |      100 |                |
-  EAS.sol                     |      100 |      100 |      100 |      100 |                |
-  EIP712Verifier.sol          |      100 |      100 |      100 |      100 |                |
-  IEAS.sol                    |      100 |      100 |      100 |      100 |                |
-  ISchemaRegistry.sol         |      100 |      100 |      100 |      100 |                |
-  SchemaRegistry.sol          |      100 |      100 |      100 |      100 |                |
-  Types.sol                   |      100 |      100 |      100 |      100 |                |
- contracts/resolver/          |      100 |      100 |      100 |      100 |                |
-  ISchemaResolver.sol         |      100 |      100 |      100 |      100 |                |
-  SchemaResolver.sol          |      100 |      100 |      100 |      100 |                |
- contracts/resolver/examples/ |      100 |      100 |      100 |      100 |                |
-  AttestationResolver.sol     |      100 |      100 |      100 |      100 |                |
-  AttesterResolver.sol        |      100 |      100 |      100 |      100 |                |
-  DataResolver.sol            |      100 |      100 |      100 |      100 |                |
-  ExpirationTimeResolver.sol  |      100 |      100 |      100 |      100 |                |
-  PayingResolver.sol          |      100 |      100 |      100 |      100 |                |
-  RecipientResolver.sol       |      100 |      100 |      100 |      100 |                |
-  RevocationResolver.sol      |      100 |      100 |      100 |      100 |                |
-  TokenResolver.sol           |      100 |      100 |      100 |      100 |                |
-  ValueResolver.sol           |      100 |      100 |      100 |      100 |                |
-------------------------------|----------|----------|----------|----------|----------------|
-All files                     |      100 |      100 |      100 |      100 |                |
-------------------------------|----------|----------|----------|----------|----------------|
+----------------------------------|----------|----------|----------|----------|----------------|
+File                              |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+----------------------------------|----------|----------|----------|----------|----------------|
+ contracts/                       |      100 |      100 |      100 |      100 |                |
+  Common.sol                      |      100 |      100 |      100 |      100 |                |
+  EAS.sol                         |      100 |      100 |      100 |      100 |                |
+  IEAS.sol                        |      100 |      100 |      100 |      100 |                |
+  ISchemaRegistry.sol             |      100 |      100 |      100 |      100 |                |
+  SchemaRegistry.sol              |      100 |      100 |      100 |      100 |                |
+  Semver.sol                      |      100 |      100 |      100 |      100 |                |
+ contracts/eip1271/               |      100 |      100 |      100 |      100 |                |
+  EIP1271Verifier.sol             |      100 |      100 |      100 |      100 |                |
+ contracts/eip712/proxy/          |      100 |      100 |      100 |      100 |                |
+  EIP712Proxy.sol                 |      100 |      100 |      100 |      100 |                |
+ contracts/eip712/proxy/examples/ |      100 |      100 |      100 |      100 |                |
+  PermissionedEIP712Proxy.sol     |      100 |      100 |      100 |      100 |                |
+ contracts/resolver/              |      100 |      100 |      100 |      100 |                |
+  ISchemaResolver.sol             |      100 |      100 |      100 |      100 |                |
+  SchemaResolver.sol              |      100 |      100 |      100 |      100 |                |
+ contracts/resolver/examples/     |      100 |      100 |      100 |      100 |                |
+  AttestationResolver.sol         |      100 |      100 |      100 |      100 |                |
+  AttesterResolver.sol            |      100 |      100 |      100 |      100 |                |
+  DataResolver.sol                |      100 |      100 |      100 |      100 |                |
+  ExpirationTimeResolver.sol      |      100 |      100 |      100 |      100 |                |
+  PayingResolver.sol              |      100 |      100 |      100 |      100 |                |
+  RecipientResolver.sol           |      100 |      100 |      100 |      100 |                |
+  RevocationResolver.sol          |      100 |      100 |      100 |      100 |                |
+  TokenResolver.sol               |      100 |      100 |      100 |      100 |                |
+  ValueResolver.sol               |      100 |      100 |      100 |      100 |                |
+----------------------------------|----------|----------|----------|----------|----------------|
+All files                         |      100 |      100 |      100 |      100 |                |
+----------------------------------|----------|----------|----------|----------|----------------|
 ```
 
 #### Instructions

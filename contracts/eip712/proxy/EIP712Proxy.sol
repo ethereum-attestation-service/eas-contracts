@@ -8,7 +8,7 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 // prettier-ignore
 import {
     AccessDenied,
-    EIP712Signature,
+    Signature,
     InvalidEAS,
     InvalidLength,
     InvalidSignature,
@@ -38,7 +38,7 @@ import { Semver } from "../../Semver.sol";
 struct DelegatedProxyAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData data; // The arguments of the attestation request.
-    EIP712Signature signature; // The EIP712 signature data.
+    Signature signature; // The EIP712 signature data.
     address attester; // The attesting account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -47,7 +47,7 @@ struct DelegatedProxyAttestationRequest {
 struct MultiDelegatedProxyAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData[] data; // The arguments of the attestation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address attester; // The attesting account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -56,7 +56,7 @@ struct MultiDelegatedProxyAttestationRequest {
 struct DelegatedProxyRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData data; // The arguments of the revocation request.
-    EIP712Signature signature; // The EIP712 signature data.
+    Signature signature; // The EIP712 signature data.
     address revoker; // The revoking account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -65,7 +65,7 @@ struct DelegatedProxyRevocationRequest {
 struct MultiDelegatedProxyRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData[] data; // The arguments of the revocation requests.
-    EIP712Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    Signature[] signatures; // The EIP712 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address revoker; // The revoking account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -99,10 +99,10 @@ contract EIP712Proxy is Semver, EIP712 {
     // Replay protection signatures.
     mapping(bytes signature => bool used) private _signatures;
 
-    /// @notice Creates a new EIP712Verifier instance.
+    /// @notice Creates a new EIP1271Verifier instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
-    constructor(IEAS eas, string memory name) Semver(0, 1, 0) EIP712(name, "0.1.0") {
+    constructor(IEAS eas, string memory name) Semver(1, 1, 0) EIP712(name, "1.1.0") {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
@@ -360,7 +360,7 @@ contract EIP712Proxy is Semver, EIP712 {
         }
 
         AttestationRequestData memory data = request.data;
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         _verifyUnusedSignature(signature);
 
@@ -403,7 +403,7 @@ contract EIP712Proxy is Semver, EIP712 {
             revert AccessDenied();
         }
 
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         _verifyUnusedSignature(signature);
 
@@ -418,7 +418,7 @@ contract EIP712Proxy is Semver, EIP712 {
 
     /// @notice Ensures that the provided EIP712 signature wasn't already used.
     /// @param signature The EIP712 signature data.
-    function _verifyUnusedSignature(EIP712Signature memory signature) internal {
+    function _verifyUnusedSignature(Signature memory signature) internal {
         bytes memory packedSignature = abi.encodePacked(signature.v, signature.r, signature.s);
 
         if (_signatures[packedSignature]) {

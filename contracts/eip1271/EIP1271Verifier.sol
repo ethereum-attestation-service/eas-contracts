@@ -4,6 +4,8 @@ pragma solidity 0.8.19;
 
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { IERC1271 } from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 // prettier-ignore
 import {
@@ -13,11 +15,13 @@ import {
     RevocationRequestData
 } from "../IEAS.sol";
 
-import { EIP712Signature, InvalidSignature } from "../Common.sol";
+import { Signature, InvalidSignature, EIP1271_MAGIC_VALUE } from "../Common.sol";
 
-/// @title EIP712
-/// @notice EIP712 typed signatures verifier for EAS delegated attestations.
-abstract contract EIP712Verifier is EIP712 {
+/// @title EIP1271Verifier
+/// @notice EIP1271Verifier typed signatures verifier for EAS delegated attestations.
+abstract contract EIP1271Verifier is EIP712 {
+    using Address for address;
+
     // The hash of the data type used to relay calls to the attest function. It's the value of
     // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce)").
     bytes32 private constant ATTEST_TYPEHASH = 0xdbfdf8dc2b135c26253e00d5b6cbe6f20457e003fd526d97cea183883570de61;
@@ -32,7 +36,7 @@ abstract contract EIP712Verifier is EIP712 {
     // Replay protection nonces.
     mapping(address attester => uint256 nonce) private _nonces;
 
-    /// @notice Creates a new EIP712Verifier instance.
+    /// @notice Creates a new EIP1271Verifier instance.
     /// @param version The current major version of the signing domain
     constructor(string memory name, string memory version) EIP712(name, version) {
         _name = name;
@@ -73,7 +77,7 @@ abstract contract EIP712Verifier is EIP712 {
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedAttestationRequest memory request) internal {
         AttestationRequestData memory data = request.data;
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {
@@ -94,17 +98,14 @@ abstract contract EIP712Verifier is EIP712 {
                 )
             )
         );
-
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.attester) {
-            revert InvalidSignature();
-        }
+        _verifySignature(digest, signature, request.attester);
     }
 
     /// @notice Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
         RevocationRequestData memory data = request.data;
-        EIP712Signature memory signature = request.signature;
+        Signature memory signature = request.signature;
 
         uint256 nonce;
         unchecked {
@@ -112,8 +113,27 @@ abstract contract EIP712Verifier is EIP712 {
         }
 
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uid, nonce)));
+        _verifySignature(digest, signature, request.revoker);
+    }
 
-        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {
+    /// @notice Verifies EIP712 signatures (with EIP1271 support).
+    /// @param digest The typed-data digest to verify.
+    /// @param signature The signature to verify (either a "real" ECDSA signature or an EIP1271-aware signature).
+    /// @param signer The signer to verify the signature against.
+    function _verifySignature(bytes32 digest, Signature memory signature, address signer) private view {
+        // If the signer is a contract, check if it's EIP1271 compliant.
+        if (signer.isContract()) {
+            bytes4 magicValue = IERC1271(signer).isValidSignature(digest, abi.encode(signature));
+            if (magicValue != EIP1271_MAGIC_VALUE) {
+                revert InvalidSignature();
+            }
+
+            return;
+        }
+
+        // If the signer is an EOA, verify the signature using the standard (non-malleable) ECDSA signature
+        // verification.
+        if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != signer) {
             revert InvalidSignature();
         }
     }
