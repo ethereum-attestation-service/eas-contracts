@@ -63,7 +63,7 @@ export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isArtheraTestnet = () => getNetworkName() === DeploymentNetwork.ArtheraTestnet;
-export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArtheraTestnet();
+export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli();
 export const isLive = () => isMainnet() || isTestnet();
 
 export const getDeploymentDir = () => {
@@ -237,7 +237,8 @@ export const execute = async (options: ExecuteOptions) => {
       maxFeePerGas: maxFee?.toString(),
       maxPriorityFeePerGas: maxPriorityFee?.toString(),
       waitConfirmations: WAIT_CONFIRMATIONS,
-      log: true
+      log: true,
+      gasLimit: 500000
     },
     methodName,
     ...(args ?? [])
