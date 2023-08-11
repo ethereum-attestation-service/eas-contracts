@@ -1,4 +1,4 @@
-import { BaseWallet, encodeBytes32String, Signer } from 'ethers';
+import { encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../typechain-types';
@@ -26,8 +26,8 @@ const EIP712_PROXY_NAME = 'EAS-Proxy';
 
 describe('EAS', () => {
   let accounts: Signer[];
-  let sender: BaseWallet;
-  let sender2: BaseWallet;
+  let sender: Signer;
+  let sender2: Signer;
   let recipient: Signer;
   let recipient2: Signer;
 
@@ -315,7 +315,7 @@ describe('EAS', () => {
             await expectAttestation(
               { eas, eip712Utils, eip712ProxyUtils },
               schema2Id,
-              { recipient: sender.address, expirationTime, data: encodeBytes32String('0') },
+              { recipient: await sender.getAddress(), expirationTime, data: encodeBytes32String('0') },
               { signatureType, from: sender }
             );
 
@@ -325,8 +325,8 @@ describe('EAS', () => {
                 {
                   schema: schema1Id,
                   requests: [
-                    { recipient: sender.address, expirationTime, data: encodeBytes32String('1') },
-                    { recipient: sender.address, expirationTime, data: encodeBytes32String('2') }
+                    { recipient: await sender.getAddress(), expirationTime, data: encodeBytes32String('1') },
+                    { recipient: await sender.getAddress(), expirationTime, data: encodeBytes32String('2') }
                   ]
                 }
               ],
@@ -938,7 +938,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: sender.address
+            attester: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -955,7 +955,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: sender.address
+            attester: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -986,7 +986,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('4')
               }
             ],
-            attester: sender.address
+            attester: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1014,7 +1014,7 @@ describe('EAS', () => {
               }
             ],
             signatures: [],
-            attester: sender.address
+            attester: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1380,7 +1380,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('2')
               }
             ],
-            revoker: sender.address
+            revoker: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1397,7 +1397,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('2')
               }
             ],
-            revoker: sender.address
+            revoker: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1419,7 +1419,7 @@ describe('EAS', () => {
                 s: encodeBytes32String('4')
               }
             ],
-            revoker: sender.address
+            revoker: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1433,7 +1433,7 @@ describe('EAS', () => {
               { uid: uid2, value: 0 }
             ],
             signatures: [],
-            revoker: sender.address
+            revoker: await sender.getAddress()
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1498,8 +1498,10 @@ describe('EAS', () => {
       const timestamp = await eas.getTime();
 
       for (const item of Array.isArray(data) ? data : [data]) {
-        await expect(res).to.emit(eas, 'RevokedOffchain').withArgs(sender.address, item, timestamp);
-        expect(await eas.getRevokeOffchain(sender.address, item)).to.equal(timestamp);
+        await expect(res)
+          .to.emit(eas, 'RevokedOffchain')
+          .withArgs(await sender.getAddress(), item, timestamp);
+        expect(await eas.getRevokeOffchain(await sender.getAddress(), item)).to.equal(timestamp);
       }
     };
 
@@ -1555,7 +1557,7 @@ describe('EAS', () => {
     });
 
     it("should return 0 for any data that wasn't timestamped", async () => {
-      expect(await eas.getRevokeOffchain(sender.address, data5)).to.equal(0);
+      expect(await eas.getRevokeOffchain(await sender.getAddress(), data5)).to.equal(0);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
+import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
@@ -23,7 +23,7 @@ import { createWallet, getBalance } from '../helpers/Wallet';
 describe('PayingResolver', () => {
   let accounts: Signer[];
   let recipient: Signer;
-  let sender: BaseWallet;
+  let sender: Signer;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -60,7 +60,7 @@ describe('PayingResolver', () => {
 
   it('should incentivize attesters', async () => {
     const prevResolverBalance: bigint = await getBalance(await resolver.getAddress());
-    const prevAttesterBalance: bigint = await getBalance(sender.address);
+    const prevAttesterBalance: bigint = await getBalance(await sender.getAddress());
 
     const { res } = await expectAttestation(
       { eas },
@@ -74,10 +74,10 @@ describe('PayingResolver', () => {
     let transactionCost = await getTransactionCost(res);
 
     expect(await getBalance(await resolver.getAddress())).to.equal(prevResolverBalance - incentive);
-    expect(await getBalance(sender.address)).to.equal(prevAttesterBalance + incentive - transactionCost);
+    expect(await getBalance(await sender.getAddress())).to.equal(prevAttesterBalance + incentive - transactionCost);
 
     const prevResolverBalance2: bigint = await getBalance(await resolver.getAddress());
-    const prevAttesterBalance2: bigint = await getBalance(sender.address);
+    const prevAttesterBalance2: bigint = await getBalance(await sender.getAddress());
 
     const { uids, res: res2 } = await expectMultiAttestations(
       { eas },
@@ -101,7 +101,7 @@ describe('PayingResolver', () => {
     expect(await getBalance(await resolver.getAddress())).to.equal(
       prevResolverBalance2 - incentive * BigInt(uids.length)
     );
-    expect(await getBalance(sender.address)).to.equal(
+    expect(await getBalance(await sender.getAddress())).to.equal(
       prevAttesterBalance2 + incentive * BigInt(uids.length) - transactionCost
     );
   });
@@ -210,17 +210,17 @@ describe('PayingResolver', () => {
 
     it('should revoke attestations', async () => {
       const prevResolverBalance: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance: bigint = await getBalance(sender.address);
+      const prevAttesterBalance: bigint = await getBalance(await sender.getAddress());
 
       const value = incentive;
       const res = await expectRevocation({ eas }, schemaId, { uid, value }, { from: sender });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(await resolver.getAddress())).to.equal(prevResolverBalance + incentive);
-      expect(await getBalance(sender.address)).to.equal(prevAttesterBalance - incentive - transactionCost);
+      expect(await getBalance(await sender.getAddress())).to.equal(prevAttesterBalance - incentive - transactionCost);
 
       const prevResolverBalance2: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance2: bigint = await getBalance(sender.address);
+      const prevAttesterBalance2: bigint = await getBalance(await sender.getAddress());
 
       const res2 = await expectMultiRevocations(
         { eas },
@@ -238,24 +238,24 @@ describe('PayingResolver', () => {
       expect(await getBalance(await resolver.getAddress())).to.equal(
         prevResolverBalance2 + incentive * BigInt(uids.length)
       );
-      expect(await getBalance(sender.address)).to.equal(
+      expect(await getBalance(await sender.getAddress())).to.equal(
         prevAttesterBalance2 - incentive * BigInt(uids.length) - transactionCost
       );
     });
 
     it('should revoke attestations and refund any remainder', async () => {
       const prevResolverBalance: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance: bigint = await getBalance(sender.address);
+      const prevAttesterBalance: bigint = await getBalance(await sender.getAddress());
 
       const value = incentive * 10n;
       const res = await expectRevocation({ eas }, schemaId, { uid, value }, { from: sender, skipBalanceCheck: true });
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(await resolver.getAddress())).to.equal(prevResolverBalance + incentive);
-      expect(await getBalance(sender.address)).to.equal(prevAttesterBalance - incentive - transactionCost);
+      expect(await getBalance(await sender.getAddress())).to.equal(prevAttesterBalance - incentive - transactionCost);
 
       const prevResolverBalance2: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance2: bigint = await getBalance(sender.address);
+      const prevAttesterBalance2: bigint = await getBalance(await sender.getAddress());
 
       const res2 = await expectMultiRevocations(
         { eas },
@@ -273,7 +273,7 @@ describe('PayingResolver', () => {
       expect(await getBalance(await resolver.getAddress())).to.equal(
         prevResolverBalance2 + incentive * BigInt(uids.length)
       );
-      expect(await getBalance(sender.address)).to.equal(
+      expect(await getBalance(await sender.getAddress())).to.equal(
         prevAttesterBalance2 - incentive * BigInt(uids.length) - transactionCost
       );
     });
@@ -299,7 +299,7 @@ describe('PayingResolver', () => {
 
     it('should allow reverting with the correct value when accidentally sending too much', async () => {
       const prevResolverBalance: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance: bigint = await getBalance(sender.address);
+      const prevAttesterBalance: bigint = await getBalance(await sender.getAddress());
 
       const value = incentive;
       const res = await expectRevocation(
@@ -315,10 +315,10 @@ describe('PayingResolver', () => {
       let transactionCost = await getTransactionCost(res);
 
       expect(await getBalance(await resolver.getAddress())).to.equal(prevResolverBalance + incentive);
-      expect(await getBalance(sender.address)).to.equal(prevAttesterBalance - incentive - transactionCost);
+      expect(await getBalance(await sender.getAddress())).to.equal(prevAttesterBalance - incentive - transactionCost);
 
       const prevResolverBalance2: bigint = await getBalance(await resolver.getAddress());
-      const prevAttesterBalance2: bigint = await getBalance(sender.address);
+      const prevAttesterBalance2: bigint = await getBalance(await sender.getAddress());
 
       const res2 = await expectMultiRevocations(
         { eas },
@@ -336,7 +336,7 @@ describe('PayingResolver', () => {
       expect(await getBalance(await resolver.getAddress())).to.equal(
         prevResolverBalance2 + incentive * BigInt(uids.length)
       );
-      expect(await getBalance(sender.address)).to.equal(
+      expect(await getBalance(await sender.getAddress())).to.equal(
         prevAttesterBalance2 - incentive * BigInt(uids.length) - transactionCost
       );
     });

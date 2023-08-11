@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../../../typechain-types';
@@ -18,8 +18,8 @@ const EIP712_PROXY_NAME = 'EIP712Proxy';
 
 describe('EIP712Proxy', () => {
   let accounts: Signer[];
-  let sender: BaseWallet;
-  let sender2: BaseWallet;
+  let sender: Signer;
+  let sender2: Signer;
   let recipient: Signer;
 
   let registry: SchemaRegistry;
@@ -99,7 +99,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address,
+          attester: await sender.getAddress(),
           deadline
         })
       ).not.to.be.reverted;
@@ -131,7 +131,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
-          attester: sender.address,
+          attester: await sender.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
@@ -141,7 +141,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender2.address,
+          attester: await sender2.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
@@ -173,7 +173,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address,
+          attester: await sender.getAddress(),
           deadline
         })
       ).not.to.be.reverted;
@@ -183,7 +183,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address,
+          attester: await sender.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'UsedSignature');
@@ -216,7 +216,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: attestationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          attester: sender.address,
+          attester: await sender.getAddress(),
           deadline: expiredDeadline
         })
       ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
@@ -252,7 +252,7 @@ describe('EIP712Proxy', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: sender.address,
+            attester: await sender.getAddress(),
             deadline: NO_EXPIRATION
           }
         ])
@@ -270,7 +270,7 @@ describe('EIP712Proxy', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: sender.address,
+            attester: await sender.getAddress(),
             deadline: NO_EXPIRATION
           }
         ])
@@ -302,7 +302,7 @@ describe('EIP712Proxy', () => {
                 s: encodeBytes32String('4')
               }
             ],
-            attester: sender.address,
+            attester: await sender.getAddress(),
             deadline: NO_EXPIRATION
           }
         ])
@@ -331,7 +331,7 @@ describe('EIP712Proxy', () => {
               }
             ],
             signatures: [],
-            attester: sender.address,
+            attester: await sender.getAddress(),
             deadline: NO_EXPIRATION
           }
         ])
@@ -369,7 +369,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline
         })
       ).not.to.be.reverted;
@@ -393,7 +393,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
@@ -403,7 +403,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender2.address,
+          revoker: await sender2.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
@@ -426,7 +426,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline
         })
       ).not.to.be.reverted;
@@ -436,7 +436,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'UsedSignature');
@@ -461,7 +461,7 @@ describe('EIP712Proxy', () => {
           schema: schemaId,
           data: revocationRequest,
           signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline: expiredDeadline
         })
       ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
@@ -487,7 +487,7 @@ describe('EIP712Proxy', () => {
               s: encodeBytes32String('2')
             }
           ],
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline: NO_EXPIRATION
         }
       ])
@@ -505,7 +505,7 @@ describe('EIP712Proxy', () => {
               s: encodeBytes32String('2')
             }
           ],
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline: NO_EXPIRATION
         }
       ])
@@ -528,7 +528,7 @@ describe('EIP712Proxy', () => {
               s: encodeBytes32String('4')
             }
           ],
-          revoker: sender.address,
+          revoker: await sender.getAddress(),
           deadline: NO_EXPIRATION
         }
       ])
@@ -543,7 +543,7 @@ describe('EIP712Proxy', () => {
             { uid: uid2, value: 0 }
           ],
           signatures: [],
-          revoker: sender.address
+          revoker: await sender.getAddress()
         }
       ])
     ).to.be.revertedWithCustomError(eas, 'InvalidLength');
