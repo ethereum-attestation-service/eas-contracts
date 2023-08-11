@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { AbiCoder, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { encodeBytes32String, hexlify, keccak256, Signer, solidityPacked, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts, { TestEIP1271Signer } from '../../components/Contracts';
 import { TestEIP1271Verifier } from '../../typechain-types';
@@ -122,10 +122,7 @@ describe('EIP1271Verifier', () => {
               const signature = { s: hexlify(keccak256(`${hash}${await latest()}`)), r: hexlify(hash), v: 27 };
               await (signer as TestEIP1271Signer).mockSignature(
                 hash,
-                AbiCoder.defaultAbiCoder().encode(
-                  ['uint8', 'bytes32', 'bytes32'],
-                  [signature.v, signature.r, signature.s]
-                )
+                solidityPacked(['bytes32', 'bytes32', 'uint8'], [signature.r, signature.s, signature.v])
               );
 
               return signature;
@@ -201,10 +198,7 @@ describe('EIP1271Verifier', () => {
               const signature = { s: hexlify(keccak256(`${hash}${await latest()}`)), r: hexlify(hash), v: 27 };
               await (signer as TestEIP1271Signer).mockSignature(
                 hash,
-                AbiCoder.defaultAbiCoder().encode(
-                  ['uint8', 'bytes32', 'bytes32'],
-                  [signature.v, signature.r, signature.s]
-                )
+                solidityPacked(['bytes32', 'bytes32', 'uint8'], [signature.r, signature.s, signature.v])
               );
 
               return signature;
