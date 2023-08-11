@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseContract, BaseWallet, hexlify, TransactionResponse } from 'ethers';
+import { BaseContract, hexlify, Signer, TransactionResponse } from 'ethers';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import {
   MultiDelegatedProxyAttestationRequestStruct,
@@ -55,7 +55,7 @@ export interface RequestContracts {
 
 export interface AttestationOptions {
   signatureType?: SignatureType;
-  from: BaseWallet;
+  from: Signer;
   deadline?: bigint;
   value?: bigint;
   bump?: number;
@@ -78,7 +78,7 @@ export interface MultiAttestationRequest {
 
 export interface RevocationOptions {
   signatureType?: SignatureType;
-  from: BaseWallet;
+  from: Signer;
   deadline?: bigint;
   value?: bigint;
   skipBalanceCheck?: boolean;
@@ -111,7 +111,7 @@ export const expectAttestation = async (
   } = request;
   const { from: txSender, signatureType = SignatureType.Direct, deadline = NO_EXPIRATION } = options;
 
-  const prevBalance: bigint = await getBalance(txSender.address);
+  const prevBalance: bigint = await getBalance(await txSender.getAddress());
 
   const msgValue = options.value ?? value;
   let uid;
@@ -146,10 +146,10 @@ export const expectAttestation = async (
         revocable,
         refUID,
         data,
-        await eas.getNonce(txSender.address)
+        await eas.getNonce(await txSender.getAddress())
       );
 
-      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be.true;
 
       const args = [
         {
@@ -160,7 +160,7 @@ export const expectAttestation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          attester: txSender.address
+          attester: await txSender.getAddress()
         },
         {
           value: msgValue
@@ -192,7 +192,8 @@ export const expectAttestation = async (
         deadline
       );
 
-      expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(await txSender.getAddress(), signature)).to
+        .be.true;
 
       const args = [
         {
@@ -203,7 +204,7 @@ export const expectAttestation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          attester: txSender.address,
+          attester: await txSender.getAddress(),
           deadline
         },
         {
@@ -217,7 +218,7 @@ export const expectAttestation = async (
       uid = await getUIDFromDelegatedProxyAttestTx(res);
       expect(uid).to.equal(returnedUid);
 
-      expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(txSender.address);
+      expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(await txSender.getAddress());
 
       break;
     }
@@ -226,11 +227,13 @@ export const expectAttestation = async (
   if (!options.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
 
-    expect(await getBalance(txSender.address)).to.equal(prevBalance - value - transactionCost);
+    expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - value - transactionCost);
   }
 
   const attester =
-    signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+    signatureType !== SignatureType.DelegatedProxy
+      ? await txSender.getAddress()
+      : await eip712ProxyUtils?.proxy.getAddress();
 
   await expect(res).to.emit(eas, 'Attested').withArgs(recipient, attester, uid, schema);
 
@@ -299,10 +302,10 @@ export const expectFailedAttestation = async (
         revocable,
         refUID,
         data,
-        await eas.getNonce(txSender.address)
+        await eas.getNonce(await txSender.getAddress())
       );
 
-      expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be.true;
 
       await expect(
         eas.connect(txSender).attestByDelegation(
@@ -321,7 +324,7 @@ export const expectFailedAttestation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            attester: txSender.address
+            attester: await txSender.getAddress()
           },
           { value: msgValue }
         )
@@ -346,7 +349,8 @@ export const expectFailedAttestation = async (
         deadline
       );
 
-      expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(await txSender.getAddress(), signature)).to
+        .be.true;
 
       await expect(
         eip712ProxyUtils.proxy.connect(txSender).attestByDelegation(
@@ -365,7 +369,7 @@ export const expectFailedAttestation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            attester: txSender.address,
+            attester: await txSender.getAddress(),
             deadline
           },
           { value: msgValue }
@@ -398,7 +402,7 @@ export const expectMultiAttestations = async (
 
   const { from: txSender, signatureType = SignatureType.Direct, deadline = NO_EXPIRATION } = options;
 
-  const prevBalance: bigint = await getBalance(txSender.address);
+  const prevBalance: bigint = await getBalance(await txSender.getAddress());
 
   const requestedValue = multiAttestationRequests.reduce((res, { data }) => {
     const total = data.reduce((res, r) => res + r.value, 0n);
@@ -434,7 +438,7 @@ export const expectMultiAttestations = async (
 
       const multiDelegatedAttestationRequests: MultiDelegatedAttestationRequestStruct[] = [];
 
-      let nonce = await eas.getNonce(txSender.address);
+      let nonce = await eas.getNonce(await txSender.getAddress());
 
       for (const { schema, data } of multiAttestationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>[] = [];
@@ -451,14 +455,15 @@ export const expectMultiAttestations = async (
             nonce
           );
 
-          expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
+          expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be
+            .true;
 
           signatures.push(signature);
 
           nonce++;
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address });
+        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: await txSender.getAddress() });
       }
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
@@ -494,13 +499,20 @@ export const expectMultiAttestations = async (
             deadline
           );
 
-          expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(txSender.address, signature)).to.be
-            .true;
+          expect(
+            await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(await txSender.getAddress(), signature)
+          ).to.be.true;
 
           signatures.push(signature);
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address, deadline });
+        multiDelegatedAttestationRequests.push({
+          schema,
+          data,
+          signatures,
+          attester: await txSender.getAddress(),
+          deadline
+        });
       }
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
@@ -512,7 +524,7 @@ export const expectMultiAttestations = async (
       expect(uids).to.deep.equal(returnedUids);
 
       for (const uid of uids) {
-        expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(txSender.address);
+        expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(await txSender.getAddress());
       }
 
       break;
@@ -522,7 +534,7 @@ export const expectMultiAttestations = async (
   if (!options.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
 
-    expect(await getBalance(txSender.address)).to.equal(prevBalance - requestedValue - transactionCost);
+    expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - requestedValue - transactionCost);
   }
 
   let i = 0;
@@ -531,7 +543,9 @@ export const expectMultiAttestations = async (
       const uid = uids[i++];
 
       const attester =
-        signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+        signatureType !== SignatureType.DelegatedProxy
+          ? await txSender.getAddress()
+          : await eip712ProxyUtils?.proxy.getAddress();
 
       await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, attester, uid, schema);
 
@@ -603,7 +617,7 @@ export const expectFailedMultiAttestations = async (
 
       const multiDelegatedAttestationRequests: MultiDelegatedAttestationRequestStruct[] = [];
 
-      let nonce = await eas.getNonce(txSender.address);
+      let nonce = await eas.getNonce(await txSender.getAddress());
 
       for (const { schema, data } of multiAttestationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712AttestationParams>[] = [];
@@ -620,14 +634,15 @@ export const expectFailedMultiAttestations = async (
             nonce
           );
 
-          expect(await eip712Utils.verifyDelegatedAttestationSignature(txSender.address, signature)).to.be.true;
+          expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be
+            .true;
 
           signatures.push(signature);
 
           nonce++;
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address });
+        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: await txSender.getAddress() });
       }
 
       await expect(
@@ -659,13 +674,20 @@ export const expectFailedMultiAttestations = async (
             deadline
           );
 
-          expect(await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(txSender.address, signature)).to.be
-            .true;
+          expect(
+            await eip712ProxyUtils.verifyDelegatedProxyAttestationSignature(await txSender.getAddress(), signature)
+          ).to.be.true;
 
           signatures.push(signature);
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: txSender.address, deadline });
+        multiDelegatedAttestationRequests.push({
+          schema,
+          data,
+          signatures,
+          attester: await txSender.getAddress(),
+          deadline
+        });
       }
 
       await expect(
@@ -691,7 +713,7 @@ export const expectRevocation = async (
 
   const msgValue = options.value ?? value;
 
-  const prevBalance: bigint = await getBalance(txSender.address);
+  const prevBalance: bigint = await getBalance(await txSender.getAddress());
 
   const attestation = await eas.getAttestation(uid);
 
@@ -713,10 +735,10 @@ export const expectRevocation = async (
         txSender,
         schema,
         uid,
-        await eas.getNonce(txSender.address)
+        await eas.getNonce(await txSender.getAddress())
       );
 
-      expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be.true;
 
       res = await eas.connect(txSender).revokeByDelegation(
         {
@@ -727,7 +749,7 @@ export const expectRevocation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          revoker: txSender.address
+          revoker: await txSender.getAddress()
         },
         { value: msgValue }
       );
@@ -742,7 +764,8 @@ export const expectRevocation = async (
 
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, deadline);
 
-      expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature)).to
+        .be.true;
 
       res = await eip712ProxyUtils.proxy.connect(txSender).revokeByDelegation(
         {
@@ -753,7 +776,7 @@ export const expectRevocation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          revoker: txSender.address,
+          revoker: await txSender.getAddress(),
           deadline
         },
         { value: msgValue }
@@ -766,11 +789,13 @@ export const expectRevocation = async (
   if (!options.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
 
-    expect(await getBalance(txSender.address)).to.equal(prevBalance - value - transactionCost);
+    expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - value - transactionCost);
   }
 
   const attester =
-    signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+    signatureType !== SignatureType.DelegatedProxy
+      ? await txSender.getAddress()
+      : await eip712ProxyUtils?.proxy.getAddress();
   await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, attester, uid, attestation.schema);
 
   const attestation2 = await eas.getAttestation(uid);
@@ -796,7 +821,7 @@ export const expectMultiRevocations = async (
 
   const { from: txSender, signatureType = SignatureType.Direct, deadline = NO_EXPIRATION } = options;
 
-  const prevBalance: bigint = await getBalance(txSender.address);
+  const prevBalance: bigint = await getBalance(await txSender.getAddress());
   const attestations: Record<string, AttestationStructOutput> = {};
   for (const data of requests) {
     for (const request of data.requests) {
@@ -829,7 +854,7 @@ export const expectMultiRevocations = async (
 
       const multiDelegatedRevocationRequests: MultiDelegatedRevocationRequestStruct[] = [];
 
-      let nonce = await eas.getNonce(txSender.address);
+      let nonce = await eas.getNonce(await txSender.getAddress());
 
       for (const { schema, data } of multiRevocationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
@@ -837,14 +862,15 @@ export const expectMultiRevocations = async (
         for (const request of data) {
           const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
 
-          expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
+          expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
+            .true;
 
           signatures.push(signature);
 
           nonce++;
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address });
+        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: await txSender.getAddress() });
       }
 
       res = await eas.connect(txSender).multiRevokeByDelegation(multiDelegatedRevocationRequests, { value: msgValue });
@@ -870,13 +896,19 @@ export const expectMultiRevocations = async (
             deadline
           );
 
-          expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(txSender.address, signature)).to.be
-            .true;
+          expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature))
+            .to.be.true;
 
           signatures.push(signature);
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address, deadline });
+        multiDelegatedRevocationRequests.push({
+          schema,
+          data,
+          signatures,
+          revoker: await txSender.getAddress(),
+          deadline
+        });
       }
 
       res = await eip712ProxyUtils.proxy
@@ -890,11 +922,13 @@ export const expectMultiRevocations = async (
   if (!options.skipBalanceCheck) {
     const transactionCost = await getTransactionCost(res);
 
-    expect(await getBalance(txSender.address)).to.equal(prevBalance - requestedValue - transactionCost);
+    expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - requestedValue - transactionCost);
   }
 
   const attester =
-    signatureType !== SignatureType.DelegatedProxy ? txSender.address : await eip712ProxyUtils?.proxy.getAddress();
+    signatureType !== SignatureType.DelegatedProxy
+      ? await txSender.getAddress()
+      : await eip712ProxyUtils?.proxy.getAddress();
 
   for (const data of requests) {
     for (const request of data.requests) {
@@ -945,10 +979,10 @@ export const expectFailedRevocation = async (
         txSender,
         schema,
         uid,
-        await eas.getNonce(txSender.address)
+        await eas.getNonce(await txSender.getAddress())
       );
 
-      expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be.true;
 
       await expect(
         eas.revokeByDelegation(
@@ -960,7 +994,7 @@ export const expectFailedRevocation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            revoker: txSender.address
+            revoker: await txSender.getAddress()
           },
           { value: msgValue }
         )
@@ -976,7 +1010,8 @@ export const expectFailedRevocation = async (
 
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, deadline);
 
-      expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(txSender.address, signature)).to.be.true;
+      expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature)).to
+        .be.true;
 
       await expect(
         eip712ProxyUtils.proxy.connect(txSender).revokeByDelegation(
@@ -988,7 +1023,7 @@ export const expectFailedRevocation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            revoker: txSender.address,
+            revoker: await txSender.getAddress(),
             deadline
           },
           { value: msgValue }
@@ -1043,7 +1078,7 @@ export const expectFailedMultiRevocations = async (
 
       const multiDelegatedRevocationRequests: MultiDelegatedRevocationRequestStruct[] = [];
 
-      let nonce = await eas.getNonce(txSender.address);
+      let nonce = await eas.getNonce(await txSender.getAddress());
 
       for (const { schema, data } of multiRevocationRequests) {
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
@@ -1051,14 +1086,15 @@ export const expectFailedMultiRevocations = async (
         for (const request of data) {
           const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
 
-          expect(await eip712Utils.verifyDelegatedRevocationSignature(txSender.address, signature)).to.be.true;
+          expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
+            .true;
 
           signatures.push(signature);
 
           nonce++;
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address });
+        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: await txSender.getAddress() });
       }
 
       await expect(
@@ -1086,13 +1122,19 @@ export const expectFailedMultiRevocations = async (
             deadline
           );
 
-          expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(txSender.address, signature)).to.be
-            .true;
+          expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature))
+            .to.be.true;
 
           signatures.push(signature);
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: txSender.address, deadline });
+        multiDelegatedRevocationRequests.push({
+          schema,
+          data,
+          signatures,
+          revoker: await txSender.getAddress(),
+          deadline
+        });
       }
 
       await expect(

@@ -1,6 +1,5 @@
 import {
   AbiCoder,
-  BaseWallet,
   getAddress,
   hexlify,
   keccak256,
@@ -188,7 +187,7 @@ export class EIP712Utils {
   }
 
   public async signDelegatedAttestation(
-    attester: BaseWallet,
+    attester: Signer,
     schema: string,
     recipient: string | Signer,
     expirationTime: bigint,
@@ -261,7 +260,7 @@ export class EIP712Utils {
   }
 
   public signDelegatedRevocation(
-    attester: BaseWallet,
+    attester: Signer,
     schema: string,
     uid: string,
     nonce: bigint
@@ -323,7 +322,7 @@ export class EIP712Utils {
   public static async signTypedDataRequest<T extends EIP712MessageTypes, P extends EIP712Params>(
     params: P,
     types: EIP712TypedData<T, P>,
-    signer: BaseWallet
+    signer: Signer
   ): Promise<EIP712Request<T, P>> {
     const rawSignature = await signer.signTypedData(types.domain, types.types, params);
     const signature = Sig.from(rawSignature);

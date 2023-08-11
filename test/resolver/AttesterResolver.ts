@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
+import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, TestEAS } from '../../typechain-types';
@@ -19,9 +19,9 @@ import { createWallet } from '../helpers/Wallet';
 describe('AttesterResolver', () => {
   let accounts: Signer[];
   let recipient: Signer;
-  let sender: BaseWallet;
-  let sender2: BaseWallet;
-  let targetSender: BaseWallet;
+  let sender: Signer;
+  let sender2: Signer;
+  let targetSender: Signer;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
@@ -48,7 +48,7 @@ describe('AttesterResolver', () => {
     sender2 = await createWallet();
     targetSender = sender2;
 
-    const resolver = await Contracts.AttesterResolver.deploy(await eas.getAddress(), targetSender.address);
+    const resolver = await Contracts.AttesterResolver.deploy(await eas.getAddress(), await targetSender.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);

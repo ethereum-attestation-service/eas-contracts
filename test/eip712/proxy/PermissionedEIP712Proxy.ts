@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseWallet, encodeBytes32String, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { encodeBytes32String, keccak256, Signer, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../../components/Contracts';
 import { PermissionedEIP712Proxy, SchemaRegistry, TestEAS } from '../../../typechain-types';
@@ -28,8 +28,8 @@ const PERMISSIONED_EIP712_PROXY_NAME = 'PermissionedEIP712Proxy';
 
 describe('PermissionedEIP712Proxy', () => {
   let accounts: Signer[];
-  let owner: BaseWallet;
-  let nonOwner: BaseWallet;
+  let owner: Signer;
+  let nonOwner: Signer;
   let recipient: Signer;
 
   let registry: SchemaRegistry;

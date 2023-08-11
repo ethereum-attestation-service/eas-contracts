@@ -1,4 +1,4 @@
-import { AbiCoder, BaseWallet, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { AbiCoder, keccak256, Signer, toUtf8Bytes } from 'ethers';
 import { network } from 'hardhat';
 import { EIP712Proxy } from '../../typechain-types';
 import {
@@ -92,7 +92,7 @@ export class EIP712ProxyUtils {
   }
 
   public async signDelegatedProxyAttestation(
-    attester: BaseWallet,
+    attester: Signer,
     schema: string,
     recipient: string | Signer,
     expirationTime: bigint,
@@ -136,7 +136,7 @@ export class EIP712ProxyUtils {
   }
 
   public signDelegatedProxyRevocation(
-    attester: BaseWallet,
+    attester: Signer,
     schema: string,
     uid: string,
     deadline: bigint

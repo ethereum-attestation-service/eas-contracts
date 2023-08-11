@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { AbiCoder, BaseWallet, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { AbiCoder, encodeBytes32String, hexlify, keccak256, Signer, toUtf8Bytes } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts, { TestEIP1271Signer } from '../../components/Contracts';
 import { TestEIP1271Verifier } from '../../typechain-types';
@@ -45,8 +45,8 @@ describe('EIP1271Verifier', () => {
 
   for (const signerType of [SignerType.EOA, SignerType.Contract]) {
     context(`by a ${signerType} signer`, () => {
-      let signer: BaseWallet | TestEIP1271Signer;
-      let wrongSigner: BaseWallet | TestEIP1271Signer;
+      let signer: Signer | TestEIP1271Signer;
+      let wrongSigner: Signer | TestEIP1271Signer;
 
       beforeEach(async () => {
         switch (signerType) {
@@ -89,7 +89,7 @@ describe('EIP1271Verifier', () => {
         });
 
         const signDelegatedAttestation = async (
-          signer: BaseWallet | TestEIP1271Signer,
+          signer: Signer | TestEIP1271Signer,
           attestationRequest: AttestationRequestData
         ) => {
           const nonce = await verifier.getNonce(await signer.getAddress());
@@ -97,7 +97,7 @@ describe('EIP1271Verifier', () => {
           switch (signerType) {
             case SignerType.EOA:
               return eip712Utils.signDelegatedAttestation(
-                signer as BaseWallet,
+                signer as Signer,
                 schema,
                 attestationRequest.recipient,
                 attestationRequest.expirationTime,
@@ -185,14 +185,14 @@ describe('EIP1271Verifier', () => {
         };
 
         const signDelegatedRevocation = async (
-          signer: BaseWallet | TestEIP1271Signer,
+          signer: Signer | TestEIP1271Signer,
           revocationRequest: RevocationRequestData
         ) => {
           const nonce = await verifier.getNonce(await signer.getAddress());
 
           switch (signerType) {
             case SignerType.EOA:
-              return eip712Utils.signDelegatedRevocation(signer as BaseWallet, schema, revocationRequest.uid, nonce);
+              return eip712Utils.signDelegatedRevocation(signer as Signer, schema, revocationRequest.uid, nonce);
 
             case SignerType.Contract: {
               const hash = await eip712Utils.hashDelegatedRevocation(schema, revocationRequest.uid, nonce);

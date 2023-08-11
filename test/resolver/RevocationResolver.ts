@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BaseWallet, Signer } from 'ethers';
+import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { RevocationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
@@ -18,7 +18,7 @@ import { createWallet } from '../helpers/Wallet';
 describe('RevocationResolver', () => {
   let accounts: Signer[];
   let recipient: Signer;
-  let sender: BaseWallet;
+  let sender: Signer;
 
   let registry: SchemaRegistry;
   let eas: TestEAS;
