@@ -1,6 +1,7 @@
 import {
   hexlify,
   Interface,
+  keccak256,
   solidityPackedKeccak256,
   toUtf8Bytes,
   TransactionReceipt,
@@ -13,6 +14,12 @@ enum Event {
   Timestamped = 'Timestamped',
   RevokedOffchain = 'RevokedOffchain'
 }
+
+const TOPICS = {
+  [Event.Attested]: keccak256(toUtf8Bytes('Attested(address,address,bytes32,bytes32)')),
+  [Event.Timestamped]: keccak256(toUtf8Bytes('Timestamped(bytes32,uint64)')),
+  [Event.RevokedOffchain]: keccak256(toUtf8Bytes('RevokedOffchain(address,bytes32,uint64)'))
+};
 
 export const getSchemaUID = (schema: string, resolverAddress: string, revocable: boolean) =>
   solidityPackedKeccak256(['string', 'address', 'bool'], [schema, resolverAddress, revocable]);
@@ -38,7 +45,7 @@ const getDataFromReceipt = (receipt: TransactionReceipt, event: Event, attribute
   const eas = new Interface(EAS__factory.abi);
   const logs = [];
 
-  for (const log of receipt.logs || []) {
+  for (const log of receipt.logs.filter((l) => l.topics[0] === TOPICS[event]) || []) {
     logs.push({
       ...log,
       log: event,
