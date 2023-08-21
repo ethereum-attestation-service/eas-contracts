@@ -16,6 +16,7 @@ deployments/optimism/solcInputs/*
 deployments/sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
 deployments/base-goerli/solcInputs/*
+deployments/arbitrum-goerli/solcInputs/*
 deployments/hardhat/*
 
 .coverage_artifacts
