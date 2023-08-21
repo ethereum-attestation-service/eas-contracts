@@ -109,10 +109,10 @@ Please note that you can also import and use the addresses directly in your code
 #### v1.1.0
 
 * **EAS**:
-  * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https:/goerli.arbiscan.io//address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io//address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
   * Deployment and ABI: [EAS.json](./deployments/arbitrum-goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https:/goerli.arbiscan.io//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https:/goerli.arbiscan.io//address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-goerli/SchemaRegistry.json)
 
 ## Installation
