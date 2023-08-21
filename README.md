@@ -80,7 +80,7 @@ Please note that you can also import and use the addresses directly in your code
   * Deployment and ABI: [EAS.json](./deployments/optimism/EAS.json)
 * **SchemaRegistry**:
   * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism/SchemaRegistry.json)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
 
 ### Optimism Goerli
 
@@ -91,7 +91,7 @@ Please note that you can also import and use the addresses directly in your code
   * Deployment and ABI: [EAS.json](./deployments/optimism-goerli/EAS.json)
 * **SchemaRegistry**:
   * Contract: [0x4200000000000000000000000000000000000020](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000020)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments//optimism-goerli/SchemaRegistry.json)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism-goerli/SchemaRegistry.json)
 
 ### Base Goerli
 
@@ -102,7 +102,18 @@ Please note that you can also import and use the addresses directly in your code
   * Deployment and ABI: [EAS.json](./deployments/base-goerli/EAS.json)
 * **SchemaRegistry**:
   * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https://goerli.basescan.org//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments//base-goerli/SchemaRegistry.json)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/base-goerli/SchemaRegistry.json)
+
+### Arbitrum Goerli
+
+#### v1.1.0
+
+* **EAS**:
+  * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https:/goerli.arbiscan.io//address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
+  * Deployment and ABI: [EAS.json](./deployments/arbitrum-goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https:/goerli.arbiscan.io//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-goerli/SchemaRegistry.json)
 
 ## Installation
 

@@ -1,19 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import Chance from 'chance';
-import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, Wallet } from 'ethers';
+import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, TransactionReceipt, Wallet } from 'ethers';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
-import {
-  execute,
-  getDeploymentDir,
-  InstanceName,
-  isMainnetFork,
-  isTestnet,
-  setDeploymentMetadata
-} from '../../utils/Deploy';
-import { getSchemaUID, getUIDsFromAttestEvents } from '../../utils/EAS';
+import { execute, getDeploymentDir, InstanceName, isTestnet, setDeploymentMetadata } from '../../utils/Deploy';
+import { getSchemaUID, getUIDsFromAttestReceipt } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 
 export const TEST_ATTESTATIONS_OUTPUT_PATH = path.join(getDeploymentDir(), 'test-attestations.json');
@@ -223,7 +216,11 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       const { data, params } = generator();
       const recipient = Wallet.createRandom().address;
 
-      Logger.info(`${i + 1}: ${recipient} --> ${JSON.stringify(params)}`);
+      Logger.info(
+        `${i + 1}: ${recipient} --> ${JSON.stringify(params, (_, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        )}`
+      );
 
       requests.push({
         recipient,
@@ -245,7 +242,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       from: deployer
     });
 
-    const uids: string[] = await getUIDsFromAttestEvents(res.events);
+    const uids: string[] = await getUIDsFromAttestReceipt(res as any as TransactionReceipt);
 
     testAttestations[schemaId] = {
       schema,
@@ -412,7 +409,11 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     const recipient = Wallet.createRandom().address;
 
     const extParams = { ...params, holdType: HoldType[holdType], useType: UseType[useType] };
-    Logger.info(`${recipient} --> ${JSON.stringify({ ...extParams })}`);
+    Logger.info(
+      `${recipient} --> ${JSON.stringify({ ...extParams }, (_, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )}`
+    );
 
     requests.push({
       recipient,
@@ -434,7 +435,7 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     from: deployer
   });
 
-  const uids: string[] = await getUIDsFromAttestEvents(res.events);
+  const uids: string[] = await getUIDsFromAttestReceipt(res as any as TransactionReceipt);
 
   testAttestations[schemaId] = {
     schema,
@@ -445,12 +446,15 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
     }))
   };
 
-  fs.writeFileSync(TEST_ATTESTATIONS_OUTPUT_PATH, JSON.stringify(testAttestations, null, 2));
+  fs.writeFileSync(
+    TEST_ATTESTATIONS_OUTPUT_PATH,
+    JSON.stringify(testAttestations, (_, value) => (typeof value === 'bigint' ? value.toString() : value), 2)
+  );
 
   return true;
 };
 
 // Run this deployment script only during test or deployments on testnet
-func.skip = async () => !isMainnetFork() && !isTestnet(); // eslint-disable-line require-await
+func.skip = async () => !isTestnet(); // eslint-disable-line require-await
 
 export default setDeploymentMetadata(__filename, func);

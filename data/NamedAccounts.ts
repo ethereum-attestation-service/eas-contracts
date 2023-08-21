@@ -32,6 +32,10 @@ const baseGoerli = (address: string) => ({
   [DeploymentNetwork.BaseGoerli]: address
 });
 
+const arbitrumGoerli = (address: string) => ({
+  [DeploymentNetwork.ArbitrumGoerli]: address
+});
+
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
@@ -39,6 +43,7 @@ export const NamedAccounts = {
     ...optimism(deployer),
     ...sepolia(deployer),
     ...optimismGoerli(deployer),
-    ...baseGoerli(deployer)
+    ...baseGoerli(deployer),
+    ...arbitrumGoerli(deployer)
   }
 };
