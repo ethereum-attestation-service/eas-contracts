@@ -18,7 +18,8 @@ interface ISchemaRegistry {
     /// @notice Emitted when a new schema has been registered
     /// @param uid The schema UID.
     /// @param registerer The address of the account used to register the schema.
-    event Registered(bytes32 indexed uid, address registerer);
+    /// @param schema The schema data.
+    event Registered(bytes32 indexed uid, address indexed registerer, SchemaRecord schema);
 
     /// @notice Submits and reserves a new schema
     /// @param schema The schema data schema.
