@@ -35,12 +35,13 @@ describe('SchemaRegistry', () => {
       const res = await registry.register(schema, resolverAddress, revocable);
       expect(retUID).to.equal(uid);
 
+      const schemaRecord = await registry.getSchema(uid);
       const sender = accounts[0];
+
       await expect(res)
         .to.emit(registry, 'Registered')
-        .withArgs(uid, await sender.getAddress());
+        .withArgs(uid, await sender.getAddress(), schemaRecord);
 
-      const schemaRecord = await registry.getSchema(uid);
       expect(schemaRecord.uid).to.equal(uid);
       expect(schemaRecord.schema).to.equal(schema);
       expect(schemaRecord.resolver).to.equal(resolverAddress);
