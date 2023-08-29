@@ -124,7 +124,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
         // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
         // possible to send too much ETH anyway.
-        uint availableValue = msg.value;
+        uint256 availableValue = msg.value;
 
         for (uint256 i = 0; i < multiRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
@@ -172,7 +172,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
         // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
         // possible to send too much ETH anyway.
-        uint availableValue = msg.value;
+        uint256 availableValue = msg.value;
 
         for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
@@ -250,7 +250,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
         // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
         // possible to send too much ETH anyway.
-        uint availableValue = msg.value;
+        uint256 availableValue = msg.value;
 
         for (uint256 i = 0; i < multiRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
@@ -276,7 +276,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
         // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
         // possible to send too much ETH anyway.
-        uint availableValue = msg.value;
+        uint256 availableValue = msg.value;
 
         for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
