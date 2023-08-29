@@ -95,10 +95,10 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @inheritdoc IEAS
     function attest(AttestationRequest calldata request) external payable returns (bytes32) {
-        AttestationRequestData[] memory requests = new AttestationRequestData[](1);
-        requests[0] = request.data;
+        AttestationRequestData[] memory data = new AttestationRequestData[](1);
+        data[0] = request.data;
 
-        return _attest(request.schema, requests, msg.sender, msg.value, true).uids[0];
+        return _attest(request.schema, data, msg.sender, msg.value, true).uids[0];
     }
 
     /// @inheritdoc IEAS
@@ -237,10 +237,10 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @inheritdoc IEAS
     function revoke(RevocationRequest calldata request) external payable {
-        RevocationRequestData[] memory requests = new RevocationRequestData[](1);
-        requests[0] = request.data;
+        RevocationRequestData[] memory data = new RevocationRequestData[](1);
+        data[0] = request.data;
 
-        _revoke(request.schema, requests, msg.sender, msg.value, true);
+        _revoke(request.schema, data, msg.sender, msg.value, true);
     }
 
     /// @inheritdoc IEAS
@@ -379,7 +379,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @inheritdoc IEAS
     function isAttestationValid(bytes32 uid) public view returns (bool) {
-        return _db[uid].uid != 0;
+        return _db[uid].uid != EMPTY_UID;
     }
 
     /// @inheritdoc IEAS
@@ -393,14 +393,14 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
     }
 
     /// @dev Attests to a specific schema.
-    /// @param schema // the unique identifier of the schema to attest to.
+    /// @param schemaUID The unique identifier of the schema to attest to.
     /// @param data The arguments of the attestation requests.
     /// @param attester The attesting account.
     /// @param availableValue The total available ETH amount that can be sent to the resolver.
     /// @param last Whether this is the last attestations/revocations set.
     /// @return The UID of the new attestations and the total sent ETH amount.
     function _attest(
-        bytes32 schema,
+        bytes32 schemaUID,
         AttestationRequestData[] memory data,
         address attester,
         uint256 availableValue,
@@ -412,7 +412,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         res.uids = new bytes32[](length);
 
         // Ensure that we aren't attempting to attest to a non-existing schema.
-        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
+        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schemaUID);
         if (schemaRecord.uid == EMPTY_UID) {
             revert InvalidSchema();
         }
@@ -435,7 +435,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
             Attestation memory attestation = Attestation({
                 uid: EMPTY_UID,
-                schema: schema,
+                schema: schemaUID,
                 refUID: request.refUID,
                 time: _time(),
                 expirationTime: request.expirationTime,
@@ -463,7 +463,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
             _db[uid] = attestation;
 
-            if (request.refUID != 0) {
+            if (request.refUID != EMPTY_UID) {
                 // Ensure that we aren't trying to attest to a non-existing referenced UID.
                 if (!isAttestationValid(request.refUID)) {
                     revert NotFound();
@@ -475,7 +475,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
             res.uids[i] = uid;
 
-            emit Attested(request.recipient, attester, uid, schema);
+            emit Attested(request.recipient, attester, uid, schemaUID);
         }
 
         res.usedValue = _resolveAttestations(schemaRecord, attestations, values, false, availableValue, last);
@@ -484,21 +484,21 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
     }
 
     /// @dev Revokes an existing attestation to a specific schema.
-    /// @param schema The unique identifier of the schema to attest to.
+    /// @param schemaUID The unique identifier of the schema to attest to.
     /// @param data The arguments of the revocation requests.
     /// @param revoker The revoking account.
     /// @param availableValue The total available ETH amount that can be sent to the resolver.
     /// @param last Whether this is the last attestations/revocations set.
     /// @return Returns the total sent ETH amount.
     function _revoke(
-        bytes32 schema,
+        bytes32 schemaUID,
         RevocationRequestData[] memory data,
         address revoker,
         uint256 availableValue,
         bool last
     ) private returns (uint256) {
         // Ensure that a non-existing schema ID wasn't passed by accident.
-        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schema);
+        SchemaRecord memory schemaRecord = _schemaRegistry.getSchema(schemaUID);
         if (schemaRecord.uid == EMPTY_UID) {
             revert InvalidSchema();
         }
@@ -518,7 +518,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             }
 
             // Ensure that a wrong schema ID wasn't passed by accident.
-            if (attestation.schema != schema) {
+            if (attestation.schema != schemaUID) {
                 revert InvalidSchema();
             }
 
@@ -542,7 +542,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             attestations[i] = attestation;
             values[i] = request.value;
 
-            emit Revoked(attestations[i].recipient, revoker, request.uid, schema);
+            emit Revoked(attestations[i].recipient, revoker, request.uid, schemaUID);
         }
 
         return _resolveAttestations(schemaRecord, attestations, values, true, availableValue, last);
@@ -734,9 +734,10 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         emit Timestamped(data, time);
     }
 
-    /// @dev Timestamps the specified bytes32 data.
-    /// @param data The data to timestamp.
-    /// @param time The timestamp.
+    /// @dev Revokes the specified bytes32 data.
+    /// @param revoker The revoking account.
+    /// @param data The data to revoke.
+    /// @param time The timestamp the data was revoked with.
     function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
         mapping(bytes32 data => uint64 timestamp) storage revocations = _revocationsOffchain[revoker];
 

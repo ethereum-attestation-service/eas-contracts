@@ -7,7 +7,8 @@ import { Attestation } from "../Common.sol";
 /// @title ISchemaResolver
 /// @notice The interface of an optional schema resolver.
 interface ISchemaResolver {
-    /// @notice Returns whether the resolver supports ETH transfers.
+    /// @notice Checks if the resolver can be sent ETH.
+    /// @return Whether the resolver supports ETH transfers.
     function isPayable() external pure returns (bool);
 
     /// @notice Processes an attestation and verifies whether it's valid.
