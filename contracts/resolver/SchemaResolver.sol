@@ -18,7 +18,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
     // The global EAS contract.
     IEAS internal immutable _eas;
 
-    /// @notice Creates a new resolver.
+    /// @dev Creates a new resolver.
     /// @param eas The address of the global EAS contract.
     constructor(IEAS eas) Semver(1, 1, 0) {
         if (address(eas) == address(0)) {
@@ -143,7 +143,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
     /// @return Whether the attestation can be revoked.
     function onRevoke(Attestation calldata attestation, uint256 value) internal virtual returns (bool);
 
-    /// @notice Ensures that only the EAS contract can make this call.
+    /// @dev Ensures that only the EAS contract can make this call.
     function _onlyEAS() private view {
         if (msg.sender != address(_eas)) {
             revert AccessDenied();

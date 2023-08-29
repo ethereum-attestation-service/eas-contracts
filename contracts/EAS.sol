@@ -39,7 +39,7 @@ import { Semver } from "./Semver.sol";
 import { ISchemaRegistry, SchemaRecord } from "./ISchemaRegistry.sol";
 
 /// @title EAS
-/// @notice EAS - Ethereum Attestation Service
+/// @notice The Ethereum Attestation Service protocol.
 contract EAS is IEAS, Semver, EIP1271Verifier {
     using Address for address payable;
 
@@ -78,7 +78,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
     // The global mapping between data and their revocation timestamps.
     mapping(address revoker => mapping(bytes32 data => uint64 timestamp) timestamps) private _revocationsOffchain;
 
-    /// @notice Creates a new EAS instance.
+    /// @dev Creates a new EAS instance.
     /// @param registry The address of the global schema registry.
     constructor(ISchemaRegistry registry) Semver(1, 1, 0) EIP1271Verifier("EAS", "1.1.0") {
         if (address(registry) == address(0)) {
@@ -392,7 +392,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         return _revocationsOffchain[revoker][data];
     }
 
-    /// @notice Attests to a specific schema.
+    /// @dev Attests to a specific schema.
     /// @param schema // the unique identifier of the schema to attest to.
     /// @param data The arguments of the attestation requests.
     /// @param attester The attesting account.
@@ -483,7 +483,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         return res;
     }
 
-    /// @notice Revokes an existing attestation to a specific schema.
+    /// @dev Revokes an existing attestation to a specific schema.
     /// @param schema The unique identifier of the schema to attest to.
     /// @param data The arguments of the revocation requests.
     /// @param revoker The revoking account.
@@ -548,7 +548,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         return _resolveAttestations(schemaRecord, attestations, values, true, availableValue, last);
     }
 
-    /// @notice Resolves a new attestation or a revocation of an existing attestation.
+    /// @dev Resolves a new attestation or a revocation of an existing attestation.
     /// @param schemaRecord The schema of the attestation.
     /// @param attestation The data of the attestation to make/revoke.
     /// @param value An explicit ETH amount to send to the resolver.
@@ -608,7 +608,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         return value;
     }
 
-    /// @notice Resolves multiple attestations or revocations of existing attestations.
+    /// @dev Resolves multiple attestations or revocations of existing attestations.
     /// @param schemaRecord The schema of the attestation.
     /// @param attestations The data of the attestations to make/revoke.
     /// @param values Explicit ETH amounts to send to the resolver.
@@ -683,7 +683,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         return totalUsedValue;
     }
 
-    /// @notice Calculates a UID for a given attestation.
+    /// @dev Calculates a UID for a given attestation.
     /// @param attestation The input attestation.
     /// @param bump A bump value to use in case of a UID conflict.
     /// @return Attestation UID.
@@ -704,7 +704,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             );
     }
 
-    /// @notice Refunds remaining ETH amount to the attester.
+    /// @dev Refunds remaining ETH amount to the attester.
     /// @param remainingValue The remaining ETH amount that was not sent to the resolver.
     function _refund(uint256 remainingValue) private {
         if (remainingValue > 0) {
@@ -715,7 +715,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         }
     }
 
-    /// @notice Timestamps the specified bytes32 data.
+    /// @dev Timestamps the specified bytes32 data.
     /// @param data The data to timestamp.
     /// @param time The timestamp.
     function _timestamp(bytes32 data, uint64 time) private {
@@ -728,7 +728,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         emit Timestamped(data, time);
     }
 
-    /// @notice Timestamps the specified bytes32 data.
+    /// @dev Timestamps the specified bytes32 data.
     /// @param data The data to timestamp.
     /// @param time The timestamp.
     function _revokeOffchain(address revoker, bytes32 data, uint64 time) private {
@@ -743,13 +743,13 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         emit RevokedOffchain(revoker, data, time);
     }
 
-    /// @notice Returns the current's block timestamp. This method is overridden during tests and used to simulate the
+    /// @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
     ///     current block time.
     function _time() internal view virtual returns (uint64) {
         return uint64(block.timestamp);
     }
 
-    /// @notice Merges lists of UIDs.
+    /// @dev Merges lists of UIDs.
     /// @param uidLists The provided lists of UIDs.
     /// @param uidsCount Total UIDs count.
     /// @return A merged and flatten list of all the UIDs.

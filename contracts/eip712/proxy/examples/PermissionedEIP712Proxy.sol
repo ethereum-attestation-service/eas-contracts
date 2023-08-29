@@ -20,7 +20,7 @@ import { AccessDenied, uncheckedInc } from "../../../Common.sol";
 /// @title PermissionedEIP712Proxy
 /// @notice A sample EIP712 proxy that allows only a specific address to attest.
 contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
-    /// @notice Creates a new PermissionedEIP712Proxy instance.
+    /// @dev Creates a new PermissionedEIP712Proxy instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
     constructor(IEAS eas, string memory name) EIP712Proxy(eas, name) {}
@@ -69,7 +69,7 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
         super.multiRevokeByDelegation(multiDelegatedRequests);
     }
 
-    /// @notice Ensures that only the allowed attester can attest.
+    /// @dev Ensures that only the allowed attester can attest.
     /// @param attester The attester to verify.
     function _verifyAttester(address attester) private view {
         if (attester != owner()) {

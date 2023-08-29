@@ -16,7 +16,7 @@ contract Semver {
     // Contract's patch version number.
     uint256 private immutable _path;
 
-    /// @notice Create a new Semver instance.
+    /// @dev Create a new Semver instance.
     /// @param major Major version number.
     /// @param minor Minor version number.
     /// @param patch Patch version number.

@@ -99,7 +99,7 @@ contract EIP712Proxy is Semver, EIP712 {
     // Replay protection signatures.
     mapping(bytes signature => bool used) private _signatures;
 
-    /// @notice Creates a new EIP1271Verifier instance.
+    /// @dev Creates a new EIP1271Verifier instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
     constructor(IEAS eas, string memory name) Semver(1, 1, 0) EIP712(name, "1.1.0") {
@@ -357,7 +357,7 @@ contract EIP712Proxy is Semver, EIP712 {
         _eas.multiRevoke{ value: msg.value }(multiRequests);
     }
 
-    /// @notice Verifies delegated attestation request.
+    /// @dev Verifies delegated attestation request.
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedProxyAttestationRequest memory request) internal {
         if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
@@ -389,7 +389,7 @@ contract EIP712Proxy is Semver, EIP712 {
         }
     }
 
-    /// @notice Verifies delegated revocation request.
+    /// @dev Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedProxyRevocationRequest memory request) internal {
         if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
@@ -421,7 +421,7 @@ contract EIP712Proxy is Semver, EIP712 {
         }
     }
 
-    /// @notice Ensures that the provided EIP712 signature wasn't already used.
+    /// @dev Ensures that the provided EIP712 signature wasn't already used.
     /// @param signature The EIP712 signature data.
     function _verifyUnusedSignature(Signature memory signature) internal {
         bytes memory packedSignature = abi.encodePacked(signature.v, signature.r, signature.s);
@@ -433,7 +433,7 @@ contract EIP712Proxy is Semver, EIP712 {
         _signatures[packedSignature] = true;
     }
 
-    /// @notice Returns the current's block timestamp. This method is overridden during tests and used to simulate the
+    /// @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
     ///     current block time.
     function _time() internal view virtual returns (uint64) {
         return uint64(block.timestamp);

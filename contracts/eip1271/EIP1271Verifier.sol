@@ -35,7 +35,7 @@ abstract contract EIP1271Verifier is EIP712 {
     // Replay protection nonces.
     mapping(address attester => uint256 nonce) private _nonces;
 
-    /// @notice Creates a new EIP1271Verifier instance.
+    /// @dev Creates a new EIP1271Verifier instance.
     /// @param version The current major version of the signing domain
     constructor(string memory name, string memory version) EIP712(name, version) {
         _name = name;
@@ -72,7 +72,7 @@ abstract contract EIP1271Verifier is EIP712 {
         return _name;
     }
 
-    /// @notice Verifies delegated attestation request.
+    /// @dev Verifies delegated attestation request.
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedAttestationRequest memory request) internal {
         AttestationRequestData memory data = request.data;
@@ -108,7 +108,7 @@ abstract contract EIP1271Verifier is EIP712 {
         }
     }
 
-    /// @notice Verifies delegated revocation request.
+    /// @dev Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
         RevocationRequestData memory data = request.data;

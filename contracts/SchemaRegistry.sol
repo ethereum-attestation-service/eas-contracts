@@ -16,7 +16,7 @@ contract SchemaRegistry is ISchemaRegistry, Semver {
     // The global mapping between schema records and their IDs.
     mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
 
-    /// @notice Creates a new SchemaRegistry instance.
+    /// @dev Creates a new SchemaRegistry instance.
     constructor() Semver(1, 1, 0) {}
 
     /// @inheritdoc ISchemaRegistry
@@ -46,7 +46,7 @@ contract SchemaRegistry is ISchemaRegistry, Semver {
         return _registry[uid];
     }
 
-    /// @notice Calculates a UID for a given schema.
+    /// @dev Calculates a UID for a given schema.
     /// @param schemaRecord The input schema.
     /// @return schema UID.
     function _getUID(SchemaRecord memory schemaRecord) private pure returns (bytes32) {
