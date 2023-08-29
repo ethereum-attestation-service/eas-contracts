@@ -9,7 +9,7 @@ import { Semver } from "../Semver.sol";
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /// @title SchemaResolver
-/// @notice A base resolver contract
+/// @notice The base schema resolver contract.
 abstract contract SchemaResolver is ISchemaResolver, Semver {
     error AccessDenied();
     error InsufficientValue();
@@ -72,7 +72,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
                 revert InsufficientValue();
             }
 
-            // Forward the attestation to the underlying resolver and revert in case it isn't approved.
+            // Forward the attestation to the underlying resolver and return false in case it isn't approved.
             if (!onAttest(attestations[i], value)) {
                 return false;
             }
@@ -111,7 +111,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
                 revert InsufficientValue();
             }
 
-            // Forward the revocation to the underlying resolver and revert in case it isn't approved.
+            // Forward the revocation to the underlying resolver and return false in case it isn't approved.
             if (!onRevoke(attestations[i], value)) {
                 return false;
             }
