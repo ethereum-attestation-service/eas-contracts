@@ -149,6 +149,48 @@ describe('EAS', () => {
             await registry.register(schema3, ZERO_ADDRESS, true);
           });
 
+          it('should revert when multi attesting using invalid parameters', async () => {
+            await expectFailedMultiAttestations(
+              {
+                eas,
+                eip712Utils,
+                eip712ProxyUtils
+              },
+              [
+                {
+                  schema: schema1Id,
+                  requests: []
+                },
+                {
+                  schema: schema1Id,
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
+                }
+              ],
+              { signatureType, from: sender },
+              'InvalidLength'
+            );
+
+            await expectFailedMultiAttestations(
+              {
+                eas,
+                eip712Utils,
+                eip712ProxyUtils
+              },
+              [
+                {
+                  schema: schema1Id,
+                  requests: [{ recipient: await recipient.getAddress(), expirationTime, data }]
+                },
+                {
+                  schema: schema1Id,
+                  requests: []
+                }
+              ],
+              { signatureType, from: sender },
+              'InvalidLength'
+            );
+          });
+
           it('should revert when multi attesting to multiple unregistered schemas', async () => {
             // Only one of the requests is to an unregistered schema
             await expectFailedMultiAttestations(
