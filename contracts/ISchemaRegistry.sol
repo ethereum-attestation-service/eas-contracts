@@ -13,7 +13,7 @@ struct SchemaRecord {
 }
 
 /// @title ISchemaRegistry
-/// @notice The global schema registry interface.
+/// @notice The interface of global attestation schemas for the Ethereum Attestation Service protocol.
 interface ISchemaRegistry {
     /// @notice Emitted when a new schema has been registered
     /// @param uid The schema UID.
