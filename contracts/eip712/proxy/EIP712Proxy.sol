@@ -216,19 +216,21 @@ contract EIP712Proxy is Semver, EIP712 {
     function multiAttestByDelegation(
         MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
     ) public payable virtual returns (bytes32[] memory) {
-        MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](multiDelegatedRequests.length);
+        uint256 length = multiDelegatedRequests.length;
+        MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](length);
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
             // Ensure that no inputs are missing.
-            if (data.length == 0 || data.length != multiDelegatedRequest.signatures.length) {
+            uint256 dataLength = data.length;
+            if (dataLength == 0 || dataLength != multiDelegatedRequest.signatures.length) {
                 revert InvalidLength();
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
                 _verifyAttest(
                     DelegatedProxyAttestationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -248,11 +250,12 @@ contract EIP712Proxy is Semver, EIP712 {
         // Store all attesters, according to the order of the attestation requests.
         uint256 uidCounter = 0;
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
-            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
+            uint256 dataLength = data.length;
+            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
                 _attesters[uids[uidCounter]] = multiDelegatedRequest.attester;
 
                 unchecked {
@@ -320,19 +323,21 @@ contract EIP712Proxy is Semver, EIP712 {
     function multiRevokeByDelegation(
         MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
     ) public payable virtual {
-        MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](multiDelegatedRequests.length);
+        uint256 length = multiDelegatedRequests.length;
+        MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](length);
 
-        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             MultiDelegatedProxyRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
             RevocationRequestData[] memory data = multiDelegatedRequest.data;
 
             // Ensure that no inputs are missing.
-            if (data.length == 0 || data.length != multiDelegatedRequest.signatures.length) {
+            uint256 dataLength = data.length;
+            if (dataLength == 0 || dataLength != multiDelegatedRequest.signatures.length) {
                 revert InvalidLength();
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < data.length; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
                 RevocationRequestData memory requestData = data[j];
 
                 _verifyRevoke(

@@ -39,7 +39,8 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
     function multiAttestByDelegation(
         MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
     ) public payable override returns (bytes32[] memory) {
-        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
+        uint256 length = multiDelegatedRequests.length;
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             // Ensure that only the owner is allowed to delegate attestations.
             _verifyAttester(multiDelegatedRequests[i].attester);
         }
@@ -59,7 +60,8 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
     function multiRevokeByDelegation(
         MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
     ) public payable override {
-        for (uint256 i = 0; i < multiDelegatedRequests.length; i = uncheckedInc(i)) {
+        uint256 length = multiDelegatedRequests.length;
+        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
             // Ensure that only the owner is allowed to delegate revocations.
             _verifyAttester(multiDelegatedRequests[i].revoker);
         }
