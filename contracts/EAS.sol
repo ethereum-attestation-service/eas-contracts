@@ -207,7 +207,8 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
                         schema: multiDelegatedRequest.schema,
                         data: data[j],
                         signature: multiDelegatedRequest.signatures[j],
-                        attester: multiDelegatedRequest.attester
+                        attester: multiDelegatedRequest.attester,
+                        deadline: multiDelegatedRequest.deadline
                     })
                 );
             }
@@ -314,7 +315,8 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
                         schema: multiDelegatedRequest.schema,
                         data: data[j],
                         signature: multiDelegatedRequest.signatures[j],
-                        revoker: multiDelegatedRequest.revoker
+                        revoker: multiDelegatedRequest.revoker,
+                        deadline: multiDelegatedRequest.deadline
                     })
                 );
             }
@@ -748,12 +750,6 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         revocations[data] = time;
 
         emit RevokedOffchain(revoker, data, time);
-    }
-
-    /// @dev Returns the current's block timestamp. This method is overridden during tests and used to simulate the
-    ///     current block time.
-    function _time() internal view virtual returns (uint64) {
-        return uint64(block.timestamp);
     }
 
     /// @dev Merges lists of UIDs.

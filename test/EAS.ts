@@ -980,7 +980,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: await sender.getAddress()
+            attester: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -997,7 +998,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('BAD')
               }
             ],
-            attester: await sender.getAddress()
+            attester: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1028,7 +1030,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('4')
               }
             ],
-            attester: await sender.getAddress()
+            attester: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1056,7 +1059,8 @@ describe('EAS', () => {
               }
             ],
             signatures: [],
-            attester: await sender.getAddress()
+            attester: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1422,7 +1426,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('2')
               }
             ],
-            revoker: await sender.getAddress()
+            revoker: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1439,7 +1444,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('2')
               }
             ],
-            revoker: await sender.getAddress()
+            revoker: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1461,7 +1467,8 @@ describe('EAS', () => {
                 s: encodeBytes32String('4')
               }
             ],
-            revoker: await sender.getAddress()
+            revoker: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
@@ -1475,7 +1482,8 @@ describe('EAS', () => {
               { uid: uid2, value: 0 }
             ],
             signatures: [],
-            revoker: await sender.getAddress()
+            revoker: await sender.getAddress(),
+            deadline: NO_EXPIRATION
           }
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
