@@ -91,8 +91,9 @@ export type EIP712RevocationParams = EIP712Params & {
 export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
 
 export const ATTEST_TYPED_SIGNATURE =
-  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 nonce,uint64 deadline)';
-export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 nonce,uint64 deadline)';
+  // eslint-disable-next-line max-len
+  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint256 nonce,uint64 deadline)';
+export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 value,uint256 nonce,uint64 deadline)';
 export const ATTEST_PRIMARY_TYPE = 'Attest';
 export const REVOKE_PRIMARY_TYPE = 'Revoke';
 export const ATTEST_TYPE: TypedData[] = [
@@ -102,12 +103,14 @@ export const ATTEST_TYPE: TypedData[] = [
   { name: 'revocable', type: 'bool' },
   { name: 'refUID', type: 'bytes32' },
   { name: 'data', type: 'bytes' },
+  { name: 'value', type: 'uint256' },
   { name: 'nonce', type: 'uint256' },
   { name: 'deadline', type: 'uint64' }
 ];
 export const REVOKE_TYPE: TypedData[] = [
   { name: 'schema', type: 'bytes32' },
   { name: 'uid', type: 'bytes32' },
+  { name: 'value', type: 'uint256' },
   { name: 'nonce', type: 'uint256' },
   { name: 'deadline', type: 'uint64' }
 ];
@@ -178,6 +181,7 @@ export class EIP712Utils {
     revocable: boolean,
     refUID: string,
     data: string,
+    value: bigint,
     nonce: bigint,
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
@@ -188,6 +192,7 @@ export class EIP712Utils {
       revocable,
       refUID,
       data: Buffer.from(data.slice(2), 'hex'),
+      value,
       nonce,
       deadline
     };
@@ -223,6 +228,7 @@ export class EIP712Utils {
     revocable: boolean,
     refUID: string,
     data: string,
+    value: bigint,
     nonce: bigint,
     deadline: bigint
   ): Promise<string> {
@@ -233,6 +239,7 @@ export class EIP712Utils {
       revocable,
       refUID,
       data: Buffer.from(data.slice(2), 'hex'),
+      value,
       nonce,
       deadline
     };
@@ -251,12 +258,14 @@ export class EIP712Utils {
     attester: Signer,
     schema: string,
     uid: string,
+    value: bigint,
     nonce: bigint,
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
       schema,
       uid,
+      value,
       nonce,
       deadline
     };
@@ -285,10 +294,11 @@ export class EIP712Utils {
     );
   }
 
-  public hashDelegatedRevocation(schema: string, uid: string, nonce: bigint, deadline: bigint): string {
+  public hashDelegatedRevocation(schema: string, uid: string, value: bigint, nonce: bigint, deadline: bigint): string {
     const params = {
       schema,
       uid,
+      value,
       nonce,
       deadline
     };
