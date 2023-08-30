@@ -5,7 +5,7 @@ import Contracts, { TestEIP1271Signer } from '../../components/Contracts';
 import { TestEIP1271Verifier } from '../../typechain-types';
 import { NO_EXPIRATION, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { ATTEST_TYPED_SIGNATURE, EIP712Utils, REVOKE_TYPED_SIGNATURE } from '../helpers/EIP712Utils';
-import { latest } from '../helpers/Time';
+import { duration, latest } from '../helpers/Time';
 import { createWallet } from '../helpers/Wallet';
 
 const EIP712_NAME = 'EAS';
@@ -75,6 +75,7 @@ describe('EIP1271Verifier', () => {
         }
 
         const schema = ZERO_BYTES32;
+        const deadline = NO_EXPIRATION;
         let attestationRequest: AttestationRequestData;
 
         beforeEach(async () => {
@@ -104,7 +105,8 @@ describe('EIP1271Verifier', () => {
                 attestationRequest.revocable,
                 attestationRequest.refUID,
                 attestationRequest.data,
-                nonce
+                nonce,
+                deadline
               );
 
             case SignerType.Contract: {
@@ -115,7 +117,8 @@ describe('EIP1271Verifier', () => {
                 attestationRequest.revocable,
                 attestationRequest.refUID,
                 attestationRequest.data,
-                nonce
+                nonce,
+                deadline
               );
 
               // Just a dummy signature
@@ -139,10 +142,25 @@ describe('EIP1271Verifier', () => {
                 schema,
                 data: attestationRequest,
                 signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-                attester: await signer.getAddress()
+                attester: await signer.getAddress(),
+                deadline
               })
             ).not.to.be.reverted;
           }
+        });
+
+        it('should revert when verifying delegated attestation request with an expired deadline', async () => {
+          const signature = await signDelegatedAttestation(signer, attestationRequest);
+
+          await expect(
+            verifier.verifyAttest({
+              schema,
+              data: attestationRequest,
+              signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+              attester: await signer.getAddress(),
+              deadline: (await latest()) - duration.hours(1n)
+            })
+          ).to.be.revertedWithCustomError(verifier, 'DeadlineExpired');
         });
 
         it('should revert when verifying delegated attestation request with a wrong signature', async () => {
@@ -153,7 +171,8 @@ describe('EIP1271Verifier', () => {
               schema,
               data: attestationRequest,
               signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
-              attester: await signer.getAddress()
+              attester: await signer.getAddress(),
+              deadline
             })
           ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
 
@@ -162,7 +181,8 @@ describe('EIP1271Verifier', () => {
               schema,
               data: attestationRequest,
               signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-              attester: await wrongSigner.getAddress()
+              attester: await wrongSigner.getAddress(),
+              deadline
             })
           ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
         });
@@ -170,6 +190,7 @@ describe('EIP1271Verifier', () => {
 
       describe('verify revoke', () => {
         const schema = ZERO_BYTES32;
+        const deadline = NO_EXPIRATION;
 
         interface RevocationRequestData {
           uid: string;
@@ -189,10 +210,16 @@ describe('EIP1271Verifier', () => {
 
           switch (signerType) {
             case SignerType.EOA:
-              return eip712Utils.signDelegatedRevocation(signer as Signer, schema, revocationRequest.uid, nonce);
+              return eip712Utils.signDelegatedRevocation(
+                signer as Signer,
+                schema,
+                revocationRequest.uid,
+                nonce,
+                deadline
+              );
 
             case SignerType.Contract: {
-              const hash = await eip712Utils.hashDelegatedRevocation(schema, revocationRequest.uid, nonce);
+              const hash = await eip712Utils.hashDelegatedRevocation(schema, revocationRequest.uid, nonce, deadline);
 
               // Just a dummy signature
               const signature = { s: hexlify(keccak256(`${hash}${await latest()}`)), r: hexlify(hash), v: 27 };
@@ -215,10 +242,25 @@ describe('EIP1271Verifier', () => {
                 schema,
                 data: revocationRequest,
                 signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-                revoker: await signer.getAddress()
+                revoker: await signer.getAddress(),
+                deadline
               })
             ).not.to.be.reverted;
           }
+        });
+
+        it('should revert when verifying delegated attestation request with an expired deadline', async () => {
+          const signature = await signDelegatedRevocation(signer, revocationRequest);
+
+          await expect(
+            verifier.verifyRevoke({
+              schema,
+              data: revocationRequest,
+              signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+              revoker: await signer.getAddress(),
+              deadline: (await latest()) - duration.hours(1n)
+            })
+          ).to.be.revertedWithCustomError(verifier, 'DeadlineExpired');
         });
 
         it('should revert when verifying delegated revocation request with a wrong signature', async () => {
@@ -229,7 +271,8 @@ describe('EIP1271Verifier', () => {
               schema,
               data: revocationRequest,
               signature: { v: signature.v, r: encodeBytes32String('BAD'), s: hexlify(signature.s) },
-              revoker: await signer.getAddress()
+              revoker: await signer.getAddress(),
+              deadline
             })
           ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
 
@@ -238,7 +281,8 @@ describe('EIP1271Verifier', () => {
               schema,
               data: revocationRequest,
               signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-              revoker: await wrongSigner.getAddress()
+              revoker: await wrongSigner.getAddress(),
+              deadline
             })
           ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
         });

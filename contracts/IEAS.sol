@@ -27,6 +27,7 @@ struct DelegatedAttestationRequest {
     AttestationRequestData data; // The arguments of the attestation request.
     Signature signature; // The ECDSA signature data.
     address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
 }
 
 /// @notice A struct representing the full arguments of the multi attestation request.
@@ -41,6 +42,7 @@ struct MultiDelegatedAttestationRequest {
     AttestationRequestData[] data; // The arguments of the attestation requests.
     Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
 }
 
 /// @notice A struct representing the arguments of the revocation request.
@@ -61,6 +63,7 @@ struct DelegatedRevocationRequest {
     RevocationRequestData data; // The arguments of the revocation request.
     Signature signature; // The ECDSA signature data.
     address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
 }
 
 /// @notice A struct representing the full arguments of the multi revocation request.
@@ -75,6 +78,7 @@ struct MultiDelegatedRevocationRequest {
     RevocationRequestData[] data; // The arguments of the revocation requests.
     Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
 }
 
 /// @title IEAS

@@ -543,7 +543,8 @@ describe('EIP712Proxy', () => {
             { uid: uid2, value: 0 }
           ],
           signatures: [],
-          revoker: await sender.getAddress()
+          revoker: await sender.getAddress(),
+          deadline: NO_EXPIRATION
         }
       ])
     ).to.be.revertedWithCustomError(eas, 'InvalidLength');

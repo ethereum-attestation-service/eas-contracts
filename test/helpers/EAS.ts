@@ -146,7 +146,8 @@ export const expectAttestation = async (
         revocable,
         refUID,
         data,
-        await eas.getNonce(await txSender.getAddress())
+        await eas.getNonce(await txSender.getAddress()),
+        deadline
       );
 
       expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be.true;
@@ -160,7 +161,8 @@ export const expectAttestation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          attester: await txSender.getAddress()
+          attester: await txSender.getAddress(),
+          deadline
         },
         {
           value: msgValue
@@ -302,7 +304,8 @@ export const expectFailedAttestation = async (
         revocable,
         refUID,
         data,
-        await eas.getNonce(await txSender.getAddress())
+        await eas.getNonce(await txSender.getAddress()),
+        deadline
       );
 
       expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be.true;
@@ -324,7 +327,8 @@ export const expectFailedAttestation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            attester: await txSender.getAddress()
+            attester: await txSender.getAddress(),
+            deadline
           },
           { value: msgValue }
         )
@@ -452,7 +456,8 @@ export const expectMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
-            nonce
+            nonce,
+            deadline
           );
 
           expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be
@@ -463,7 +468,13 @@ export const expectMultiAttestations = async (
           nonce++;
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: await txSender.getAddress() });
+        multiDelegatedAttestationRequests.push({
+          schema,
+          data,
+          signatures,
+          attester: await txSender.getAddress(),
+          deadline
+        });
       }
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
@@ -631,7 +642,8 @@ export const expectFailedMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
-            nonce
+            nonce,
+            deadline
           );
 
           expect(await eip712Utils.verifyDelegatedAttestationSignature(await txSender.getAddress(), signature)).to.be
@@ -642,7 +654,13 @@ export const expectFailedMultiAttestations = async (
           nonce++;
         }
 
-        multiDelegatedAttestationRequests.push({ schema, data, signatures, attester: await txSender.getAddress() });
+        multiDelegatedAttestationRequests.push({
+          schema,
+          data,
+          signatures,
+          attester: await txSender.getAddress(),
+          deadline
+        });
       }
 
       await expect(
@@ -735,7 +753,8 @@ export const expectRevocation = async (
         txSender,
         schema,
         uid,
-        await eas.getNonce(await txSender.getAddress())
+        await eas.getNonce(await txSender.getAddress()),
+        deadline
       );
 
       expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be.true;
@@ -749,7 +768,8 @@ export const expectRevocation = async (
             r: hexlify(signature.r),
             s: hexlify(signature.s)
           },
-          revoker: await txSender.getAddress()
+          revoker: await txSender.getAddress(),
+          deadline
         },
         { value: msgValue }
       );
@@ -860,7 +880,7 @@ export const expectMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce, deadline);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
             .true;
@@ -870,7 +890,13 @@ export const expectMultiRevocations = async (
           nonce++;
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: await txSender.getAddress() });
+        multiDelegatedRevocationRequests.push({
+          schema,
+          data,
+          signatures,
+          revoker: await txSender.getAddress(),
+          deadline
+        });
       }
 
       res = await eas.connect(txSender).multiRevokeByDelegation(multiDelegatedRevocationRequests, { value: msgValue });
@@ -979,7 +1005,8 @@ export const expectFailedRevocation = async (
         txSender,
         schema,
         uid,
-        await eas.getNonce(await txSender.getAddress())
+        await eas.getNonce(await txSender.getAddress()),
+        deadline
       );
 
       expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be.true;
@@ -994,7 +1021,8 @@ export const expectFailedRevocation = async (
               r: hexlify(signature.r),
               s: hexlify(signature.s)
             },
-            revoker: await txSender.getAddress()
+            revoker: await txSender.getAddress(),
+            deadline
           },
           { value: msgValue }
         )
@@ -1084,7 +1112,7 @@ export const expectFailedMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce);
+          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce, deadline);
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
             .true;
@@ -1094,7 +1122,13 @@ export const expectFailedMultiRevocations = async (
           nonce++;
         }
 
-        multiDelegatedRevocationRequests.push({ schema, data, signatures, revoker: await txSender.getAddress() });
+        multiDelegatedRevocationRequests.push({
+          schema,
+          data,
+          signatures,
+          revoker: await txSender.getAddress(),
+          deadline
+        });
       }
 
       await expect(

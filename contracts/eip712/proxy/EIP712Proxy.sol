@@ -8,6 +8,7 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 // prettier-ignore
 import {
     AccessDenied,
+    DeadlineExpired,
     Signature,
     InvalidEAS,
     InvalidLength,
@@ -75,7 +76,6 @@ struct MultiDelegatedProxyRevocationRequest {
 ///     nonces. The contract doesn't request nonces and implements replay protection by storing ***immalleable***
 ///     signatures.
 contract EIP712Proxy is Semver, EIP712 {
-    error DeadlineExpired();
     error UsedSignature();
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
