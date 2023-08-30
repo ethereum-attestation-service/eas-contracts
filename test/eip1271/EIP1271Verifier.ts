@@ -71,7 +71,7 @@ describe('EIP1271Verifier', () => {
           revocable: boolean;
           refUID: string;
           data: string;
-          value: number;
+          value: bigint;
         }
 
         const schema = ZERO_BYTES32;
@@ -85,7 +85,7 @@ describe('EIP1271Verifier', () => {
             revocable: true,
             refUID: ZERO_BYTES32,
             data: ZERO_BYTES,
-            value: 1000
+            value: 1000n
           };
         });
 
@@ -105,6 +105,7 @@ describe('EIP1271Verifier', () => {
                 attestationRequest.revocable,
                 attestationRequest.refUID,
                 attestationRequest.data,
+                attestationRequest.value,
                 nonce,
                 deadline
               );
@@ -117,6 +118,7 @@ describe('EIP1271Verifier', () => {
                 attestationRequest.revocable,
                 attestationRequest.refUID,
                 attestationRequest.data,
+                attestationRequest.value,
                 nonce,
                 deadline
               );
@@ -194,12 +196,12 @@ describe('EIP1271Verifier', () => {
 
         interface RevocationRequestData {
           uid: string;
-          value: number;
+          value: bigint;
         }
 
         const revocationRequest: RevocationRequestData = {
           uid: ZERO_BYTES32,
-          value: 1000
+          value: 1000n
         };
 
         const signDelegatedRevocation = async (
@@ -214,12 +216,19 @@ describe('EIP1271Verifier', () => {
                 signer as Signer,
                 schema,
                 revocationRequest.uid,
+                revocationRequest.value,
                 nonce,
                 deadline
               );
 
             case SignerType.Contract: {
-              const hash = await eip712Utils.hashDelegatedRevocation(schema, revocationRequest.uid, nonce, deadline);
+              const hash = await eip712Utils.hashDelegatedRevocation(
+                schema,
+                revocationRequest.uid,
+                revocationRequest.value,
+                nonce,
+                deadline
+              );
 
               // Just a dummy signature
               const signature = { s: hexlify(keccak256(`${hash}${await latest()}`)), r: hexlify(hash), v: 27 };

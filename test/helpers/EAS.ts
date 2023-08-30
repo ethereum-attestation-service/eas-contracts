@@ -146,6 +146,7 @@ export const expectAttestation = async (
         revocable,
         refUID,
         data,
+        msgValue,
         await eas.getNonce(await txSender.getAddress()),
         deadline
       );
@@ -191,6 +192,7 @@ export const expectAttestation = async (
         revocable,
         refUID,
         data,
+        msgValue,
         deadline
       );
 
@@ -304,6 +306,7 @@ export const expectFailedAttestation = async (
         revocable,
         refUID,
         data,
+        msgValue,
         await eas.getNonce(await txSender.getAddress()),
         deadline
       );
@@ -350,6 +353,7 @@ export const expectFailedAttestation = async (
         revocable,
         refUID,
         data,
+        msgValue,
         deadline
       );
 
@@ -456,6 +460,7 @@ export const expectMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
+            msgValue,
             nonce,
             deadline
           );
@@ -507,6 +512,7 @@ export const expectMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
+            msgValue,
             deadline
           );
 
@@ -642,6 +648,7 @@ export const expectFailedMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
+            msgValue,
             nonce,
             deadline
           );
@@ -689,6 +696,7 @@ export const expectFailedMultiAttestations = async (
             request.revocable,
             request.refUID,
             request.data,
+            msgValue,
             deadline
           );
 
@@ -753,6 +761,7 @@ export const expectRevocation = async (
         txSender,
         schema,
         uid,
+        msgValue,
         await eas.getNonce(await txSender.getAddress()),
         deadline
       );
@@ -782,7 +791,7 @@ export const expectRevocation = async (
         throw new Error('Invalid proxy');
       }
 
-      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, deadline);
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, msgValue, deadline);
 
       expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature)).to
         .be.true;
@@ -880,7 +889,14 @@ export const expectMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce, deadline);
+          const signature = await eip712Utils.signDelegatedRevocation(
+            txSender,
+            schema,
+            request.uid,
+            msgValue,
+            nonce,
+            deadline
+          );
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
             .true;
@@ -919,6 +935,7 @@ export const expectMultiRevocations = async (
             txSender,
             schema,
             request.uid,
+            msgValue,
             deadline
           );
 
@@ -982,7 +999,7 @@ export const expectFailedRevocation = async (
   contract?: BaseContract
 ) => {
   const { eas, eip712Utils, eip712ProxyUtils } = contracts;
-  const { uid, value = 0 } = request;
+  const { uid, value = 0n } = request;
   const { from: txSender, signatureType = SignatureType.Direct, deadline = NO_EXPIRATION } = options;
 
   const msgValue = options.value ?? value;
@@ -1005,6 +1022,7 @@ export const expectFailedRevocation = async (
         txSender,
         schema,
         uid,
+        msgValue,
         await eas.getNonce(await txSender.getAddress()),
         deadline
       );
@@ -1036,7 +1054,7 @@ export const expectFailedRevocation = async (
         throw new Error('Invalid proxy');
       }
 
-      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, deadline);
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(txSender, schema, uid, msgValue, deadline);
 
       expect(await eip712ProxyUtils.verifyDelegatedProxyRevocationSignature(await txSender.getAddress(), signature)).to
         .be.true;
@@ -1112,7 +1130,14 @@ export const expectFailedMultiRevocations = async (
         const signatures: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>[] = [];
 
         for (const request of data) {
-          const signature = await eip712Utils.signDelegatedRevocation(txSender, schema, request.uid, nonce, deadline);
+          const signature = await eip712Utils.signDelegatedRevocation(
+            txSender,
+            schema,
+            request.uid,
+            msgValue,
+            nonce,
+            deadline
+          );
 
           expect(await eip712Utils.verifyDelegatedRevocationSignature(await txSender.getAddress(), signature)).to.be
             .true;
@@ -1153,6 +1178,7 @@ export const expectFailedMultiRevocations = async (
             txSender,
             schema,
             request.uid,
+            msgValue,
             deadline
           );
 

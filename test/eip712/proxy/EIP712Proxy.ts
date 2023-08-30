@@ -80,7 +80,7 @@ describe('EIP712Proxy', () => {
         revocable: true,
         refUID: ZERO_BYTES32,
         data: ZERO_BYTES,
-        value: 1000
+        value: 1000n
       };
 
       const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
@@ -91,6 +91,7 @@ describe('EIP712Proxy', () => {
         attestationRequest.revocable,
         attestationRequest.refUID,
         attestationRequest.data,
+        attestationRequest.value,
         deadline
       );
 
@@ -112,7 +113,7 @@ describe('EIP712Proxy', () => {
         revocable: true,
         refUID: ZERO_BYTES32,
         data: ZERO_BYTES,
-        value: 1000
+        value: 1000n
       };
 
       const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
@@ -123,6 +124,7 @@ describe('EIP712Proxy', () => {
         attestationRequest.revocable,
         attestationRequest.refUID,
         attestationRequest.data,
+        attestationRequest.value,
         deadline
       );
 
@@ -154,7 +156,7 @@ describe('EIP712Proxy', () => {
         revocable: true,
         refUID: ZERO_BYTES32,
         data: ZERO_BYTES,
-        value: 1000
+        value: 1000n
       };
 
       const signature = await eip712ProxyUtils.signDelegatedProxyAttestation(
@@ -165,6 +167,7 @@ describe('EIP712Proxy', () => {
         attestationRequest.revocable,
         attestationRequest.refUID,
         attestationRequest.data,
+        attestationRequest.value,
         deadline
       );
 
@@ -196,7 +199,7 @@ describe('EIP712Proxy', () => {
         revocable: true,
         refUID: ZERO_BYTES32,
         data: ZERO_BYTES,
-        value: 1000
+        value: 1000n
       };
 
       const expiredDeadline = 1n;
@@ -208,6 +211,7 @@ describe('EIP712Proxy', () => {
         attestationRequest.revocable,
         attestationRequest.refUID,
         attestationRequest.data,
+        attestationRequest.value,
         expiredDeadline
       );
 
@@ -354,13 +358,14 @@ describe('EIP712Proxy', () => {
     it('should verify delegated revocation request', async () => {
       const revocationRequest = {
         uid,
-        value: 1000
+        value: 1000n
       };
 
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
         sender,
         schemaId,
         revocationRequest.uid,
+        revocationRequest.value,
         deadline
       );
 
@@ -378,13 +383,14 @@ describe('EIP712Proxy', () => {
     it('should revert when verifying delegated revocation request with a wrong signature', async () => {
       const revocationRequest = {
         uid,
-        value: 1000
+        value: 1000n
       };
 
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
         sender,
         schemaId,
         revocationRequest.uid,
+        revocationRequest.value,
         deadline
       );
 
@@ -412,12 +418,13 @@ describe('EIP712Proxy', () => {
     it('should revert when verifying delegated revocation request with a used signature', async () => {
       const revocationRequest = {
         uid,
-        value: 1000
+        value: 1000n
       };
       const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
         sender,
         schemaId,
         revocationRequest.uid,
+        revocationRequest.value,
         deadline
       );
 
@@ -445,7 +452,7 @@ describe('EIP712Proxy', () => {
     it('should revert when verifying delegated revocation request with an expired deadline', async () => {
       const revocationRequest = {
         uid,
-        value: 1000
+        value: 1000n
       };
 
       const expiredDeadline = 1n;
@@ -453,6 +460,7 @@ describe('EIP712Proxy', () => {
         sender,
         schemaId,
         revocationRequest.uid,
+        revocationRequest.value,
         expiredDeadline
       );
 

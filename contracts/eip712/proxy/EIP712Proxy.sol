@@ -79,12 +79,12 @@ contract EIP712Proxy is Semver, EIP712 {
     error UsedSignature();
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)").
-    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0x4120d3b28306666b714826ad7cb70744d9658ad3e6cd873411bedadcf55afda7;
+    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)").
+    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0x9d3e80e7032dc16815a5f67aa94e851240ae3b24eed13a7431bdac738f814567;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(bytes32 schema,bytes32 uid,uint64 deadline)").
-    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0x96bdbea8fa280f8a0d0835587e1fbb1470e81d05c44514158443340cea40a05d;
+    // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)").
+    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0xd4e76f924411647a916bb4ae4631b3cf45c44e2da56ed1c63edb18ebc97ba5e4;
 
     // The global EAS contract.
     IEAS private immutable _eas;
@@ -383,6 +383,7 @@ contract EIP712Proxy is Semver, EIP712 {
                     data.revocable,
                     data.refUID,
                     keccak256(data.data),
+                    data.value,
                     request.deadline
                 )
             )
@@ -417,7 +418,7 @@ contract EIP712Proxy is Semver, EIP712 {
         _verifyUnusedSignature(signature);
 
         bytes32 digest = _hashTypedDataV4(
-            keccak256(abi.encode(REVOKE_PROXY_TYPEHASH, request.schema, data.uid, request.deadline))
+            keccak256(abi.encode(REVOKE_PROXY_TYPEHASH, request.schema, data.uid, data.value, request.deadline))
         );
 
         if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {

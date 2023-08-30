@@ -14,8 +14,8 @@ import {
 } from './EIP712Utils';
 
 export const ATTEST_PROXY_TYPED_SIGNATURE =
-  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint64 deadline)';
-export const REVOKE_PROXY_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint64 deadline)';
+  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)';
+export const REVOKE_PROXY_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)';
 export const ATTEST_PROXY_PRIMARY_TYPE = 'Attest';
 export const REVOKE_PROXY_PRIMARY_TYPE = 'Revoke';
 export const ATTEST_PROXY_TYPE: TypedData[] = [
@@ -25,11 +25,13 @@ export const ATTEST_PROXY_TYPE: TypedData[] = [
   { name: 'revocable', type: 'bool' },
   { name: 'refUID', type: 'bytes32' },
   { name: 'data', type: 'bytes' },
+  { name: 'value', type: 'uint256' },
   { name: 'deadline', type: 'uint64' }
 ];
 export const REVOKE_PROXY_TYPE: TypedData[] = [
   { name: 'schema', type: 'bytes32' },
   { name: 'uid', type: 'bytes32' },
+  { name: 'value', type: 'uint256' },
   { name: 'deadline', type: 'uint64' }
 ];
 
@@ -99,6 +101,7 @@ export class EIP712ProxyUtils {
     revocable: boolean,
     refUID: string,
     data: string,
+    value: bigint,
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
@@ -108,6 +111,7 @@ export class EIP712ProxyUtils {
       revocable,
       refUID,
       data: Buffer.from(data.slice(2), 'hex'),
+      value,
       deadline
     };
 
@@ -139,11 +143,13 @@ export class EIP712ProxyUtils {
     attester: Signer,
     schema: string,
     uid: string,
+    value: bigint,
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
       schema,
       uid,
+      value,
       deadline
     };
 
