@@ -28,7 +28,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         _eas = eas;
     }
 
-    /// @notice Ensures that only the EAS contract can make this call.
+    /// @dev Ensures that only the EAS contract can make this call.
     modifier onlyEAS() {
         _onlyEAS();
 
@@ -40,7 +40,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         return false;
     }
 
-    /// @notice ETH callback.
+    /// @dev ETH callback.
     receive() external payable virtual {
         if (!isPayable()) {
             revert NotPayable();
