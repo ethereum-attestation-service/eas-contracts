@@ -287,6 +287,42 @@ describe('EIP1271Verifier', () => {
           ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
         });
       });
+
+      describe('increasing nonces', () => {
+        let user: Signer;
+
+        before(() => {
+          [user] = accounts;
+        });
+
+        it('should allow users to increase their nonces', async () => {
+          const nonce = await verifier.getNonce(await user.getAddress());
+
+          const newNonce = nonce + 100n;
+          await verifier.connect(user).increaseNonce(newNonce);
+          expect(await verifier.getNonce(await user.getAddress())).to.equal(newNonce);
+
+          const newNonce2 = newNonce + 1n;
+          await verifier.connect(user).increaseNonce(newNonce2);
+          expect(await verifier.getNonce(await user.getAddress())).to.equal(newNonce2);
+        });
+
+        it('should revert when users attempt to decrease/keep their nonces', async () => {
+          // Increase the current nonce such that it doesn't start at 0.
+          await verifier.connect(user).increaseNonce((await verifier.getNonce(await user.getAddress())) + 100n);
+
+          const nonce = await verifier.getNonce(await user.getAddress());
+
+          await expect(verifier.connect(user).increaseNonce(nonce)).to.be.revertedWithCustomError(
+            verifier,
+            'InvalidNonce'
+          );
+          await expect(verifier.connect(user).increaseNonce(nonce - 5n)).to.be.revertedWithCustomError(
+            verifier,
+            'InvalidNonce'
+          );
+        });
+      });
     });
   }
 });
