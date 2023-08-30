@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 
 import { IEAS, Attestation } from "../IEAS.sol";
-import { InvalidEAS, uncheckedInc } from "../Common.sol";
+import { AccessDenied, InvalidEAS, InvalidLength, uncheckedInc } from "../Common.sol";
 import { Semver } from "../Semver.sol";
 
 import { ISchemaResolver } from "./ISchemaResolver.sol";
@@ -11,7 +11,6 @@ import { ISchemaResolver } from "./ISchemaResolver.sol";
 /// @title SchemaResolver
 /// @notice The base schema resolver contract.
 abstract contract SchemaResolver is ISchemaResolver, Semver {
-    error AccessDenied();
     error InsufficientValue();
     error NotPayable();
 
@@ -58,6 +57,9 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         uint256[] calldata values
     ) external payable onlyEAS returns (bool) {
         uint256 length = attestations.length;
+        if (length != values.length) {
+            revert InvalidLength();
+        }
 
         // We are keeping track of the remaining ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
@@ -97,6 +99,9 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         uint256[] calldata values
     ) external payable onlyEAS returns (bool) {
         uint256 length = attestations.length;
+        if (length != values.length) {
+            revert InvalidLength();
+        }
 
         // We are keeping track of the remaining ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless

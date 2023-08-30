@@ -3,6 +3,7 @@ import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
+import { AttestationStruct } from '../../typechain-types/contracts/IEAS';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES, ZERO_BYTES32 } from '../../utils/Constants';
 import { expectFailedAttestation, expectFailedMultiAttestations, registerSchema } from '../helpers/EAS';
 import { latest } from '../helpers/Time';
@@ -105,16 +106,11 @@ describe('SchemaResolver', () => {
       context('as an EAS', () => {
         let sender: Signer;
 
-        before(() => {
-          sender = accounts[0];
-        });
+        let attestation: AttestationStruct;
+        const value = 12345;
 
         beforeEach(async () => {
-          resolver = await Contracts.TestSchemaResolver.deploy(await sender.getAddress());
-        });
-
-        it('should revert when attempting to multi attest with more value than was actually sent', async () => {
-          const attestation = {
+          attestation = {
             uid: ZERO_BYTES32,
             schema: ZERO_BYTES32,
             refUID: ZERO_BYTES32,
@@ -126,8 +122,37 @@ describe('SchemaResolver', () => {
             attester: await sender.getAddress(),
             data: ZERO_BYTES
           };
-          const value = 12345;
+        });
 
+        before(() => {
+          sender = accounts[0];
+        });
+
+        beforeEach(async () => {
+          resolver = await Contracts.TestSchemaResolver.deploy(await sender.getAddress());
+        });
+
+        it('should revert when attempting to multi attest with invalid data lengths', async () => {
+          await expect(resolver.multiAttest([attestation], [value - 1, 1], { value })).to.be.revertedWithCustomError(
+            resolver,
+            'InvalidLength'
+          );
+          await expect(
+            resolver.multiAttest([attestation, attestation], [value], { value })
+          ).to.be.revertedWithCustomError(resolver, 'InvalidLength');
+        });
+
+        it('should revert when attempting to multi revert with invalid data lengths', async () => {
+          await expect(resolver.multiRevoke([attestation], [value - 1, 1], { value })).to.be.revertedWithCustomError(
+            resolver,
+            'InvalidLength'
+          );
+          await expect(
+            resolver.multiRevoke([attestation, attestation], [value], { value })
+          ).to.be.revertedWithCustomError(resolver, 'InvalidLength');
+        });
+
+        it('should revert when attempting to multi attest with more value than was actually sent', async () => {
           await expect(
             resolver.multiAttest([attestation, attestation], [value, value], { value })
           ).to.be.revertedWithCustomError(resolver, 'InsufficientValue');
@@ -137,20 +162,6 @@ describe('SchemaResolver', () => {
         });
 
         it('should revert when attempting to multi revoke with more value than was actually sent', async () => {
-          const attestation = {
-            uid: ZERO_BYTES32,
-            schema: ZERO_BYTES32,
-            refUID: ZERO_BYTES32,
-            time: await latest(),
-            expirationTime: 0,
-            revocationTime: 0,
-            revocable: true,
-            recipient: await recipient.getAddress(),
-            attester: await sender.getAddress(),
-            data: ZERO_BYTES
-          };
-          const value = 12345;
-
           await expect(
             resolver.multiRevoke([attestation, attestation], [value, value], { value })
           ).to.be.revertedWithCustomError(resolver, 'InsufficientValue');
