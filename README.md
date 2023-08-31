@@ -38,9 +38,11 @@ On-chain attestations will enable a powerful new range of web3 applications, inc
 
 Please note that you can also import and use the addresses directly in your code using the `@ethereum-attestation-service/eas-contracts/deployments` deployment artifacts corresponding to your desired network.
 
-### Ethereum
+### Mainnets
 
-#### v0.26
+#### Ethereum
+
+Version v0.26:
 
 * **EAS**:
   * Contract: [0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587](https://etherscan.io/address/0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587)
@@ -49,9 +51,9 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0xA7b39296258348C78294F95B872b282326A97BDF](https://etherscan.io/address/0xA7b39296258348C78294F95B872b282326A97BDF)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/mainnet/SchemaRegistry.json)
 
-### Arbitrum One
+#### Arbitrum One
 
-#### v0.26
+Version v0.26:
 
 * **EAS**:
   * Contract: [0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458](https://arbiscan.io/address/0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458)
@@ -60,20 +62,9 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0xA310da9c5B885E7fb3fbA9D66E9Ba6Df512b78eB](https://arbiscan.io/address/0xA310da9c5B885E7fb3fbA9D66E9Ba6Df512b78eB)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-one/SchemaRegistry.json)
 
-### Sepolia
+#### Optimism
 
-#### v0.26
-
-* **EAS**:
-  * Contract: [0xC2679fBD37d54388Ce493F1DB75320D236e1815e](https://sepolia.etherscan.io/address/0xC2679fBD37d54388Ce493F1DB75320D236e1815e)
-  * Deployment and ABI: [EAS.json](./deployments/sepolia/EAS.json)
-* **SchemaRegistry**:
-  * Contract: [0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0](https://sepolia.etherscan.io/address/0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
-
-### Optimism
-
-#### v1.0.1
+Version v1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000021)
@@ -82,9 +73,22 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
 
-### Optimism Goerli
+### Testnets
 
-#### v1.0.1
+#### Sepolia
+
+Version v0.26:
+
+* **EAS**:
+  * Contract: [0xC2679fBD37d54388Ce493F1DB75320D236e1815e](https://sepolia.etherscan.io/address/0xC2679fBD37d54388Ce493F1DB75320D236e1815e)
+  * Deployment and ABI: [EAS.json](./deployments/sepolia/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0](https://sepolia.etherscan.io/address/0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
+
+#### Optimism Goerli
+
+Version v1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000021)
@@ -93,9 +97,9 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0x4200000000000000000000000000000000000020](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism-goerli/SchemaRegistry.json)
 
-### Base Goerli
+#### Base Goerli
 
-#### v0.27
+Version v0.27:
 
 * **EAS**:
   * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https://goerli.basescan.org//address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
@@ -104,9 +108,9 @@ Please note that you can also import and use the addresses directly in your code
   * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https://goerli.basescan.org//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/base-goerli/SchemaRegistry.json)
 
-### Arbitrum Goerli
+#### Arbitrum Goerli
 
-#### v1.1.0
+Version v1.1.0:
 
 * **EAS**:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io//address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
