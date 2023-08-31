@@ -139,12 +139,12 @@ pnpm test
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2023-08-08)
+#### Latest Test Coverage Report (2023-08-31)
 
-* 100% Statements 290/290
-* 100% Branches 142/142
+* 100% Statements 313/313
+* 100% Branches 160/160
 * 100% Functions 105/105
-* 100% Lines 419/419
+* 100% Lines 450/450
 
 ```sh
 ----------------------------------|----------|----------|----------|----------|----------------|
