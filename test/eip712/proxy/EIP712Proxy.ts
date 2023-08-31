@@ -62,7 +62,7 @@ describe('EIP712Proxy', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('1.1.0');
+      expect(await proxy.version()).to.equal('1.2.0');
 
       expect(await proxy.getEAS()).to.equal(await eas.getAddress());
       expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
