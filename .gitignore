@@ -13,6 +13,7 @@ out
 deployments/mainnet/solcInputs/*
 deployments/arbitrum-one/solcInputs/*
 deployments/optimism/solcInputs/*
+deployments/linea/solcInputs/*
 deployments/sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
 deployments/base-goerli/solcInputs/*

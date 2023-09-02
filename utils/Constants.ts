@@ -4,6 +4,7 @@ export enum DeploymentNetwork {
   Mainnet = 'mainnet',
   ArbitrumOne = 'arbitrum-one',
   Optimism = 'optimism',
+  Linea = 'linea',
   Sepolia = 'sepolia',
   OptimismGoerli = 'optimism-goerli',
   BaseGoerli = 'base-goerli',
