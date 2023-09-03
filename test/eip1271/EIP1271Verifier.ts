@@ -304,23 +304,24 @@ describe('EIP1271Verifier', () => {
           [user] = accounts;
         });
 
-        it('should allow users to increase their nonces', async () => {
-          const nonce = await verifier.getNonce(await user.getAddress());
+        const expectNonceIncrease = async (newNonce: bigint) => {
+          const oldNonce = await verifier.getNonce(await user.getAddress());
+          const res = await verifier.connect(user).increaseNonce(newNonce);
 
-          const newNonce = nonce + 100n;
-          await verifier.connect(user).increaseNonce(newNonce);
+          await expect(res).to.emit(verifier, 'NonceIncreased').withArgs(oldNonce, newNonce);
+
           expect(await verifier.getNonce(await user.getAddress())).to.equal(newNonce);
+        };
 
-          const newNonce2 = newNonce + 1n;
-          await verifier.connect(user).increaseNonce(newNonce2);
-          expect(await verifier.getNonce(await user.getAddress())).to.equal(newNonce2);
+        it('should allow users to increase their nonces', async () => {
+          await expectNonceIncrease(100n);
+          await expectNonceIncrease(201n);
         });
 
         it('should revert when users attempt to decrease/keep their nonces', async () => {
           // Increase the current nonce such that it doesn't start at 0.
-          await verifier.connect(user).increaseNonce((await verifier.getNonce(await user.getAddress())) + 100n);
-
-          const nonce = await verifier.getNonce(await user.getAddress());
+          const nonce = 100n;
+          await verifier.connect(user).increaseNonce(nonce);
 
           await expect(verifier.connect(user).increaseNonce(nonce)).to.be.revertedWithCustomError(
             verifier,
