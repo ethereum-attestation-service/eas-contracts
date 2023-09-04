@@ -82,10 +82,15 @@ export type EIP712AttestationParams = EIP712Params & {
   revocable: boolean;
   refUID: string;
   data: Buffer;
+  value: bigint;
+  deadline: bigint;
 };
 
 export type EIP712RevocationParams = EIP712Params & {
+  schema: string;
   uid: string;
+  value: bigint;
+  deadline: bigint;
 };
 
 export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
