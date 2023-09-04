@@ -95,17 +95,12 @@ abstract contract EIP1271Verifier is EIP712 {
     /// @dev Verifies delegated attestation request.
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedAttestationRequest memory request) internal {
-        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
             revert DeadlineExpired();
         }
 
         AttestationRequestData memory data = request.data;
         Signature memory signature = request.signature;
-
-        uint256 nonce;
-        unchecked {
-            nonce = _nonces[request.attester]++;
-        }
 
         bytes32 hash = _hashTypedDataV4(
             keccak256(
@@ -118,7 +113,7 @@ abstract contract EIP1271Verifier is EIP712 {
                     data.refUID,
                     keccak256(data.data),
                     data.value,
-                    nonce,
+                    _nonces[request.attester]++,
                     request.deadline
                 )
             )
@@ -137,20 +132,24 @@ abstract contract EIP1271Verifier is EIP712 {
     /// @dev Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
-        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
             revert DeadlineExpired();
         }
 
         RevocationRequestData memory data = request.data;
         Signature memory signature = request.signature;
 
-        uint256 nonce;
-        unchecked {
-            nonce = _nonces[request.revoker]++;
-        }
-
         bytes32 hash = _hashTypedDataV4(
-            keccak256(abi.encode(REVOKE_TYPEHASH, request.schema, data.uid, data.value, nonce, request.deadline))
+            keccak256(
+                abi.encode(
+                    REVOKE_TYPEHASH,
+                    request.schema,
+                    data.uid,
+                    data.value,
+                    _nonces[request.revoker]++,
+                    request.deadline
+                )
+            )
         );
         if (
             !SignatureChecker.isValidSignatureNow(

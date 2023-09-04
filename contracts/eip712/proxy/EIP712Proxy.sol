@@ -364,7 +364,7 @@ contract EIP712Proxy is Semver, EIP712 {
     /// @dev Verifies delegated attestation request.
     /// @param request The arguments of the delegated attestation request.
     function _verifyAttest(DelegatedProxyAttestationRequest memory request) internal {
-        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
             revert DeadlineExpired();
         }
 
@@ -397,7 +397,7 @@ contract EIP712Proxy is Semver, EIP712 {
     /// @dev Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedProxyRevocationRequest memory request) internal {
-        if (request.deadline != NO_EXPIRATION_TIME && request.deadline <= _time()) {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
             revert DeadlineExpired();
         }
 
