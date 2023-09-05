@@ -59,11 +59,13 @@ export const DeployedContracts = {
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet;
 export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
 export const isOptimism = () => getNetworkName() === DeploymentNetwork.Optimism;
+export const isLinea = () => getNetworkName() === DeploymentNetwork.Linea;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.ArbitrumGoerli;
-export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli();
+export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
+export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli() || isLineaGoerli();
 export const isLive = () => isMainnet() || isTestnet();
 
 export const getDeploymentDir = () => {

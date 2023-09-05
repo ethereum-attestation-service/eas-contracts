@@ -20,6 +20,10 @@ const optimism = (address: string) => ({
   [DeploymentNetwork.Optimism]: address
 });
 
+const linea = (address: string) => ({
+  [DeploymentNetwork.Linea]: address
+});
+
 const sepolia = (address: string) => ({
   [DeploymentNetwork.Sepolia]: address
 });
@@ -36,14 +40,20 @@ const arbitrumGoerli = (address: string) => ({
   [DeploymentNetwork.ArbitrumGoerli]: address
 });
 
+const lineaGoerli = (address: string) => ({
+  [DeploymentNetwork.LineaGoerli]: address
+});
+
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
     ...arbitrumOne(deployer),
     ...optimism(deployer),
+    ...linea(deployer),
     ...sepolia(deployer),
     ...optimismGoerli(deployer),
     ...baseGoerli(deployer),
-    ...arbitrumGoerli(deployer)
+    ...arbitrumGoerli(deployer),
+    ...lineaGoerli(deployer)
   }
 };
