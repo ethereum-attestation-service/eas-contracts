@@ -73,17 +73,6 @@ Version v1.0.1:
   * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
 
-#### Linea
-
-Version v1.2.0:
-
-* **EAS**:
-  * Contract: [0x4200000000000000000000000000000000000021](https://lineascan.build//address/0x4200000000000000000000000000000000000021)
-  * Deployment and ABI: [EAS.json](./deployments/linea/EAS.json)
-* **SchemaRegistry**:
-  * Contract: [0x4200000000000000000000000000000000000020](https://lineascan.build//address/0x4200000000000000000000000000000000000020)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/linea/SchemaRegistry.json)
-
 ### Testnets
 
 #### Sepolia
@@ -113,10 +102,10 @@ Version v1.0.1:
 Version v0.27:
 
 * **EAS**:
-  * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https://goerli.basescan.org//address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
+  * Contract: [0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A](https://goerli.basescan.org/address/0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A)
   * Deployment and ABI: [EAS.json](./deployments/base-goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https://goerli.basescan.org//address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
+  * Contract: [0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E](https://goerli.basescan.org/address/0x720c2bA66D19A725143FBf5fDC5b4ADA2742682E)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/base-goerli/SchemaRegistry.json)
 
 #### Arbitrum Goerli
@@ -124,11 +113,22 @@ Version v0.27:
 Version v1.1.0:
 
 * **EAS**:
-  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io//address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
   * Deployment and ABI: [EAS.json](./deployments/arbitrum-goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https:/goerli.arbiscan.io//address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https:/goerli.arbiscan.io/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-goerli/SchemaRegistry.json)
+
+#### Linea Goerli
+
+Version v1.2.0:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://goerli.lineascan.build/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/linea-goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://goerli.lineascan.build/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
 
 ## Installation
 

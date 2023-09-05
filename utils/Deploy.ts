@@ -64,7 +64,8 @@ export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.OptimismGoerli;
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.ArbitrumGoerli;
-export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli();
+export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
+export const isTestnet = () => isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli() || isLineaGoerli();
 export const isLive = () => isMainnet() || isTestnet();
 
 export const getDeploymentDir = () => {

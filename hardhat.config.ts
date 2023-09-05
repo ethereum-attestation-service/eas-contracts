@@ -18,6 +18,7 @@ interface EnvOptions {
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL?: string;
+  ETHEREUM_LINEA_GOERLI_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
 }
@@ -31,6 +32,7 @@ const {
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL = '',
+  ETHEREUM_LINEA_GOERLI_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
@@ -112,7 +114,13 @@ const config: HardhatUserConfig = {
       url: ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL,
       saveDeployments: true,
       live: true
-    }
+    },
+    [DeploymentNetwork.LineaGoerli]: {
+      chainId: 59140,
+      url: ETHEREUM_LINEA_GOERLI_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
   },
 
   paths: {
