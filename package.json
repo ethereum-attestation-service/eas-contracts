@@ -52,7 +52,7 @@
     "verify:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli-optimism.etherscan.io",
     "verify:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.basescan.org",
     "verify:arbitrum-goerli": "HARDHAT_NETWORK=arbitrum-goerli hardhat etherscan-verify --license MIT",
-    "verify:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat etherscan-verify --license MIT --api-url https://api-testnet.lineascan.build",
+    "verify:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.lineascan.build",
     "lint": "pnpm lint:sol && pnpm lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",
     "lint:ts": "pnpm eslint components data deploy test utils",
