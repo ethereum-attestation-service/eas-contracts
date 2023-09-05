@@ -53,7 +53,7 @@ export const NamedAccounts = {
     ...sepolia(deployer),
     ...optimismGoerli(deployer),
     ...baseGoerli(deployer),
-    ...arbitrumGoerli(deployer)
+    ...arbitrumGoerli(deployer),
     ...lineaGoerli(deployer)
   }
 };
