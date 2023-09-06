@@ -73,6 +73,17 @@ Version v1.0.1:
   * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
 
+#### Linea
+
+Version v1.2.0:
+
+* **EAS**:
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Deployment and ABI: [EAS.json](./deployments/linea/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/linea/SchemaRegistry.json)
+
 ### Testnets
 
 #### Sepolia
