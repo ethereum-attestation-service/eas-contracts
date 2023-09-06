@@ -124,10 +124,10 @@ Version v1.1.0:
 Version v1.2.0:
 
 * **EAS**:
-  * Contract: [0x4200000000000000000000000000000000000021](https://goerli.lineascan.build/address/0x4200000000000000000000000000000000000021)
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://goerli.lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
   * Deployment and ABI: [EAS.json](./deployments/linea-goerli/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x4200000000000000000000000000000000000020](https://goerli.lineascan.build/address/0x4200000000000000000000000000000000000020)
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
 
 ## Installation
