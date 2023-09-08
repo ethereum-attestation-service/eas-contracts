@@ -20,6 +20,10 @@ const optimism = (address: string) => ({
   [DeploymentNetwork.Optimism]: address
 });
 
+const base = (address: string) => ({
+  [DeploymentNetwork.Base]: address
+});
+
 const linea = (address: string) => ({
   [DeploymentNetwork.Linea]: address
 });
@@ -49,6 +53,7 @@ export const NamedAccounts = {
     ...mainnet(deployer),
     ...arbitrumOne(deployer),
     ...optimism(deployer),
+    ...base(deployer),
     ...linea(deployer),
     ...sepolia(deployer),
     ...optimismGoerli(deployer),
