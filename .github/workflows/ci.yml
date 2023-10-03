@@ -20,18 +20,18 @@ jobs:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'pnpm'
-
       - name: Install PNPM
         uses: pnpm/action-setup@v2
         id: pnpm-install
         with:
           version: 8
           run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
