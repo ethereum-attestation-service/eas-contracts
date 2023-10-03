@@ -71,7 +71,7 @@
     "prepare:release": "pnpm prepare && pnpm export-types && pnpm lint && pnpm test"
   },
   "dependencies": {
-    "hardhat": "2.17.2"
+    "hardhat": "2.17.4"
   },
   "devDependencies": {
     "@ethersproject/hardware-wallets": "^5.7.0",
