@@ -3,6 +3,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { execute, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
 import Logger from '../../utils/Logger';
+import { getSchemaUID } from '../../utils/EAS';
 
 export const SCHEMAS = [
   { schema: 'bytes32 schemaId,string name', name: 'Name a Schema' },
@@ -124,14 +125,14 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
   const { deployer } = await getNamedAccounts();
 
   for (const { schema } of SCHEMAS) {
-    const res = await execute({
+    await execute({
       name: InstanceName.SchemaRegistry,
       methodName: 'register',
       args: [schema, ZERO_ADDRESS, true],
       from: deployer
     });
 
-    Logger.log(`Registered schema ${schema} with UID ${res.events?.find((e) => e.event === 'Registered').args.uid}`);
+    Logger.log(`Registered schema ${schema} with UID ${getSchemaUID(schema, ZERO_ADDRESS, true)}`);
   }
 
   return true;

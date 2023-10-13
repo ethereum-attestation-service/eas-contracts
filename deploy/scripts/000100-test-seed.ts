@@ -160,17 +160,6 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
       }
     },
     {
-      schema: 'uint256 postId,bool like',
-      generator: () => {
-        const params = {
-          postId: chance.natural(),
-          like: chance.bool()
-        };
-
-        return { data: AbiCoder.defaultAbiCoder().encode(['uint256', 'bool'], Object.values(params)), params };
-      }
-    },
-    {
       schema: 'bool hasPassedKYC',
       generator: () => {
         const params = {
