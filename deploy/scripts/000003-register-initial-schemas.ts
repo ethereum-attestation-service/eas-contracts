@@ -2,8 +2,8 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { ZERO_ADDRESS } from '../../utils/Constants';
 import { execute, InstanceName, setDeploymentMetadata } from '../../utils/Deploy';
-import Logger from '../../utils/Logger';
 import { getSchemaUID } from '../../utils/EAS';
+import Logger from '../../utils/Logger';
 
 export const SCHEMAS = [
   { schema: 'bytes32 schemaId,string name', name: 'Name a Schema' },
