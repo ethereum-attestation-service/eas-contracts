@@ -27,6 +27,7 @@
     "/deployments/optimism-goerli/**/*",
     "/deployments/base-goerli/**/*",
     "/deployments/arbitrum-goerli/**/*",
+    "/deployments/polygon-mumbai/**/*",
     "/deployments/linea-goerli/**/*"
   ],
   "scripts": {
@@ -45,6 +46,7 @@
     "deploy:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat deploy",
     "deploy:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat deploy",
     "deploy:arbitrum-goerli": "HARDHAT_NETWORK=arbitrum-goerli hardhat deploy",
+    "deploy:polygon-mumbai": "HARDHAT_NETWORK=polygon-mumbai hardhat deploy",
     "deploy:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat etherscan-verify --license MIT",
@@ -55,6 +57,7 @@
     "verify:optimism-goerli": "HARDHAT_NETWORK=optimism-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli-optimism.etherscan.io",
     "verify:base-goerli": "HARDHAT_NETWORK=base-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.basescan.org",
     "verify:arbitrum-goerli": "HARDHAT_NETWORK=arbitrum-goerli hardhat etherscan-verify --license MIT",
+    "verify:polygon-mumbai": "HARDHAT_NETWORK=polygon-mumbai hardhat etherscan-verify --license MIT --api-url https://api-mumbai.polygonscan.com/",
     "verify:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.lineascan.build",
     "lint": "pnpm lint:sol && pnpm lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",

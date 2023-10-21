@@ -19,6 +19,7 @@ interface EnvOptions {
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL?: string;
+  ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL?: string;
   ETHEREUM_LINEA_GOERLI_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
@@ -34,6 +35,7 @@ const {
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL = '',
+  ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL = '',
   ETHEREUM_LINEA_GOERLI_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
   PROFILE: isProfiling
@@ -120,6 +122,12 @@ const config: HardhatUserConfig = {
     [DeploymentNetwork.ArbitrumGoerli]: {
       chainId: 421613,
       url: ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+    [DeploymentNetwork.PolygonMumbai]: {
+      chainId: 80001,
+      url: ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },

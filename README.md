@@ -141,6 +141,17 @@ Version v1.1.0:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https:/goerli.arbiscan.io/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-goerli/SchemaRegistry.json)
 
+#### Polygon Mumbai
+
+Version v1.2.0:
+
+* **EAS**:
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://mumbai.polygonscan.com/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Deployment and ABI: [EAS.json](./deployments/polygon-mumbai/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://mumbai.polygonscan.com/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/polygon-mumbai/SchemaRegistry.json)
+
 #### Linea Goerli
 
 Version v1.2.0:

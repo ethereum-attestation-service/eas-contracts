@@ -10,6 +10,7 @@ export enum DeploymentNetwork {
   OptimismGoerli = 'optimism-goerli',
   BaseGoerli = 'base-goerli',
   ArbitrumGoerli = 'arbitrum-goerli',
+  PolygonMumbai = 'polygon-mumbai',
   LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat'
 }
