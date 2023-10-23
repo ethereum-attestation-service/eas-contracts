@@ -1096,14 +1096,14 @@ describe('EAS', () => {
           uids = [];
 
           for (let i = 0; i < 2; i++) {
-            const { uid: newUid } = await expectAttestation(
+            const { uid: newUID } = await expectAttestation(
               { eas, eip712Utils, eip712ProxyUtils },
               schemaId,
               { recipient: ZERO_ADDRESS, expirationTime, data: encodeBytes32String((i + 1).toString()) },
               { signatureType, from: sender }
             );
 
-            uids.push(newUid);
+            uids.push(newUID);
           }
         });
 
@@ -1282,7 +1282,7 @@ describe('EAS', () => {
             uids = [];
 
             for (let i = 0; i < 2; i++) {
-              const { uid: newUid } = await expectAttestation(
+              const { uid: newUID } = await expectAttestation(
                 { eas, eip712Utils, eip712ProxyUtils },
                 schemaId,
                 {
@@ -1294,7 +1294,7 @@ describe('EAS', () => {
                 { signatureType, from: sender }
               );
 
-              uids.push(newUid);
+              uids.push(newUID);
             }
           });
 
@@ -1340,7 +1340,7 @@ describe('EAS', () => {
             uids = [];
 
             for (let i = 0; i < 2; i++) {
-              const { uid: newUid } = await expectAttestation(
+              const { uid: newUID } = await expectAttestation(
                 { eas, eip712Utils, eip712ProxyUtils },
                 schema2Id,
                 {
@@ -1352,7 +1352,7 @@ describe('EAS', () => {
                 { signatureType, from: sender }
               );
 
-              uids.push(newUid);
+              uids.push(newUID);
             }
           });
 

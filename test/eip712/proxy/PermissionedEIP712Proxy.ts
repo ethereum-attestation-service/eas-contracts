@@ -144,14 +144,14 @@ describe('PermissionedEIP712Proxy', () => {
       uids = [];
 
       for (let i = 0; i < 2; i++) {
-        const { uid: newUid } = await expectAttestation(
+        const { uid: newUID } = await expectAttestation(
           { eas, eip712ProxyUtils },
           schemaId,
           { recipient: await recipient.getAddress(), expirationTime, data: encodeBytes32String((i + 1).toString()) },
           { signatureType: SignatureType.DelegatedProxy, from: owner }
         );
 
-        uids.push(newUid);
+        uids.push(newUID);
       }
     });
 

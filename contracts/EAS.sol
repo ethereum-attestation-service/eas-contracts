@@ -118,8 +118,8 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
         // all the returned UIDs into a single list.
         uint256 length = multiRequests.length;
-        bytes32[][] memory totalUids = new bytes32[][](length);
-        uint256 totalUidsCount = 0;
+        bytes32[][] memory totalUIDs = new bytes32[][](length);
+        uint256 totalUIDCount = 0;
 
         // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
@@ -156,14 +156,14 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             availableValue -= res.usedValue;
 
             // Collect UIDs (and merge them later).
-            totalUids[i] = res.uids;
+            totalUIDs[i] = res.uids;
             unchecked {
-                totalUidsCount += res.uids.length;
+                totalUIDCount += res.uids.length;
             }
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return _mergeUIDs(totalUids, totalUidsCount);
+        return _mergeUIDs(totalUIDs, totalUIDCount);
     }
 
     /// @inheritdoc IEAS
@@ -173,8 +173,8 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
         // all the returned UIDs into a single list.
         uint256 length = multiDelegatedRequests.length;
-        bytes32[][] memory totalUids = new bytes32[][](length);
-        uint256 totalUidsCount = 0;
+        bytes32[][] memory totalUIDs = new bytes32[][](length);
+        uint256 totalUIDCount = 0;
 
         // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
         // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
@@ -226,14 +226,14 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             availableValue -= res.usedValue;
 
             // Collect UIDs (and merge them later).
-            totalUids[i] = res.uids;
+            totalUIDs[i] = res.uids;
             unchecked {
-                totalUidsCount += res.uids.length;
+                totalUIDCount += res.uids.length;
             }
         }
 
         // Merge all the collected UIDs and return them as a flatten array.
-        return _mergeUIDs(totalUids, totalUidsCount);
+        return _mergeUIDs(totalUIDs, totalUIDCount);
     }
 
     /// @inheritdoc IEAS
@@ -754,18 +754,18 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @dev Merges lists of UIDs.
     /// @param uidLists The provided lists of UIDs.
-    /// @param uidsCount Total UIDs count.
+    /// @param uidCount Total UID count.
     /// @return A merged and flatten list of all the UIDs.
-    function _mergeUIDs(bytes32[][] memory uidLists, uint256 uidsCount) private pure returns (bytes32[] memory) {
-        bytes32[] memory uids = new bytes32[](uidsCount);
+    function _mergeUIDs(bytes32[][] memory uidLists, uint256 uidCount) private pure returns (bytes32[] memory) {
+        bytes32[] memory uids = new bytes32[](uidCount);
 
         uint256 currentIndex = 0;
         uint256 uidListLength = uidLists.length;
         for (uint256 i = 0; i < uidListLength; i = uncheckedInc(i)) {
-            bytes32[] memory currentUids = uidLists[i];
-            uint256 currentUidsLength = currentUids.length;
-            for (uint256 j = 0; j < currentUidsLength; j = uncheckedInc(j)) {
-                uids[currentIndex] = currentUids[j];
+            bytes32[] memory currentUIDs = uidLists[i];
+            uint256 currentUIDsLength = currentUIDs.length;
+            for (uint256 j = 0; j < currentUIDsLength; j = uncheckedInc(j)) {
+                uids[currentIndex] = currentUIDs[j];
 
                 unchecked {
                     ++currentIndex;

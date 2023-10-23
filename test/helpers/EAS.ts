@@ -125,10 +125,10 @@ export const expectAttestation = async (
         { value: msgValue }
       ] as const;
 
-      const returnedUid = await eas.connect(txSender).attest.staticCall(...args);
+      const returnedUID = await eas.connect(txSender).attest.staticCall(...args);
       res = await eas.connect(txSender).attest(...args);
       uid = await getUIDFromAttestTx(res);
-      expect(uid).to.equal(returnedUid);
+      expect(uid).to.equal(returnedUID);
 
       break;
     }
@@ -170,11 +170,11 @@ export const expectAttestation = async (
         }
       ] as const;
 
-      const returnedUid = await eas.connect(txSender).attestByDelegation.staticCall(...args);
+      const returnedUID = await eas.connect(txSender).attestByDelegation.staticCall(...args);
       res = await eas.connect(txSender).attestByDelegation(...args);
 
       uid = await getUIDFromAttestTx(res);
-      expect(uid).to.equal(returnedUid);
+      expect(uid).to.equal(returnedUID);
 
       break;
     }
@@ -216,11 +216,11 @@ export const expectAttestation = async (
         }
       ] as const;
 
-      const returnedUid = await eip712ProxyUtils.proxy.connect(txSender).attestByDelegation.staticCall(...args);
+      const returnedUID = await eip712ProxyUtils.proxy.connect(txSender).attestByDelegation.staticCall(...args);
       res = await eip712ProxyUtils.proxy.connect(txSender).attestByDelegation(...args);
 
       uid = await getUIDFromDelegatedProxyAttestTx(res);
-      expect(uid).to.equal(returnedUid);
+      expect(uid).to.equal(returnedUID);
 
       expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(await txSender.getAddress());
 
@@ -430,11 +430,11 @@ export const expectMultiAttestations = async (
         }
       ] as const;
 
-      const returnedUids = await eas.connect(txSender).multiAttest.staticCall(...args);
+      const returnedUIDs = await eas.connect(txSender).multiAttest.staticCall(...args);
       res = await eas.connect(txSender).multiAttest(...args);
 
       uids = await getUIDsFromMultiAttestTx(res);
-      expect(uids).to.deep.equal(returnedUids);
+      expect(uids).to.deep.equal(returnedUIDs);
 
       break;
     }
@@ -484,11 +484,11 @@ export const expectMultiAttestations = async (
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
 
-      const returnedUids = await eas.connect(txSender).multiAttestByDelegation.staticCall(...args);
+      const returnedUIDs = await eas.connect(txSender).multiAttestByDelegation.staticCall(...args);
       res = await eas.connect(txSender).multiAttestByDelegation(...args);
 
       uids = await getUIDsFromMultiAttestTx(res);
-      expect(uids).to.deep.equal(returnedUids);
+      expect(uids).to.deep.equal(returnedUIDs);
 
       break;
     }
@@ -534,11 +534,11 @@ export const expectMultiAttestations = async (
 
       const args = [multiDelegatedAttestationRequests, { value: msgValue }] as const;
 
-      const returnedUids = await eip712ProxyUtils.proxy.connect(txSender).multiAttestByDelegation.staticCall(...args);
+      const returnedUIDs = await eip712ProxyUtils.proxy.connect(txSender).multiAttestByDelegation.staticCall(...args);
       res = await eip712ProxyUtils.proxy.connect(txSender).multiAttestByDelegation(...args);
 
       uids = await getUIDFromMultiDelegatedProxyAttestTx(res);
-      expect(uids).to.deep.equal(returnedUids);
+      expect(uids).to.deep.equal(returnedUIDs);
 
       for (const uid of uids) {
         expect(await eip712ProxyUtils.proxy.getAttester(uid)).to.equal(await txSender.getAddress());
