@@ -45,6 +45,11 @@ contract EASIndexer is Semver {
         _eas = eas;
     }
 
+    /// @notice Returns the EAS.
+    function getEAS() external view returns (IEAS) {
+        return _eas;
+    }
+
     function indexAttestation(bytes32 attestationUID) external {
         _indexAttestation(attestationUID);
     }
