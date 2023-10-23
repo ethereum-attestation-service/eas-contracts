@@ -64,6 +64,7 @@ export const NamedAccounts = {
     ...baseGoerli(deployer),
     ...arbitrumGoerli(deployer),
     ...polygonMumbai(deployer),
-    ...lineaGoerli(deployer)
+    ...lineaGoerli(deployer),
+    [DeploymentNetwork.Hardhat]: 0
   }
 };
