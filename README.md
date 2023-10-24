@@ -183,12 +183,12 @@ pnpm test
 
 ### Test Coverage
 
-#### Latest Test Coverage Report (2023-08-31)
+#### Latest Test Coverage Report (2023-10-24)
 
-* 100% Statements 313/313
-* 100% Branches 160/160
-* 100% Functions 105/105
-* 100% Lines 450/450
+* 100% Statements 349/349
+* 100% Branches 172/172
+* 100% Functions 120/120
+* 100% Lines 491/491
 
 ```sh
 ----------------------------------|----------|----------|----------|----------|----------------|
@@ -199,6 +199,7 @@ File                              |  % Stmts | % Branch |  % Funcs |  % Lines |U
   EAS.sol                         |      100 |      100 |      100 |      100 |                |
   IEAS.sol                        |      100 |      100 |      100 |      100 |                |
   ISchemaRegistry.sol             |      100 |      100 |      100 |      100 |                |
+  Indexer.sol                     |      100 |      100 |      100 |      100 |                |
   SchemaRegistry.sol              |      100 |      100 |      100 |      100 |                |
   Semver.sol                      |      100 |      100 |      100 |      100 |                |
  contracts/eip1271/               |      100 |      100 |      100 |      100 |                |
