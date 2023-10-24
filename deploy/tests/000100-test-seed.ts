@@ -13,7 +13,7 @@ describeDeployment(__filename, () => {
     eas = await DeployedContracts.EAS.deployed();
   });
 
-  it.only('should generate test attestations', async () => {
+  it('should generate test attestations', async () => {
     const testAttestations: Record<string, TestAttestationGroup> = JSON.parse(
       fs.readFileSync(TEST_ATTESTATIONS_OUTPUT_PATH, 'utf-8')
     );
