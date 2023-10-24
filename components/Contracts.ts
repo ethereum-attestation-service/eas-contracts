@@ -6,6 +6,7 @@ import {
   AttesterResolver__factory,
   DataResolver__factory,
   EAS__factory,
+  EASIndexer__factory,
   ExpirationTimeResolver__factory,
   PayingResolver__factory,
   PermissionedEIP712Proxy__factory,
@@ -34,7 +35,6 @@ type Contract<F extends ContractFactory> = AsyncReturnType<F['deploy']>;
 
 export interface ContractBuilder<F extends ContractFactory> {
   metadata: {
-    contractName: string;
     abi: ABI;
     bytecode: string;
   };
@@ -49,13 +49,11 @@ export type FactoryConstructor<F extends ContractFactory> = {
 };
 
 export const deployOrAttach = <F extends ContractFactory>(
-  contractName: string,
   FactoryConstructor: FactoryConstructor<F>,
   initialSigner?: Signer
 ): ContractBuilder<F> => {
   return {
     metadata: {
-      contractName,
       abi: FactoryConstructor.abi as ABI,
       bytecode: FactoryConstructor.bytecode
     },
@@ -84,24 +82,25 @@ export const attachOnly = <F extends ContractFactory>(
 const getContracts = (signer?: Signer) => ({
   connect: (signer: Signer) => getContracts(signer),
 
-  AttestationResolver: deployOrAttach('AttestationResolver', AttestationResolver__factory, signer),
-  AttesterResolver: deployOrAttach('AttesterResolver', AttesterResolver__factory, signer),
-  DataResolver: deployOrAttach('DataResolver', DataResolver__factory, signer),
-  EAS: deployOrAttach('EAS', EAS__factory, signer),
-  ExpirationTimeResolver: deployOrAttach('ExpirationTimeResolver', ExpirationTimeResolver__factory, signer),
-  PayingResolver: deployOrAttach('PayingResolver', PayingResolver__factory, signer),
-  PermissionedEIP712Proxy: deployOrAttach('PermissionedEIP712Proxy', PermissionedEIP712Proxy__factory, signer),
-  RecipientResolver: deployOrAttach('RecipientResolver', RecipientResolver__factory, signer),
-  RevocationResolver: deployOrAttach('RevocationResolver', RevocationResolver__factory, signer),
-  SchemaRegistry: deployOrAttach('SchemaRegistry', SchemaRegistry__factory, signer),
-  TestEAS: deployOrAttach('TestEAS', TestEAS__factory, signer),
-  TestEIP712Proxy: deployOrAttach('TestEIP712Proxy', TestEIP712Proxy__factory, signer),
-  TestEIP1271Signer: deployOrAttach('TestEIP1271Signer', TestEIP1271Signer__factory, signer),
-  TestEIP1271Verifier: deployOrAttach('TestEIP1271Verifier', TestEIP1271Verifier__factory, signer),
-  TestERC20Token: deployOrAttach('TestERC20Token', TestERC20Token__factory, signer),
-  TestSchemaResolver: deployOrAttach('TestSchemaResolver', TestSchemaResolver__factory, signer),
-  TokenResolver: deployOrAttach('TokenResolver', TokenResolver__factory, signer),
-  ValueResolver: deployOrAttach('ValueResolver', ValueResolver__factory, signer)
+  AttestationResolver: deployOrAttach(AttestationResolver__factory, signer),
+  AttesterResolver: deployOrAttach(AttesterResolver__factory, signer),
+  DataResolver: deployOrAttach(DataResolver__factory, signer),
+  EAS: deployOrAttach(EAS__factory, signer),
+  EASIndexer: deployOrAttach(EASIndexer__factory, signer),
+  ExpirationTimeResolver: deployOrAttach(ExpirationTimeResolver__factory, signer),
+  PayingResolver: deployOrAttach(PayingResolver__factory, signer),
+  PermissionedEIP712Proxy: deployOrAttach(PermissionedEIP712Proxy__factory, signer),
+  RecipientResolver: deployOrAttach(RecipientResolver__factory, signer),
+  RevocationResolver: deployOrAttach(RevocationResolver__factory, signer),
+  SchemaRegistry: deployOrAttach(SchemaRegistry__factory, signer),
+  TestEAS: deployOrAttach(TestEAS__factory, signer),
+  TestEIP712Proxy: deployOrAttach(TestEIP712Proxy__factory, signer),
+  TestEIP1271Signer: deployOrAttach(TestEIP1271Signer__factory, signer),
+  TestEIP1271Verifier: deployOrAttach(TestEIP1271Verifier__factory, signer),
+  TestERC20Token: deployOrAttach(TestERC20Token__factory, signer),
+  TestSchemaResolver: deployOrAttach(TestSchemaResolver__factory, signer),
+  TokenResolver: deployOrAttach(TokenResolver__factory, signer),
+  ValueResolver: deployOrAttach(ValueResolver__factory, signer)
 });
 /* eslint-enable camelcase */
 
