@@ -69,6 +69,7 @@ export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoe
 export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.ArbitrumGoerli;
 export const isPolygonMumbai = () => getNetworkName() === DeploymentNetwork.PolygonMumbai;
 export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
+export const isHardhat = () => getNetworkName() === DeploymentNetwork.Hardhat;
 export const isTestnet = () =>
   isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli() || isPolygonMumbai() || isLineaGoerli();
 export const isLive = () => isMainnet() || isTestnet();

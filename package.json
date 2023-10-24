@@ -37,7 +37,7 @@
     "test": "hardhat test",
     "test:coverage": "hardhat coverage",
     "test:profile": "PROFILE=1 pnpm test",
-    "test:deploy": "HARDHAT_NETWORK=hardhat pnpm mocha --require hardhat/register --extension ts --recursive --exit --timeout 600000 --bail --no-exit 'deploy/tests/**/*.ts'",
+    "test:deploy": "find ./deployments/hardhat -type f -not -name '.chainId' -exec rm -f {} + && HARDHAT_NETWORK=hardhat pnpm mocha --require hardhat/register --extension ts --recursive --exit --timeout 600000 --bail --no-exit 'deploy/tests/**/*.ts'",
     "deploy:prepare": "rm -rf ./node_modules && rm pnpm.lock && pnpm && pnpm recompile",
     "deploy:mainnet": "HARDHAT_NETWORK=mainnet hardhat deploy",
     "deploy:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat deploy",

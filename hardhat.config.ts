@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
         accountsBalance: '10000000000000000000000000000000000000000000000'
       },
       allowUnlimitedContractSize: true,
-      saveDeployments: false,
+      saveDeployments: true,
       live: false
     },
     [DeploymentNetwork.Mainnet]: {

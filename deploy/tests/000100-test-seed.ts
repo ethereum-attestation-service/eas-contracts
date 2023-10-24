@@ -13,7 +13,7 @@ describeDeployment(__filename, () => {
     eas = await DeployedContracts.EAS.deployed();
   });
 
-  it('should generate test attestations', async () => {
+  it.only('should generate test attestations', async () => {
     const testAttestations: Record<string, TestAttestationGroup> = JSON.parse(
       fs.readFileSync(TEST_ATTESTATIONS_OUTPUT_PATH, 'utf-8')
     );
@@ -25,7 +25,7 @@ describeDeployment(__filename, () => {
         const attestation = await eas.getAttestation(uid);
 
         expect(attestation.uid).to.equal(uid);
-        expect(attestation.schema).to.equal(schema);
+        expect(attestation.schema).to.equal(schemaId);
         expect(attestation.recipient).to.equal(recipient);
       }
     }

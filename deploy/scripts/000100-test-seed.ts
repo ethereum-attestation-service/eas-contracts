@@ -5,7 +5,14 @@ import { AbiCoder, encodeBytes32String, keccak256, toUtf8Bytes, TransactionRecei
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../../utils/Constants';
-import { execute, getDeploymentDir, InstanceName, isTestnet, setDeploymentMetadata } from '../../utils/Deploy';
+import {
+  execute,
+  getDeploymentDir,
+  InstanceName,
+  isHardhat,
+  isTestnet,
+  setDeploymentMetadata
+} from '../../utils/Deploy';
 import { getSchemaUID, getUIDsFromAttestReceipt } from '../../utils/EAS';
 import Logger from '../../utils/Logger';
 
@@ -444,6 +451,6 @@ const func: DeployFunction = async ({ getNamedAccounts }: HardhatRuntimeEnvironm
 };
 
 // Run this deployment script only during test or deployments on testnet
-func.skip = async () => !isTestnet(); // eslint-disable-line require-await
+func.skip = async () => !isTestnet() && !isHardhat(); // eslint-disable-line require-await
 
 export default setDeploymentMetadata(__filename, func);
