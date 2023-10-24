@@ -207,7 +207,7 @@ describe('Indexer', () => {
           infos[uid] = info;
         }
 
-        const res = uids.length == 1 ? await indexer.indexAttestation(uids[0]) : await indexer.indexAttestations(uids);
+        const res = uids.length === 1 ? await indexer.indexAttestation(uids[0]) : await indexer.indexAttestations(uids);
 
         for (const uid of uids) {
           const info = infos[uid];
@@ -285,7 +285,7 @@ describe('Indexer', () => {
         }
       };
 
-      const expectIndexedAttestation = async (uid: string) => expectIndexedAttestations([uid]);
+      const expectIndexedAttestation = (uid: string) => expectIndexedAttestations([uid]);
 
       it('should index an attestation', async () => {
         for (const uid of uids) {
