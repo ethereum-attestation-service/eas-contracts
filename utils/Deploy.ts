@@ -6,7 +6,7 @@ import path from 'path';
 import { BaseContract, Interface, Signer } from 'ethers';
 import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
 import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
-import { EAS, EASIndexer, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
+import { EAS, EIP712Proxy, Indexer, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 
@@ -34,7 +34,7 @@ export enum NewInstanceName {
   EAS = 'EAS',
   SchemaRegistry = 'SchemaRegistry',
   EIP712Proxy = 'EIP712Proxy',
-  EASIndexer = 'EASIndexer'
+  Indexer = 'Indexer'
 }
 
 export const InstanceName = {
@@ -51,7 +51,7 @@ const DeployedNewContracts = {
   EAS: deployed<EAS>(InstanceName.EAS),
   SchemaRegistry: deployed<SchemaRegistry>(InstanceName.SchemaRegistry),
   EIP712Proxy: deployed<EIP712Proxy>(InstanceName.EIP712Proxy),
-  EASIndexer: deployed<EASIndexer>(InstanceName.EASIndexer)
+  Indexer: deployed<Indexer>(InstanceName.Indexer)
 };
 
 export const DeployedContracts = {

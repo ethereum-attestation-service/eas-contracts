@@ -6,9 +6,9 @@ import { IEAS, AttestationRequest, AttestationRequestData, Attestation } from ".
 import { EMPTY_UID, uncheckedInc } from "./Common.sol";
 import { Semver } from "./Semver.sol";
 
-/// @title EASIndexer
+/// @title Indexer
 /// @notice Indexing Service for the Ethereum Attestation Service
-contract EASIndexer is Semver {
+contract Indexer is Semver {
     error InvalidEAS();
     error InvalidAttestation();
     error AlreadyIndexed();
@@ -16,7 +16,7 @@ contract EASIndexer is Semver {
 
     /// @notice Emitted when an attestation has been indexed.
     /// @param uid The UID the attestation.
-    event AttestationIndexed(bytes32 indexed uid);
+    event Indexed(bytes32 indexed uid);
 
     /// A mapping between an account and its received attestations.
     mapping(address account => mapping(bytes32 => bytes32[] uids) receivedAttestations) private _receivedAttestations;
@@ -37,7 +37,7 @@ contract EASIndexer is Semver {
     // The address of the global EAS contract.
     IEAS private immutable _eas;
 
-    /// @dev Creates a new EASIndexer instance.
+    /// @dev Creates a new Indexer instance.
     /// @param eas The address of the global EAS contract.
     constructor(IEAS eas) Semver(1, 2, 0) {
         if (address(eas) == address(0)) {
@@ -129,17 +129,17 @@ contract EASIndexer is Semver {
 
     /// @notice Returns the UIDs of attestations to a specific schema which were attested by a specific attester to a
     ///     specific recipient.
-    /// @param recipient The recipient of the attestation.
-    /// @param attester The attester of the attestation.
     /// @param schema The UID of the schema.
+    /// @param attester The attester of the attestation.
+    /// @param recipient The recipient of the attestation.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     /// @return An array of attestation UIDs.
     function getSchemaAttesterRecipientAttestationUIDs(
+        bytes32 schema,
         address attester,
         address recipient,
-        bytes32 schema,
         uint256 start,
         uint256 length,
         bool reverseOrder
@@ -150,9 +150,9 @@ contract EASIndexer is Semver {
 
     /// @notice Returns the total number of UIDs of attestations to a specific schema which were attested by a specific
     ///     attester to a specific recipient.
-    /// @param recipient The recipient of the attestation.
-    /// @param attester The attester of the attestation.
     /// @param schema The UID of the schema.
+    /// @param attester The attester of the attestation.
+    /// @param recipient The recipient of the attestation.
     /// @return An array of attestation UIDs.
     function getSchemaAttesterRecipientAttestationUIDCount(
         bytes32 schema,
@@ -211,7 +211,7 @@ contract EASIndexer is Semver {
         _sentAttestations[attester][schema].push(attestationUID);
         _schemaAttesterRecipientAttestations[schema][attester][recipient].push(attestationUID);
 
-        emit AttestationIndexed({ uid: uid });
+        emit Indexed({ uid: uid });
     }
 
     /// @dev Returns a slice in an array of attestation UIDs.

@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { EAS, EASIndexer } from '../../components/Contracts';
+import { EAS, Indexer } from '../../components/Contracts';
 import { describeDeployment } from '../../test/helpers/Deploy';
 import { DeployedContracts } from '../../utils/Deploy';
 
 describeDeployment(__filename, () => {
   let eas: EAS;
-  let indexer: EASIndexer;
+  let indexer: Indexer;
 
   beforeEach(async () => {
     eas = await DeployedContracts.EAS.deployed();
-    indexer = await DeployedContracts.EASIndexer.deployed();
+    indexer = await DeployedContracts.Indexer.deployed();
   });
 
   it('should deploy the indexer', async () => {
