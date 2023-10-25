@@ -25,7 +25,7 @@ describeDeployment(__filename, () => {
         const attestation = await eas.getAttestation(uid);
 
         expect(attestation.uid).to.equal(uid);
-        expect(attestation.schema).to.equal(schema);
+        expect(attestation.schema).to.equal(schemaId);
         expect(attestation.recipient).to.equal(recipient);
       }
     }

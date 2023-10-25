@@ -6,7 +6,7 @@ import path from 'path';
 import { BaseContract, Interface, Signer } from 'ethers';
 import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
 import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
-import { EAS, EIP712Proxy, SchemaRegistry } from '../components/Contracts';
+import { EAS, EIP712Proxy, Indexer, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
 
@@ -33,7 +33,8 @@ const maxPriorityFee = MAX_PRIORITY_FEE ? BigInt(MAX_PRIORITY_FEE) : undefined;
 export enum NewInstanceName {
   EAS = 'EAS',
   SchemaRegistry = 'SchemaRegistry',
-  EIP712Proxy = 'EIP712Proxy'
+  EIP712Proxy = 'EIP712Proxy',
+  Indexer = 'Indexer'
 }
 
 export const InstanceName = {
@@ -49,7 +50,8 @@ const deployed = <F extends BaseContract>(name: InstanceName) => ({
 const DeployedNewContracts = {
   EAS: deployed<EAS>(InstanceName.EAS),
   SchemaRegistry: deployed<SchemaRegistry>(InstanceName.SchemaRegistry),
-  EIP712Proxy: deployed<EIP712Proxy>(InstanceName.EIP712Proxy)
+  EIP712Proxy: deployed<EIP712Proxy>(InstanceName.EIP712Proxy),
+  Indexer: deployed<Indexer>(InstanceName.Indexer)
 };
 
 export const DeployedContracts = {
@@ -67,6 +69,7 @@ export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoe
 export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.ArbitrumGoerli;
 export const isPolygonMumbai = () => getNetworkName() === DeploymentNetwork.PolygonMumbai;
 export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
+export const isHardhat = () => getNetworkName() === DeploymentNetwork.Hardhat;
 export const isTestnet = () =>
   isSepolia() || isOptimismGoerli() || isBaseGoerli() || isArbitrumGoerli() || isPolygonMumbai() || isLineaGoerli();
 export const isLive = () => isMainnet() || isTestnet();

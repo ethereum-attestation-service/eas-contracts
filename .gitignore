@@ -22,6 +22,7 @@ deployments/arbitrum-goerli/solcInputs/*
 deployments/polygon-mumbai/solcInputs/*
 deployments/linea-goerli/solcInputs/*
 deployments/hardhat/*
+!deployments/hardhat/.chainId
 
 .coverage_artifacts
 .coverage_contracts
