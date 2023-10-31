@@ -11,7 +11,6 @@ import { Semver } from "./Semver.sol";
 contract Indexer is Semver {
     error InvalidEAS();
     error InvalidAttestation();
-    error AlreadyIndexed();
     error InvalidOffset();
 
     /// @notice Emitted when an attestation has been indexed.
@@ -187,9 +186,9 @@ contract Indexer is Semver {
     /// @dev Indexes an existing attestation.
     /// @param attestationUID The UID of the attestation to index.
     function _indexAttestation(bytes32 attestationUID) private {
-        // Check if attestation is already indexed.
+        // Skip already indexed attestations.
         if (_indexedAttestations[attestationUID]) {
-            revert AlreadyIndexed();
+            return;
         }
 
         // Check if the attestation exists.

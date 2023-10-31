@@ -309,16 +309,21 @@ describe('Indexer', () => {
         );
       });
 
-      it('should revert when attempting to index the same attestation twice', async () => {
+      it('should handle gracefully an attempt to index the same attestation twice', async () => {
         for (const uid of uids) {
           await expectIndexedAttestation(uid);
-          await expect(indexer.indexAttestation(uid)).to.be.revertedWithCustomError(indexer, 'AlreadyIndexed');
+
+          const res = await indexer.indexAttestation(uid);
+          expect(res).not.to.emit(indexer, 'Indexed');
         }
       });
 
-      it('should revert when attempting to index same attestations twice', async () => {
-        await expectIndexedAttestations(uids);
-        await expect(indexer.indexAttestations(uids)).to.be.revertedWithCustomError(indexer, 'AlreadyIndexed');
+      it('should handle gracefully an attempt to index same attestations twice', async () => {
+        const indexedUids = uids.slice(2);
+        await expectIndexedAttestations(indexedUids);
+
+        const res = await indexer.indexAttestations(uids);
+        expect(res).not.to.emit(indexer, 'Indexed');
       });
 
       it('should revert when providing invalid pagination indexes', async () => {
