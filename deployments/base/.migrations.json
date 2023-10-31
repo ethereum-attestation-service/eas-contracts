@@ -2,5 +2,7 @@
   "000001-registry": 1682454805,
   "000002-eas": 1682454812,
   "000003-register-initial-schemas": 1694192651,
-  "000004-name-initial-schemas": 1694192936
+  "000004-name-initial-schemas": 1694192936,
+  "000005-eip712-proxy": 1698793201,
+  "000006-indexer": 1698793220
 }
