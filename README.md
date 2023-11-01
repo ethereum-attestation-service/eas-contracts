@@ -148,6 +148,15 @@ Version 1.0.1:
   * Contract: [0x4200000000000000000000000000000000000020](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism-goerli/SchemaRegistry.json)
 
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0x88D1bd62AC014424b987CE5ABf311BD7749e426B](https://goerli-optimism.etherscan.io/address/0x88D1bd62AC014424b987CE5ABf311BD7749e426B)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/optimism-goerli/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0xa42428D1bf904d762adD02b27ADac26d53643782](https://goerli-optimism.etherscan.io/address/0xa42428D1bf904d762adD02b27ADac26d53643782)
+  * Deployment and ABI: [Indexer.json](./deployments/optimism-goerli/Indexer.json)
+
 #### Base Goerli
 
 Version 1.0.1:

@@ -3,179 +3,162 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  EventFragment,
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../common";
 
 export type AttestationRequestDataStruct = {
-  recipient: PromiseOrValue<string>;
-  expirationTime: PromiseOrValue<BigNumberish>;
-  revocable: PromiseOrValue<boolean>;
-  refUID: PromiseOrValue<BytesLike>;
-  data: PromiseOrValue<BytesLike>;
-  value: PromiseOrValue<BigNumberish>;
+  recipient: AddressLike;
+  expirationTime: BigNumberish;
+  revocable: boolean;
+  refUID: BytesLike;
+  data: BytesLike;
+  value: BigNumberish;
 };
 
 export type AttestationRequestDataStructOutput = [
-  string,
-  BigNumber,
-  boolean,
-  string,
-  string,
-  BigNumber
+  recipient: string,
+  expirationTime: bigint,
+  revocable: boolean,
+  refUID: string,
+  data: string,
+  value: bigint
 ] & {
   recipient: string;
-  expirationTime: BigNumber;
+  expirationTime: bigint;
   revocable: boolean;
   refUID: string;
   data: string;
-  value: BigNumber;
+  value: bigint;
 };
 
-export type EIP712SignatureStruct = {
-  v: PromiseOrValue<BigNumberish>;
-  r: PromiseOrValue<BytesLike>;
-  s: PromiseOrValue<BytesLike>;
-};
+export type SignatureStruct = { v: BigNumberish; r: BytesLike; s: BytesLike };
 
-export type EIP712SignatureStructOutput = [number, string, string] & {
-  v: number;
+export type SignatureStructOutput = [v: bigint, r: string, s: string] & {
+  v: bigint;
   r: string;
   s: string;
 };
 
 export type DelegatedProxyAttestationRequestStruct = {
-  schema: PromiseOrValue<BytesLike>;
+  schema: BytesLike;
   data: AttestationRequestDataStruct;
-  signature: EIP712SignatureStruct;
-  attester: PromiseOrValue<string>;
-  deadline: PromiseOrValue<BigNumberish>;
+  signature: SignatureStruct;
+  attester: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type DelegatedProxyAttestationRequestStructOutput = [
-  string,
-  AttestationRequestDataStructOutput,
-  EIP712SignatureStructOutput,
-  string,
-  BigNumber
+  schema: string,
+  data: AttestationRequestDataStructOutput,
+  signature: SignatureStructOutput,
+  attester: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: AttestationRequestDataStructOutput;
-  signature: EIP712SignatureStructOutput;
+  signature: SignatureStructOutput;
   attester: string;
-  deadline: BigNumber;
+  deadline: bigint;
 };
 
 export type MultiDelegatedProxyAttestationRequestStruct = {
-  schema: PromiseOrValue<BytesLike>;
+  schema: BytesLike;
   data: AttestationRequestDataStruct[];
-  signatures: EIP712SignatureStruct[];
-  attester: PromiseOrValue<string>;
-  deadline: PromiseOrValue<BigNumberish>;
+  signatures: SignatureStruct[];
+  attester: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type MultiDelegatedProxyAttestationRequestStructOutput = [
-  string,
-  AttestationRequestDataStructOutput[],
-  EIP712SignatureStructOutput[],
-  string,
-  BigNumber
+  schema: string,
+  data: AttestationRequestDataStructOutput[],
+  signatures: SignatureStructOutput[],
+  attester: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: AttestationRequestDataStructOutput[];
-  signatures: EIP712SignatureStructOutput[];
+  signatures: SignatureStructOutput[];
   attester: string;
-  deadline: BigNumber;
+  deadline: bigint;
 };
 
 export type RevocationRequestDataStruct = {
-  uid: PromiseOrValue<BytesLike>;
-  value: PromiseOrValue<BigNumberish>;
+  uid: BytesLike;
+  value: BigNumberish;
 };
 
-export type RevocationRequestDataStructOutput = [string, BigNumber] & {
+export type RevocationRequestDataStructOutput = [uid: string, value: bigint] & {
   uid: string;
-  value: BigNumber;
+  value: bigint;
 };
 
 export type MultiDelegatedProxyRevocationRequestStruct = {
-  schema: PromiseOrValue<BytesLike>;
+  schema: BytesLike;
   data: RevocationRequestDataStruct[];
-  signatures: EIP712SignatureStruct[];
-  revoker: PromiseOrValue<string>;
-  deadline: PromiseOrValue<BigNumberish>;
+  signatures: SignatureStruct[];
+  revoker: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type MultiDelegatedProxyRevocationRequestStructOutput = [
-  string,
-  RevocationRequestDataStructOutput[],
-  EIP712SignatureStructOutput[],
-  string,
-  BigNumber
+  schema: string,
+  data: RevocationRequestDataStructOutput[],
+  signatures: SignatureStructOutput[],
+  revoker: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: RevocationRequestDataStructOutput[];
-  signatures: EIP712SignatureStructOutput[];
+  signatures: SignatureStructOutput[];
   revoker: string;
-  deadline: BigNumber;
+  deadline: bigint;
 };
 
 export type DelegatedProxyRevocationRequestStruct = {
-  schema: PromiseOrValue<BytesLike>;
+  schema: BytesLike;
   data: RevocationRequestDataStruct;
-  signature: EIP712SignatureStruct;
-  revoker: PromiseOrValue<string>;
-  deadline: PromiseOrValue<BigNumberish>;
+  signature: SignatureStruct;
+  revoker: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type DelegatedProxyRevocationRequestStructOutput = [
-  string,
-  RevocationRequestDataStructOutput,
-  EIP712SignatureStructOutput,
-  string,
-  BigNumber
+  schema: string,
+  data: RevocationRequestDataStructOutput,
+  signature: SignatureStructOutput,
+  revoker: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: RevocationRequestDataStructOutput;
-  signature: EIP712SignatureStructOutput;
+  signature: SignatureStructOutput;
   revoker: string;
-  deadline: BigNumber;
+  deadline: bigint;
 };
 
-export interface EIP712ProxyInterface extends utils.Interface {
-  functions: {
-    "attestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256),(uint8,bytes32,bytes32),address,uint64))": FunctionFragment;
-    "getAttestTypeHash()": FunctionFragment;
-    "getAttester(bytes32)": FunctionFragment;
-    "getDomainSeparator()": FunctionFragment;
-    "getEAS()": FunctionFragment;
-    "getName()": FunctionFragment;
-    "getRevokeTypeHash()": FunctionFragment;
-    "multiAttestByDelegation((bytes32,(address,uint64,bool,bytes32,bytes,uint256)[],(uint8,bytes32,bytes32)[],address,uint64)[])": FunctionFragment;
-    "multiRevokeByDelegation((bytes32,(bytes32,uint256)[],(uint8,bytes32,bytes32)[],address,uint64)[])": FunctionFragment;
-    "revokeByDelegation((bytes32,(bytes32,uint256),(uint8,bytes32,bytes32),address,uint64))": FunctionFragment;
-    "version()": FunctionFragment;
-  };
-
+export interface EIP712ProxyInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "attestByDelegation"
+      | "eip712Domain"
       | "getAttestTypeHash"
       | "getAttester"
       | "getDomainSeparator"
@@ -188,9 +171,15 @@ export interface EIP712ProxyInterface extends utils.Interface {
       | "version"
   ): FunctionFragment;
 
+  getEvent(nameOrSignatureOrTopic: "EIP712DomainChanged"): EventFragment;
+
   encodeFunctionData(
     functionFragment: "attestByDelegation",
     values: [DelegatedProxyAttestationRequestStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eip712Domain",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getAttestTypeHash",
@@ -198,7 +187,7 @@ export interface EIP712ProxyInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getAttester",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getDomainSeparator",
@@ -226,6 +215,10 @@ export interface EIP712ProxyInterface extends utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "attestByDelegation",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "eip712Domain",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -259,230 +252,204 @@ export interface EIP712ProxyInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
+}
 
-  events: {};
+export namespace EIP712DomainChangedEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export interface EIP712Proxy extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): EIP712Proxy;
+  waitForDeployment(): Promise<this>;
 
   interface: EIP712ProxyInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    attestByDelegation(
-      delegatedRequest: DelegatedProxyAttestationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    getAttestTypeHash(overrides?: CallOverrides): Promise<[string]>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    getAttester(
-      uid: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  attestByDelegation: TypedContractMethod<
+    [delegatedRequest: DelegatedProxyAttestationRequestStruct],
+    [string],
+    "payable"
+  >;
 
-    getDomainSeparator(overrides?: CallOverrides): Promise<[string]>;
+  eip712Domain: TypedContractMethod<
+    [],
+    [
+      [string, string, string, bigint, string, string, bigint[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: string;
+        salt: string;
+        extensions: bigint[];
+      }
+    ],
+    "view"
+  >;
 
-    getEAS(overrides?: CallOverrides): Promise<[string]>;
+  getAttestTypeHash: TypedContractMethod<[], [string], "view">;
 
-    getName(overrides?: CallOverrides): Promise<[string]>;
+  getAttester: TypedContractMethod<[uid: BytesLike], [string], "view">;
 
-    getRevokeTypeHash(overrides?: CallOverrides): Promise<[string]>;
+  getDomainSeparator: TypedContractMethod<[], [string], "view">;
 
-    multiAttestByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  getEAS: TypedContractMethod<[], [string], "view">;
 
-    multiRevokeByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  getName: TypedContractMethod<[], [string], "view">;
 
-    revokeByDelegation(
-      delegatedRequest: DelegatedProxyRevocationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  getRevokeTypeHash: TypedContractMethod<[], [string], "view">;
 
-    version(overrides?: CallOverrides): Promise<[string]>;
-  };
+  multiAttestByDelegation: TypedContractMethod<
+    [multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[]],
+    [string[]],
+    "payable"
+  >;
 
-  attestByDelegation(
-    delegatedRequest: DelegatedProxyAttestationRequestStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  multiRevokeByDelegation: TypedContractMethod<
+    [multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[]],
+    [void],
+    "payable"
+  >;
 
-  getAttestTypeHash(overrides?: CallOverrides): Promise<string>;
+  revokeByDelegation: TypedContractMethod<
+    [delegatedRequest: DelegatedProxyRevocationRequestStruct],
+    [void],
+    "payable"
+  >;
 
-  getAttester(
-    uid: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  version: TypedContractMethod<[], [string], "view">;
 
-  getDomainSeparator(overrides?: CallOverrides): Promise<string>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  getEAS(overrides?: CallOverrides): Promise<string>;
+  getFunction(
+    nameOrSignature: "attestByDelegation"
+  ): TypedContractMethod<
+    [delegatedRequest: DelegatedProxyAttestationRequestStruct],
+    [string],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "eip712Domain"
+  ): TypedContractMethod<
+    [],
+    [
+      [string, string, string, bigint, string, string, bigint[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: string;
+        salt: string;
+        extensions: bigint[];
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getAttestTypeHash"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getAttester"
+  ): TypedContractMethod<[uid: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "getDomainSeparator"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getEAS"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getName"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getRevokeTypeHash"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "multiAttestByDelegation"
+  ): TypedContractMethod<
+    [multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[]],
+    [string[]],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "multiRevokeByDelegation"
+  ): TypedContractMethod<
+    [multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[]],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "revokeByDelegation"
+  ): TypedContractMethod<
+    [delegatedRequest: DelegatedProxyRevocationRequestStruct],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "version"
+  ): TypedContractMethod<[], [string], "view">;
 
-  getName(overrides?: CallOverrides): Promise<string>;
+  getEvent(
+    key: "EIP712DomainChanged"
+  ): TypedContractEvent<
+    EIP712DomainChangedEvent.InputTuple,
+    EIP712DomainChangedEvent.OutputTuple,
+    EIP712DomainChangedEvent.OutputObject
+  >;
 
-  getRevokeTypeHash(overrides?: CallOverrides): Promise<string>;
-
-  multiAttestByDelegation(
-    multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[],
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  multiRevokeByDelegation(
-    multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[],
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeByDelegation(
-    delegatedRequest: DelegatedProxyRevocationRequestStruct,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  version(overrides?: CallOverrides): Promise<string>;
-
-  callStatic: {
-    attestByDelegation(
-      delegatedRequest: DelegatedProxyAttestationRequestStruct,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getAttestTypeHash(overrides?: CallOverrides): Promise<string>;
-
-    getAttester(
-      uid: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getDomainSeparator(overrides?: CallOverrides): Promise<string>;
-
-    getEAS(overrides?: CallOverrides): Promise<string>;
-
-    getName(overrides?: CallOverrides): Promise<string>;
-
-    getRevokeTypeHash(overrides?: CallOverrides): Promise<string>;
-
-    multiAttestByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[],
-      overrides?: CallOverrides
-    ): Promise<string[]>;
-
-    multiRevokeByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    revokeByDelegation(
-      delegatedRequest: DelegatedProxyRevocationRequestStruct,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    version(overrides?: CallOverrides): Promise<string>;
-  };
-
-  filters: {};
-
-  estimateGas: {
-    attestByDelegation(
-      delegatedRequest: DelegatedProxyAttestationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    getAttestTypeHash(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getAttester(
-      uid: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDomainSeparator(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getEAS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getName(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getRevokeTypeHash(overrides?: CallOverrides): Promise<BigNumber>;
-
-    multiAttestByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    multiRevokeByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    revokeByDelegation(
-      delegatedRequest: DelegatedProxyRevocationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    version(overrides?: CallOverrides): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    attestByDelegation(
-      delegatedRequest: DelegatedProxyAttestationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getAttestTypeHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getAttester(
-      uid: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDomainSeparator(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getEAS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getName(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getRevokeTypeHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    multiAttestByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyAttestationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    multiRevokeByDelegation(
-      multiDelegatedRequests: MultiDelegatedProxyRevocationRequestStruct[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeByDelegation(
-      delegatedRequest: DelegatedProxyRevocationRequestStruct,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+  filters: {
+    "EIP712DomainChanged()": TypedContractEvent<
+      EIP712DomainChangedEvent.InputTuple,
+      EIP712DomainChangedEvent.OutputTuple,
+      EIP712DomainChangedEvent.OutputObject
+    >;
+    EIP712DomainChanged: TypedContractEvent<
+      EIP712DomainChangedEvent.InputTuple,
+      EIP712DomainChangedEvent.OutputTuple,
+      EIP712DomainChangedEvent.OutputObject
+    >;
   };
 }
