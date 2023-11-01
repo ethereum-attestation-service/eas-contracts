@@ -42,7 +42,7 @@ Please note that you can also import and use the addresses directly in your code
 
 #### Ethereum
 
-Version v0.26:
+Version 0.26:
 
 * **EAS**:
   * Contract: [0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587](https://etherscan.io/address/0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587)
@@ -53,7 +53,7 @@ Version v0.26:
 
 #### Arbitrum One
 
-Version v0.26:
+Version 0.26:
 
 * **EAS**:
   * Contract: [0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458](https://arbiscan.io/address/0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458)
@@ -64,7 +64,7 @@ Version v0.26:
 
 #### Optimism
 
-Version v1.0.1:
+Version 1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000021)
@@ -75,7 +75,7 @@ Version v1.0.1:
 
 #### Base
 
-Version v1.0.1:
+Version 1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://basescan.org/address/0x4200000000000000000000000000000000000021)
@@ -86,7 +86,7 @@ Version v1.0.1:
 
 #### Linea
 
-Version v1.2.0:
+Version 1.2.0:
 
 * **EAS**:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
@@ -99,7 +99,7 @@ Version v1.2.0:
 
 #### Sepolia
 
-Version v0.26:
+Version 0.26:
 
 * **EAS**:
   * Contract: [0xC2679fBD37d54388Ce493F1DB75320D236e1815e](https://sepolia.etherscan.io/address/0xC2679fBD37d54388Ce493F1DB75320D236e1815e)
@@ -108,9 +108,20 @@ Version v0.26:
   * Contract: [0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0](https://sepolia.etherscan.io/address/0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/sepolia/SchemaRegistry.json)
 
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0x9C9d17bEE150E4eCDf3b99baFA62c08Cb30E82BC](https://sepolia.etherscan.io/address/0x9C9d17bEE150E4eCDf3b99baFA62c08Cb30E82BC)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://sepolia.etherscan.io/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Deployment and ABI: [Indexer.json](./deployments/sepolia/Indexer.json)
+
+0xaEF4103A04090071165F78D45D83A0C0782c2B2a
+
 #### Optimism Goerli
 
-Version v1.0.1:
+Version 1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://goerli-optimism.etherscan.io/address/0x4200000000000000000000000000000000000021)
@@ -121,7 +132,7 @@ Version v1.0.1:
 
 #### Base Goerli
 
-Version v1.0.1:
+Version 1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://goerli.basescan.org/address/0x4200000000000000000000000000000000000021)
@@ -132,7 +143,7 @@ Version v1.0.1:
 
 #### Arbitrum Goerli
 
-Version v1.1.0:
+Version 1.1.0:
 
 * **EAS**:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
@@ -143,7 +154,7 @@ Version v1.1.0:
 
 #### Polygon Mumbai
 
-Version v1.2.0:
+Version 1.2.0:
 
 * **EAS**:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://mumbai.polygonscan.com/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
@@ -154,7 +165,7 @@ Version v1.2.0:
 
 #### Linea Goerli
 
-Version v1.2.0:
+Version 1.2.0:
 
 * **EAS**:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://goerli.lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
