@@ -73,16 +73,34 @@ Version 1.0.1:
   * Contract: [0x4200000000000000000000000000000000000020](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
 
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0xE132c2E90274B44FfD8090b58399D04ddc060AE1](https://optimistic.etherscan.io/address/0xE132c2E90274B44FfD8090b58399D04ddc060AE1)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/optimism/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x6dd0CB3C3711c8B5d03b3790e5339Bbc2Bbcf934](https://optimistic.etherscan.io/address/0x6dd0CB3C3711c8B5d03b3790e5339Bbc2Bbcf934)
+  * Deployment and ABI: [Indexer.json](./deployments/optimism/Indexer.json)
+
 #### Base
 
 Version 1.0.1:
 
 * **EAS**:
   * Contract: [0x4200000000000000000000000000000000000021](https://basescan.org/address/0x4200000000000000000000000000000000000021)
-  * Deployment and ABI: [EAS.json](./deployments/optimism/EAS.json)
+  * Deployment and ABI: [EAS.json](./deployments/base/EAS.json)
 * **SchemaRegistry**:
   * Contract: [0x4200000000000000000000000000000000000020](https://basescan.org/address/0x4200000000000000000000000000000000000020)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism/SchemaRegistry.json)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/base/SchemaRegistry.json)
+
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0xF095fE4b23958b08D38e52d5d5674bBF0C03cbF6](https://basescan.org/address/0xF095fE4b23958b08D38e52d5d5674bBF0C03cbF6)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/base/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x37AC6006646f2e687B7fB379F549Dc7634dF5b84](https://basescan.org/address/0x37AC6006646f2e687B7fB379F549Dc7634dF5b84)
+  * Deployment and ABI: [Indexer.json](./deployments/base/Indexer.json)
 
 #### Linea
 
