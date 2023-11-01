@@ -168,6 +168,15 @@ Version 1.0.1:
   * Contract: [0x4200000000000000000000000000000000000020](https://goerli.basescan.org/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/base-goerli/SchemaRegistry.json)
 
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0x37AC6006646f2e687B7fB379F549Dc7634dF5b84](https://goerli.basescan.org/address/0x37AC6006646f2e687B7fB379F549Dc7634dF5b84)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/base-goerli/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0xE0893F47009776D6aEC3De8455Cb0ed325Eea74a](https://goerli.basescan.org/address/0xE0893F47009776D6aEC3De8455Cb0ed325Eea74a)
+  * Deployment and ABI: [Indexer.json](./deployments/base-goerli/Indexer.json)
+
 #### Arbitrum Goerli
 
 Version 1.1.0:
