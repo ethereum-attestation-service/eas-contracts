@@ -14,11 +14,14 @@ import {
 } from './EIP712Utils';
 
 export const ATTEST_PROXY_TYPED_SIGNATURE =
-  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)';
-export const REVOKE_PROXY_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)';
+  // eslint-disable-next-line max-len
+  'Attest(address attester,bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)';
+export const REVOKE_PROXY_TYPED_SIGNATURE =
+  'Revoke(address revoker,bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)';
 export const ATTEST_PROXY_PRIMARY_TYPE = 'Attest';
 export const REVOKE_PROXY_PRIMARY_TYPE = 'Revoke';
 export const ATTEST_PROXY_TYPE: TypedData[] = [
+  { name: 'attester', type: 'address' },
   { name: 'schema', type: 'bytes32' },
   { name: 'recipient', type: 'address' },
   { name: 'expirationTime', type: 'uint64' },
@@ -29,6 +32,7 @@ export const ATTEST_PROXY_TYPE: TypedData[] = [
   { name: 'deadline', type: 'uint64' }
 ];
 export const REVOKE_PROXY_TYPE: TypedData[] = [
+  { name: 'revoker', type: 'address' },
   { name: 'schema', type: 'bytes32' },
   { name: 'uid', type: 'bytes32' },
   { name: 'value', type: 'uint256' },
@@ -105,6 +109,7 @@ export class EIP712ProxyUtils {
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
+      attester: await attester.getAddress(),
       schema,
       recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
@@ -139,14 +144,15 @@ export class EIP712ProxyUtils {
     );
   }
 
-  public signDelegatedProxyRevocation(
-    attester: Signer,
+  public async signDelegatedProxyRevocation(
+    revoker: Signer,
     schema: string,
     uid: string,
     value: bigint,
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
+      revoker: await revoker.getAddress(),
       schema,
       uid,
       value,
@@ -163,7 +169,7 @@ export class EIP712ProxyUtils {
           Revoke: REVOKE_PROXY_TYPE
         }
       },
-      attester
+      revoker
     );
   }
 
