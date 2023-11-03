@@ -102,7 +102,7 @@ contract EIP712Proxy is Semver, EIP712 {
     /// @dev Creates a new EIP1271Verifier instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
-    constructor(IEAS eas, string memory name) Semver(1, 2, 0) EIP712(name, "1.2.0") {
+    constructor(IEAS eas, string memory name) Semver(1, 3, 0) EIP712(name, "1.3.0") {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }

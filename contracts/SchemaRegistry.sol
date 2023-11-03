@@ -17,7 +17,7 @@ contract SchemaRegistry is ISchemaRegistry, Semver {
     mapping(bytes32 uid => SchemaRecord schemaRecord) private _registry;
 
     /// @dev Creates a new SchemaRegistry instance.
-    constructor() Semver(1, 2, 0) {}
+    constructor() Semver(1, 3, 0) {}
 
     /// @inheritdoc ISchemaRegistry
     function register(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32) {

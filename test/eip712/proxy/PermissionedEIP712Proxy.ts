@@ -68,7 +68,7 @@ describe('PermissionedEIP712Proxy', () => {
 
   describe('construction', () => {
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('1.2.0');
+      expect(await proxy.version()).to.equal('1.3.0');
 
       expect(await proxy.getDomainSeparator()).to.equal(
         eip712ProxyUtils.getDomainSeparator(PERMISSIONED_EIP712_PROXY_NAME)
