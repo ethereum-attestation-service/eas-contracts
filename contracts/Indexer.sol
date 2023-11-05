@@ -38,7 +38,7 @@ contract Indexer is Semver {
 
     /// @dev Creates a new Indexer instance.
     /// @param eas The address of the global EAS contract.
-    constructor(IEAS eas) Semver(1, 2, 0) {
+    constructor(IEAS eas) Semver(1, 3, 0) {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }

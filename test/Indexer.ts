@@ -34,7 +34,7 @@ describe('Indexer', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await indexer.version()).to.equal('1.2.0');
+      expect(await indexer.version()).to.equal('1.3.0');
 
       expect(await indexer.getEAS()).to.equal(await eas.getAddress());
     });

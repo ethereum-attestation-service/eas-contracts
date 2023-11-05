@@ -13,7 +13,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy the indexer', async () => {
-    expect(await indexer.version()).to.equal('1.2.0');
+    expect(await indexer.version()).to.equal('1.3.0');
 
     expect(await indexer.getEAS()).to.equal(await eas.getAddress());
   });

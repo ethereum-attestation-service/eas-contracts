@@ -79,12 +79,12 @@ contract EIP712Proxy is Semver, EIP712 {
     error UsedSignature();
 
     // The hash of the data type used to relay calls to the attest function. It's the value of
-    // keccak256("Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)").
-    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0x9d3e80e7032dc16815a5f67aa94e851240ae3b24eed13a7431bdac738f814567;
+    // keccak256("Attest(address attester,bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint64 deadline)").
+    bytes32 private constant ATTEST_PROXY_TYPEHASH = 0xea02ffba7dcb45f6fc649714d23f315eef12e3b27f9a7735d8d8bf41eb2b1af1;
 
     // The hash of the data type used to relay calls to the revoke function. It's the value of
-    // keccak256("Revoke(bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)").
-    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0xd4e76f924411647a916bb4ae4631b3cf45c44e2da56ed1c63edb18ebc97ba5e4;
+    // keccak256("Revoke(address revoker,bytes32 schema,bytes32 uid,uint256 value,uint64 deadline)").
+    bytes32 private constant REVOKE_PROXY_TYPEHASH = 0x78a69a78c1a55cdff5cbf949580b410778cd9e4d1ecbe6f06a7fa8dc2441b57d;
 
     // The global EAS contract.
     IEAS private immutable _eas;
@@ -102,7 +102,7 @@ contract EIP712Proxy is Semver, EIP712 {
     /// @dev Creates a new EIP1271Verifier instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
-    constructor(IEAS eas, string memory name) Semver(1, 2, 0) EIP712(name, "1.2.0") {
+    constructor(IEAS eas, string memory name) Semver(1, 3, 0) EIP712(name, "1.3.0") {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
@@ -377,6 +377,7 @@ contract EIP712Proxy is Semver, EIP712 {
             keccak256(
                 abi.encode(
                     ATTEST_PROXY_TYPEHASH,
+                    request.attester,
                     request.schema,
                     data.recipient,
                     data.expirationTime,
@@ -418,7 +419,16 @@ contract EIP712Proxy is Semver, EIP712 {
         _verifyUnusedSignature(signature);
 
         bytes32 digest = _hashTypedDataV4(
-            keccak256(abi.encode(REVOKE_PROXY_TYPEHASH, request.schema, data.uid, data.value, request.deadline))
+            keccak256(
+                abi.encode(
+                    REVOKE_PROXY_TYPEHASH,
+                    request.revoker,
+                    request.schema,
+                    data.uid,
+                    data.value,
+                    request.deadline
+                )
+            )
         );
 
         if (ECDSA.recover(digest, signature.v, signature.r, signature.s) != request.revoker) {

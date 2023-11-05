@@ -76,6 +76,7 @@ export interface EIP712Request<T extends EIP712MessageTypes, P extends EIP712Par
 }
 
 export type EIP712AttestationParams = EIP712Params & {
+  attester: string;
   schema: string;
   recipient: string;
   expirationTime: bigint;
@@ -87,6 +88,7 @@ export type EIP712AttestationParams = EIP712Params & {
 };
 
 export type EIP712RevocationParams = EIP712Params & {
+  revoker: string;
   schema: string;
   uid: string;
   value: bigint;
@@ -97,11 +99,13 @@ export const EIP712_DOMAIN = 'EIP712Domain(string name,string version,uint256 ch
 
 export const ATTEST_TYPED_SIGNATURE =
   // eslint-disable-next-line max-len
-  'Attest(bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint256 nonce,uint64 deadline)';
-export const REVOKE_TYPED_SIGNATURE = 'Revoke(bytes32 schema,bytes32 uid,uint256 value,uint256 nonce,uint64 deadline)';
+  'Attest(address attester,bytes32 schema,address recipient,uint64 expirationTime,bool revocable,bytes32 refUID,bytes data,uint256 value,uint256 nonce,uint64 deadline)';
+export const REVOKE_TYPED_SIGNATURE =
+  'Revoke(address revoker,bytes32 schema,bytes32 uid,uint256 value,uint256 nonce,uint64 deadline)';
 export const ATTEST_PRIMARY_TYPE = 'Attest';
 export const REVOKE_PRIMARY_TYPE = 'Revoke';
 export const ATTEST_TYPE: TypedData[] = [
+  { name: 'attester', type: 'address' },
   { name: 'schema', type: 'bytes32' },
   { name: 'recipient', type: 'address' },
   { name: 'expirationTime', type: 'uint64' },
@@ -113,6 +117,7 @@ export const ATTEST_TYPE: TypedData[] = [
   { name: 'deadline', type: 'uint64' }
 ];
 export const REVOKE_TYPE: TypedData[] = [
+  { name: 'revoker', type: 'address' },
   { name: 'schema', type: 'bytes32' },
   { name: 'uid', type: 'bytes32' },
   { name: 'value', type: 'uint256' },
@@ -191,6 +196,7 @@ export class EIP712Utils {
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712AttestationParams>> {
     const params = {
+      attester: await attester.getAddress(),
       schema,
       recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
@@ -227,6 +233,7 @@ export class EIP712Utils {
   }
 
   public async hashDelegatedAttestation(
+    attester: string | Signer,
     schema: string,
     recipient: string | Signer,
     expirationTime: bigint,
@@ -238,6 +245,7 @@ export class EIP712Utils {
     deadline: bigint
   ): Promise<string> {
     const params = {
+      attester: typeof attester === 'string' ? attester : await attester.getAddress(),
       schema,
       recipient: typeof recipient === 'string' ? recipient : await recipient.getAddress(),
       expirationTime,
@@ -259,8 +267,8 @@ export class EIP712Utils {
     });
   }
 
-  public signDelegatedRevocation(
-    attester: Signer,
+  public async signDelegatedRevocation(
+    revoker: Signer,
     schema: string,
     uid: string,
     value: bigint,
@@ -268,6 +276,7 @@ export class EIP712Utils {
     deadline: bigint
   ): Promise<EIP712Request<EIP712MessageTypes, EIP712RevocationParams>> {
     const params = {
+      revoker: await revoker.getAddress(),
       schema,
       uid,
       value,
@@ -285,22 +294,30 @@ export class EIP712Utils {
           Revoke: REVOKE_TYPE
         }
       },
-      attester
+      revoker
     );
   }
 
   public async verifyDelegatedRevocationSignature(
-    attester: string | Signer,
+    revoker: string | Signer,
     request: EIP712Request<EIP712MessageTypes, EIP712RevocationParams>
   ): Promise<boolean> {
     return EIP712Utils.verifyTypedDataRequestSignature(
-      typeof attester === 'string' ? attester : await attester.getAddress(),
+      typeof revoker === 'string' ? revoker : await revoker.getAddress(),
       request
     );
   }
 
-  public hashDelegatedRevocation(schema: string, uid: string, value: bigint, nonce: bigint, deadline: bigint): string {
+  public async hashDelegatedRevocation(
+    revoker: string | Signer,
+    schema: string,
+    uid: string,
+    value: bigint,
+    nonce: bigint,
+    deadline: bigint
+  ): Promise<string> {
     const params = {
+      revoker: typeof revoker === 'string' ? revoker : await revoker.getAddress(),
       schema,
       uid,
       value,

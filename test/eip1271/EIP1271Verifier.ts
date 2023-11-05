@@ -112,6 +112,7 @@ describe('EIP1271Verifier', () => {
 
             case SignerType.Contract: {
               const hash = await eip712Utils.hashDelegatedAttestation(
+                await signer.getAddress(),
                 schema,
                 attestationRequest.recipient,
                 attestationRequest.expirationTime,
@@ -223,6 +224,7 @@ describe('EIP1271Verifier', () => {
 
             case SignerType.Contract: {
               const hash = await eip712Utils.hashDelegatedRevocation(
+                await signer.getAddress(),
                 schema,
                 revocationRequest.uid,
                 revocationRequest.value,
