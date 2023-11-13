@@ -76,59 +76,59 @@ contract Indexer is Semver {
     /// @notice Returns the UIDs of attestations to a specific schema which were attested to/received by a specific
     ///     recipient.
     /// @param recipient The recipient of the attestation.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     /// @return An array of attestation UIDs.
     function getReceivedAttestationUIDs(
         address recipient,
-        bytes32 schema,
+        bytes32 schemaUID,
         uint256 start,
         uint256 length,
         bool reverseOrder
     ) external view returns (bytes32[] memory) {
-        return _sliceUIDs(_receivedAttestations[recipient][schema], start, length, reverseOrder);
+        return _sliceUIDs(_receivedAttestations[recipient][schemaUID], start, length, reverseOrder);
     }
 
     /// @notice Returns the total number of attestations to a specific schema which were attested to/received by a
     ///     specific recipient.
     /// @param recipient The recipient of the attestation.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @return The total number of attestations.
-    function getReceivedAttestationUIDCount(address recipient, bytes32 schema) external view returns (uint256) {
-        return _receivedAttestations[recipient][schema].length;
+    function getReceivedAttestationUIDCount(address recipient, bytes32 schemaUID) external view returns (uint256) {
+        return _receivedAttestations[recipient][schemaUID].length;
     }
 
     /// @notice Returns the UIDs of attestations to a specific schema which were attested by a specific attester.
     /// @param attester The attester of the attestation.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     /// @return An array of attestation UIDs.
     function getSentAttestationUIDs(
         address attester,
-        bytes32 schema,
+        bytes32 schemaUID,
         uint256 start,
         uint256 length,
         bool reverseOrder
     ) external view returns (bytes32[] memory) {
-        return _sliceUIDs(_sentAttestations[attester][schema], start, length, reverseOrder);
+        return _sliceUIDs(_sentAttestations[attester][schemaUID], start, length, reverseOrder);
     }
 
     /// @notice Returns the total number of attestations to a specific schema which were attested by a specific
     /// attester.
     /// @param attester The attester of the attestation.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @return The total number of attestations.
-    function getSentAttestationUIDCount(address attester, bytes32 schema) external view returns (uint256) {
-        return _sentAttestations[attester][schema].length;
+    function getSentAttestationUIDCount(address attester, bytes32 schemaUID) external view returns (uint256) {
+        return _sentAttestations[attester][schemaUID].length;
     }
 
     /// @notice Returns the UIDs of attestations to a specific schema which were attested by a specific attester to a
     ///     specific recipient.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @param attester The attester of the attestation.
     /// @param recipient The recipient of the attestation.
     /// @param start The offset to start from.
@@ -136,7 +136,7 @@ contract Indexer is Semver {
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     /// @return An array of attestation UIDs.
     function getSchemaAttesterRecipientAttestationUIDs(
-        bytes32 schema,
+        bytes32 schemaUID,
         address attester,
         address recipient,
         uint256 start,
@@ -144,43 +144,48 @@ contract Indexer is Semver {
         bool reverseOrder
     ) external view returns (bytes32[] memory) {
         return
-            _sliceUIDs(_schemaAttesterRecipientAttestations[schema][attester][recipient], start, length, reverseOrder);
+            _sliceUIDs(
+                _schemaAttesterRecipientAttestations[schemaUID][attester][recipient],
+                start,
+                length,
+                reverseOrder
+            );
     }
 
     /// @notice Returns the total number of UIDs of attestations to a specific schema which were attested by a specific
     ///     attester to a specific recipient.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @param attester The attester of the attestation.
     /// @param recipient The recipient of the attestation.
     /// @return An array of attestation UIDs.
     function getSchemaAttesterRecipientAttestationUIDCount(
-        bytes32 schema,
+        bytes32 schemaUID,
         address attester,
         address recipient
     ) external view returns (uint256) {
-        return _schemaAttesterRecipientAttestations[schema][attester][recipient].length;
+        return _schemaAttesterRecipientAttestations[schemaUID][attester][recipient].length;
     }
 
     /// @notice Returns the UIDs of attestations to a specific schema.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @param start The offset to start from.
     /// @param length The number of total members to retrieve.
     /// @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.
     /// @return An array of attestation UIDs.
     function getSchemaAttestationUIDs(
-        bytes32 schema,
+        bytes32 schemaUID,
         uint256 start,
         uint256 length,
         bool reverseOrder
     ) external view returns (bytes32[] memory) {
-        return _sliceUIDs(_schemaAttestations[schema], start, length, reverseOrder);
+        return _sliceUIDs(_schemaAttestations[schemaUID], start, length, reverseOrder);
     }
 
     /// @notice Returns the total number of attestations to a specific schema.
-    /// @param schema The UID of the schema.
+    /// @param schemaUID The UID of the schema.
     /// @return An array of attestation UIDs.
-    function getSchemaAttestationUIDCount(bytes32 schema) external view returns (uint256) {
-        return _schemaAttestations[schema].length;
+    function getSchemaAttestationUIDCount(bytes32 schemaUID) external view returns (uint256) {
+        return _schemaAttestations[schemaUID].length;
     }
 
     /// @dev Indexes an existing attestation.
@@ -202,13 +207,13 @@ contract Indexer is Semver {
         // Index the attestation.
         address attester = attestation.attester;
         address recipient = attestation.recipient;
-        bytes32 schema = attestation.schema;
+        bytes32 schemaUID = attestation.schema;
 
         _indexedAttestations[attestationUID] = true;
-        _schemaAttestations[schema].push(attestationUID);
-        _receivedAttestations[recipient][schema].push(attestationUID);
-        _sentAttestations[attester][schema].push(attestationUID);
-        _schemaAttesterRecipientAttestations[schema][attester][recipient].push(attestationUID);
+        _schemaAttestations[schemaUID].push(attestationUID);
+        _receivedAttestations[recipient][schemaUID].push(attestationUID);
+        _sentAttestations[attester][schemaUID].push(attestationUID);
+        _schemaAttesterRecipientAttestations[schemaUID][attester][recipient].push(attestationUID);
 
         emit Indexed({ uid: uid });
     }
