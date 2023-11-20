@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { ISchemaRegistry } from "./ISchemaRegistry.sol";
+import { ISemver } from "./ISemver.sol";
 import { Attestation, Signature } from "./Common.sol";
 
 /// @notice A struct representing the arguments of the attestation request.
@@ -83,7 +84,7 @@ struct MultiDelegatedRevocationRequest {
 
 /// @title IEAS
 /// @notice EAS - Ethereum Attestation Service interface.
-interface IEAS {
+interface IEAS is ISemver {
     /// @notice Emitted when an attestation has been made.
     /// @param recipient The recipient of the attestation.
     /// @param attester The attesting account.
