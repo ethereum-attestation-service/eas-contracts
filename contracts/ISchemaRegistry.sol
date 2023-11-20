@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.0;
 
+import { ISemver } from "./ISemver.sol";
+
 import { ISchemaResolver } from "./resolver/ISchemaResolver.sol";
 
 /// @notice A struct representing a record for a submitted schema.
@@ -14,7 +16,7 @@ struct SchemaRecord {
 
 /// @title ISchemaRegistry
 /// @notice The interface of global attestation schemas for the Ethereum Attestation Service protocol.
-interface ISchemaRegistry {
+interface ISchemaRegistry is ISemver {
     /// @notice Emitted when a new schema has been registered
     /// @param uid The schema UID.
     /// @param registerer The address of the account used to register the schema.

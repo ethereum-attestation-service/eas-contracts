@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity 0.8.19;
 
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
+import { ISemver } from "./ISemver.sol";
+
 /// @title Semver
 /// @notice A simple contract for managing contract versions.
-contract Semver {
+contract Semver is ISemver {
     // Contract's major version number.
     uint256 private immutable _major;
 

@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.0;
 
+import { ISemver } from "../ISemver.sol";
 import { Attestation } from "../Common.sol";
 
 /// @title ISchemaResolver
 /// @notice The interface of an optional schema resolver.
-interface ISchemaResolver {
+interface ISchemaResolver is ISemver {
     /// @notice Checks if the resolver can be sent ETH.
     /// @return Whether the resolver supports ETH transfers.
     function isPayable() external pure returns (bool);
