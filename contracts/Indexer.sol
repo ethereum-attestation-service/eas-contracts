@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import { IEAS, AttestationRequest, AttestationRequestData, Attestation } from "./IEAS.sol";
 import { EMPTY_UID, uncheckedInc } from "./Common.sol";
