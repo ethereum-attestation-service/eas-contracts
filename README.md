@@ -210,6 +210,23 @@ Version 1.2.0:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
 
+#### Scroll Sepolia
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://sepolia.scrollscan.com/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Deployment and ABI: [EAS.json](./deployments/scroll-sepolia/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://sepolia.scrollscan.com/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/scroll-sepolia/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0xB3574f76b1720E61FdA98702c7016674CD6Eaa7b](https://sepolia.scrollscan.com/address/0xB3574f76b1720E61FdA98702c7016674CD6Eaa7b)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/scroll-sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17](https://sepolia.scrollscan.com/address/0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17)
+  * Deployment and ABI: [Indexer.json](./deployments/scroll-sepolia/Indexer.json)
+
 ## Installation
 
 ```sh

@@ -52,6 +52,10 @@ const lineaGoerli = (address: string) => ({
   [DeploymentNetwork.LineaGoerli]: address
 });
 
+const scrollSepolia = (address: string) => ({
+  [DeploymentNetwork.ScrollSepolia]: address
+});
+
 export const NamedAccounts = {
   deployer: {
     ...mainnet(deployer),
@@ -65,6 +69,7 @@ export const NamedAccounts = {
     ...arbitrumGoerli(deployer),
     ...polygonMumbai(deployer),
     ...lineaGoerli(deployer),
+    ...scrollSepolia(deployer),
     [DeploymentNetwork.Hardhat]: 0
   }
 };
