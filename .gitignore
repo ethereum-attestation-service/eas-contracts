@@ -21,6 +21,7 @@ deployments/base-goerli/solcInputs/*
 deployments/arbitrum-goerli/solcInputs/*
 deployments/polygon-mumbai/solcInputs/*
 deployments/linea-goerli/solcInputs/*
+deployments/scroll-sepolia/solcInputs/*
 deployments/hardhat/*
 !deployments/hardhat/.chainId
 
