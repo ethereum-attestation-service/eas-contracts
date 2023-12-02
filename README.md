@@ -137,6 +137,26 @@ Version 1.2.0:
 
 0xaEF4103A04090071165F78D45D83A0C0782c2B2a
 
+#### Optimism Sepolia
+
+Version 1.0.2:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://sepolia-optimism.etherscan.io/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/optimism-sepolia/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://sepolia-optimism.etherscan.io/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/optimism-sepolia/SchemaRegistry.json)
+
+Version 1.3.0:
+
+* **EIP712Proxy**:
+  * Contract: [0x37AC6006646f2e687B7fB379F549Dc7634dF5b84](https://sepolia-optimism.etherscan.io/address/0x37AC6006646f2e687B7fB379F549Dc7634dF5b84)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/optimism-sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x97e6822A36E38D4d93C0c810CC2be1C6Fd492b64](https://sepolia-optimism.etherscan.io/address/0x97e6822A36E38D4d93C0c810CC2be1C6Fd492b64)
+  * Deployment and ABI: [Indexer.json](./deployments/optimism-sepolia/Indexer.json)
+
 #### Optimism Goerli
 
 Version 1.0.1:
