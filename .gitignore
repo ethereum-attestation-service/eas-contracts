@@ -16,6 +16,7 @@ deployments/optimism/solcInputs/*
 deployments/base/solcInputs/*
 deployments/linea/solcInputs/*
 deployments/sepolia/solcInputs/*
+deployments/optimism-sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
 deployments/base-goerli/solcInputs/*
 deployments/arbitrum-goerli/solcInputs/*
