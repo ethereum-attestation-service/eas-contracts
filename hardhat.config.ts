@@ -14,6 +14,7 @@ interface EnvOptions {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_PROVIDER_URL?: string;
   ETHEREUM_BASE_PROVIDER_URL?: string;
+  ETHEREUM_SCROLL_PROVIDER_URL?: string;
   ETHEREUM_LINEA_PROVIDER_URL?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
@@ -21,8 +22,8 @@ interface EnvOptions {
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL?: string;
-  ETHEREUM_LINEA_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL?: string;
+  ETHEREUM_LINEA_GOERLI_PROVIDER_URL?: string;
   ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
 }
@@ -32,6 +33,7 @@ const {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_PROVIDER_URL = '',
   ETHEREUM_BASE_PROVIDER_URL = '',
+  ETHEREUM_SCROLL_PROVIDER_URL = '',
   ETHEREUM_LINEA_PROVIDER_URL = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL = '',
@@ -39,8 +41,8 @@ const {
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL = '',
-  ETHEREUM_LINEA_GOERLI_PROVIDER_URL = '',
   ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL = '',
+  ETHEREUM_LINEA_GOERLI_PROVIDER_URL = '',
   ETHERSCAN_API_KEY,
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
@@ -99,6 +101,12 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       live: true
     },
+    [DeploymentNetwork.Scroll]: {
+      chainId: 534352,
+      url: ETHEREUM_SCROLL_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
     [DeploymentNetwork.Linea]: {
       chainId: 59144,
       url: ETHEREUM_LINEA_PROVIDER_URL,
@@ -141,15 +149,15 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       live: true
     },
-    [DeploymentNetwork.LineaGoerli]: {
-      chainId: 59140,
-      url: ETHEREUM_LINEA_GOERLI_PROVIDER_URL,
-      saveDeployments: true,
-      live: true
-    },
     [DeploymentNetwork.ScrollSepolia]: {
       chainId: 534351,
       url: ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+    [DeploymentNetwork.LineaGoerli]: {
+      chainId: 59140,
+      url: ETHEREUM_LINEA_GOERLI_PROVIDER_URL,
       saveDeployments: true,
       live: true
     }

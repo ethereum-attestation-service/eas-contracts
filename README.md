@@ -102,6 +102,23 @@ Version 1.2.0:
   * Contract: [0x37AC6006646f2e687B7fB379F549Dc7634dF5b84](https://basescan.org/address/0x37AC6006646f2e687B7fB379F549Dc7634dF5b84)
   * Deployment and ABI: [Indexer.json](./deployments/base/Indexer.json)
 
+#### Scroll
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0xC47300428b6AD2c7D03BB76D05A176058b47E6B0](https://scrollscan.com/address/0xC47300428b6AD2c7D03BB76D05A176058b47E6B0)
+  * Deployment and ABI: [EAS.json](./deployments/scroll/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xD2CDF46556543316e7D34e8eDc4624e2bB95e3B6](https://scrollscan.com/address/0xD2CDF46556543316e7D34e8eDc4624e2bB95e3B6)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/scroll/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x77b7DA1c40762Cd8AFfE2069b575328EfD4D9801](https://scrollscan.com/address/0x77b7DA1c40762Cd8AFfE2069b575328EfD4D9801)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/scroll/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [XXX](https://scrollscan.com/address/XXX)
+  * Deployment and ABI: [Indexer.json](./deployments/scroll/Indexer.json)
+
 #### Linea
 
 Version 1.2.0:
@@ -219,17 +236,6 @@ Version 1.2.0:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://mumbai.polygonscan.com/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/polygon-mumbai/SchemaRegistry.json)
 
-#### Linea Goerli
-
-Version 1.2.0:
-
-* **EAS**:
-  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://goerli.lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
-  * Deployment and ABI: [EAS.json](./deployments/linea-goerli/EAS.json)
-* **SchemaRegistry**:
-  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
-
 #### Scroll Sepolia
 
 Version 1.3.0:
@@ -246,6 +252,17 @@ Version 1.3.0:
 * **Indexer**:
   * Contract: [0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17](https://sepolia.scrollscan.com/address/0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17)
   * Deployment and ABI: [Indexer.json](./deployments/scroll-sepolia/Indexer.json)
+
+#### Linea Goerli
+
+Version 1.2.0:
+
+* **EAS**:
+  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://goerli.lineascan.build/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Deployment and ABI: [EAS.json](./deployments/linea-goerli/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
 
 ## Installation
 

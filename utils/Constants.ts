@@ -5,6 +5,7 @@ export enum DeploymentNetwork {
   ArbitrumOne = 'arbitrum-one',
   Optimism = 'optimism',
   Base = 'base',
+  Scroll = 'scroll',
   Linea = 'linea',
   Sepolia = 'sepolia',
   OptimismSepolia = 'optimism-sepolia',
@@ -12,8 +13,8 @@ export enum DeploymentNetwork {
   BaseGoerli = 'base-goerli',
   ArbitrumGoerli = 'arbitrum-goerli',
   PolygonMumbai = 'polygon-mumbai',
-  LineaGoerli = 'linea-goerli',
   ScrollSepolia = 'scroll-sepolia',
+  LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat'
 }
 

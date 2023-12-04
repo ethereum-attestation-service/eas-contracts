@@ -62,6 +62,7 @@ export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet;
 export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
 export const isOptimism = () => getNetworkName() === DeploymentNetwork.Optimism;
 export const isBase = () => getNetworkName() === DeploymentNetwork.Base;
+export const isScroll = () => getNetworkName() === DeploymentNetwork.Scroll;
 export const isLinea = () => getNetworkName() === DeploymentNetwork.Linea;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismSepolia = () => getNetworkName() === DeploymentNetwork.OptimismSepolia;
@@ -69,8 +70,8 @@ export const isOptimismGoerli = () => getNetworkName() === DeploymentNetwork.Opt
 export const isBaseGoerli = () => getNetworkName() === DeploymentNetwork.BaseGoerli;
 export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.ArbitrumGoerli;
 export const isPolygonMumbai = () => getNetworkName() === DeploymentNetwork.PolygonMumbai;
-export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
 export const isScrollSepolia = () => getNetworkName() === DeploymentNetwork.ScrollSepolia;
+export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
 export const isHardhat = () => getNetworkName() === DeploymentNetwork.Hardhat;
 export const isTestnet = () =>
   isSepolia() ||
