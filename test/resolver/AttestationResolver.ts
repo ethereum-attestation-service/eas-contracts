@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Signer } from 'ethers';
+import { encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import Contracts from '../../components/Contracts';
 import { AttestationResolver, SchemaRegistry, TestEAS } from '../../typechain-types';
@@ -29,11 +29,10 @@ describe('AttestationResolver', () => {
   const schema = 'bytes32 eventId,uint8 ticketType,uint32 ticketNum';
   let schemaId: string;
   const expirationTime = NO_EXPIRATION;
-  const data = '0x1234';
+  const MAGIC_DATA = encodeBytes32String('EA5EA5EA5EA5EA5EA5EA5EA5EA5EA5');
 
   const schema2 = 'bool isFriend';
   const schema2Id = getSchemaUID(schema2, ZERO_ADDRESS, true);
-  let uid: string;
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -51,126 +50,233 @@ describe('AttestationResolver', () => {
 
     await registerSchema(schema2, registry, ZERO_ADDRESS, true);
 
-    uid = await getUIDFromAttestTx(
-      eas.attest({
-        schema: schema2Id,
-        data: {
-          recipient: await recipient.getAddress(),
-          expirationTime,
-          revocable: true,
-          refUID: ZERO_BYTES32,
-          data,
-          value: 0
-        }
-      })
-    );
-
     resolver = await Contracts.AttestationResolver.deploy(eas.getAddress());
     expect(await resolver.isPayable()).to.be.false;
 
     schemaId = await registerSchema(schema, registry, resolver, true);
   });
 
-  it('should revert when attesting to non-existing attestations', async () => {
-    await expectFailedAttestation(
-      {
-        eas
-      },
-      schemaId,
-      {
-        recipient: await recipient.getAddress(),
-        expirationTime
-      },
-      { from: sender },
-      'InvalidAttestation'
-    );
-
-    await expectFailedMultiAttestations(
-      {
-        eas
-      },
-      [
+  context('non-existing attestation', () => {
+    it('should revert', async () => {
+      await expectFailedAttestation(
         {
-          schema: schemaId,
-          requests: [
-            {
-              recipient: await recipient.getAddress(),
-              expirationTime
-            },
-            {
-              recipient: await recipient.getAddress(),
-              expirationTime,
-              data: uid
-            }
-          ]
-        }
-      ],
-      { from: sender },
-      'InvalidAttestations'
-    );
-
-    await expectFailedMultiAttestations(
-      {
-        eas
-      },
-      [
+          eas
+        },
+        schemaId,
         {
-          schema: schemaId,
-          requests: [
-            {
-              recipient: await recipient.getAddress(),
-              expirationTime,
-              data: uid
-            },
-            {
-              recipient: await recipient.getAddress(),
-              expirationTime
-            }
-          ]
-        }
-      ],
-      { from: sender },
-      'InvalidAttestations'
-    );
+          recipient: await recipient.getAddress(),
+          expirationTime
+        },
+        { from: sender },
+        'InvalidAttestation'
+      );
+
+      const uid = await getUIDFromAttestTx(
+        eas.attest({
+          schema: schema2Id,
+          data: {
+            recipient: await recipient.getAddress(),
+            expirationTime,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data: '0x1234',
+            value: 0
+          }
+        })
+      );
+
+      await expectFailedMultiAttestations(
+        {
+          eas
+        },
+        [
+          {
+            schema: schemaId,
+            requests: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                data: uid
+              }
+            ]
+          }
+        ],
+        { from: sender },
+        'InvalidAttestations'
+      );
+
+      await expectFailedMultiAttestations(
+        {
+          eas
+        },
+        [
+          {
+            schema: schemaId,
+            requests: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                data: uid
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime
+              }
+            ]
+          }
+        ],
+        { from: sender },
+        'InvalidAttestations'
+      );
+    });
   });
 
-  it('should allow attesting to an existing attestation', async () => {
-    const { uid: uid2 } = await expectAttestation(
-      { eas },
-      schemaId,
-      { recipient: await recipient.getAddress(), expirationTime, data: uid },
-      { from: sender }
-    );
+  context('invalid attestation', () => {
+    let uid: string;
 
-    await expectRevocation({ eas }, schemaId, { uid: uid2 }, { from: sender });
+    beforeEach(async () => {
+      uid = await getUIDFromAttestTx(
+        eas.attest({
+          schema: schema2Id,
+          data: {
+            recipient: await recipient.getAddress(),
+            expirationTime,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data: '0x1234',
+            value: 0
+          }
+        })
+      );
+    });
 
-    const res = await expectMultiAttestations(
-      { eas },
-      [
+    it('should revert', async () => {
+      await expectFailedAttestation(
         {
-          schema: schemaId,
-          requests: [
-            { recipient: await recipient.getAddress(), expirationTime, data: uid },
-            { recipient: await recipient.getAddress(), expirationTime, data: uid }
-          ]
-        }
-      ],
-      { from: sender }
-    );
-
-    await expectMultiRevocations(
-      { eas },
-      [
+          eas
+        },
+        schemaId,
         {
-          schema: schemaId,
-          requests: res.uids.map((uid) => ({ uid }))
-        }
-      ],
-      { from: sender }
-    );
+          recipient: await recipient.getAddress(),
+          expirationTime
+        },
+        { from: sender },
+        'InvalidAttestation'
+      );
+
+      await expectFailedMultiAttestations(
+        {
+          eas
+        },
+        [
+          {
+            schema: schemaId,
+            requests: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                data: uid
+              }
+            ]
+          }
+        ],
+        { from: sender },
+        'InvalidAttestations'
+      );
+
+      await expectFailedMultiAttestations(
+        {
+          eas
+        },
+        [
+          {
+            schema: schemaId,
+            requests: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                data: uid
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime
+              }
+            ]
+          }
+        ],
+        { from: sender },
+        'InvalidAttestations'
+      );
+    });
   });
 
-  it('should revert on invalid input', async () => {
-    await expect(resolver.toBytes32(data, 1000)).to.be.revertedWithCustomError(resolver, 'OutOfBounds');
+  context('valid attestation', () => {
+    let uid: string;
+
+    beforeEach(async () => {
+      uid = await getUIDFromAttestTx(
+        eas.attest({
+          schema: schema2Id,
+          data: {
+            recipient: await recipient.getAddress(),
+            expirationTime,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data: MAGIC_DATA,
+            value: 0
+          }
+        })
+      );
+    });
+
+    it('should allow attesting', async () => {
+      const { uid: uid2 } = await expectAttestation(
+        { eas },
+        schemaId,
+        { recipient: await recipient.getAddress(), expirationTime, data: uid },
+        { from: sender }
+      );
+
+      await expectRevocation({ eas }, schemaId, { uid: uid2 }, { from: sender });
+
+      const { uids } = await expectMultiAttestations(
+        { eas },
+        [
+          {
+            schema: schemaId,
+            requests: [
+              { recipient: await recipient.getAddress(), expirationTime, data: uid },
+              { recipient: await recipient.getAddress(), expirationTime, data: uid }
+            ]
+          }
+        ],
+        { from: sender }
+      );
+
+      await expectMultiRevocations(
+        { eas },
+        [
+          {
+            schema: schemaId,
+            requests: uids.map((uid) => ({ uid }))
+          }
+        ],
+        { from: sender }
+      );
+    });
+  });
+
+  describe('byte utils', () => {
+    it('should revert on invalid input', async () => {
+      await expect(resolver.toBytes32('0x1234', 1000)).to.be.revertedWithCustomError(resolver, 'OutOfBounds');
+    });
   });
 });
