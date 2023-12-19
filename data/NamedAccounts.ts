@@ -14,6 +14,7 @@ export const NamedAccounts = {
     [DeploymentNetwork.Optimism]: deployer,
     [DeploymentNetwork.Base]: deployer,
     [DeploymentNetwork.ArbitrumOne]: deployer,
+    [DeploymentNetwork.Polygon]: deployer,
     [DeploymentNetwork.Scroll]: deployer,
     [DeploymentNetwork.Linea]: deployer,
     [DeploymentNetwork.Sepolia]: deployer,
@@ -22,8 +23,8 @@ export const NamedAccounts = {
     [DeploymentNetwork.BaseGoerli]: deployer,
     [DeploymentNetwork.ArbitrumGoerli]: deployer,
     [DeploymentNetwork.PolygonMumbai]: deployer,
-    [DeploymentNetwork.LineaGoerli]: deployer,
     [DeploymentNetwork.ScrollSepolia]: deployer,
+    [DeploymentNetwork.LineaGoerli]: deployer,
     [DeploymentNetwork.Hardhat]: 0
   }
 };

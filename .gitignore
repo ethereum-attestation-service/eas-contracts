@@ -14,6 +14,7 @@ deployments/mainnet/solcInputs/*
 deployments/arbitrum-one/solcInputs/*
 deployments/optimism/solcInputs/*
 deployments/base/solcInputs/*
+deployments/polygon/solcInputs/*
 deployments/scroll/solcInputs/*
 deployments/linea/solcInputs/*
 deployments/sepolia/solcInputs/*

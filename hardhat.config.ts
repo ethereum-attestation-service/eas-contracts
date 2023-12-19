@@ -14,6 +14,7 @@ interface EnvOptions {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_PROVIDER_URL?: string;
   ETHEREUM_BASE_PROVIDER_URL?: string;
+  ETHEREUM_POLYGON_PROVIDER_URL?: string;
   ETHEREUM_SCROLL_PROVIDER_URL?: string;
   ETHEREUM_LINEA_PROVIDER_URL?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
@@ -33,6 +34,7 @@ const {
   ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_PROVIDER_URL = '',
   ETHEREUM_BASE_PROVIDER_URL = '',
+  ETHEREUM_POLYGON_PROVIDER_URL = '',
   ETHEREUM_SCROLL_PROVIDER_URL = '',
   ETHEREUM_LINEA_PROVIDER_URL = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
@@ -98,6 +100,12 @@ const config: HardhatUserConfig = {
     [DeploymentNetwork.Base]: {
       chainId: 8453,
       url: ETHEREUM_BASE_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+    [DeploymentNetwork.Polygon]: {
+      chainId: 137,
+      url: ETHEREUM_POLYGON_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },

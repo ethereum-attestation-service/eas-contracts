@@ -102,6 +102,23 @@ Version 1.2.0:
   * Contract: [0x37AC6006646f2e687B7fB379F549Dc7634dF5b84](https://basescan.org/address/0x37AC6006646f2e687B7fB379F549Dc7634dF5b84)
   * Deployment and ABI: [Indexer.json](./deployments/base/Indexer.json)
 
+#### Polygon
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x5E634ef5355f45A855d02D66eCD687b1502AF790](https://polygonscan.com/address/0x5E634ef5355f45A855d02D66eCD687b1502AF790)
+  * Deployment and ABI: [EAS.json](./deployments/polygon/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x7876EEF51A891E737AF8ba5A5E0f0Fd29073D5a7](https://polygonscan.com/address/0x7876EEF51A891E737AF8ba5A5E0f0Fd29073D5a7)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/polygon/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x4be71865917C7907ccA531270181D9B7dD4f2733](https://polygonscan.com/address/0x4be71865917C7907ccA531270181D9B7dD4f2733)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/polygon/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x12d0f50Eb2d67b14293bdDA2C248358f3dfE5308](https://polygonscan.com/address/0x12d0f50Eb2d67b14293bdDA2C248358f3dfE5308)
+  * Deployment and ABI: [Indexer.json](./deployments/polygon/Indexer.json)
+
 #### Scroll
 
 Version 1.3.0:
@@ -116,7 +133,7 @@ Version 1.3.0:
   * Contract: [0x77b7DA1c40762Cd8AFfE2069b575328EfD4D9801](https://scrollscan.com/address/0x77b7DA1c40762Cd8AFfE2069b575328EfD4D9801)
   * Deployment and ABI: [EIP712Proxy.json](./deployments/scroll/EIP712Proxy.json)
 * **Indexer**:
-  * Contract: [XXX](https://scrollscan.com/address/XXX)
+  * Contract: [0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083](https://scrollscan.com/address/0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083)
   * Deployment and ABI: [Indexer.json](./deployments/scroll/Indexer.json)
 
 #### Linea
