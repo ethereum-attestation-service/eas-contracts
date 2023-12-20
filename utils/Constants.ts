@@ -5,6 +5,7 @@ export enum DeploymentNetwork {
   ArbitrumOne = 'arbitrum-one',
   Optimism = 'optimism',
   Base = 'base',
+  Polygon = 'polygon',
   Scroll = 'scroll',
   Linea = 'linea',
   Sepolia = 'sepolia',
