@@ -16,7 +16,7 @@ contract Semver is ISemver {
     uint256 private immutable _minor;
 
     // Contract's patch version number.
-    uint256 private immutable _path;
+    uint256 private immutable _patch;
 
     /// @dev Create a new Semver instance.
     /// @param major Major version number.
@@ -25,7 +25,7 @@ contract Semver is ISemver {
     constructor(uint256 major, uint256 minor, uint256 patch) {
         _major = major;
         _minor = minor;
-        _path = patch;
+        _patch = patch;
     }
 
     /// @notice Returns the full semver contract version.
@@ -33,7 +33,7 @@ contract Semver is ISemver {
     function version() external view returns (string memory) {
         return
             string(
-                abi.encodePacked(Strings.toString(_major), ".", Strings.toString(_minor), ".", Strings.toString(_path))
+                abi.encodePacked(Strings.toString(_major), ".", Strings.toString(_minor), ".", Strings.toString(_patch))
             );
     }
 }
