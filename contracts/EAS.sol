@@ -98,7 +98,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
         data[0] = request.data;
 
-        return _attest(request.schema, data, msg.sender, msg.value, true).uids[0];
+        return _attest(request.schema, data, tx.origin, msg.value, true).uids[0];
     }
 
     /// @inheritdoc IEAS
