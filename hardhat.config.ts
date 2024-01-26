@@ -20,6 +20,7 @@ interface EnvOptions {
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL?: string;
+  ETHEREUM_BASE_SEPOLIA_PROVIDER_URL?: string;
   ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL?: string;
   ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL?: string;
@@ -40,6 +41,7 @@ const {
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
+  ETHEREUM_BASE_SEPOLIA_PROVIDER_URL = '',
   ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
   ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL = '',
   ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL = '',
@@ -136,6 +138,12 @@ const config: HardhatUserConfig = {
     [DeploymentNetwork.OptimismGoerli]: {
       chainId: 420,
       url: ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
+    [DeploymentNetwork.BaseSepolia]: {
+      chainId: 84532,
+      url: ETHEREUM_BASE_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
       live: true
     },

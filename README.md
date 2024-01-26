@@ -211,6 +211,26 @@ Version 1.2.0:
   * Contract: [0xa42428D1bf904d762adD02b27ADac26d53643782](https://goerli-optimism.etherscan.io/address/0xa42428D1bf904d762adD02b27ADac26d53643782)
   * Deployment and ABI: [Indexer.json](./deployments/optimism-goerli/Indexer.json)
 
+#### Base Sepolia
+
+Version 1.2.0:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://sepolia.basescan.org/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/base-sepolia/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://sepolia.basescan.org/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/base-sepolia/SchemaRegistry.json)
+
+Version 1.3.0:
+
+* **EIP712Proxy**:
+  * Contract: [0xAd64A04c20dDBbA7cBb0EcAe4823095B4adA5c57](https://sepolia.basescan.org/address/0xAd64A04c20dDBbA7cBb0EcAe4823095B4adA5c57)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/base-sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x2C7BCE69D5Ee84EF73CC9286416F68E60F9A61b3](https://sepolia.basescan.org/address/0x2C7BCE69D5Ee84EF73CC9286416F68E60F9A61b3)
+  * Deployment and ABI: [Indexer.json](./deployments/base-sepolia/Indexer.json)
+
 #### Base Goerli
 
 Version 1.0.1:
