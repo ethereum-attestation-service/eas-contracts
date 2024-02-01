@@ -2,9 +2,10 @@ import { ZeroAddress } from 'ethers';
 
 export enum DeploymentNetwork {
   Mainnet = 'mainnet',
-  ArbitrumOne = 'arbitrum-one',
   Optimism = 'optimism',
   Base = 'base',
+  ArbitrumOne = 'arbitrum-one',
+  ArbitrumNova = 'arbitrum-nova',
   Polygon = 'polygon',
   Scroll = 'scroll',
   Linea = 'linea',

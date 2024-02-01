@@ -11,43 +11,59 @@ import { MochaOptions } from 'mocha';
 
 interface EnvOptions {
   ETHEREUM_PROVIDER_URL?: string;
-  ETHEREUM_ARBITRUM_ONE_PROVIDER_URL?: string;
-  ETHEREUM_OPTIMISM_PROVIDER_URL?: string;
-  ETHEREUM_BASE_PROVIDER_URL?: string;
-  ETHEREUM_POLYGON_PROVIDER_URL?: string;
-  ETHEREUM_SCROLL_PROVIDER_URL?: string;
-  ETHEREUM_LINEA_PROVIDER_URL?: string;
+  ETHEREUM_ETHERSCAN_API_KEY?: string;
+  OPTIMISM_PROVIDER_URL?: string;
+  OPTIMISM_ETHERSCAN_API_KEY?: string;
+  BASE_PROVIDER_URL?: string;
+  BASE_ETHERSCAN_API_KEY?: string;
+  ARBITRUM_ONE_PROVIDER_URL?: string;
+  ARBITRUM_ONE_ETHERSCAN_API_KEY?: string;
+  ARBITRUM_NOVA_PROVIDER_URL?: string;
+  ARBITRUM_NOVA_ETHERSCAN_API_KEY?: string;
+  POLYGON_PROVIDER_URL?: string;
+  POLYGON_ETHERSCAN_API_KEY?: string;
+  SCROLL_PROVIDER_URL?: string;
+  SCROLL_ETHERSCAN_API_KEY?: string;
+  LINEA_PROVIDER_URL?: string;
+  LINEA_ETHERSCAN_API_KEY?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
-  ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL?: string;
-  ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL?: string;
-  ETHEREUM_BASE_SEPOLIA_PROVIDER_URL?: string;
-  ETHEREUM_BASE_GOERLI_PROVIDER_URL?: string;
-  ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL?: string;
-  ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL?: string;
-  ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL?: string;
-  ETHEREUM_LINEA_GOERLI_PROVIDER_URL?: string;
-  ETHERSCAN_API_KEY?: string;
+  OPTIMISM_GOERLI_PROVIDER_URL?: string;
+  OPTIMISM_SEPOLIA_PROVIDER_URL?: string;
+  BASE_SEPOLIA_PROVIDER_URL?: string;
+  BASE_GOERLI_PROVIDER_URL?: string;
+  ARBITRUM_GOERLI_PROVIDER_URL?: string;
+  POLYGON_MUMBAI_PROVIDER_URL?: string;
+  SCROLL_SEPOLIA_PROVIDER_URL?: string;
+  LINEA_GOERLI_PROVIDER_URL?: string;
   PROFILE?: boolean;
 }
 
 const {
-  ETHEREUM_PROVIDER_URL = '',
-  ETHEREUM_ARBITRUM_ONE_PROVIDER_URL = '',
-  ETHEREUM_OPTIMISM_PROVIDER_URL = '',
-  ETHEREUM_BASE_PROVIDER_URL = '',
-  ETHEREUM_POLYGON_PROVIDER_URL = '',
-  ETHEREUM_SCROLL_PROVIDER_URL = '',
-  ETHEREUM_LINEA_PROVIDER_URL = '',
-  ETHEREUM_SEPOLIA_PROVIDER_URL = '',
-  ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL = '',
-  ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL = '',
-  ETHEREUM_BASE_SEPOLIA_PROVIDER_URL = '',
-  ETHEREUM_BASE_GOERLI_PROVIDER_URL = '',
-  ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL = '',
-  ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL = '',
-  ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL = '',
-  ETHEREUM_LINEA_GOERLI_PROVIDER_URL = '',
-  ETHERSCAN_API_KEY,
+  ETHEREUM_PROVIDER_URL,
+  ETHEREUM_ETHERSCAN_API_KEY,
+  OPTIMISM_PROVIDER_URL,
+  OPTIMISM_ETHERSCAN_API_KEY,
+  BASE_PROVIDER_URL,
+  BASE_ETHERSCAN_API_KEY,
+  ARBITRUM_ONE_PROVIDER_URL,
+  ARBITRUM_ONE_ETHERSCAN_API_KEY,
+  ARBITRUM_NOVA_PROVIDER_URL,
+  ARBITRUM_NOVA_ETHERSCAN_API_KEY,
+  POLYGON_PROVIDER_URL,
+  SCROLL_PROVIDER_URL,
+  SCROLL_ETHERSCAN_API_KEY,
+  LINEA_PROVIDER_URL,
+  LINEA_ETHERSCAN_API_KEY,
+  ETHEREUM_SEPOLIA_PROVIDER_URL,
+  OPTIMISM_SEPOLIA_PROVIDER_URL,
+  OPTIMISM_GOERLI_PROVIDER_URL,
+  BASE_SEPOLIA_PROVIDER_URL,
+  BASE_GOERLI_PROVIDER_URL,
+  ARBITRUM_GOERLI_PROVIDER_URL,
+  POLYGON_MUMBAI_PROVIDER_URL,
+  POLYGON_ETHERSCAN_API_KEY,
+  SCROLL_SEPOLIA_PROVIDER_URL,
+  LINEA_GOERLI_PROVIDER_URL,
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
 
@@ -85,97 +101,154 @@ const config: HardhatUserConfig = {
       chainId: 1,
       url: ETHEREUM_PROVIDER_URL,
       saveDeployments: true,
-      live: true
-    },
-    [DeploymentNetwork.ArbitrumOne]: {
-      chainId: 42161,
-      url: ETHEREUM_ARBITRUM_ONE_PROVIDER_URL,
-      saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: ETHEREUM_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Optimism]: {
       chainId: 10,
-      url: ETHEREUM_OPTIMISM_PROVIDER_URL,
+      url: OPTIMISM_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: OPTIMISM_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Base]: {
       chainId: 8453,
-      url: ETHEREUM_BASE_PROVIDER_URL,
+      url: BASE_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: BASE_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.ArbitrumOne]: {
+      chainId: 42161,
+      url: ARBITRUM_ONE_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: ARBITRUM_ONE_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.ArbitrumNova]: {
+      chainId: 42170,
+      url: ARBITRUM_NOVA_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: ARBITRUM_NOVA_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Polygon]: {
       chainId: 137,
-      url: ETHEREUM_POLYGON_PROVIDER_URL,
+      url: POLYGON_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: POLYGON_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Scroll]: {
       chainId: 534352,
-      url: ETHEREUM_SCROLL_PROVIDER_URL,
+      url: SCROLL_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Linea]: {
       chainId: 59144,
-      url: ETHEREUM_LINEA_PROVIDER_URL,
+      url: LINEA_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: LINEA_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.Sepolia]: {
       chainId: 11155111,
       url: ETHEREUM_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: ETHEREUM_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.OptimismSepolia]: {
       chainId: 11155420,
-      url: ETHEREUM_OPTIMISM_SEPOLIA_PROVIDER_URL,
+      url: OPTIMISM_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: OPTIMISM_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.OptimismGoerli]: {
       chainId: 420,
-      url: ETHEREUM_OPTIMISM_GOERLI_PROVIDER_URL,
+      url: OPTIMISM_GOERLI_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: OPTIMISM_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.BaseSepolia]: {
       chainId: 84532,
-      url: ETHEREUM_BASE_SEPOLIA_PROVIDER_URL,
+      url: BASE_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: BASE_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.BaseGoerli]: {
       chainId: 84531,
-      url: ETHEREUM_BASE_GOERLI_PROVIDER_URL,
+      url: BASE_GOERLI_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: BASE_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.ArbitrumGoerli]: {
       chainId: 421613,
-      url: ETHEREUM_ARBITRUM_GOERLI_PROVIDER_URL,
+      url: ARBITRUM_GOERLI_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: ARBITRUM_ONE_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.PolygonMumbai]: {
       chainId: 80001,
-      url: ETHEREUM_POLYGON_MUMBAI_PROVIDER_URL,
+      url: POLYGON_MUMBAI_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: POLYGON_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.ScrollSepolia]: {
       chainId: 534351,
-      url: ETHEREUM_SCROLL_SEPOLIA_PROVIDER_URL,
+      url: SCROLL_SEPOLIA_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
+      }
     },
     [DeploymentNetwork.LineaGoerli]: {
       chainId: 59140,
-      url: ETHEREUM_LINEA_GOERLI_PROVIDER_URL,
+      url: LINEA_GOERLI_PROVIDER_URL,
       saveDeployments: true,
-      live: true
+      live: true,
+      verify: {
+        etherscan: { apiKey: LINEA_ETHERSCAN_API_KEY }
+      }
     }
   },
 
@@ -201,12 +274,6 @@ const config: HardhatUserConfig = {
   },
 
   namedAccounts: NamedAccounts,
-
-  verify: {
-    etherscan: {
-      apiKey: ETHERSCAN_API_KEY
-    }
-  },
 
   contractSizer: {
     alphaSort: true,

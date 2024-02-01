@@ -11,9 +11,10 @@ typechain-types
 out
 
 deployments/mainnet/solcInputs/*
-deployments/arbitrum-one/solcInputs/*
 deployments/optimism/solcInputs/*
 deployments/base/solcInputs/*
+deployments/arbitrum-one/solcInputs/*
+deployments/arbitrum-nova/solcInputs/*
 deployments/polygon/solcInputs/*
 deployments/scroll/solcInputs/*
 deployments/linea/solcInputs/*
