@@ -107,16 +107,16 @@ Version 0.26:
 Version 1.3.0:
 
 * **EAS**:
-  * Contract: [XXX](https://nova.arbiscan.io/address/XXX)
+  * Contract: [0x6d3dC0Fe5351087E3Af3bDe8eB3F7350ed894fc3](https://nova.arbiscan.io/address/0x6d3dC0Fe5351087E3Af3bDe8eB3F7350ed894fc3)
   * Deployment and ABI: [EAS.json](./deployments/arbitrum-nova/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [XXX](https://nova.arbiscan.io/address/XXX)
+  * Contract: [0x49563d0DA8DF38ef2eBF9C1167270334D72cE0AE](https://nova.arbiscan.io/address/0x49563d0DA8DF38ef2eBF9C1167270334D72cE0AE)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-nova/SchemaRegistry.json)
 * **EIP712Proxy**:
-  * Contract: [XXX](https://nova.arbiscan.io/address/XXX)
+  * Contract: [0xEbf2DeeD690F8A68b8248d6a12231ee70ED2154A](https://nova.arbiscan.io/address/0xEbf2DeeD690F8A68b8248d6a12231ee70ED2154A)
   * Deployment and ABI: [EIP712Proxy.json](./deployments/arbitrum-nova/EIP712Proxy.json)
 * **Indexer**:
-  * Contract: [XXX](https://nova.arbiscan.io/address/XXX)
+  * Contract: [0x7182Be5e84aFEe9Dc29C69D081F8A0FA834d6CB8](https://nova.arbiscan.io/address/0x7182Be5e84aFEe9Dc29C69D081F8A0FA834d6CB8)
   * Deployment and ABI: [Indexer.json](./deployments/arbitrum-nova/Indexer.json)
 
 #### Polygon

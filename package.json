@@ -66,7 +66,7 @@
     "verify:optimism": "HARDHAT_NETWORK=optimism hardhat etherscan-verify --license MIT --api-url https://api-optimistic.etherscan.io",
     "verify:base": "HARDHAT_NETWORK=base hardhat etherscan-verify --license MIT --api-url https://api.basescan.org",
     "verify:arbitrum-one": "HARDHAT_NETWORK=arbitrum-one hardhat etherscan-verify --license MIT",
-    "verify:arbitrum-nova": "HARDHAT_NETWORK=arbitrum-nova hardhat etherscan-verify --license MIT",
+    "verify:arbitrum-nova": "HARDHAT_NETWORK=arbitrum-nova hardhat etherscan-verify --license MIT --api-url https://api-nova.arbiscan.io",
     "verify:polygon": "HARDHAT_NETWORK=polygon hardhat etherscan-verify --license MIT",
     "verify:scroll": "HARDHAT_NETWORK=scroll hardhat etherscan-verify --license MIT --api-url https://api.scrollscan.com",
     "verify:linea": "HARDHAT_NETWORK=linea hardhat etherscan-verify --license MIT --api-url https://api.lineascan.build",
