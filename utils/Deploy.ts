@@ -59,9 +59,10 @@ export const DeployedContracts = {
 };
 
 export const isMainnet = () => getNetworkName() === DeploymentNetwork.Mainnet;
-export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
 export const isOptimism = () => getNetworkName() === DeploymentNetwork.Optimism;
 export const isBase = () => getNetworkName() === DeploymentNetwork.Base;
+export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.ArbitrumOne;
+export const isArbitrumNova = () => getNetworkName() === DeploymentNetwork.ArbitrumNova;
 export const isPolygon = () => getNetworkName() === DeploymentNetwork.Polygon;
 export const isScroll = () => getNetworkName() === DeploymentNetwork.Scroll;
 export const isLinea = () => getNetworkName() === DeploymentNetwork.Linea;

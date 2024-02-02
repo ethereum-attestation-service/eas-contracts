@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repository
+      - name: Check out the Repository
         uses: actions/checkout@v3
 
-      - name: Install packages
+      - name: Install Packages
         run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
 
       - name: Install PNPM
@@ -33,7 +33,7 @@ jobs:
           node-version: 16
           cache: 'pnpm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: pnpm install
 
       - name: Install Foundry

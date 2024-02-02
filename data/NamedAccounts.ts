@@ -14,6 +14,7 @@ export const NamedAccounts = {
     [DeploymentNetwork.Optimism]: deployer,
     [DeploymentNetwork.Base]: deployer,
     [DeploymentNetwork.ArbitrumOne]: deployer,
+    [DeploymentNetwork.ArbitrumNova]: deployer,
     [DeploymentNetwork.Polygon]: deployer,
     [DeploymentNetwork.Scroll]: deployer,
     [DeploymentNetwork.Linea]: deployer,
