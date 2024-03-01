@@ -186,8 +186,6 @@ Version 1.2.0:
   * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://sepolia.etherscan.io/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
   * Deployment and ABI: [Indexer.json](./deployments/sepolia/Indexer.json)
 
-0xaEF4103A04090071165F78D45D83A0C0782c2B2a
-
 #### Optimism Sepolia
 
 Version 1.0.2:
