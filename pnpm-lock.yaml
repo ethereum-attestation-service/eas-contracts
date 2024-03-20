@@ -16,6 +16,9 @@ devDependencies:
   '@ianvs/prettier-plugin-sort-imports':
     specifier: ^4.2.1
     version: 4.2.1(prettier@3.2.5)
+  '@nomicfoundation/edr-linux-x64-gnu':
+    specifier: ^0.3.2
+    version: 0.3.2
   '@nomicfoundation/hardhat-ethers':
     specifier: ^3.0.5
     version: 3.0.5(ethers@6.11.1)(hardhat@2.22.1)
@@ -1003,7 +1006,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    optional: true
 
   /@nomicfoundation/edr-linux-x64-musl@0.3.2:
     resolution: {integrity: sha512-sRhwhiPbkpJMOUwXW1FZw9ks6xWyQhIhM0E8o3TXEXKSPKTE6whQLEk1R37iFITaI36vb6rSwLKTU1cb32gCoA==}
