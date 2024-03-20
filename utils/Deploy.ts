@@ -65,6 +65,7 @@ export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.Arbitr
 export const isArbitrumNova = () => getNetworkName() === DeploymentNetwork.ArbitrumNova;
 export const isPolygon = () => getNetworkName() === DeploymentNetwork.Polygon;
 export const isScroll = () => getNetworkName() === DeploymentNetwork.Scroll;
+export const isCelo = () => getNetworkName() === DeploymentNetwork.Celo;
 export const isLinea = () => getNetworkName() === DeploymentNetwork.Linea;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
 export const isOptimismSepolia = () => getNetworkName() === DeploymentNetwork.OptimismSepolia;
@@ -86,7 +87,7 @@ export const isTestnet = () =>
   isPolygonMumbai() ||
   isLineaGoerli() ||
   isScrollSepolia();
-export const isLive = () => isMainnet() || isTestnet();
+export const isLive = () => !isHardhat();
 
 export const getDeploymentDir = () => {
   return path.join(config.paths.deployments, getNetworkName());

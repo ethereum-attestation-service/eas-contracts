@@ -8,6 +8,7 @@ export enum DeploymentNetwork {
   ArbitrumNova = 'arbitrum-nova',
   Polygon = 'polygon',
   Scroll = 'scroll',
+  Celo = 'celo',
   Linea = 'linea',
   Sepolia = 'sepolia',
   OptimismSepolia = 'optimism-sepolia',
