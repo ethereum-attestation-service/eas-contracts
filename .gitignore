@@ -17,6 +17,7 @@ deployments/arbitrum-one/solcInputs/*
 deployments/arbitrum-nova/solcInputs/*
 deployments/polygon/solcInputs/*
 deployments/scroll/solcInputs/*
+deployments/celo/solcInputs/*
 deployments/linea/solcInputs/*
 deployments/sepolia/solcInputs/*
 deployments/optimism-sepolia/solcInputs/*

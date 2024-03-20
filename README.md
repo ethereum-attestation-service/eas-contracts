@@ -153,6 +153,23 @@ Version 1.3.0:
   * Contract: [0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083](https://scrollscan.com/address/0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083)
   * Deployment and ABI: [Indexer.json](./deployments/scroll/Indexer.json)
 
+#### Celo
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92](https://celoscan.io/address/0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92)
+  * Deployment and ABI: [EAS.json](./deployments/celo/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x5ece93bE4BDCF293Ed61FA78698B594F2135AF34](https://celoscan.io/address/0x5ece93bE4BDCF293Ed61FA78698B594F2135AF34)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/celo/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x6792B6AE17c6416016b943585e957a29bc452806](https://celoscan.io/address/0x6792B6AE17c6416016b943585e957a29bc452806)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/celo/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x76591b332d0F099E89FA335fC827D44C47705D2f](https://celoscan.io/address/0x76591b332d0F099E89FA335fC827D44C47705D2f)
+  * Deployment and ABI: [Indexer.json](./deployments/celo/Indexer.json)
+
 #### Linea
 
 Version 1.2.0:

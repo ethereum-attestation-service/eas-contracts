@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-attestation-service/eas-contracts",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Ethereum Attestation Service",
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "/deployments/arbitrum-nova/**/*",
     "/deployments/polygon/**/*",
     "/deployments/scroll/**/*",
+    "/deployments/celo/**/*",
     "/deployments/linea/**/*",
     "/deployments/sepolia/**/*",
     "/deployments/optimism-sepolia/**/*",
@@ -52,6 +53,7 @@
     "deploy:arbitrum-nova": "HARDHAT_NETWORK=arbitrum-nova hardhat deploy",
     "deploy:polygon": "HARDHAT_NETWORK=polygon hardhat deploy",
     "deploy:scroll": "HARDHAT_NETWORK=scroll hardhat deploy",
+    "deploy:celo": "HARDHAT_NETWORK=celo hardhat deploy",
     "deploy:linea": "HARDHAT_NETWORK=linea hardhat deploy",
     "deploy:sepolia": "HARDHAT_NETWORK=sepolia hardhat deploy",
     "deploy:optimism-sepolia": "HARDHAT_NETWORK=optimism-sepolia hardhat deploy",
@@ -69,6 +71,7 @@
     "verify:arbitrum-nova": "HARDHAT_NETWORK=arbitrum-nova hardhat etherscan-verify --license MIT --api-url https://api-nova.arbiscan.io",
     "verify:polygon": "HARDHAT_NETWORK=polygon hardhat etherscan-verify --license MIT",
     "verify:scroll": "HARDHAT_NETWORK=scroll hardhat etherscan-verify --license MIT --api-url https://api.scrollscan.com",
+    "verify:celo": "HARDHAT_NETWORK=celo hardhat etherscan-verify --license MIT --api-url https://api.celoscan.io",
     "verify:linea": "HARDHAT_NETWORK=linea hardhat etherscan-verify --license MIT --api-url https://api.lineascan.build",
     "verify:sepolia": "HARDHAT_NETWORK=sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.etherscan.io",
     "verify:optimism-sepolia": "HARDHAT_NETWORK=optimism-sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia-optimism.etherscan.io",

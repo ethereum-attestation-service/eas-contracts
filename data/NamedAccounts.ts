@@ -17,6 +17,7 @@ export const NamedAccounts = {
     [DeploymentNetwork.ArbitrumNova]: deployer,
     [DeploymentNetwork.Polygon]: deployer,
     [DeploymentNetwork.Scroll]: deployer,
+    [DeploymentNetwork.Celo]: deployer,
     [DeploymentNetwork.Linea]: deployer,
     [DeploymentNetwork.Sepolia]: deployer,
     [DeploymentNetwork.OptimismSepolia]: deployer,

@@ -24,6 +24,8 @@ interface EnvOptions {
   POLYGON_ETHERSCAN_API_KEY?: string;
   SCROLL_PROVIDER_URL?: string;
   SCROLL_ETHERSCAN_API_KEY?: string;
+  CELO_PROVIDER_URL?: string;
+  CELO_ETHERSCAN_API_KEY?: string;
   LINEA_PROVIDER_URL?: string;
   LINEA_ETHERSCAN_API_KEY?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
@@ -52,6 +54,8 @@ const {
   POLYGON_PROVIDER_URL = '',
   SCROLL_PROVIDER_URL = '',
   SCROLL_ETHERSCAN_API_KEY = '',
+  CELO_PROVIDER_URL = '',
+  CELO_ETHERSCAN_API_KEY = '',
   LINEA_PROVIDER_URL = '',
   LINEA_ETHERSCAN_API_KEY = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
@@ -158,6 +162,15 @@ const config: HardhatUserConfig = {
       live: true,
       verify: {
         etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.Celo]: {
+      chainId: 42220,
+      url: CELO_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: CELO_ETHERSCAN_API_KEY }
       }
     },
     [DeploymentNetwork.Linea]: {
