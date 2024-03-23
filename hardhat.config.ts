@@ -26,6 +26,7 @@ interface EnvOptions {
   SCROLL_ETHERSCAN_API_KEY?: string;
   CELO_PROVIDER_URL?: string;
   CELO_ETHERSCAN_API_KEY?: string;
+  LUKSO_MAINNET_PROVIDER_URL?: string;
   LINEA_PROVIDER_URL?: string;
   LINEA_ETHERSCAN_API_KEY?: string;
   ETHEREUM_SEPOLIA_PROVIDER_URL?: string;
@@ -36,6 +37,7 @@ interface EnvOptions {
   ARBITRUM_GOERLI_PROVIDER_URL?: string;
   POLYGON_MUMBAI_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
+  LUKSO_TESTNET_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
   PROFILE?: boolean;
 }
@@ -56,6 +58,7 @@ const {
   SCROLL_ETHERSCAN_API_KEY = '',
   CELO_PROVIDER_URL = '',
   CELO_ETHERSCAN_API_KEY = '',
+  LUKSO_MAINNET_PROVIDER_URL = '',
   LINEA_PROVIDER_URL = '',
   LINEA_ETHERSCAN_API_KEY = '',
   ETHEREUM_SEPOLIA_PROVIDER_URL = '',
@@ -67,6 +70,7 @@ const {
   POLYGON_MUMBAI_PROVIDER_URL = '',
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
+  LUKSO_TESTNET_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
@@ -173,6 +177,12 @@ const config: HardhatUserConfig = {
         etherscan: { apiKey: CELO_ETHERSCAN_API_KEY }
       }
     },
+    [DeploymentNetwork.LUKSOMainnet]: {
+      chainId: 42,
+      url: LUKSO_MAINNET_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
     [DeploymentNetwork.Linea]: {
       chainId: 59144,
       url: LINEA_PROVIDER_URL,
@@ -254,6 +264,12 @@ const config: HardhatUserConfig = {
         etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
       }
     },
+    [DeploymentNetwork.LUKSOTestnet]: {
+      chainId: 4201,
+      url: LUKSO_TESTNET_PROVIDER_URL,
+      saveDeployments: true,
+      live: true
+    },
     [DeploymentNetwork.LineaGoerli]: {
       chainId: 59140,
       url: LINEA_GOERLI_PROVIDER_URL,
@@ -284,6 +300,27 @@ const config: HardhatUserConfig = {
 
   typechain: {
     target: 'ethers-v6'
+  },
+  etherscan: {
+    apiKey: 'no-api-key-needed',
+    customChains: [
+      {
+        network: 'lukso-mainnet',
+        chainId: 42,
+        urls: {
+          apiURL: 'https://api.explorer.execution.mainnet.lukso.network/api',
+          browserURL: 'https://explorer.execution.mainnet.lukso.network/'
+        }
+      },
+      {
+        network: 'lukso-testnet',
+        chainId: 4201,
+        urls: {
+          apiURL: 'https://api.explorer.execution.testnet.lukso.network/api',
+          browserURL: 'https://explorer.execution.testnet.lukso.network/'
+        }
+      }
+    ]
   },
 
   namedAccounts: NamedAccounts,

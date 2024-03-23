@@ -18,6 +18,8 @@ export const NamedAccounts = {
     [DeploymentNetwork.Polygon]: deployer,
     [DeploymentNetwork.Scroll]: deployer,
     [DeploymentNetwork.Celo]: deployer,
+    [DeploymentNetwork.LUKSOMainnet]: deployer,
+    [DeploymentNetwork.LUKSOTestnet]: deployer,
     [DeploymentNetwork.Linea]: deployer,
     [DeploymentNetwork.Sepolia]: deployer,
     [DeploymentNetwork.OptimismSepolia]: deployer,

@@ -9,6 +9,7 @@ export enum DeploymentNetwork {
   Polygon = 'polygon',
   Scroll = 'scroll',
   Celo = 'celo',
+  LUKSOMainnet = 'lukso-mainnet',
   Linea = 'linea',
   Sepolia = 'sepolia',
   OptimismSepolia = 'optimism-sepolia',
@@ -18,6 +19,7 @@ export enum DeploymentNetwork {
   ArbitrumGoerli = 'arbitrum-goerli',
   PolygonMumbai = 'polygon-mumbai',
   ScrollSepolia = 'scroll-sepolia',
+  LUKSOTestnet = 'lukso-testnet',
   LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat'
 }

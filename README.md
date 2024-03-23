@@ -170,6 +170,23 @@ Version 1.3.0:
   * Contract: [0x76591b332d0F099E89FA335fC827D44C47705D2f](https://celoscan.io/address/0x76591b332d0F099E89FA335fC827D44C47705D2f)
   * Deployment and ABI: [Indexer.json](./deployments/celo/Indexer.json)
 
+#### LUKSO Mainnet
+
+Version 1.3.0:
+
+- **EAS**:
+  - Contract: [0xeC53F3F1ea61aE68067997b8f083A8a4B23E6EED](https://explorer.execution.mainnet.lukso.network/address/0xeC53F3F1ea61aE68067997b8f083A8a4B23E6EED)
+  - Deployment and ABI: [EAS.json](./deployments/lukso-mainnet/EAS.json)
+- **SchemaRegistry**:
+  - Contract: [0x35c362105Ad0Ea28F8F49106CE3D587BeaF80ef3](https://explorer.execution.mainnet.lukso.network/address/0x35c362105Ad0Ea28F8F49106CE3D587BeaF80ef3)
+  - Deployment and ABI: [SchemaRegistry.json](./deployments/lukso-mainnet/SchemaRegistry.json)
+- **EIP712Proxy**:
+  - Contract: [0xD49D3fEF06AD1D6C312D4d960DA29De17996CC5c](https://explorer.execution.mainnet.lukso.network/address/0xD49D3fEF06AD1D6C312D4d960DA29De17996CC5c)
+  - Deployment and ABI: [EIP712Proxy.json](./deployments/lukso-mainnet/EIP712Proxy.json)
+- **Indexer**:
+  - Contract: [0xDe978fc470f3EBa16174ca99E1fE31edd8E4A3F7](https://explorer.execution.mainnet.lukso.network/address/0xDe978fc470f3EBa16174ca99E1fE31edd8E4A3F7)
+  - Deployment and ABI: [Indexer.json](./deployments/lukso-mainnet/Indexer.json)
+
 #### Linea
 
 Version 1.2.0:
@@ -321,6 +338,23 @@ Version 1.3.0:
 * **Indexer**:
   * Contract: [0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17](https://sepolia.scrollscan.com/address/0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17)
   * Deployment and ABI: [Indexer.json](./deployments/scroll-sepolia/Indexer.json)
+
+#### LUKSO Testnet
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0xbd485476d4cB991b02496d443220B2183A1d335A](https://explorer.execution.testnet.lukso.network/address/0xbd485476d4cB991b02496d443220B2183A1d335A)
+  * Deployment and ABI: [EAS.json](./deployments/lukso-testnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x861DFbBe1BE8FAeed1767fb7Df93416F1FfebEca](https://explorer.execution.testnet.lukso.network/address/0x861DFbBe1BE8FAeed1767fb7Df93416F1FfebEca)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/lukso-testnet/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0xd577Dee8a12068B208c8D93Eb619b71a2A01B7e8](https://explorer.execution.testnet.lukso.network/address/0xd577Dee8a12068B208c8D93Eb619b71a2A01B7e8)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/lukso-testnet/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x5a27678BE1b9A4652B2A375455Ea2a90830d058A](https://explorer.execution.testnet.lukso.network/address/0x5a27678BE1b9A4652B2A375455Ea2a90830d058A)
+  * Deployment and ABI: [Indexer.json](./deployments/lukso-testnet/Indexer.json)
 
 #### Linea Goerli
 
