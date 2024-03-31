@@ -170,6 +170,17 @@ Version 1.3.0:
   * Contract: [0x76591b332d0F099E89FA335fC827D44C47705D2f](https://celoscan.io/address/0x76591b332d0F099E89FA335fC827D44C47705D2f)
   * Deployment and ABI: [Indexer.json](./deployments/celo/Indexer.json)
 
+#### Blast
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://blastscan.io/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/blast/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://blastscan.io/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/blast/SchemaRegistry.json)
+
 #### Linea
 
 Version 1.2.0:
