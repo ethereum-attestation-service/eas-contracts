@@ -88,7 +88,7 @@ interface IEAS is ISemver {
     /// @notice Emitted when an attestation has been made.
     /// @param recipient The recipient of the attestation.
     /// @param attester The attesting account.
-    /// @param uid The UID the revoked attestation.
+    /// @param uid The UID of the new attestation.
     /// @param schemaUID The UID of the schema.
     event Attested(address indexed recipient, address indexed attester, bytes32 uid, bytes32 indexed schemaUID);
 
