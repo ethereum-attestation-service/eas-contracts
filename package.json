@@ -42,7 +42,7 @@
     "compile": "hardhat compile",
     "recompile": "pnpm clean && pnpm compile",
     "test": "hardhat test",
-    "test:coverage": "hardhat coverage",
+    "test:coverage": "hardhat coverage --solcoverjs .solcover.ts",
     "test:profile": "PROFILE=1 pnpm test",
     "test:deploy": "find ./deployments/hardhat -type f -not -name '.chainId' -exec rm -f {} + && HARDHAT_NETWORK=hardhat pnpm mocha --require hardhat/register --extension ts --recursive --exit --timeout 600000 --bail 'deploy/tests/**/*.ts'",
     "deploy:prepare": "rm -rf ./node_modules && rm pnpm.lock && pnpm && pnpm recompile",
