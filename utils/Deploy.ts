@@ -3,9 +3,11 @@ import glob from 'glob';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import path from 'path';
+import { Deployer } from '@matterlabs/hardhat-zksync-deploy';
 import { BaseContract, Interface, Signer } from 'ethers';
-import { config, deployments, ethers, getNamedAccounts } from 'hardhat';
+import hre, { config, deployments, ethers, getNamedAccounts, network } from 'hardhat';
 import { ABI, Address, DeployFunction, Deployment as DeploymentData } from 'hardhat-deploy/types';
+import { Wallet } from 'zksync-ethers';
 import { EAS, EIP712Proxy, Indexer, SchemaRegistry } from '../components/Contracts';
 import Logger from '../utils/Logger';
 import { DeploymentNetwork } from './Constants';
@@ -21,7 +23,7 @@ const {
 } = deployments;
 
 interface EnvOptions {
-  TEST_FORK?: boolean;
+  DEPLOYER: string;
   MAX_FEE: bigint;
   MAX_PRIORITY_FEE: bigint;
 }
@@ -65,6 +67,7 @@ export const isArbitrumOne = () => getNetworkName() === DeploymentNetwork.Arbitr
 export const isArbitrumNova = () => getNetworkName() === DeploymentNetwork.ArbitrumNova;
 export const isPolygon = () => getNetworkName() === DeploymentNetwork.Polygon;
 export const isScroll = () => getNetworkName() === DeploymentNetwork.Scroll;
+export const isZKSync = () => getNetworkName() === DeploymentNetwork.ZKSync;
 export const isCelo = () => getNetworkName() === DeploymentNetwork.Celo;
 export const isLinea = () => getNetworkName() === DeploymentNetwork.Linea;
 export const isSepolia = () => getNetworkName() === DeploymentNetwork.Sepolia;
@@ -218,22 +221,42 @@ export const deploy = async (options: DeployOptions) => {
 
   await logParams({ contractName, contractArtifactData, args });
 
-  const res = await deployContract(name, {
-    contract: contractArtifactData ?? contractName,
-    from,
-    value: (value ?? '0x0').toString(),
-    args,
-    maxFeePerGas: maxFee?.toString(),
-    maxPriorityFeePerGas: maxPriorityFee?.toString(),
-    waitConfirmations: WAIT_CONFIRMATIONS,
-    log: true
-  });
+  let address: string;
+
+  if (network.zksync) {
+    const wallet = new Wallet((process.env as any as EnvOptions).DEPLOYER.split('//')[1]);
+    const deployer = new Deployer(hre, wallet);
+    const artifact = await deployer.loadArtifact(contractName);
+
+    const contract = await deployer.deploy(artifact, args, {
+      from,
+      maxFeePerGas: maxFee?.toString(),
+      maxPriorityFeePerGas: maxPriorityFee?.toString()
+    });
+
+    address = await contract.getAddress();
+
+    await save({ name, contract: contractName, address });
+  } else {
+    const res = await deployContract(name, {
+      contract: contractArtifactData ?? contractName,
+      from,
+      value: (value ?? '0x0').toString(),
+      args,
+      maxFeePerGas: maxFee?.toString(),
+      maxPriorityFeePerGas: maxPriorityFee?.toString(),
+      waitConfirmations: WAIT_CONFIRMATIONS,
+      log: true
+    });
+
+    ({ address } = res);
+  }
 
   const data = { name, contract: contractName };
 
   await saveTypes(data);
 
-  return res.address;
+  return address;
 };
 
 interface ExecuteOptions {

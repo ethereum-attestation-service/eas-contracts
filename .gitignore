@@ -8,7 +8,9 @@ dist
 cache
 artifacts
 typechain-types
-out
+cache-zk
+artifacts-zk
+deployments-zk
 
 deployments/mainnet/solcInputs/*
 deployments/optimism/solcInputs/*
@@ -17,6 +19,7 @@ deployments/arbitrum-one/solcInputs/*
 deployments/arbitrum-nova/solcInputs/*
 deployments/polygon/solcInputs/*
 deployments/scroll/solcInputs/*
+deployments/zksync/solcInputs/*
 deployments/celo/solcInputs/*
 deployments/linea/solcInputs/*
 deployments/sepolia/solcInputs/*
