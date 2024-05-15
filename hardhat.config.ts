@@ -1,8 +1,12 @@
 import { NamedAccounts } from './data/NamedAccounts';
 import { DeploymentNetwork } from './utils/Constants';
+import '@nomicfoundation/hardhat-toolbox';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
-import '@nomicfoundation/hardhat-toolbox';
+import 'zksync-ethers';
+import '@matterlabs/hardhat-zksync-solc';
+import '@matterlabs/hardhat-zksync-deploy';
+import '@matterlabs/hardhat-zksync-verify';
 import '@nomiclabs/hardhat-solhint';
 import 'dotenv/config';
 import 'hardhat-contract-sizer';
@@ -24,6 +28,7 @@ interface EnvOptions {
   POLYGON_ETHERSCAN_API_KEY?: string;
   SCROLL_PROVIDER_URL?: string;
   SCROLL_ETHERSCAN_API_KEY?: string;
+  ZKSYNC_PROVIDER_URL?: string;
   CELO_PROVIDER_URL?: string;
   CELO_ETHERSCAN_API_KEY?: string;
   LINEA_PROVIDER_URL?: string;
@@ -54,6 +59,7 @@ const {
   POLYGON_PROVIDER_URL = '',
   SCROLL_PROVIDER_URL = '',
   SCROLL_ETHERSCAN_API_KEY = '',
+  ZKSYNC_PROVIDER_URL = '',
   CELO_PROVIDER_URL = '',
   CELO_ETHERSCAN_API_KEY = '',
   LINEA_PROVIDER_URL = '',
@@ -163,6 +169,15 @@ const config: HardhatUserConfig = {
       verify: {
         etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
       }
+    },
+    [DeploymentNetwork.ZKSync]: {
+      chainId: 324,
+      url: ZKSYNC_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      zksync: true,
+      ethNetwork: DeploymentNetwork.Mainnet,
+      verifyURL: 'https://zksync2-mainnet-explorer.zksync.io/contract_verification'
     },
     [DeploymentNetwork.Celo]: {
       chainId: 42220,
@@ -297,6 +312,16 @@ const config: HardhatUserConfig = {
   gasReporter: {
     currency: 'USD',
     enabled: isProfiling
+  },
+
+  zksolc: {
+    version: '1.4.1',
+    settings: {
+      optimizer: {
+        enabled: true,
+        mode: '3'
+      }
+    }
   },
 
   mocha: mochaOptions()

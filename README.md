@@ -153,6 +153,23 @@ Version 1.3.0:
   * Contract: [0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083](https://scrollscan.com/address/0x8314bc1B2f7F286cb4f0323FE7119C0F99D4A083)
   * Deployment and ABI: [Indexer.json](./deployments/scroll/Indexer.json)
 
+#### zkSync
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x21d8d4eE83b80bc0Cc0f2B7df3117Cf212d02901](https://explorer.zksync.io/address/0x21d8d4eE83b80bc0Cc0f2B7df3117Cf212d02901)
+  * Deployment and ABI: [EAS.json](./deployments/zksync/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xB8566376dFe68B76FA985D5448cc2FbD578412a2](https://explorer.zksync.io/address/0xB8566376dFe68B76FA985D5448cc2FbD578412a2)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/zksync/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x8E8F79e9A1Cd4da7bD2f15e5B0a4B4a613E37C5a](https://explorer.zksync.io/address/0x8E8F79e9A1Cd4da7bD2f15e5B0a4B4a613E37C5a)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/zksync/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x8AdA7852df64A66ca89EFc82144e6be71Bd53B4E](https://explorer.zksync.io/address/0x8AdA7852df64A66ca89EFc82144e6be71Bd53B4E)
+  * Deployment and ABI: [Indexer.json](./deployments/zksync/Indexer.json)
+
 #### Celo
 
 Version 1.3.0:
