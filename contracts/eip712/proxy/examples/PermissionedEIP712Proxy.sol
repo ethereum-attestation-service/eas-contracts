@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity 0.8.26;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -23,7 +23,7 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
     /// @dev Creates a new PermissionedEIP712Proxy instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
-    constructor(IEAS eas, string memory name) EIP712Proxy(eas, name) {}
+    constructor(IEAS eas, string memory name) Ownable(msg.sender) EIP712Proxy(eas, name) {}
 
     /// @inheritdoc EIP712Proxy
     function attestByDelegation(

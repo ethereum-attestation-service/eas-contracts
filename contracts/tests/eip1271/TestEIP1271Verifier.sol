@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity 0.8.26;
 
 import { EIP1271Verifier } from "../../eip1271/EIP1271Verifier.sol";
 import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "../../IEAS.sol";
