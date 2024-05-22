@@ -324,14 +324,20 @@ Version 1.1.0:
 
 #### Polygon Amoy
 
-Version 1.2.0:
+Version 1.3.0:
 
 * **EAS**:
-  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https://amoy.polygonscan.com/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
+  * Contract: [0xb101275a60d8bfb14529C421899aD7CA1Ae5B5Fc](https://amoy.polygonscan.com/address/0xb101275a60d8bfb14529C421899aD7CA1Ae5B5Fc)
   * Deployment and ABI: [EAS.json](./deployments/polygon-amoy/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://amoy.polygonscan.com/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
+  * Contract: [0x23c5701A1BDa89C61d181BD79E5203c730708AE7](https://amoy.polygonscan.com/address/0x23c5701A1BDa89C61d181BD79E5203c730708AE7)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/polygon-amoy/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0xA0ec8a80a0b8496B9Cf6Ee703bC16ABdC9F4cf2e](https://amoy.polygonscan.com/address/0xA0ec8a80a0b8496B9Cf6Ee703bC16ABdC9F4cf2e)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/polygon-amoy/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x9F07c0B0E52C36D78Ac8ABfC543c77f83888ac64](https://amoy.polygonscan.com/address/0x9F07c0B0E52C36D78Ac8ABfC543c77f83888ac64)
+  * Deployment and ABI: [Indexer.json](./deployments/polygon-amoy/Indexer.json)
 
 #### Scroll Sepolia
 
