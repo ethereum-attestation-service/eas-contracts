@@ -17,7 +17,7 @@ export enum DeploymentNetwork {
   BaseSepolia = 'base-sepolia',
   BaseGoerli = 'base-goerli',
   ArbitrumGoerli = 'arbitrum-goerli',
-  PolygonMumbai = 'polygon-mumbai',
+  PolygonAmoy = 'polygon-amoy',
   ScrollSepolia = 'scroll-sepolia',
   LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat'
