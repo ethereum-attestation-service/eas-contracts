@@ -39,7 +39,7 @@ interface EnvOptions {
   BASE_SEPOLIA_PROVIDER_URL?: string;
   BASE_GOERLI_PROVIDER_URL?: string;
   ARBITRUM_GOERLI_PROVIDER_URL?: string;
-  POLYGON_MUMBAI_PROVIDER_URL?: string;
+  POLYGON_AMOY_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
   PROFILE?: boolean;
@@ -70,7 +70,7 @@ const {
   BASE_SEPOLIA_PROVIDER_URL = '',
   BASE_GOERLI_PROVIDER_URL = '',
   ARBITRUM_GOERLI_PROVIDER_URL = '',
-  POLYGON_MUMBAI_PROVIDER_URL = '',
+  POLYGON_AMOY_PROVIDER_URL = '',
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
@@ -251,9 +251,9 @@ const config: HardhatUserConfig = {
         etherscan: { apiKey: ARBITRUM_ONE_ETHERSCAN_API_KEY }
       }
     },
-    [DeploymentNetwork.PolygonMumbai]: {
-      chainId: 80001,
-      url: POLYGON_MUMBAI_PROVIDER_URL,
+    [DeploymentNetwork.PolygonAmoy]: {
+      chainId: 80002,
+      url: POLYGON_AMOY_PROVIDER_URL,
       saveDeployments: true,
       live: true,
       verify: {
