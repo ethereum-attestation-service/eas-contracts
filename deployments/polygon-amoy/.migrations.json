@@ -1,8 +1,9 @@
 {
-  "000001-registry": 1697837753,
-  "000002-eas": 1697837767,
-  "000003-register-initial-schemas": 1697838116,
-  "000004-name-initial-schemas": 1697839724,
-  "000005-eip712-proxy": 1697839733,
-  "000100-test-seed": 1697839830
+  "000001-registry": 1716415922,
+  "000002-eas": 1716415937,
+  "000003-register-initial-schemas": 1716416376,
+  "000004-name-initial-schemas": 1716416816,
+  "000005-eip712-proxy": 1716416827,
+  "000006-indexer": 1716416838,
+  "000100-test-seed": 1716416977
 }

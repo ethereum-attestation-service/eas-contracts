@@ -291,8 +291,9 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 1000000
       },
+      evmVersion: 'paris', // Prevent using the `PUSH0` opcode
       metadata: {
-        bytecodeHash: 'none'
+        bytecodeHash: 'none' // Remove the metadata hash from the bytecode
       }
     }
   },
