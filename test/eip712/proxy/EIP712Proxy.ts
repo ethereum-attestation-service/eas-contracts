@@ -62,7 +62,7 @@ describe('EIP712Proxy', () => {
     });
 
     it('should be properly initialized', async () => {
-      expect(await proxy.version()).to.equal('1.3.0');
+      expect(await proxy.version()).to.equal('1.4.0');
 
       expect(await proxy.getEAS()).to.equal(await eas.getAddress());
       expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
@@ -403,16 +403,6 @@ describe('EIP712Proxy', () => {
           deadline
         })
       ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
-
-      await expect(
-        proxy.connect(sender).verifyRevoke({
-          schema: schemaId,
-          data: revocationRequest,
-          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
-          revoker: await sender2.getAddress(),
-          deadline
-        })
-      ).to.be.revertedWithCustomError(proxy, 'InvalidSignature');
     });
 
     it('should revert when verifying delegated revocation request with a used signature', async () => {
@@ -473,6 +463,31 @@ describe('EIP712Proxy', () => {
           deadline: expiredDeadline
         })
       ).to.be.revertedWithCustomError(proxy, 'DeadlineExpired');
+    });
+
+    it('should revert when verifying delegated revocation request from a different account', async () => {
+      const revocationRequest = {
+        uid,
+        value: 1000n
+      };
+
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender2,
+        schemaId,
+        revocationRequest.uid,
+        revocationRequest.value,
+        deadline
+      );
+
+      await expect(
+        proxy.connect(sender2).verifyRevoke({
+          schema: schemaId,
+          data: revocationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          revoker: await sender2.getAddress(),
+          deadline
+        })
+      ).to.be.revertedWithCustomError(proxy, 'AccessDenied');
     });
   });
 
