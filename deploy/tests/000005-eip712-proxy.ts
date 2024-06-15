@@ -23,7 +23,7 @@ describeDeployment(__filename, () => {
   });
 
   it('should deploy the EIP712 proxy', async () => {
-    expect(await proxy.version()).to.equal('1.3.0');
+    expect(await proxy.version()).to.equal('1.4.0');
 
     expect(await proxy.getEAS()).to.equal(await eas.getAddress());
     expect(await proxy.getDomainSeparator()).to.equal(eip712ProxyUtils.getDomainSeparator(EIP712_PROXY_NAME));
