@@ -380,6 +380,31 @@ describe('EIP712Proxy', () => {
       ).not.to.be.reverted;
     });
 
+    it('should verify delegated revocation request sent from a different account', async () => {
+      const revocationRequest = {
+        uid,
+        value: 0n
+      };
+
+      const signature = await eip712ProxyUtils.signDelegatedProxyRevocation(
+        sender,
+        schemaId,
+        revocationRequest.uid,
+        revocationRequest.value,
+        deadline
+      );
+
+      await expect(
+        proxy.connect(sender2).verifyRevoke({
+          schema: schemaId,
+          data: revocationRequest,
+          signature: { v: signature.v, r: hexlify(signature.r), s: hexlify(signature.s) },
+          revoker: await sender.getAddress(),
+          deadline
+        })
+      ).not.to.be.reverted;
+    });
+
     it('should revert when verifying delegated revocation request with a wrong signature', async () => {
       const revocationRequest = {
         uid,
