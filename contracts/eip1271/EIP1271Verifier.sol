@@ -2,9 +2,10 @@
 
 pragma solidity 0.8.26;
 
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { SignatureChecker } from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { DeadlineExpired, NO_EXPIRATION_TIME, Signature, InvalidSignature } from "./../Common.sol";
 
 // prettier-ignore
 import {
@@ -13,8 +14,6 @@ import {
     DelegatedRevocationRequest,
     RevocationRequestData
 } from "../IEAS.sol";
-
-import { DeadlineExpired, NO_EXPIRATION_TIME, Signature, InvalidSignature } from "../Common.sol";
 
 /// @title EIP1271Verifier
 /// @notice EIP1271Verifier typed signatures verifier for EAS delegated attestations.

@@ -2,9 +2,8 @@
 
 pragma solidity 0.8.26;
 
-import { SchemaResolver } from "../resolver/SchemaResolver.sol";
-
-import { IEAS, Attestation } from "../IEAS.sol";
+import { IEAS, Attestation } from "./../IEAS.sol";
+import { SchemaResolver } from "./../resolver/SchemaResolver.sol";
 
 contract TestSchemaResolver is SchemaResolver {
     constructor(IEAS eas) SchemaResolver(eas) {}
