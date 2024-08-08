@@ -78,7 +78,6 @@ export const attachOnly = <F extends ContractFactory>(
   };
 };
 
-/* eslint-disable camelcase */
 const getContracts = (signer?: Signer) => ({
   connect: (signer: Signer) => getContracts(signer),
 
@@ -102,6 +101,5 @@ const getContracts = (signer?: Signer) => ({
   TokenResolver: deployOrAttach(TokenResolver__factory, signer),
   ValueResolver: deployOrAttach(ValueResolver__factory, signer)
 });
-/* eslint-enable camelcase */
 
 export default getContracts();

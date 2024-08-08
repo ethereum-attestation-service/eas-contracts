@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import { ISemver } from "../ISemver.sol";
-import { Attestation } from "../Common.sol";
+import { Attestation } from "./../Common.sol";
+import { ISemver } from "./../ISemver.sol";
 
 /// @title ISchemaResolver
 /// @notice The interface of an optional schema resolver.

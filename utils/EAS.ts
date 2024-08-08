@@ -65,10 +65,7 @@ const getDataFromReceipt = (receipt: TransactionReceipt, event: Event, attribute
     throw new Error(`Unable to process ${event} events`);
   }
 
-  return filteredLogs.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (log: any) => eas.decodeEventLog(event, log.data, log.topics)[attribute]
-  );
+  return filteredLogs.map((log: any) => eas.decodeEventLog(event, log.data, log.topics)[attribute]);
 };
 
 export const getUIDsFromAttestReceipt = (receipt: TransactionReceipt): string[] =>

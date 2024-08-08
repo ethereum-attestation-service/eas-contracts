@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.4;
 
-import { IEAS, Attestation } from "../IEAS.sol";
-import { AccessDenied, InvalidEAS, InvalidLength, uncheckedInc } from "../Common.sol";
-import { Semver } from "../Semver.sol";
-
+import { AccessDenied, InvalidEAS, InvalidLength, uncheckedInc } from "./../Common.sol";
+import { IEAS, Attestation } from "./../IEAS.sol";
+import { Semver } from "./../Semver.sol";
 import { ISchemaResolver } from "./ISchemaResolver.sol";
 
 /// @title SchemaResolver
