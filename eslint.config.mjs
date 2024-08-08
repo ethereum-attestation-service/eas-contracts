@@ -27,6 +27,7 @@ export default [
       ],
       semi: ['error', 'always'],
       quotes: ['error', 'single', { avoidEscape: true }],
+      'constructor-super': 'error',
       'no-plusplus': 'off',
       'no-await-in-loop': 'off',
       'no-restricted-syntax': 'off',
