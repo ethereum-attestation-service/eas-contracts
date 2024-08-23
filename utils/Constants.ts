@@ -22,6 +22,7 @@ export enum DeploymentNetwork {
   LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat',
   RootstockTestnet = 'rootstock-testnet',
+  Rootstock = 'rootstock',
 }
 
 export const ZERO_ADDRESS = ZeroAddress;

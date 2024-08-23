@@ -30,6 +30,7 @@ export const NamedAccounts = {
     [DeploymentNetwork.ScrollSepolia]: deployer,
     [DeploymentNetwork.LineaGoerli]: deployer,
     [DeploymentNetwork.RootstockTestnet]: deployer,
+    [DeploymentNetwork.Rootstock]: deployer,
     [DeploymentNetwork.Hardhat]: 0,    
   }
 };
