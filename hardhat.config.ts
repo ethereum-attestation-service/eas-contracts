@@ -42,6 +42,12 @@ interface EnvOptions {
   POLYGON_AMOY_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
+  AVALANCHE_ETHERSCAN_API_KEY?: string;
+  AVALANCHE_FUJI_PROVIDER_URL?: string;
+  ASTAR_ZKYOTO_PROVIDER_URL?: string;
+  ASTAR_ETHERSCAN_API_KEY?: string;
+  MINATO_PROVIDER_URL?: string;
+  MINATO_ETHERSCAN_API_KEY?: string
   PROFILE?: boolean;
 }
 
@@ -74,6 +80,12 @@ const {
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
+  AVALANCHE_ETHERSCAN_API_KEY = '',
+  AVALANCHE_FUJI_PROVIDER_URL = '',
+  ASTAR_ZKYOTO_PROVIDER_URL = '',
+  ASTAR_ETHERSCAN_API_KEY = '',
+  MINATO_PROVIDER_URL = '',
+  MINATO_ETHERSCAN_API_KEY = '',
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
 
@@ -277,7 +289,40 @@ const config: HardhatUserConfig = {
       verify: {
         etherscan: { apiKey: LINEA_ETHERSCAN_API_KEY }
       }
-    }
+    },
+    [DeploymentNetwork.AvalancheFuji]: {
+      chainId: 43113,
+      url: AVALANCHE_FUJI_PROVIDER_URL,
+      accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: AVALANCHE_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.AstarzKyoto]: {
+      chainId: 1998,
+      url: ASTAR_ZKYOTO_PROVIDER_URL,
+      accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: ASTAR_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.Minato]: {
+      chainId: 1946,
+      url: MINATO_PROVIDER_URL,
+      accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { 
+          apiKey: MINATO_ETHERSCAN_API_KEY 
+        },
+      },
+      verifyURL: 'https://explorer-testnet.soneium.org/api'
+    },
   },
 
   paths: {
@@ -285,7 +330,7 @@ const config: HardhatUserConfig = {
   },
 
   solidity: {
-    version: '0.8.27',
+    version: '0.8.26',
     settings: {
       optimizer: {
         enabled: true,
