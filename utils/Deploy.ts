@@ -79,6 +79,9 @@ export const isArbitrumGoerli = () => getNetworkName() === DeploymentNetwork.Arb
 export const isPolygonAmoy = () => getNetworkName() === DeploymentNetwork.PolygonAmoy;
 export const isScrollSepolia = () => getNetworkName() === DeploymentNetwork.ScrollSepolia;
 export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
+export const isAvalancheFuji = () => getNetworkName() === DeploymentNetwork.AvalancheFuji;
+export const isAstarzKyoto = () => getNetworkName() === DeploymentNetwork.AstarzKyoto;
+export const isMinato = () => getNetworkName() === DeploymentNetwork.Minato;
 export const isHardhat = () => getNetworkName() === DeploymentNetwork.Hardhat;
 export const isTestnet = () =>
   isSepolia() ||
@@ -89,6 +92,9 @@ export const isTestnet = () =>
   isArbitrumGoerli() ||
   isPolygonAmoy() ||
   isLineaGoerli() ||
+  isAvalancheFuji() ||
+  isAstarzKyoto() ||
+  isMinato() ||
   isScrollSepolia();
 export const isLive = () => !isHardhat();
 

@@ -20,7 +20,10 @@ export enum DeploymentNetwork {
   PolygonAmoy = 'polygon-amoy',
   ScrollSepolia = 'scroll-sepolia',
   LineaGoerli = 'linea-goerli',
-  Hardhat = 'hardhat'
+  Hardhat = 'hardhat',
+  AvalancheFuji = 'avalanche-fuji',
+  AstarzKyoto = 'astar-zkyoto',
+  Minato = 'minato'
 }
 
 export const ZERO_ADDRESS = ZeroAddress;
