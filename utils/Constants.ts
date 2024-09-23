@@ -22,7 +22,6 @@ export enum DeploymentNetwork {
   LineaGoerli = 'linea-goerli',
   Hardhat = 'hardhat',
   AvalancheFuji = 'avalanche-fuji',
-  AstarzKyoto = 'astar-zkyoto',
   Minato = 'minato'
 }
 

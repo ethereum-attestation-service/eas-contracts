@@ -44,8 +44,6 @@ interface EnvOptions {
   LINEA_GOERLI_PROVIDER_URL?: string;
   AVALANCHE_ETHERSCAN_API_KEY?: string;
   AVALANCHE_FUJI_PROVIDER_URL?: string;
-  ASTAR_ZKYOTO_PROVIDER_URL?: string;
-  ASTAR_ETHERSCAN_API_KEY?: string;
   MINATO_PROVIDER_URL?: string;
   MINATO_ETHERSCAN_API_KEY?: string
   PROFILE?: boolean;
@@ -82,8 +80,6 @@ const {
   LINEA_GOERLI_PROVIDER_URL = '',
   AVALANCHE_ETHERSCAN_API_KEY = '',
   AVALANCHE_FUJI_PROVIDER_URL = '',
-  ASTAR_ZKYOTO_PROVIDER_URL = '',
-  ASTAR_ETHERSCAN_API_KEY = '',
   MINATO_PROVIDER_URL = '',
   MINATO_ETHERSCAN_API_KEY = '',
   PROFILE: isProfiling
@@ -298,16 +294,6 @@ const config: HardhatUserConfig = {
       live: true,
       verify: {
         etherscan: { apiKey: AVALANCHE_ETHERSCAN_API_KEY }
-      }
-    },
-    [DeploymentNetwork.AstarzKyoto]: {
-      chainId: 1998,
-      url: ASTAR_ZKYOTO_PROVIDER_URL,
-      accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
-      saveDeployments: true,
-      live: true,
-      verify: {
-        etherscan: { apiKey: ASTAR_ETHERSCAN_API_KEY }
       }
     },
     [DeploymentNetwork.Minato]: {
