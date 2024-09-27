@@ -42,6 +42,7 @@ interface EnvOptions {
   POLYGON_AMOY_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
+  MORPH_PROVIDER_URL?: string;
   PROFILE?: boolean;
 }
 
@@ -74,6 +75,7 @@ const {
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
+  MORPH_PROVIDER_URL = '',
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
 
@@ -276,6 +278,18 @@ const config: HardhatUserConfig = {
       live: true,
       verify: {
         etherscan: { apiKey: LINEA_ETHERSCAN_API_KEY }
+      }
+    },
+    [DeploymentNetwork.Morph]: {
+      chainId: 2810,
+      url: MORPH_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: {
+          apiKey: 'anything',
+          apiUrl: 'https://explorer-api-holesky.morphl2.io'
+        }
       }
     }
   },
