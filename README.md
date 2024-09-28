@@ -366,6 +366,26 @@ Version 1.2.0:
 * **SchemaRegistry**:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
+  
+#### Morph Holesky
+
+Version 1.0.1:
+
+* **EAS**:
+  * Contract: [0x6832388C4f3abC983Bf1c35cfF6581AD08680ce3](https://explorer-holesky.morphl2.io/address/0x6832388C4f3abC983Bf1c35cfF6581AD08680ce3)
+  * Deployment and ABI: [EAS.json](./deployments/morph-holesky/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x571270B452E34F2e2840bdfEF9050e97819d9844](https://explorer-holesky.morphl2.io/address/0x571270B452E34F2e2840bdfEF9050e97819d9844)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/morph-holesky/SchemaRegistry.json)
+
+Version 1.2.0:
+
+* **EIP712Proxy**:
+  * Contract: [0x9c855c2b1F219b0c4e1195493436655f3CAA5B9c](https://explorer-holesky.morphl2.io/address/0x9c855c2b1F219b0c4e1195493436655f3CAA5B9c)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/morph-holesky/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x3F36BaFa3a32d319af47C9bfF50D19cB571BC226](https://explorer-holesky.morphl2.io/address/0x3F36BaFa3a32d319af47C9bfF50D19cB571BC226)
+  * Deployment and ABI: [Indexer.json](./deployments/morph-holesky/Indexer.json)
 
 ## Installation
 
