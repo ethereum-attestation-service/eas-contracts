@@ -209,6 +209,23 @@ Version 1.2.0:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea/SchemaRegistry.json)
 
+#### Rootstock
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x54C0726E9d2D57Bc37AD52c7E219A3229e0eE963](https://explorer.rootstock.io/address/0x54c0726e9d2d57bc37ad52c7e219a3229e0ee963)
+  * Deployment and ABI: [EAS.json](./deployments/rootstock/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xeF29675d82CC5967069d6d9C17F2719f67728F5B](https://explorer.rootstock.io/address/0xeF29675d82CC5967069d6d9C17F2719f67728F5B)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/rootstock/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x08cc68B734B14E7984D638eF141eC6De9Faf7d27](https://explorer.rootstock.io/address/0x08cc68B734B14E7984D638eF141eC6De9Faf7d27)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/rootstock/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x4c0Ac010C2ec50fc1Ff3e7E35DaDA06A7F26073f](https://explorer.rootstock.io/address/0x4c0Ac010C2ec50fc1Ff3e7E35DaDA06A7F26073f)
+  * Deployment and ABI: [Indexer.json](./deployments/roosrtock/Indexer.json)
+
 ### Testnets
 
 #### Sepolia
@@ -366,6 +383,24 @@ Version 1.2.0:
 * **SchemaRegistry**:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
+
+
+#### Rootstock
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0xc300aeEaDd60999933468738c9F5D7e9C0671e1c](https://explorer.testnet.rootstock.io/0xc300aeEaDd60999933468738c9F5D7e9C0671e1c)
+  * Deployment and ABI: [EAS.json](./deployments/rootstock-testnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x679c62956cD2801AbAbF80e9D430f18859Eea2d5](https://explorer.testnet.rootstock.io/0x679c62956cD2801AbAbF80e9D430f18859Eea2d5)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/rootstock-testnet/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x91dD0c0795E22f7448bC2330aDe1020D2115cCbC](https://explorer.testnet.rootstock.io/0x91dD0c0795E22f7448bC2330aDe1020D2115cCbC)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/rootstock-testnet/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x4352E5b2567551986E21eD65D5Ad3052a09e3717](https://explorer.testnet.rootstock.io/address/0x4352E5b2567551986E21eD65D5Ad3052a09e3717)
+  * Deployment and ABI: [Indexer.json](./deployments/roostock-testnet/Indexer.json)
 
 ## Installation
 

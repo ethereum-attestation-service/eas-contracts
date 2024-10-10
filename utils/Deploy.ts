@@ -80,6 +80,8 @@ export const isPolygonAmoy = () => getNetworkName() === DeploymentNetwork.Polygo
 export const isScrollSepolia = () => getNetworkName() === DeploymentNetwork.ScrollSepolia;
 export const isLineaGoerli = () => getNetworkName() === DeploymentNetwork.LineaGoerli;
 export const isHardhat = () => getNetworkName() === DeploymentNetwork.Hardhat;
+export const isRootstockTestnet = () => getNetworkName() === DeploymentNetwork.RootstockTestnet;
+export const isRootstock = () => getNetworkName() === DeploymentNetwork.Rootstock;
 export const isTestnet = () =>
   isSepolia() ||
   isOptimismSepolia() ||
@@ -89,7 +91,8 @@ export const isTestnet = () =>
   isArbitrumGoerli() ||
   isPolygonAmoy() ||
   isLineaGoerli() ||
-  isScrollSepolia();
+  isScrollSepolia() ||
+  isRootstockTestnet();
 export const isLive = () => !isHardhat();
 
 export const getDeploymentDir = () => {

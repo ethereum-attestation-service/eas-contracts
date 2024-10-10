@@ -42,6 +42,10 @@ interface EnvOptions {
   POLYGON_AMOY_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
+  ROOTSTOCK_TESTNET_PROVIDER_URL?: string;
+  ROOTSTOCK_TESTNET_ETHERSCAN_API_KEY?: string;
+  ROOTSTOCK_PROVIDER_URL?: string;
+  ROOTSTOCK_ETHERSCAN_API_KEY?: string;
   PROFILE?: boolean;
 }
 
@@ -74,6 +78,10 @@ const {
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
+  ROOTSTOCK_TESTNET_PROVIDER_URL = '',
+  ROOTSTOCK_TESTNET_ETHERSCAN_API_KEY = '',
+  ROOTSTOCK_PROVIDER_URL = '',
+  ROOTSTOCK_ETHERSCAN_API_KEY = '',
   PROFILE: isProfiling
 }: EnvOptions = process.env as any as EnvOptions;
 
@@ -277,6 +285,24 @@ const config: HardhatUserConfig = {
       verify: {
         etherscan: { apiKey: LINEA_ETHERSCAN_API_KEY }
       }
+    },
+    [DeploymentNetwork.RootstockTestnet]: {
+      chainId: 31,
+      url: ROOTSTOCK_TESTNET_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: ROOTSTOCK_TESTNET_ETHERSCAN_API_KEY }
+      },      
+    },
+    [DeploymentNetwork.Rootstock]: {
+      chainId: 30,
+      url: ROOTSTOCK_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      verify: {
+        etherscan: { apiKey: ROOTSTOCK_ETHERSCAN_API_KEY }
+      },
     }
   },
 

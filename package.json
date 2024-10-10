@@ -66,6 +66,8 @@
     "deploy:polygon-amoy": "HARDHAT_NETWORK=polygon-amoy hardhat deploy",
     "deploy:scroll-sepolia": "HARDHAT_NETWORK=scroll-sepolia hardhat deploy",
     "deploy:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat deploy",
+    "deploy:rootstock-testnet": "HARDHAT_NETWORK=rootstock-testnet hardhat deploy",
+    "deploy:rootstock": "HARDHAT_NETWORK=rootstock hardhat deploy",
     "verify:mainnet": "HARDHAT_NETWORK=mainnet hardhat etherscan-verify --license MIT",
     "verify:optimism": "HARDHAT_NETWORK=optimism hardhat etherscan-verify --license MIT --api-url https://api-optimistic.etherscan.io",
     "verify:base": "HARDHAT_NETWORK=base hardhat etherscan-verify --license MIT --api-url https://api.basescan.org",
@@ -85,6 +87,8 @@
     "verify:polygon-amoy": "HARDHAT_NETWORK=polygon-amoy hardhat etherscan-verify --license MIT --api-url https://api-amoy.polygonscan.com/",
     "verify:scroll-sepolia": "HARDHAT_NETWORK=scroll-sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.scrollscan.com",
     "verify:linea-goerli": "HARDHAT_NETWORK=linea-goerli hardhat etherscan-verify --license MIT --api-url https://api-goerli.lineascan.build",
+    "verify:rootstock-testnet": "HARDHAT_NETWORK=rootstock-testnet hardhat etherscan-verify --license MIT --api-url https://rootstock-testnet.blockscout.com/api/",
+    "verify:rootstock": "HARDHAT_NETWORK=rootstock hardhat etherscan-verify --license MIT --api-url https://rootstock.blockscout.com/api/",
     "lint": "pnpm lint:sol && pnpm lint:ts",
     "lint:sol": "solhint --max-warnings 0 contracts/**/*.sol",
     "lint:ts": "pnpm eslint components/**/*.ts data/**/*.ts deploy/**/*.ts scripts/**/*.ts test/**/*.ts utils/**/*.ts",
@@ -99,7 +103,7 @@
     "restore-test-types": "mv typechain-types/index.ts.bak typechain-types/index.ts && mv typechain-types/contracts/index.ts.bak typechain-types/contracts/index.ts && mv typechain-types/factories/contracts/index.ts.bak typechain-types/factories/contracts/index.ts && mv typechain-types/hardhat.d.ts.bak typechain-types/hardhat.d.ts",
     "prepare:release": "pnpm prepare && pnpm export-types && pnpm lint && pnpm test"
   },
-  "dependencies": {
+  "dependencies": {    
     "hardhat": "2.22.8"
   },
   "devDependencies": {
