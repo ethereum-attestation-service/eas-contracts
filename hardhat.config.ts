@@ -42,6 +42,7 @@ interface EnvOptions {
   ARBITRUM_GOERLI_PROVIDER_URL?: string;
   POLYGON_AMOY_PROVIDER_URL?: string;
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
+  TREASURE_TOPAZ_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
   PROFILE?: boolean;
   KMS_KEY_ID?: string;
@@ -75,6 +76,7 @@ const {
   POLYGON_AMOY_PROVIDER_URL = '',
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
+  TREASURE_TOPAZ_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
   PROFILE: isProfiling,
   KMS_KEY_ID
@@ -272,6 +274,16 @@ const config: HardhatUserConfig = {
         etherscan: { apiKey: SCROLL_ETHERSCAN_API_KEY }
       }
     },
+    [DeploymentNetwork.TreasureTopaz]: {
+      chainId: 978658,
+      kmsKeyId: KMS_KEY_ID,
+      url: TREASURE_TOPAZ_PROVIDER_URL,
+      saveDeployments: true,
+      live: true,
+      zksync: true,
+      ethNetwork: DeploymentNetwork.Sepolia,
+      verifyURL: 'https://rpc-explorer-verify.topaz.treasure.lol/contract_verification'
+    },
     [DeploymentNetwork.LineaGoerli]: {
       chainId: 59140,
       url: LINEA_GOERLI_PROVIDER_URL,
@@ -319,7 +331,7 @@ const config: HardhatUserConfig = {
   },
 
   zksolc: {
-    version: '1.4.1',
+    version: '1.5.4',
     settings: {
       optimizer: {
         enabled: true,

@@ -14,6 +14,7 @@ contract PayingResolver is SchemaResolver {
     using Address for address payable;
 
     error InvalidValue();
+    error InsufficientBalance();
 
     uint256 private immutable _incentive;
 
@@ -30,7 +31,10 @@ contract PayingResolver is SchemaResolver {
             return false;
         }
 
-        payable(attestation.attester).transfer(_incentive);
+        (bool success,) = payable(attestation.attester).call{value: _incentive}("");
+        if (!success) {
+            revert InsufficientBalance();
+        }
 
         return true;
     }

@@ -356,6 +356,24 @@ Version 1.3.0:
   * Contract: [0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17](https://sepolia.scrollscan.com/address/0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17)
   * Deployment and ABI: [Indexer.json](./deployments/scroll-sepolia/Indexer.json)
 
+#### Treasure Topaz
+
+Version 1.3.0:
+
+* **EAS**:
+  * Contract: [0x49E52f8A6C294C650B8C6D9711966c15436AE206](https://explorer.topaz.treasurescan.io/address/0x49E52f8A6C294C650B8C6D9711966c15436AE206)
+  * Deployment and ABI: [EAS.json](./deployments/treasure-topaz/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xBA0cD6c857E06788f3CE1398a022541EdEf6B0Ea](https://explorer.topaz.treasurescan.io/address/0xBA0cD6c857E06788f3CE1398a022541EdEf6B0Ea)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/treasure-topaz/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x1A018C1870524a2c24297571963474F0E24fF6f1](https://explorer.topaz.treasurescan.io/address/0x1A018C1870524a2c24297571963474F0E24fF6f1)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/treasure-topaz/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x1377a305D9295Eba08985770d32db1DECE7D2F21](https://explorer.topaz.treasurescan.io/address/0x1377a305D9295Eba08985770d32db1DECE7D2F21)
+  * Deployment and ABI: [Indexer.json](./deployments/treasure-topaz/Indexer.json)
+
+
 #### Linea Goerli
 
 Version 1.2.0:
