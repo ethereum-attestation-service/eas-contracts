@@ -7,6 +7,7 @@ import 'zksync-ethers';
 import '@matterlabs/hardhat-zksync-solc';
 import '@matterlabs/hardhat-zksync-deploy';
 import '@matterlabs/hardhat-zksync-verify';
+import '@treasure-dev/hardhat-kms';
 import '@nomiclabs/hardhat-solhint';
 import 'dotenv/config';
 import 'hardhat-contract-sizer';
@@ -43,6 +44,7 @@ interface EnvOptions {
   SCROLL_SEPOLIA_PROVIDER_URL?: string;
   LINEA_GOERLI_PROVIDER_URL?: string;
   PROFILE?: boolean;
+  KMS_KEY_ID?: string;
 }
 
 const {
@@ -74,7 +76,8 @@ const {
   POLYGON_ETHERSCAN_API_KEY = '',
   SCROLL_SEPOLIA_PROVIDER_URL = '',
   LINEA_GOERLI_PROVIDER_URL = '',
-  PROFILE: isProfiling
+  PROFILE: isProfiling,
+  KMS_KEY_ID
 }: EnvOptions = process.env as any as EnvOptions;
 
 const mochaOptions = (): MochaOptions => {
