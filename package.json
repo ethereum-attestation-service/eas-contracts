@@ -55,6 +55,7 @@
     "deploy:polygon": "HARDHAT_NETWORK=polygon hardhat deploy",
     "deploy:scroll": "HARDHAT_NETWORK=scroll hardhat deploy",
     "deploy:zksync": "HARDHAT_NETWORK=zksync hardhat deploy",
+    "deploy:treasure-topaz": "HARDHAT_NETWORK=treasure-topaz hardhat deploy",
     "deploy:celo": "HARDHAT_NETWORK=celo hardhat deploy",
     "deploy:linea": "HARDHAT_NETWORK=linea hardhat deploy",
     "deploy:sepolia": "HARDHAT_NETWORK=sepolia hardhat deploy",
@@ -74,6 +75,7 @@
     "verify:polygon": "HARDHAT_NETWORK=polygon hardhat etherscan-verify --license MIT",
     "verify:scroll": "HARDHAT_NETWORK=scroll hardhat etherscan-verify --license MIT --api-url https://api.scrollscan.com",
     "verify:zksync": "HARDHAT_NETWORK=zksync hardhat run scripts/verify.ts",
+    "verify:treasure-topaz": "HARDHAT_NETWORK=treasure-topaz hardhat run scripts/verify.ts",
     "verify:celo": "HARDHAT_NETWORK=celo hardhat etherscan-verify --license MIT --api-url https://api.celoscan.io",
     "verify:linea": "HARDHAT_NETWORK=linea hardhat etherscan-verify --license MIT --api-url https://api.lineascan.build",
     "verify:sepolia": "HARDHAT_NETWORK=sepolia hardhat etherscan-verify --license MIT --api-url https://api-sepolia.etherscan.io",
@@ -100,6 +102,7 @@
     "prepare:release": "pnpm prepare && pnpm export-types && pnpm lint && pnpm test"
   },
   "dependencies": {
+    "@treasure-dev/hardhat-kms": "^1.0.0",
     "hardhat": "2.22.8"
   },
   "devDependencies": {

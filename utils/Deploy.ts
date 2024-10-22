@@ -223,7 +223,7 @@ export const deploy = async (options: DeployOptions) => {
 
   let address: string;
 
-  if (network.zksync) {
+  if (network.zksync && network.config.kmsKeyId == null) {
     const wallet = new Wallet((process.env as any as EnvOptions).DEPLOYER.split('//')[1]);
     const deployer = new Deployer(hre, wallet);
     const artifact = await deployer.loadArtifact(contractName);
