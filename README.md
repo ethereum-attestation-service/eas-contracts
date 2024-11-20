@@ -451,13 +451,7 @@ pnpm test:profile
 The contracts have built-in support for deployments on different chains and mainnet forks. You can deploy the project by:
 
 ```sh
-pnpm deploy
-```
-
-There’s also a special deployment mode which deploys the protocol to a mainnet fork, with additional goodies. It can be run via:
-
-```sh
-pnpm deploy:fork
+pnpm run deploy
 ```
 
 The framework was inspired and adopted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).
