@@ -15,20 +15,20 @@ jobs:
 
     steps:
       - name: Check out the Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Packages
         run: sudo apt-get update && sudo apt-get -y install pkg-config libusb-1.0 libudev-dev
 
       - name: Install PNPM
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         id: pnpm-install
         with:
           version: 8
           run_install: false
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
