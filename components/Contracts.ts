@@ -1,6 +1,5 @@
 import { ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { ABI } from 'hardhat-deploy/types';
 import {
   AttestationResolver__factory,
   AttesterResolver__factory,
@@ -35,7 +34,6 @@ type Contract<F extends ContractFactory> = AsyncReturnType<F['deploy']>;
 
 export interface ContractBuilder<F extends ContractFactory> {
   metadata: {
-    abi: ABI;
     bytecode: string;
   };
   deploy(...args: Parameters<F['deploy']>): Promise<Contract<F>>;
@@ -54,7 +52,6 @@ export const deployOrAttach = <F extends ContractFactory>(
 ): ContractBuilder<F> => {
   return {
     metadata: {
-      abi: FactoryConstructor.abi as ABI,
       bytecode: FactoryConstructor.bytecode
     },
     deploy: async (...args: Parameters<F['deploy']>): Promise<Contract<F>> => {

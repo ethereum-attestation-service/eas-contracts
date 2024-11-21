@@ -446,16 +446,6 @@ You can profile the gas costs of all of the user-focused flows via:
 pnpm test:profile
 ```
 
-## Deploying
-
-The contracts have built-in support for deployments on different chains and mainnet forks. You can deploy the project by:
-
-```sh
-pnpm run deploy
-```
-
-The framework was inspired and adopted from [Bancor V3](https://github.com/bancorprotocol/contracts-v3).
-
 ## License
 
 EAS is open source and distributed under the MIT License (see [`LICENSE`](./LICENSE)).

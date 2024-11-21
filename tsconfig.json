@@ -19,7 +19,6 @@
   "include": [
     "./components",
     "./data",
-    "./deploy",
     "./deployments",
     "./hardhat.config.ts",
     "./scripts",

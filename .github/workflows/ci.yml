@@ -50,8 +50,5 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Test Deployment
-        run: pnpm test:deploy
-
       - name: Compile (Foundry)
         run: forge build
