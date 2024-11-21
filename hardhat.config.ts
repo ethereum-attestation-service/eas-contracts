@@ -12,7 +12,6 @@ const { PROFILE: isProfiling }: EnvOptions = process.env as any as EnvOptions;
 
 const mochaOptions = (): MochaOptions => {
   let timeout = 600000;
-  let grep;
   let reporter;
 
   if (isProfiling) {
@@ -24,7 +23,6 @@ const mochaOptions = (): MochaOptions => {
     timeout,
     color: true,
     bail: true,
-    grep,
     reporter
   };
 };
