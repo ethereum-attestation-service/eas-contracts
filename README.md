@@ -187,6 +187,23 @@ Version 1.3.0:
   * Contract: [0x76591b332d0F099E89FA335fC827D44C47705D2f](https://celoscan.io/address/0x76591b332d0F099E89FA335fC827D44C47705D2f)
   * Deployment and ABI: [Indexer.json](./deployments/celo/Indexer.json)
 
+#### Telos
+
+Version 1.4.0:
+
+* **EAS**:
+  * Contract: [0x9898C3FF2fdCA9E734556fC4BCCd5b9239218155](https://teloscan.io/address/0x9898C3FF2fdCA9E734556fC4BCCd5b9239218155)
+  * Deployment and ABI: [EAS.json](./deployments/telos/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x842511adC21B85C0B2fdB02AAcFA92fdf7Cda470](https://teloscan.io/address/0x842511adC21B85C0B2fdB02AAcFA92fdf7Cda470)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/telos/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0xA76973759A350D4D7EC7aF042c6c2A32be861AD9](https://teloscan.io/address/0xA76973759A350D4D7EC7aF042c6c2A32be861AD9)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/telos/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x6Abe1F9489B97d9f11E1347567f61137BC61B6F9](https://teloscan.io/address/0x6Abe1F9489B97d9f11E1347567f61137BC61B6F9)
+  * Deployment and ABI: [Indexer.json](./deployments/telos/Indexer.json)
+
 #### Blast
 
 Version 1.3.0:
