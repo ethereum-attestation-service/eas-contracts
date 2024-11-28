@@ -20,6 +20,8 @@ export enum DeploymentNetwork {
   PolygonAmoy = 'polygon-amoy',
   ScrollSepolia = 'scroll-sepolia',
   LineaGoerli = 'linea-goerli',
+  Flow = 'flow',
+  FlowTestnet = 'flow-testnet',
   Hardhat = 'hardhat'
 }
 
