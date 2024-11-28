@@ -373,6 +373,23 @@ Version 1.3.0:
   * Contract: [0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17](https://sepolia.scrollscan.com/address/0x7C2cb1eDC328491da52de2a0afc44D3B0Ae7ee17)
   * Deployment and ABI: [Indexer.json](./deployments/scroll-sepolia/Indexer.json)
 
+#### Ink Sepolia
+
+Version 1.4.1-beta.1:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://explorer-sepolia.inkonchain.com/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/ink-sepolia/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://explorer-sepolia.inkonchain.com/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/ink-sepolia/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x79369eEe29e7e191F5a6278185eA4a0D906b9b9F](https://explorer-sepolia.inkonchain.com/address/0x79369eEe29e7e191F5a6278185eA4a0D906b9b9F)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/ink-sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x367A20665BAB1bb4DB6D80A4CF20db5Be1568d1e](https://explorer-sepolia.inkonchain.com/address/0x367A20665BAB1bb4DB6D80A4CF20db5Be1568d1e)
+  * Deployment and ABI: [Indexer.json](./deployments/ink-sepolia/Indexer.json)
+
 #### Linea Goerli
 
 Version 1.2.0:
