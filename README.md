@@ -385,10 +385,10 @@ Version 1.2.0:
 Version 1.0.1:
 
 * **EAS**:
-  * Contract: [0xb072d6e454f526FA8b81f74eA5Ee5c85562B829c](https://evm-testnet.flowscan.io/address/0xb072d6e454f526FA8b81f74eA5Ee5c85562B829c)
+  * Contract: [0x2ac8Be7de9442ff1C3b043311610f0C6bE0DA2fb](https://evm-testnet.flowscan.io/address/0x2ac8Be7de9442ff1C3b043311610f0C6bE0DA2fb )
   * Deployment and ABI: [EAS.json](./deployments/flow-testnet/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0xEC7631dbee810c7D164315dE74fD69C0b589beeF](https://evm-testnet.flowscan.io/address/0x571270B452E34F2e2840bdfEF9050e97819d9844)
+  * Contract: [0x35457E403696EBB88B25CD52f8a7F2a15Efc21F0](https://evm-testnet.flowscan.io/address/0x35457E403696EBB88B25CD52f8a7F2a15Efc21F0 )
   * Deployment and ABI: [SchemaRegistry.json](./deployments/flow-testnet/SchemaRegistry.json)
 
 
