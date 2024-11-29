@@ -209,6 +209,19 @@ Version 1.2.0:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea/SchemaRegistry.json)
 
+
+#### Flow
+
+Version 1.0.1:
+
+* **EAS**:
+  * Contract: [0xc6376222F6E009A705a34dbF1dF72fEf8efB3964](https://evm.flowscan.io/address/0xc6376222F6E009A705a34dbF1dF72fEf8efB3964)
+  * Deployment and ABI: [EAS.json](./deployments/flow/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xB0cF748a05AEA8D59e15834446CFC95bcFF510F0](https://evm.flowscan.io/address/0xB0cF748a05AEA8D59e15834446CFC95bcFF510F0)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/flow/SchemaRegistry.json)
+
+
 ### Testnets
 
 #### Sepolia
@@ -366,6 +379,18 @@ Version 1.2.0:
 * **SchemaRegistry**:
   * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https://goerli.lineascan.build/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/linea-goerli/SchemaRegistry.json)
+
+#### Flow Testnet
+
+Version 1.0.1:
+
+* **EAS**:
+  * Contract: [0xb072d6e454f526FA8b81f74eA5Ee5c85562B829c](https://evm-testnet.flowscan.io/address/0xb072d6e454f526FA8b81f74eA5Ee5c85562B829c)
+  * Deployment and ABI: [EAS.json](./deployments/flow-testnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0xEC7631dbee810c7D164315dE74fD69C0b589beeF](https://evm-testnet.flowscan.io/address/0x571270B452E34F2e2840bdfEF9050e97819d9844)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/flow-testnet/SchemaRegistry.json)
+
 
 ## Installation
 
