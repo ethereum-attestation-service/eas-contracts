@@ -204,6 +204,23 @@ Version 1.4.0:
   * Contract: [0x6Abe1F9489B97d9f11E1347567f61137BC61B6F9](https://teloscan.io/address/0x6Abe1F9489B97d9f11E1347567f61137BC61B6F9)
   * Deployment and ABI: [Indexer.json](./deployments/telos/Indexer.json)
 
+#### Soneium
+
+Version 1.4.1-beta.1:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://soneium.blockscout.com//address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/soneium/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://soneium.blockscout.com//address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/soneium/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE](https://soneium.blockscout.com//address/0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/soneium/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x16613642e9793d413c296f9AB5457077b99AA7B0](https://soneium.blockscout.com//address/0x16613642e9793d413c296f9AB5457077b99AA7B0)
+  * Deployment and ABI: [Indexer.json](./deployments/soneium/Indexer.json)
+
 #### Blast
 
 Version 1.3.0:
