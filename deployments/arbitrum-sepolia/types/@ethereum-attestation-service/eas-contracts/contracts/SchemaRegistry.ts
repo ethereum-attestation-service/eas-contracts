@@ -20,7 +20,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../../common";
 
 export type SchemaRecordStruct = {
   uid: BytesLike;
@@ -59,11 +59,20 @@ export interface SchemaRegistryInterface extends Interface {
 }
 
 export namespace RegisteredEvent {
-  export type InputTuple = [uid: BytesLike, registerer: AddressLike];
-  export type OutputTuple = [uid: string, registerer: string];
+  export type InputTuple = [
+    uid: BytesLike,
+    registerer: AddressLike,
+    schema: SchemaRecordStruct
+  ];
+  export type OutputTuple = [
+    uid: string,
+    registerer: string,
+    schema: SchemaRecordStructOutput
+  ];
   export interface OutputObject {
     uid: string;
     registerer: string;
+    schema: SchemaRecordStructOutput;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -155,7 +164,7 @@ export interface SchemaRegistry extends BaseContract {
   >;
 
   filters: {
-    "Registered(bytes32,address)": TypedContractEvent<
+    "Registered(bytes32,address,tuple)": TypedContractEvent<
       RegisteredEvent.InputTuple,
       RegisteredEvent.OutputTuple,
       RegisteredEvent.OutputObject

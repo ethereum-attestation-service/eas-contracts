@@ -27,7 +27,7 @@ deployments/optimism-sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
 deployments/base-sepolia/solcInputs/*
 deployments/base-goerli/solcInputs/*
-deployments/arbitrum-goerli/solcInputs/*
+deployments/arbitrum-sepolia/solcInputs/*
 deployments/polygon-amoy/solcInputs/*
 deployments/scroll-sepolia/solcInputs/*
 deployments/linea-goerli/solcInputs/*

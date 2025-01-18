@@ -345,16 +345,22 @@ Version 1.2.0:
   * Contract: [0xE0893F47009776D6aEC3De8455Cb0ed325Eea74a](https://goerli.basescan.org/address/0xE0893F47009776D6aEC3De8455Cb0ed325Eea74a)
   * Deployment and ABI: [Indexer.json](./deployments/base-goerli/Indexer.json)
 
-#### Arbitrum Goerli
+#### Arbitrum Sepolia
 
-Version 1.1.0:
+Version 1.3.0:
 
 * **EAS**:
-  * Contract: [0xaEF4103A04090071165F78D45D83A0C0782c2B2a](https:/goerli.arbiscan.io/address/0xaEF4103A04090071165F78D45D83A0C0782c2B2a)
-  * Deployment and ABI: [EAS.json](./deployments/arbitrum-goerli/EAS.json)
+  * Contract: [0x2521021fc8BF070473E1e1801D3c7B4aB701E1dE](https:/sepolia.arbiscan.io/address/0x2521021fc8BF070473E1e1801D3c7B4aB701E1dE)
+  * Deployment and ABI: [EAS.json](./deployments/arbitrum-sepolia/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797](https:/goerli.arbiscan.io/address/0x55D26f9ae0203EF95494AE4C170eD35f4Cf77797)
-  * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-goerli/SchemaRegistry.json)
+  * Contract: [0x45CB6Fa0870a8Af06796Ac15915619a0f22cd475](https:/sepolia.arbiscan.io/address/0x45CB6Fa0870a8Af06796Ac15915619a0f22cd475)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/arbitrum-sepolia/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x8E807011c16E538B2dEEf1dc652EFe7724E09397](https://sepolia.arbiscan.io/address/0x8E807011c16E538B2dEEf1dc652EFe7724E09397)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/arbitrum-sepolia/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x501D6d86240De5A57E91414356ad4B1778F0AB18](https://sepolia.arbiscan.io/address/0x501D6d86240De5A57E91414356ad4B1778F0AB18)
+  * Deployment and ABI: [Indexer.json](./deployments/arbitrum-sepolia/Indexer.json)
 
 #### Polygon Amoy
 

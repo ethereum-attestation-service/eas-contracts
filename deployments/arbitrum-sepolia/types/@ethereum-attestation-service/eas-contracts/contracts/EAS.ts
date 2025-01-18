@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../../common";
 
 export type AttestationRequestDataStruct = {
   recipient: AddressLike;
@@ -71,18 +71,21 @@ export type DelegatedAttestationRequestStruct = {
   data: AttestationRequestDataStruct;
   signature: SignatureStruct;
   attester: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type DelegatedAttestationRequestStructOutput = [
   schema: string,
   data: AttestationRequestDataStructOutput,
   signature: SignatureStructOutput,
-  attester: string
+  attester: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: AttestationRequestDataStructOutput;
   signature: SignatureStructOutput;
   attester: string;
+  deadline: bigint;
 };
 
 export type AttestationStruct = {
@@ -137,18 +140,21 @@ export type MultiDelegatedAttestationRequestStruct = {
   data: AttestationRequestDataStruct[];
   signatures: SignatureStruct[];
   attester: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type MultiDelegatedAttestationRequestStructOutput = [
   schema: string,
   data: AttestationRequestDataStructOutput[],
   signatures: SignatureStructOutput[],
-  attester: string
+  attester: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: AttestationRequestDataStructOutput[];
   signatures: SignatureStructOutput[];
   attester: string;
+  deadline: bigint;
 };
 
 export type RevocationRequestDataStruct = {
@@ -176,18 +182,21 @@ export type MultiDelegatedRevocationRequestStruct = {
   data: RevocationRequestDataStruct[];
   signatures: SignatureStruct[];
   revoker: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type MultiDelegatedRevocationRequestStructOutput = [
   schema: string,
   data: RevocationRequestDataStructOutput[],
   signatures: SignatureStructOutput[],
-  revoker: string
+  revoker: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: RevocationRequestDataStructOutput[];
   signatures: SignatureStructOutput[];
   revoker: string;
+  deadline: bigint;
 };
 
 export type RevocationRequestStruct = {
@@ -205,18 +214,21 @@ export type DelegatedRevocationRequestStruct = {
   data: RevocationRequestDataStruct;
   signature: SignatureStruct;
   revoker: AddressLike;
+  deadline: BigNumberish;
 };
 
 export type DelegatedRevocationRequestStructOutput = [
   schema: string,
   data: RevocationRequestDataStructOutput,
   signature: SignatureStructOutput,
-  revoker: string
+  revoker: string,
+  deadline: bigint
 ] & {
   schema: string;
   data: RevocationRequestDataStructOutput;
   signature: SignatureStructOutput;
   revoker: string;
+  deadline: bigint;
 };
 
 export interface EASInterface extends Interface {
@@ -234,6 +246,7 @@ export interface EASInterface extends Interface {
       | "getRevokeTypeHash"
       | "getSchemaRegistry"
       | "getTimestamp"
+      | "increaseNonce"
       | "isAttestationValid"
       | "multiAttest"
       | "multiAttestByDelegation"
@@ -252,6 +265,7 @@ export interface EASInterface extends Interface {
     nameOrSignatureOrTopic:
       | "Attested"
       | "EIP712DomainChanged"
+      | "NonceIncreased"
       | "Revoked"
       | "RevokedOffchain"
       | "Timestamped"
@@ -301,6 +315,10 @@ export interface EASInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getTimestamp",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "increaseNonce",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isAttestationValid",
@@ -388,6 +406,10 @@ export interface EASInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "increaseNonce",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isAttestationValid",
     data: BytesLike
   ): Result;
@@ -433,19 +455,19 @@ export namespace AttestedEvent {
     recipient: AddressLike,
     attester: AddressLike,
     uid: BytesLike,
-    schema: BytesLike
+    schemaUID: BytesLike
   ];
   export type OutputTuple = [
     recipient: string,
     attester: string,
     uid: string,
-    schema: string
+    schemaUID: string
   ];
   export interface OutputObject {
     recipient: string;
     attester: string;
     uid: string;
-    schema: string;
+    schemaUID: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -463,24 +485,37 @@ export namespace EIP712DomainChangedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace NonceIncreasedEvent {
+  export type InputTuple = [oldNonce: BigNumberish, newNonce: BigNumberish];
+  export type OutputTuple = [oldNonce: bigint, newNonce: bigint];
+  export interface OutputObject {
+    oldNonce: bigint;
+    newNonce: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace RevokedEvent {
   export type InputTuple = [
     recipient: AddressLike,
     attester: AddressLike,
     uid: BytesLike,
-    schema: BytesLike
+    schemaUID: BytesLike
   ];
   export type OutputTuple = [
     recipient: string,
     attester: string,
     uid: string,
-    schema: string
+    schemaUID: string
   ];
   export interface OutputObject {
     recipient: string;
     attester: string;
     uid: string;
-    schema: string;
+    schemaUID: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -616,6 +651,12 @@ export interface EAS extends BaseContract {
 
   getTimestamp: TypedContractMethod<[data: BytesLike], [bigint], "view">;
 
+  increaseNonce: TypedContractMethod<
+    [newNonce: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   isAttestationValid: TypedContractMethod<[uid: BytesLike], [boolean], "view">;
 
   multiAttest: TypedContractMethod<
@@ -743,6 +784,9 @@ export interface EAS extends BaseContract {
     nameOrSignature: "getTimestamp"
   ): TypedContractMethod<[data: BytesLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "increaseNonce"
+  ): TypedContractMethod<[newNonce: BigNumberish], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "isAttestationValid"
   ): TypedContractMethod<[uid: BytesLike], [boolean], "view">;
   getFunction(
@@ -814,6 +858,13 @@ export interface EAS extends BaseContract {
     EIP712DomainChangedEvent.OutputObject
   >;
   getEvent(
+    key: "NonceIncreased"
+  ): TypedContractEvent<
+    NonceIncreasedEvent.InputTuple,
+    NonceIncreasedEvent.OutputTuple,
+    NonceIncreasedEvent.OutputObject
+  >;
+  getEvent(
     key: "Revoked"
   ): TypedContractEvent<
     RevokedEvent.InputTuple,
@@ -856,6 +907,17 @@ export interface EAS extends BaseContract {
       EIP712DomainChangedEvent.InputTuple,
       EIP712DomainChangedEvent.OutputTuple,
       EIP712DomainChangedEvent.OutputObject
+    >;
+
+    "NonceIncreased(uint256,uint256)": TypedContractEvent<
+      NonceIncreasedEvent.InputTuple,
+      NonceIncreasedEvent.OutputTuple,
+      NonceIncreasedEvent.OutputObject
+    >;
+    NonceIncreased: TypedContractEvent<
+      NonceIncreasedEvent.InputTuple,
+      NonceIncreasedEvent.OutputTuple,
+      NonceIncreasedEvent.OutputObject
     >;
 
     "Revoked(address,address,bytes32,bytes32)": TypedContractEvent<

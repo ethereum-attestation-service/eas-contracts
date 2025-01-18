@@ -34,7 +34,7 @@
     "/deployments/optimism-goerli/**/*",
     "/deployments/base-sepolia/**/*",
     "/deployments/base-goerli/**/*",
-    "/deployments/arbitrum-goerli/**/*",
+    "/deployments/arbitrum-sepolia/**/*",
     "/deployments/polygon-amoy/**/*",
     "/deployments/scroll-sepolia/**/*",
     "/deployments/linea-goerli/**/*"
