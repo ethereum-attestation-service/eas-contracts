@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import { IEAS } from "../../../IEAS.sol";
 import { EIP712Proxy, DelegatedProxyAttestationRequest, DelegatedProxyRevocationRequest } from "../../../eip712/proxy/EIP712Proxy.sol";

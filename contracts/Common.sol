@@ -35,10 +35,3 @@ struct Attestation {
     bool revocable; // Whether the attestation is revocable.
     bytes data; // Custom attestation data.
 }
-
-/// @notice A helper function to work with unchecked iterators in loops.
-function uncheckedInc(uint256 i) pure returns (uint256 j) {
-    unchecked {
-        j = i + 1;
-    }
-}

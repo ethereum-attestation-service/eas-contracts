@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Ownable, Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 // prettier-ignore
 import {
@@ -15,11 +15,11 @@ import {
 
 import { IEAS } from "../../../IEAS.sol";
 
-import { AccessDenied, uncheckedInc } from "../../../Common.sol";
+import { AccessDenied } from "../../../Common.sol";
 
 /// @title PermissionedEIP712Proxy
 /// @notice A sample EIP712 proxy that allows only a specific address to attest.
-contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
+contract PermissionedEIP712Proxy is EIP712Proxy, Ownable2Step {
     /// @dev Creates a new PermissionedEIP712Proxy instance.
     /// @param eas The address of the global EAS contract.
     /// @param name The user readable name of the signing domain.
@@ -40,7 +40,7 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
         MultiDelegatedProxyAttestationRequest[] calldata multiDelegatedRequests
     ) public payable override returns (bytes32[] memory) {
         uint256 length = multiDelegatedRequests.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // Ensure that only the owner is allowed to delegate attestations.
             _verifyAttester(multiDelegatedRequests[i].attester);
         }
@@ -61,7 +61,7 @@ contract PermissionedEIP712Proxy is EIP712Proxy, Ownable {
         MultiDelegatedProxyRevocationRequest[] calldata multiDelegatedRequests
     ) public payable override {
         uint256 length = multiDelegatedRequests.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // Ensure that only the owner is allowed to delegate revocations.
             _verifyAttester(multiDelegatedRequests[i].revoker);
         }

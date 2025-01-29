@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import { IEAS, Attestation } from "./IEAS.sol";
-import { EMPTY_UID, uncheckedInc } from "./Common.sol";
+import { EMPTY_UID } from "./Common.sol";
 import { Semver } from "./Semver.sol";
 
 /// @title Indexer
@@ -38,7 +38,7 @@ contract Indexer is Semver {
 
     /// @dev Creates a new Indexer instance.
     /// @param eas The address of the global EAS contract.
-    constructor(IEAS eas) Semver(1, 3, 0) {
+    constructor(IEAS eas) Semver(1, 4, 0) {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
@@ -61,7 +61,7 @@ contract Indexer is Semver {
     /// @param attestationUIDs The UIDs of the attestations to index.
     function indexAttestations(bytes32[] calldata attestationUIDs) external {
         uint256 length = attestationUIDs.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             _indexAttestation(attestationUIDs[i]);
         }
     }

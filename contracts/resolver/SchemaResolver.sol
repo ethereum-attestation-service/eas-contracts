@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-import { AccessDenied, InvalidEAS, InvalidLength, uncheckedInc } from "./../Common.sol";
+import { AccessDenied, InvalidEAS, InvalidLength } from "./../Common.sol";
 import { IEAS, Attestation } from "./../IEAS.sol";
 import { Semver } from "./../Semver.sol";
 import { ISchemaResolver } from "./ISchemaResolver.sol";
@@ -18,7 +18,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
 
     /// @dev Creates a new resolver.
     /// @param eas The address of the global EAS contract.
-    constructor(IEAS eas) Semver(1, 3, 0) {
+    constructor(IEAS eas) Semver(1, 4, 0) {
         if (address(eas) == address(0)) {
             revert InvalidEAS();
         }
@@ -66,7 +66,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {
@@ -108,7 +108,7 @@ abstract contract SchemaResolver is ISchemaResolver, Semver {
         // possible to send too much ETH anyway.
         uint256 remainingValue = msg.value;
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // Ensure that the attester/revoker doesn't try to spend more than available.
             uint256 value = values[i];
             if (value > remainingValue) {

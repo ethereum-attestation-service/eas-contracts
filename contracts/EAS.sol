@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
@@ -14,8 +14,7 @@ import {
     EMPTY_UID,
     InvalidLength,
     NotFound,
-    NO_EXPIRATION_TIME,
-    uncheckedInc
+    NO_EXPIRATION_TIME
 } from "./Common.sol";
 
 // prettier-ignore
@@ -79,7 +78,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
     /// @dev Creates a new EAS instance.
     /// @param registry The address of the global schema registry.
-    constructor(ISchemaRegistry registry) Semver(1, 3, 0) EIP1271Verifier("EAS", "1.3.0") {
+    constructor(ISchemaRegistry registry) Semver(1, 4, 0) EIP1271Verifier("EAS", "1.4.0") {
         if (address(registry) == address(0)) {
             revert InvalidRegistry();
         }
@@ -126,7 +125,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // possible to send too much ETH anyway.
         uint256 availableValue = msg.value;
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -181,7 +180,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         // possible to send too much ETH anyway.
         uint256 availableValue = msg.value;
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -200,7 +199,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             }
 
             // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; ++j) {
                 _verifyAttest(
                     DelegatedAttestationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -262,7 +261,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         uint256 availableValue = msg.value;
 
         uint256 length = multiRequests.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -289,7 +288,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         uint256 availableValue = msg.value;
 
         uint256 length = multiDelegatedRequests.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
             // is a remainder - it will be refunded back to the attester (something that we can only verify during the
             // last and final batch).
@@ -308,7 +307,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             }
 
             // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; ++j) {
                 _verifyRevoke(
                     DelegatedRevocationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -354,7 +353,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         uint64 time = _time();
 
         uint256 length = data.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             _revokeOffchain(msg.sender, data[i], time);
         }
 
@@ -366,7 +365,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         uint64 time = _time();
 
         uint256 length = data.length;
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             _timestamp(data[i], time);
         }
 
@@ -421,7 +420,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         Attestation[] memory attestations = new Attestation[](length);
         uint256[] memory values = new uint256[](length);
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             AttestationRequestData memory request = data[i];
 
             // Ensure that either no expiration time was set or that it was set in the future.
@@ -508,7 +507,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         Attestation[] memory attestations = new Attestation[](length);
         uint256[] memory values = new uint256[](length);
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             RevocationRequestData memory request = data[i];
 
             Attestation storage attestation = _db[request.uid];
@@ -635,7 +634,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         ISchemaResolver resolver = schemaRecord.resolver;
         if (address(resolver) == address(0)) {
             // Ensure that we don't accept payments if there is no resolver.
-            for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+            for (uint256 i = 0; i < length; ++i) {
                 if (values[i] != 0) {
                     revert NotPayable();
                 }
@@ -651,7 +650,7 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         uint256 totalUsedValue = 0;
         bool isResolverPayable = resolver.isPayable();
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             uint256 value = values[i];
 
             // Ensure that we don't accept payments which can't be forwarded to the resolver.
@@ -760,10 +759,10 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
 
         uint256 currentIndex = 0;
         uint256 uidListLength = uidLists.length;
-        for (uint256 i = 0; i < uidListLength; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < uidListLength; ++i) {
             bytes32[] memory currentUIDs = uidLists[i];
             uint256 currentUIDsLength = currentUIDs.length;
-            for (uint256 j = 0; j < currentUIDsLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < currentUIDsLength; ++j) {
                 uids[currentIndex] = currentUIDs[j];
 
                 unchecked {
