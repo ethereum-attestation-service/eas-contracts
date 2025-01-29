@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -14,8 +14,7 @@ import {
     InvalidLength,
     InvalidSignature,
     NotFound,
-    NO_EXPIRATION_TIME,
-    uncheckedInc
+    NO_EXPIRATION_TIME
 } from "../../Common.sol";
 
 // prettier-ignore
@@ -217,7 +216,7 @@ contract EIP712Proxy is Semver, EIP712 {
         uint256 length = multiDelegatedRequests.length;
         MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](length);
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
@@ -228,7 +227,7 @@ contract EIP712Proxy is Semver, EIP712 {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; ++j) {
                 _verifyAttest(
                     DelegatedProxyAttestationRequest({
                         schema: multiDelegatedRequest.schema,
@@ -248,12 +247,12 @@ contract EIP712Proxy is Semver, EIP712 {
         // Store all attesters, according to the order of the attestation requests.
         uint256 uidCounter = 0;
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             MultiDelegatedProxyAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
             AttestationRequestData[] calldata data = multiDelegatedRequest.data;
 
             uint256 dataLength = data.length;
-            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; ++j) {
                 _attesters[uids[uidCounter]] = multiDelegatedRequest.attester;
 
                 unchecked {
@@ -326,7 +325,7 @@ contract EIP712Proxy is Semver, EIP712 {
         uint256 length = multiDelegatedRequests.length;
         MultiRevocationRequest[] memory multiRequests = new MultiRevocationRequest[](length);
 
-        for (uint256 i = 0; i < length; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < length; ++i) {
             MultiDelegatedProxyRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
             RevocationRequestData[] memory data = multiDelegatedRequest.data;
 
@@ -337,7 +336,7 @@ contract EIP712Proxy is Semver, EIP712 {
             }
 
             // Verify EIP712 signatures. Please note that the signatures are assumed to be signed with increasing nonces.
-            for (uint256 j = 0; j < dataLength; j = uncheckedInc(j)) {
+            for (uint256 j = 0; j < dataLength; ++j) {
                 RevocationRequestData memory requestData = data[j];
 
                 _verifyRevoke(

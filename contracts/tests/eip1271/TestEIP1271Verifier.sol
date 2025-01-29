@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import { EIP1271Verifier } from "../../eip1271/EIP1271Verifier.sol";
 import { DelegatedAttestationRequest, DelegatedRevocationRequest } from "../../IEAS.sol";
 import { Semver } from "../../Semver.sol";
 
 contract TestEIP1271Verifier is Semver, EIP1271Verifier {
-    constructor(string memory name) Semver(1, 3, 0) EIP1271Verifier(name, "1.3.0") {}
+    constructor(string memory name) Semver(1, 4, 0) EIP1271Verifier(name, "1.4.0") {}
 
     function verifyAttest(DelegatedAttestationRequest memory request) external {
         _verifyAttest(request);
