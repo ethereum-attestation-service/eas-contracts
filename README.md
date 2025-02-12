@@ -209,17 +209,34 @@ Version 1.4.0:
 Version 1.4.1-beta.1:
 
 * **EAS**:
-  * Contract: [0x4200000000000000000000000000000000000021](https://soneium.blockscout.com//address/0x4200000000000000000000000000000000000021)
+  * Contract: [0x4200000000000000000000000000000000000021](https://soneium.blockscout.com/address/0x4200000000000000000000000000000000000021)
   * Deployment and ABI: [EAS.json](./deployments/soneium/EAS.json)
 * **SchemaRegistry**:
-  * Contract: [0x4200000000000000000000000000000000000020](https://soneium.blockscout.com//address/0x4200000000000000000000000000000000000020)
+  * Contract: [0x4200000000000000000000000000000000000020](https://soneium.blockscout.com/address/0x4200000000000000000000000000000000000020)
   * Deployment and ABI: [SchemaRegistry.json](./deployments/soneium/SchemaRegistry.json)
 * **EIP712Proxy**:
-  * Contract: [0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE](https://soneium.blockscout.com//address/0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE)
+  * Contract: [0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE](https://soneium.blockscout.com/address/0x465a34dd6dDb5DF22DBC67D005b5BF4a0BF7f8AE)
   * Deployment and ABI: [EIP712Proxy.json](./deployments/soneium/EIP712Proxy.json)
 * **Indexer**:
-  * Contract: [0x16613642e9793d413c296f9AB5457077b99AA7B0](https://soneium.blockscout.com//address/0x16613642e9793d413c296f9AB5457077b99AA7B0)
+  * Contract: [0x16613642e9793d413c296f9AB5457077b99AA7B0](https://soneium.blockscout.com/address/0x16613642e9793d413c296f9AB5457077b99AA7B0)
   * Deployment and ABI: [Indexer.json](./deployments/soneium/Indexer.json)
+
+#### Unichain
+
+Version 1.4.1-beta.1:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://uniscan.xyz/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/unichain/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://uniscan.xyz/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/unichain/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x65c83e3C5f1505C4220B2f57815285Dc58464088](https://uniscan.xyz/address/0x65c83e3C5f1505C4220B2f57815285Dc58464088)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/unichain/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0xE6afd49f7beF444e39BFDFbB6BE63119a8BdE88F](https://uniscan.xyz/address/0xE6afd49f7beF444e39BFDFbB6BE63119a8BdE88F)
+  * Deployment and ABI: [Indexer.json](./deployments/unichain/Indexer.json)
 
 #### Blast
 

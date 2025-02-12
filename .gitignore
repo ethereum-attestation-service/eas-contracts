@@ -22,6 +22,9 @@ deployments/scroll/solcInputs/*
 deployments/zksync/solcInputs/*
 deployments/celo/solcInputs/*
 deployments/linea/solcInputs/*
+deployments/telos/solcInputs/*
+deployments/soneium/solcInputs/*
+deployments/unichain/solcInputs/*
 deployments/sepolia/solcInputs/*
 deployments/optimism-sepolia/solcInputs/*
 deployments/optimism-goerli/solcInputs/*
