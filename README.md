@@ -221,6 +221,23 @@ Version 1.4.1-beta.1:
   * Contract: [0x16613642e9793d413c296f9AB5457077b99AA7B0](https://soneium.blockscout.com/address/0x16613642e9793d413c296f9AB5457077b99AA7B0)
   * Deployment and ABI: [Indexer.json](./deployments/soneium/Indexer.json)
 
+#### Ink
+
+Version 1.4.1-beta.1:
+
+* **EAS**:
+  * Contract: [0x4200000000000000000000000000000000000021](https://explorer.inkonchain.com/address/0x4200000000000000000000000000000000000021)
+  * Deployment and ABI: [EAS.json](./deployments/ink/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x4200000000000000000000000000000000000020](https://explorer.inkonchain.com/address/0x4200000000000000000000000000000000000020)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/ink/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x6511967899445c5944f555Fe2B2D5EC4D74d2579](https://explorer.inkonchain.com/address/0x6511967899445c5944f555Fe2B2D5EC4D74d2579)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/ink/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0xd87dCB0E5E0044Ba5Aa57D383cd3f8D0509a42b9](https://explorer.inkonchain.com/address/0xd87dCB0E5E0044Ba5Aa57D383cd3f8D0509a42b9)
+  * Deployment and ABI: [Indexer.json](./deployments/ink/Indexer.json)
+
 #### Unichain
 
 Version 1.4.1-beta.1:
