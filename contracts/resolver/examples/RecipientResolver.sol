@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.28;
+pragma solidity 0.8.29;
 
 import { SchemaResolver } from "../SchemaResolver.sol";
 
