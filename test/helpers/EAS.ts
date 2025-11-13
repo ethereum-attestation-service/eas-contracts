@@ -1,5 +1,15 @@
 import { expect } from 'chai';
-import { BaseContract, hexlify, Signer, TransactionResponse } from 'ethers';
+import {
+  AbiCoder,
+  BaseContract,
+  hexlify,
+  keccak256,
+  Signer,
+  solidityPacked,
+  toUtf8Bytes,
+  TransactionResponse
+} from 'ethers';
+import Contracts, { TestEIP1271Signer } from '../../components/Contracts';
 import { SchemaRegistry, SchemaResolver, TestEAS } from '../../typechain-types';
 import {
   MultiDelegatedProxyAttestationRequestStruct,
@@ -8,7 +18,9 @@ import {
 import {
   AttestationStructOutput,
   MultiDelegatedAttestationRequestStruct,
-  MultiDelegatedRevocationRequestStruct
+  MultiDelegatedRevocationRequestStruct,
+  MultiERC1271DelegatedAttestationRequestStruct,
+  MultiERC1271DelegatedRevocationRequestStruct
 } from '../../typechain-types/contracts/IEAS';
 import { NO_EXPIRATION, ZERO_BYTES32 } from '../../utils/Constants';
 import {
@@ -44,13 +56,15 @@ export const registerSchema = async (
 export enum SignatureType {
   Direct = 'direct',
   Delegated = 'delegated',
-  DelegatedProxy = 'delegated-proxy'
+  DelegatedProxy = 'delegated-proxy',
+  ERC1271Delegated = 'erc1271-delegated'
 }
 
 export interface RequestContracts {
   eas: TestEAS;
   eip712Utils?: EIP712Utils;
   eip712ProxyUtils?: EIP712ProxyUtils;
+  erc1271Signer?: TestEIP1271Signer;
 }
 
 export interface AttestationOptions {
@@ -115,6 +129,7 @@ export const expectAttestation = async (
 
   const msgValue = options.value ?? value;
   let uid;
+  let erc1271AttesterAddress: string | undefined;
 
   let res: TransactionResponse;
 
@@ -226,6 +241,63 @@ export const expectAttestation = async (
 
       break;
     }
+
+    case SignatureType.ERC1271Delegated: {
+      if (!eip712Utils) {
+        throw new Error('Invalid verifier');
+      }
+
+      // For ERC1271, we need to use a contract signer
+      let erc1271Signer = contracts.erc1271Signer;
+      if (!erc1271Signer) {
+        erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+      }
+      const erc1271Address = await erc1271Signer.getAddress();
+      erc1271AttesterAddress = erc1271Address;
+
+      const nonce = await eas.getNonce(erc1271Address);
+      const hash = await eip712Utils.hashDelegatedAttestation(
+        erc1271Address,
+        schema,
+        recipient,
+        expirationTime,
+        revocable,
+        refUID,
+        data,
+        msgValue,
+        nonce,
+        deadline
+      );
+
+      // Create a dummy signature and mock it in the contract
+      // For ERC1271, we just need any valid bytes signature - we'll use the hash with some padding
+      const dummySignature = solidityPacked(
+        ['bytes32', 'bytes32', 'uint8'],
+        [hash, keccak256(AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint256'], [hash, nonce])), 27]
+      );
+      await erc1271Signer.mockSignature(hash, dummySignature);
+
+      const args = [
+        {
+          schema,
+          data: { recipient, expirationTime, revocable, refUID, data, value },
+          signature: dummySignature,
+          attester: erc1271Address,
+          deadline
+        },
+        {
+          value: msgValue
+        }
+      ] as const;
+
+      const returnedUID = await eas.connect(txSender).attestByERC1271Delegation.staticCall(...args);
+      res = await eas.connect(txSender).attestByERC1271Delegation(...args);
+
+      uid = await getUIDFromAttestTx(res);
+      expect(uid).to.equal(returnedUID);
+
+      break;
+    }
   }
 
   if (!options.skipBalanceCheck) {
@@ -234,10 +306,18 @@ export const expectAttestation = async (
     expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - value - transactionCost);
   }
 
-  const attester =
-    signatureType !== SignatureType.DelegatedProxy
-      ? await txSender.getAddress()
-      : await eip712ProxyUtils?.proxy.getAddress();
+  let attester: string;
+  if (signatureType === SignatureType.DelegatedProxy) {
+    attester = await eip712ProxyUtils!.proxy.getAddress();
+  } else if (signatureType === SignatureType.ERC1271Delegated) {
+    // Use the erc1271AttesterAddress that was set in the switch case above
+    if (!erc1271AttesterAddress) {
+      throw new Error('ERC1271 attester address not set');
+    }
+    attester = erc1271AttesterAddress;
+  } else {
+    attester = await txSender.getAddress();
+  }
 
   await expect(res).to.emit(eas, 'Attested').withArgs(recipient, attester, uid, schema);
 
@@ -420,6 +500,7 @@ export const expectMultiAttestations = async (
 
   let uids: string[] = [];
   let res: TransactionResponse;
+  let erc1271AttesterAddress: string | undefined;
 
   switch (signatureType) {
     case SignatureType.Direct: {
@@ -546,6 +627,73 @@ export const expectMultiAttestations = async (
 
       break;
     }
+
+    case SignatureType.ERC1271Delegated: {
+      if (!eip712Utils) {
+        throw new Error('Invalid verifier');
+      }
+
+      // For ERC1271, we need to use a contract signer
+      let erc1271Signer = contracts.erc1271Signer;
+      if (!erc1271Signer) {
+        erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+      }
+      const erc1271Address = await erc1271Signer.getAddress();
+      erc1271AttesterAddress = erc1271Address;
+
+      const multiERC1271DelegatedAttestationRequests: MultiERC1271DelegatedAttestationRequestStruct[] = [];
+
+      let nonce = await eas.getNonce(erc1271Address);
+
+      for (const { schema, data } of multiAttestationRequests) {
+        const signatures: string[] = [];
+
+        for (const request of data) {
+          const hash = await eip712Utils.hashDelegatedAttestation(
+            erc1271Address,
+            schema,
+            request.recipient,
+            request.expirationTime,
+            request.revocable,
+            request.refUID,
+            request.data,
+            msgValue,
+            nonce,
+            deadline
+          );
+
+          // Create a dummy signature and mock it in the contract
+          // For ERC1271, we just need any valid bytes signature - we'll use the hash with some padding
+          const dummySignature = solidityPacked(
+            ['bytes32', 'bytes32', 'uint8'],
+            [hash, keccak256(AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint256'], [hash, nonce])), 27]
+          );
+          await erc1271Signer.mockSignature(hash, dummySignature);
+
+          signatures.push(dummySignature);
+
+          nonce++;
+        }
+
+        multiERC1271DelegatedAttestationRequests.push({
+          schema,
+          data,
+          signatures,
+          attester: erc1271Address,
+          deadline
+        });
+      }
+
+      const args = [multiERC1271DelegatedAttestationRequests, { value: msgValue }] as const;
+
+      const returnedUIDs = await eas.connect(txSender).multiAttestByERC1271Delegation.staticCall(...args);
+      res = await eas.connect(txSender).multiAttestByERC1271Delegation(...args);
+
+      uids = await getUIDsFromMultiAttestTx(res);
+      expect(uids).to.deep.equal(returnedUIDs);
+
+      break;
+    }
   }
 
   if (!options.skipBalanceCheck) {
@@ -559,10 +707,18 @@ export const expectMultiAttestations = async (
     for (const request of data) {
       const uid = uids[i++];
 
-      const attester =
-        signatureType !== SignatureType.DelegatedProxy
-          ? await txSender.getAddress()
-          : await eip712ProxyUtils?.proxy.getAddress();
+      let attester: string;
+      if (signatureType === SignatureType.DelegatedProxy) {
+        attester = await eip712ProxyUtils!.proxy.getAddress();
+      } else if (signatureType === SignatureType.ERC1271Delegated) {
+        // Use the erc1271AttesterAddress that was set in the switch case above
+        if (!erc1271AttesterAddress) {
+          throw new Error('ERC1271 attester address not set');
+        }
+        attester = erc1271AttesterAddress;
+      } else {
+        attester = await txSender.getAddress();
+      }
 
       await expect(res).to.emit(eas, 'Attested').withArgs(request.recipient, attester, uid, schema);
 
@@ -744,6 +900,7 @@ export const expectRevocation = async (
   const attestation = await eas.getAttestation(uid);
 
   let res;
+  let erc1271RevokerAddress: string | undefined;
 
   switch (signatureType) {
     case SignatureType.Direct: {
@@ -813,6 +970,44 @@ export const expectRevocation = async (
 
       break;
     }
+
+    case SignatureType.ERC1271Delegated: {
+      if (!eip712Utils) {
+        throw new Error('Invalid verifier');
+      }
+
+      // For ERC1271, we need to use a contract signer
+      let erc1271Signer = contracts.erc1271Signer;
+      if (!erc1271Signer) {
+        erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+      }
+      const erc1271Address = await erc1271Signer.getAddress();
+      erc1271RevokerAddress = erc1271Address;
+
+      const nonce = await eas.getNonce(erc1271Address);
+      const hash = await eip712Utils.hashDelegatedRevocation(erc1271Address, schema, uid, msgValue, nonce, deadline);
+
+      // Create a dummy signature and mock it in the contract
+      // For ERC1271, we just need any valid bytes signature - we'll use the hash with some padding
+      const dummySignature = solidityPacked(
+        ['bytes32', 'bytes32', 'uint8'],
+        [hash, keccak256(AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint256'], [hash, nonce])), 27]
+      );
+      await erc1271Signer.mockSignature(hash, dummySignature);
+
+      res = await eas.connect(txSender).revokeByERC1271Delegation(
+        {
+          schema,
+          data: { uid, value },
+          signature: dummySignature,
+          revoker: erc1271Address,
+          deadline
+        },
+        { value: msgValue }
+      );
+
+      break;
+    }
   }
 
   if (!options.skipBalanceCheck) {
@@ -821,10 +1016,18 @@ export const expectRevocation = async (
     expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - value - transactionCost);
   }
 
-  const attester =
-    signatureType !== SignatureType.DelegatedProxy
-      ? await txSender.getAddress()
-      : await eip712ProxyUtils?.proxy.getAddress();
+  let attester: string;
+  if (signatureType === SignatureType.DelegatedProxy) {
+    attester = await eip712ProxyUtils!.proxy.getAddress();
+  } else if (signatureType === SignatureType.ERC1271Delegated) {
+    // Use the erc1271RevokerAddress that was set in the switch case above
+    if (!erc1271RevokerAddress) {
+      throw new Error('ERC1271 revoker address not set');
+    }
+    attester = erc1271RevokerAddress;
+  } else {
+    attester = await txSender.getAddress();
+  }
   await expect(res).to.emit(eas, 'Revoked').withArgs(attestation.recipient, attester, uid, attestation.schema);
 
   const attestation2 = await eas.getAttestation(uid);
@@ -866,6 +1069,7 @@ export const expectMultiRevocations = async (
   const msgValue = options.value ?? requestedValue;
 
   let res: TransactionResponse;
+  let erc1271RevokerAddress: string | undefined;
 
   switch (signatureType) {
     case SignatureType.Direct: {
@@ -960,6 +1164,65 @@ export const expectMultiRevocations = async (
 
       break;
     }
+
+    case SignatureType.ERC1271Delegated: {
+      if (!eip712Utils) {
+        throw new Error('Invalid verifier');
+      }
+
+      // For ERC1271, we need to use a contract signer
+      let erc1271Signer = contracts.erc1271Signer;
+      if (!erc1271Signer) {
+        erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+      }
+      const erc1271Address = await erc1271Signer.getAddress();
+      erc1271RevokerAddress = erc1271Address;
+
+      const multiERC1271DelegatedRevocationRequests: MultiERC1271DelegatedRevocationRequestStruct[] = [];
+
+      let nonce = await eas.getNonce(erc1271Address);
+
+      for (const { schema, data } of multiRevocationRequests) {
+        const signatures: string[] = [];
+
+        for (const request of data) {
+          const hash = await eip712Utils.hashDelegatedRevocation(
+            erc1271Address,
+            schema,
+            request.uid,
+            msgValue,
+            nonce,
+            deadline
+          );
+
+          // Create a dummy signature and mock it in the contract
+          // For ERC1271, we just need any valid bytes signature - we'll use the hash with some padding
+          const dummySignature = solidityPacked(
+            ['bytes32', 'bytes32', 'uint8'],
+            [hash, keccak256(AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint256'], [hash, nonce])), 27]
+          );
+          await erc1271Signer.mockSignature(hash, dummySignature);
+
+          signatures.push(dummySignature);
+
+          nonce++;
+        }
+
+        multiERC1271DelegatedRevocationRequests.push({
+          schema,
+          data,
+          signatures,
+          revoker: erc1271Address,
+          deadline
+        });
+      }
+
+      res = await eas.connect(txSender).multiRevokeByERC1271Delegation(multiERC1271DelegatedRevocationRequests, {
+        value: msgValue
+      });
+
+      break;
+    }
   }
 
   if (!options.skipBalanceCheck) {
@@ -968,10 +1231,18 @@ export const expectMultiRevocations = async (
     expect(await getBalance(await txSender.getAddress())).to.equal(prevBalance - requestedValue - transactionCost);
   }
 
-  const attester =
-    signatureType !== SignatureType.DelegatedProxy
-      ? await txSender.getAddress()
-      : await eip712ProxyUtils?.proxy.getAddress();
+  let attester: string;
+  if (signatureType === SignatureType.DelegatedProxy) {
+    attester = await eip712ProxyUtils!.proxy.getAddress();
+  } else if (signatureType === SignatureType.ERC1271Delegated) {
+    // Use the erc1271RevokerAddress that was set in the switch case above
+    if (!erc1271RevokerAddress) {
+      throw new Error('ERC1271 revoker address not set');
+    }
+    attester = erc1271RevokerAddress;
+  } else {
+    attester = await txSender.getAddress();
+  }
 
   for (const data of requests) {
     for (const request of data.requests) {

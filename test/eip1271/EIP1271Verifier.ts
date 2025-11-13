@@ -299,6 +299,222 @@ describe('EIP1271Verifier', () => {
         });
       });
 
+      describe('verify ERC1271 attest', () => {
+        interface AttestationRequestData {
+          recipient: string;
+          expirationTime: bigint;
+          revocable: boolean;
+          refUID: string;
+          data: string;
+          value: bigint;
+        }
+
+        const schema = ZERO_BYTES32;
+        const deadline = NO_EXPIRATION;
+        let attestationRequest: AttestationRequestData;
+        let erc1271Signer: TestEIP1271Signer;
+
+        beforeEach(async () => {
+          attestationRequest = {
+            recipient: await recipient.getAddress(),
+            expirationTime: NO_EXPIRATION,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data: ZERO_BYTES,
+            value: 1000n
+          };
+
+          erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+        });
+
+        const signERC1271DelegatedAttestation = async (
+          signer: TestEIP1271Signer,
+          attestationRequest: AttestationRequestData
+        ) => {
+          const nonce = await verifier.getNonce(await signer.getAddress());
+          const hash = await eip712Utils.hashDelegatedAttestation(
+            await signer.getAddress(),
+            schema,
+            attestationRequest.recipient,
+            attestationRequest.expirationTime,
+            attestationRequest.revocable,
+            attestationRequest.refUID,
+            attestationRequest.data,
+            attestationRequest.value,
+            nonce,
+            deadline
+          );
+
+          // Create a dummy signature and mock it in the contract
+          const dummySignature = solidityPacked(
+            ['bytes32', 'bytes32', 'uint8'],
+            [hash, keccak256(`${hash}${await latest()}`), 27]
+          );
+          await signer.mockSignature(hash, dummySignature);
+
+          return dummySignature;
+        };
+
+        it('should verify ERC1271 delegated attestation request', async () => {
+          for (let i = 0; i < 3; ++i) {
+            const signature = await signERC1271DelegatedAttestation(erc1271Signer, attestationRequest);
+
+            await expect(
+              verifier.verifyERC1271Attest({
+                schema,
+                data: attestationRequest,
+                signature,
+                attester: await erc1271Signer.getAddress(),
+                deadline
+              })
+            ).not.to.be.reverted;
+          }
+        });
+
+        it('should revert when verifying ERC1271 delegated attestation request with an expired deadline', async () => {
+          const signature = await signERC1271DelegatedAttestation(erc1271Signer, attestationRequest);
+
+          await expect(
+            verifier.verifyERC1271Attest({
+              schema,
+              data: attestationRequest,
+              signature,
+              attester: await erc1271Signer.getAddress(),
+              deadline: (await latest()) - duration.hours(1n)
+            })
+          ).to.be.revertedWithCustomError(verifier, 'DeadlineExpired');
+        });
+
+        it('should revert when verifying ERC1271 delegated attestation request with a wrong signature', async () => {
+          const signature = await signERC1271DelegatedAttestation(erc1271Signer, attestationRequest);
+
+          const wrongSignature = '0x' + '1'.repeat(130); // Invalid signature
+
+          await expect(
+            verifier.verifyERC1271Attest({
+              schema,
+              data: attestationRequest,
+              signature: wrongSignature,
+              attester: await erc1271Signer.getAddress(),
+              deadline
+            })
+          ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
+
+          const wrongSigner = await Contracts.TestEIP1271Signer.deploy();
+          await expect(
+            verifier.verifyERC1271Attest({
+              schema,
+              data: attestationRequest,
+              signature,
+              attester: await wrongSigner.getAddress(),
+              deadline
+            })
+          ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
+        });
+      });
+
+      describe('verify ERC1271 revoke', () => {
+        const schema = ZERO_BYTES32;
+        const deadline = NO_EXPIRATION;
+
+        interface RevocationRequestData {
+          uid: string;
+          value: bigint;
+        }
+
+        const revocationRequest: RevocationRequestData = {
+          uid: ZERO_BYTES32,
+          value: 1000n
+        };
+
+        let erc1271Signer: TestEIP1271Signer;
+
+        beforeEach(async () => {
+          erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
+        });
+
+        const signERC1271DelegatedRevocation = async (
+          signer: TestEIP1271Signer,
+          revocationRequest: RevocationRequestData
+        ) => {
+          const nonce = await verifier.getNonce(await signer.getAddress());
+          const hash = await eip712Utils.hashDelegatedRevocation(
+            await signer.getAddress(),
+            schema,
+            revocationRequest.uid,
+            revocationRequest.value,
+            nonce,
+            deadline
+          );
+
+          // Create a dummy signature and mock it in the contract
+          const dummySignature = solidityPacked(
+            ['bytes32', 'bytes32', 'uint8'],
+            [hash, keccak256(`${hash}${await latest()}`), 27]
+          );
+          await signer.mockSignature(hash, dummySignature);
+
+          return dummySignature;
+        };
+
+        it('should verify ERC1271 delegated revocation request', async () => {
+          for (let i = 0; i < 3; ++i) {
+            const signature = await signERC1271DelegatedRevocation(erc1271Signer, revocationRequest);
+
+            await expect(
+              verifier.verifyERC1271Revoke({
+                schema,
+                data: revocationRequest,
+                signature,
+                revoker: await erc1271Signer.getAddress(),
+                deadline
+              })
+            ).not.to.be.reverted;
+          }
+        });
+
+        it('should revert when verifying ERC1271 delegated revocation request with an expired deadline', async () => {
+          const signature = await signERC1271DelegatedRevocation(erc1271Signer, revocationRequest);
+
+          await expect(
+            verifier.verifyERC1271Revoke({
+              schema,
+              data: revocationRequest,
+              signature,
+              revoker: await erc1271Signer.getAddress(),
+              deadline: (await latest()) - duration.hours(1n)
+            })
+          ).to.be.revertedWithCustomError(verifier, 'DeadlineExpired');
+        });
+
+        it('should revert when verifying ERC1271 delegated revocation request with a wrong signature', async () => {
+          const signature = await signERC1271DelegatedRevocation(erc1271Signer, revocationRequest);
+
+          const wrongSignature = '0x' + '1'.repeat(130); // Invalid signature
+
+          await expect(
+            verifier.verifyERC1271Revoke({
+              schema,
+              data: revocationRequest,
+              signature: wrongSignature,
+              revoker: await erc1271Signer.getAddress(),
+              deadline
+            })
+          ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
+
+          const wrongSigner = await Contracts.TestEIP1271Signer.deploy();
+          await expect(
+            verifier.verifyERC1271Revoke({
+              schema,
+              data: revocationRequest,
+              signature,
+              revoker: await wrongSigner.getAddress(),
+              deadline
+            })
+          ).to.be.revertedWithCustomError(verifier, 'InvalidSignature');
+        });
+      });
+
       describe('increasing nonces', () => {
         let user: Signer;
 

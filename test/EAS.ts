@@ -1,6 +1,6 @@
 import { encodeBytes32String, Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import Contracts from '../components/Contracts';
+import Contracts, { TestEIP1271Signer } from '../components/Contracts';
 import { SchemaRegistry, TestEAS, TestEIP712Proxy } from '../typechain-types';
 import { NO_EXPIRATION, ZERO_ADDRESS, ZERO_BYTES32 } from '../utils/Constants';
 import { getSchemaUID, getUIDFromAttestTx } from '../utils/EAS';
@@ -43,6 +43,8 @@ describe('EAS', () => {
     [recipient, recipient2] = accounts;
   });
 
+  let erc1271Signer: TestEIP1271Signer;
+
   beforeEach(async () => {
     sender = await createWallet();
     sender2 = await createWallet();
@@ -54,6 +56,8 @@ describe('EAS', () => {
 
     eip712Utils = await EIP712Utils.fromVerifier(eas);
     eip712ProxyUtils = await EIP712ProxyUtils.fromProxy(proxy);
+
+    erc1271Signer = await Contracts.TestEIP1271Signer.deploy();
 
     const now = await latest();
     expect(await eas.getTime()).to.equal(now);
@@ -82,7 +86,12 @@ describe('EAS', () => {
       expirationTime = (await eas.getTime()) + duration.days(30n);
     });
 
-    for (const signatureType of [SignatureType.Direct, SignatureType.Delegated, SignatureType.DelegatedProxy]) {
+    for (const signatureType of [
+      SignatureType.Direct,
+      SignatureType.Delegated,
+      SignatureType.DelegatedProxy,
+      SignatureType.ERC1271Delegated
+    ]) {
       context(`via ${signatureType} attestation`, () => {
         it('should revert when attesting to an unregistered schema', async () => {
           await expectFailedAttestation(
@@ -194,7 +203,7 @@ describe('EAS', () => {
           it('should revert when multi attesting to multiple unregistered schemas', async () => {
             // Only one of the requests is to an unregistered schema
             await expectFailedMultiAttestations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [
                 {
                   schema: schema1Id,
@@ -256,7 +265,7 @@ describe('EAS', () => {
 
             // The first request is invalid
             await expectFailedMultiAttestations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [
                 {
                   schema: schema1Id,
@@ -290,7 +299,7 @@ describe('EAS', () => {
 
             // The second request is invalid
             await expectFailedMultiAttestations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [
                 {
                   schema: schema1Id,
@@ -325,14 +334,14 @@ describe('EAS', () => {
 
           it('should allow attesting to an empty recipient', async () => {
             await expectAttestation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schema1Id,
               { recipient: ZERO_ADDRESS, expirationTime, data: '0x00' },
               { signatureType, from: sender }
             );
 
             await expectMultiAttestations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [
                 {
                   schema: schema1Id,
@@ -355,14 +364,14 @@ describe('EAS', () => {
 
           it('should allow self attestations', async () => {
             await expectAttestation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schema2Id,
               { recipient: await sender.getAddress(), expirationTime, data: encodeBytes32String('0') },
               { signatureType, from: sender }
             );
 
             await expectMultiAttestations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [
                 {
                   schema: schema1Id,
@@ -1065,6 +1074,106 @@ describe('EAS', () => {
         ])
       ).to.be.revertedWithCustomError(eas, 'InvalidLength');
     });
+
+    it('should revert when multi ERC1271 delegation attesting with inconsistent input lengths', async () => {
+      const schema = 'bool count, bytes32 id';
+      const schemaId = getSchemaUID(schema, ZERO_ADDRESS, true);
+      await registry.register(schema, ZERO_ADDRESS, true);
+
+      const erc1271Address = await erc1271Signer.getAddress();
+      const dummySignature = '0x' + '1'.repeat(130); // 65 bytes signature
+
+      await expect(
+        eas.multiAttestByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [dummySignature],
+            attester: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiAttestByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [],
+            signatures: [dummySignature],
+            attester: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiAttestByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [dummySignature, dummySignature],
+            attester: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiAttestByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              },
+              {
+                recipient: await recipient.getAddress(),
+                expirationTime,
+                revocable: true,
+                refUID: ZERO_BYTES32,
+                data: ZERO_BYTES32,
+                value: 0
+              }
+            ],
+            signatures: [],
+            attester: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+    });
   });
 
   describe('revocation', () => {
@@ -1080,14 +1189,19 @@ describe('EAS', () => {
       expirationTime = (await eas.getTime()) + duration.days(30n);
     });
 
-    for (const signatureType of [SignatureType.Direct, SignatureType.Delegated, SignatureType.DelegatedProxy]) {
+    for (const signatureType of [
+      SignatureType.Direct,
+      SignatureType.Delegated,
+      SignatureType.DelegatedProxy,
+      SignatureType.ERC1271Delegated
+    ]) {
       context(`via ${signatureType} revocation`, () => {
         let uid: string;
         let uids: string[] = [];
 
         beforeEach(async () => {
           ({ uid } = await expectAttestation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { recipient: ZERO_ADDRESS, expirationTime, data: encodeBytes32String('0') },
             { signatureType, from: sender }
@@ -1097,7 +1211,7 @@ describe('EAS', () => {
 
           for (let i = 0; i < 2; i++) {
             const { uid: newUID } = await expectAttestation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schemaId,
               { recipient: ZERO_ADDRESS, expirationTime, data: encodeBytes32String((i + 1).toString()) },
               { signatureType, from: sender }
@@ -1109,7 +1223,7 @@ describe('EAS', () => {
 
         it('should revert when revoking a non-existing attestation', async () => {
           await expectFailedRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { uid: encodeBytes32String('BAD') },
             { signatureType, from: sender },
@@ -1117,14 +1231,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid: encodeBytes32String('BAD') }, { uid }] }],
             { signatureType, from: sender },
             'NotFound'
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid }, { uid: encodeBytes32String('BAD') }] }],
             { signatureType, from: sender },
             'NotFound'
@@ -1133,7 +1247,7 @@ describe('EAS', () => {
 
         it("should revert when revoking a someone's else attestation", async () => {
           await expectFailedRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { uid },
             { signatureType, from: sender2 },
@@ -1141,14 +1255,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
             { signatureType, from: sender2 },
             'AccessDenied'
@@ -1157,14 +1271,14 @@ describe('EAS', () => {
 
         it('should allow to revoke existing attestations', async () => {
           await expectRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { uid },
             { signatureType, from: sender }
           );
 
           await expectMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [
               {
                 schema: schemaId,
@@ -1177,14 +1291,14 @@ describe('EAS', () => {
 
         it('should revert when revoking an already revoked attestation', async () => {
           await expectRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { uid },
             { signatureType, from: sender }
           );
 
           await expectFailedRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schemaId,
             { uid },
             { signatureType, from: sender, deadline: (await latest()) + duration.days(1n) },
@@ -1192,14 +1306,14 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
             { signatureType, from: sender, deadline: (await latest()) + duration.days(1n) },
             'AlreadyRevoked'
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
             { signatureType, from: sender, deadline: (await latest()) + duration.days(1n) },
             'AlreadyRevoked'
@@ -1212,7 +1326,7 @@ describe('EAS', () => {
           await registry.register(schema2, ZERO_ADDRESS, true);
 
           await expectFailedRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             schema2Id,
             { uid },
             { signatureType, from: sender },
@@ -1220,7 +1334,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [
               { schema: schema2Id, requests: [{ uid }] },
               { schema: schemaId, requests: [{ uid: uids[0] }] }
@@ -1230,7 +1344,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [
               { schema: schemaId, requests: [{ uid }] },
               { schema: schema2Id, requests: [{ uid: uids[0] }] }
@@ -1242,7 +1356,7 @@ describe('EAS', () => {
 
         it('should revert when attempting to revoke attestations while specifying an empty schema', async () => {
           await expectFailedRevocation(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             ZERO_BYTES32,
             { uid },
             { signatureType, from: sender },
@@ -1250,7 +1364,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [
               { schema: ZERO_BYTES32, requests: [{ uid }] },
               { schema: schemaId, requests: [{ uid: uids[0] }] }
@@ -1260,7 +1374,7 @@ describe('EAS', () => {
           );
 
           await expectFailedMultiRevocations(
-            { eas, eip712Utils, eip712ProxyUtils },
+            { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
             [
               { schema: schemaId, requests: [{ uid }] },
               { schema: ZERO_BYTES32, requests: [{ uid: uids[0] }] }
@@ -1273,7 +1387,7 @@ describe('EAS', () => {
         context('with irrevocable attestations', () => {
           beforeEach(async () => {
             ({ uid } = await expectAttestation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schemaId,
               { recipient: ZERO_ADDRESS, expirationTime, revocable: false, data: encodeBytes32String('0') },
               { signatureType, from: sender }
@@ -1283,7 +1397,7 @@ describe('EAS', () => {
 
             for (let i = 0; i < 2; i++) {
               const { uid: newUID } = await expectAttestation(
-                { eas, eip712Utils, eip712ProxyUtils },
+                { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
                 schemaId,
                 {
                   recipient: ZERO_ADDRESS,
@@ -1300,7 +1414,7 @@ describe('EAS', () => {
 
           it('should revert when revoking', async () => {
             await expectFailedRevocation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schemaId,
               { uid },
               { signatureType, from: sender },
@@ -1308,14 +1422,14 @@ describe('EAS', () => {
             );
 
             await expectFailedMultiRevocations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [{ schema: schemaId, requests: [{ uid }, { uid: uids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [{ schema: schemaId, requests: [{ uid: uids[1] }, { uid }] }],
               { signatureType, from: sender },
               'Irrevocable'
@@ -1331,7 +1445,7 @@ describe('EAS', () => {
             await registry.register(schema2, ZERO_ADDRESS, false);
 
             ({ uid } = await expectAttestation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schema2Id,
               { recipient: ZERO_ADDRESS, expirationTime, revocable: false, data: encodeBytes32String('0') },
               { signatureType, from: sender }
@@ -1341,7 +1455,7 @@ describe('EAS', () => {
 
             for (let i = 0; i < 2; i++) {
               const { uid: newUID } = await expectAttestation(
-                { eas, eip712Utils, eip712ProxyUtils },
+                { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
                 schema2Id,
                 {
                   recipient: ZERO_ADDRESS,
@@ -1358,7 +1472,7 @@ describe('EAS', () => {
 
           it('should revert when revoking', async () => {
             await expectFailedRevocation(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               schema2Id,
               { uid },
               { signatureType, from: sender },
@@ -1366,14 +1480,14 @@ describe('EAS', () => {
             );
 
             await expectFailedMultiRevocations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [{ schema: schema2Id, requests: [{ uid }, { uid: uids[0] }] }],
               { signatureType, from: sender },
               'Irrevocable'
             );
 
             await expectFailedMultiRevocations(
-              { eas, eip712Utils, eip712ProxyUtils },
+              { eas, eip712Utils, eip712ProxyUtils, erc1271Signer },
               [{ schema: schema2Id, requests: [{ uid: uids[1] }, { uid }] }],
               { signatureType, from: sender },
               'Irrevocable'
@@ -1483,6 +1597,92 @@ describe('EAS', () => {
             ],
             signatures: [],
             revoker: await sender.getAddress(),
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+    });
+
+    it('should revert when multi ERC1271 delegation revoking with inconsistent input lengths', async () => {
+      const uid = await getUIDFromAttestTx(
+        eas.connect(sender).attest({
+          schema: schemaId,
+          data: {
+            recipient: await recipient.getAddress(),
+            expirationTime,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data,
+            value: 0
+          }
+        })
+      );
+      const uid2 = await getUIDFromAttestTx(
+        eas.connect(sender).attest({
+          schema: schemaId,
+          data: {
+            recipient: await recipient.getAddress(),
+            expirationTime,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data,
+            value: 0
+          }
+        })
+      );
+
+      const erc1271Address = await erc1271Signer.getAddress();
+      const dummySignature = '0x' + '1'.repeat(130); // 65 bytes signature
+
+      await expect(
+        eas.multiRevokeByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [
+              { uid, value: 0 },
+              { uid: uid2, value: 0 }
+            ],
+            signatures: [dummySignature],
+            revoker: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiRevokeByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [],
+            signatures: [dummySignature],
+            revoker: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiRevokeByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [{ uid, value: 0 }],
+            signatures: [dummySignature, dummySignature],
+            revoker: erc1271Address,
+            deadline: NO_EXPIRATION
+          }
+        ])
+      ).to.be.revertedWithCustomError(eas, 'InvalidLength');
+
+      await expect(
+        eas.multiRevokeByERC1271Delegation([
+          {
+            schema: schemaId,
+            data: [
+              { uid, value: 0 },
+              { uid: uid2, value: 0 }
+            ],
+            signatures: [],
+            revoker: erc1271Address,
             deadline: NO_EXPIRATION
           }
         ])

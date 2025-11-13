@@ -25,9 +25,13 @@ import {
     DelegatedAttestationRequest,
     DelegatedRevocationRequest,
     IEAS,
+    ERC1271DelegatedAttestationRequest,
+    ERC1271DelegatedRevocationRequest,
     MultiAttestationRequest,
     MultiDelegatedAttestationRequest,
+    MultiERC1271DelegatedAttestationRequest,
     MultiDelegatedRevocationRequest,
+    MultiERC1271DelegatedRevocationRequest,
     MultiRevocationRequest,
     RevocationRequest,
     RevocationRequestData
@@ -104,6 +108,18 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
         DelegatedAttestationRequest calldata delegatedRequest
     ) external payable returns (bytes32) {
         _verifyAttest(delegatedRequest);
+
+        AttestationRequestData[] memory data = new AttestationRequestData[](1);
+        data[0] = delegatedRequest.data;
+
+        return _attest(delegatedRequest.schema, data, delegatedRequest.attester, msg.value, true).uids[0];
+    }
+
+    /// @inheritdoc IEAS
+    function attestByERC1271Delegation(
+        ERC1271DelegatedAttestationRequest calldata delegatedRequest
+    ) external payable returns (bytes32) {
+        _verifyERC1271Attest(delegatedRequest);
 
         AttestationRequestData[] memory data = new AttestationRequestData[](1);
         data[0] = delegatedRequest.data;
@@ -235,6 +251,76 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
     }
 
     /// @inheritdoc IEAS
+    function multiAttestByERC1271Delegation(
+        MultiERC1271DelegatedAttestationRequest[] calldata multiDelegatedRequests
+    ) external payable returns (bytes32[] memory) {
+        // Since a multi-attest call is going to make multiple attestations for multiple schemas, we'd need to collect
+        // all the returned UIDs into a single list.
+        uint256 length = multiDelegatedRequests.length;
+        bytes32[][] memory totalUIDs = new bytes32[][](length);
+        uint256 totalUIDCount = 0;
+
+        // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
+        // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
+        // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
+        // possible to send too much ETH anyway.
+        uint256 availableValue = msg.value;
+
+        for (uint256 i = 0; i < length; ++i) {
+            // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
+            // is a remainder - it will be refunded back to the attester (something that we can only verify during the
+            // last and final batch).
+            bool last;
+            unchecked {
+                last = i == length - 1;
+            }
+
+            MultiERC1271DelegatedAttestationRequest calldata multiDelegatedRequest = multiDelegatedRequests[i];
+            AttestationRequestData[] calldata data = multiDelegatedRequest.data;
+
+            // Ensure that no inputs are missing.
+            uint256 dataLength = data.length;
+            if (dataLength == 0 || dataLength != multiDelegatedRequest.signatures.length) {
+                revert InvalidLength();
+            }
+
+            // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            for (uint256 j = 0; j < dataLength; ++j) {
+                _verifyERC1271Attest(
+                    ERC1271DelegatedAttestationRequest({
+                        schema: multiDelegatedRequest.schema,
+                        data: data[j],
+                        signature: multiDelegatedRequest.signatures[j],
+                        attester: multiDelegatedRequest.attester,
+                        deadline: multiDelegatedRequest.deadline
+                    })
+                );
+            }
+
+            // Process the current batch of attestations.
+            AttestationsResult memory res = _attest(
+                multiDelegatedRequest.schema,
+                data,
+                multiDelegatedRequest.attester,
+                availableValue,
+                last
+            );
+
+            // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
+            availableValue -= res.usedValue;
+
+            // Collect UIDs (and merge them later).
+            totalUIDs[i] = res.uids;
+            unchecked {
+                totalUIDCount += res.uids.length;
+            }
+        }
+
+        // Merge all the collected UIDs and return them as a flatten array.
+        return _mergeUIDs(totalUIDs, totalUIDCount);
+    }
+
+    /// @inheritdoc IEAS
     function revoke(RevocationRequest calldata request) external payable {
         RevocationRequestData[] memory data = new RevocationRequestData[](1);
         data[0] = request.data;
@@ -245,6 +331,16 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
     /// @inheritdoc IEAS
     function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable {
         _verifyRevoke(delegatedRequest);
+
+        RevocationRequestData[] memory data = new RevocationRequestData[](1);
+        data[0] = delegatedRequest.data;
+
+        _revoke(delegatedRequest.schema, data, delegatedRequest.revoker, msg.value, true);
+    }
+
+    /// @inheritdoc IEAS
+    function revokeByERC1271Delegation(ERC1271DelegatedRevocationRequest calldata delegatedRequest) external payable {
+        _verifyERC1271Revoke(delegatedRequest);
 
         RevocationRequestData[] memory data = new RevocationRequestData[](1);
         data[0] = delegatedRequest.data;
@@ -310,6 +406,59 @@ contract EAS is IEAS, Semver, EIP1271Verifier {
             for (uint256 j = 0; j < dataLength; ++j) {
                 _verifyRevoke(
                     DelegatedRevocationRequest({
+                        schema: multiDelegatedRequest.schema,
+                        data: data[j],
+                        signature: multiDelegatedRequest.signatures[j],
+                        revoker: multiDelegatedRequest.revoker,
+                        deadline: multiDelegatedRequest.deadline
+                    })
+                );
+            }
+
+            // Ensure to deduct the ETH that was forwarded to the resolver during the processing of this batch.
+            availableValue -= _revoke(
+                multiDelegatedRequest.schema,
+                data,
+                multiDelegatedRequest.revoker,
+                availableValue,
+                last
+            );
+        }
+    }
+
+    /// @inheritdoc IEAS
+    function multiRevokeByERC1271Delegation(
+        MultiERC1271DelegatedRevocationRequest[] calldata multiDelegatedRequests
+    ) external payable {
+        // We are keeping track of the total available ETH amount that can be sent to resolvers and will keep deducting
+        // from it to verify that there isn't any attempt to send too much ETH to resolvers. Please note that unless
+        // some ETH was stuck in the contract by accident (which shouldn't happen in normal conditions), it won't be
+        // possible to send too much ETH anyway.
+        uint256 availableValue = msg.value;
+
+        uint256 length = multiDelegatedRequests.length;
+        for (uint256 i = 0; i < length; ++i) {
+            // The last batch is handled slightly differently: if the total available ETH wasn't spent in full and there
+            // is a remainder - it will be refunded back to the attester (something that we can only verify during the
+            // last and final batch).
+            bool last;
+            unchecked {
+                last = i == length - 1;
+            }
+
+            MultiERC1271DelegatedRevocationRequest memory multiDelegatedRequest = multiDelegatedRequests[i];
+            RevocationRequestData[] memory data = multiDelegatedRequest.data;
+
+            // Ensure that no inputs are missing.
+            uint256 dataLength = data.length;
+            if (dataLength == 0 || dataLength != multiDelegatedRequest.signatures.length) {
+                revert InvalidLength();
+            }
+
+            // Verify signatures. Please note that the signatures are assumed to be signed with increasing nonces.
+            for (uint256 j = 0; j < dataLength; ++j) {
+                _verifyERC1271Revoke(
+                    ERC1271DelegatedRevocationRequest({
                         schema: multiDelegatedRequest.schema,
                         data: data[j],
                         signature: multiDelegatedRequest.signatures[j],

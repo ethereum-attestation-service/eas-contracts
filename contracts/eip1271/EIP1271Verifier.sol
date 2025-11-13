@@ -12,6 +12,8 @@ import {
     AttestationRequestData,
     DelegatedAttestationRequest,
     DelegatedRevocationRequest,
+    ERC1271DelegatedAttestationRequest,
+    ERC1271DelegatedRevocationRequest,
     RevocationRequestData
 } from "../IEAS.sol";
 
@@ -129,6 +131,38 @@ abstract contract EIP1271Verifier is EIP712 {
         }
     }
 
+    /// @dev Verifies ERC1271 delegated attestation request.
+    /// @param request The arguments of the ERC1271 delegated attestation request.
+    function _verifyERC1271Attest(ERC1271DelegatedAttestationRequest memory request) internal {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
+            revert DeadlineExpired();
+        }
+
+        AttestationRequestData memory data = request.data;
+        bytes memory signature = request.signature;
+
+        bytes32 hash = _hashTypedDataV4(
+            keccak256(
+                abi.encode(
+                    ATTEST_TYPEHASH,
+                    request.attester,
+                    request.schema,
+                    data.recipient,
+                    data.expirationTime,
+                    data.revocable,
+                    data.refUID,
+                    keccak256(data.data),
+                    data.value,
+                    _nonces[request.attester]++,
+                    request.deadline
+                )
+            )
+        );
+        if (!SignatureChecker.isValidERC1271SignatureNow(request.attester, hash, signature)) {
+            revert InvalidSignature();
+        }
+    }
+
     /// @dev Verifies delegated revocation request.
     /// @param request The arguments of the delegated revocation request.
     function _verifyRevoke(DelegatedRevocationRequest memory request) internal {
@@ -159,6 +193,34 @@ abstract contract EIP1271Verifier is EIP712 {
                 abi.encodePacked(signature.r, signature.s, signature.v)
             )
         ) {
+            revert InvalidSignature();
+        }
+    }
+
+    /// @dev Verifies ERC1271 delegated revocation request.
+    /// @param request The arguments of the ERC1271 delegated revocation request.
+    function _verifyERC1271Revoke(ERC1271DelegatedRevocationRequest memory request) internal {
+        if (request.deadline != NO_EXPIRATION_TIME && request.deadline < _time()) {
+            revert DeadlineExpired();
+        }
+
+        RevocationRequestData memory data = request.data;
+        bytes memory signature = request.signature;
+
+        bytes32 hash = _hashTypedDataV4(
+            keccak256(
+                abi.encode(
+                    REVOKE_TYPEHASH,
+                    request.revoker,
+                    request.schema,
+                    data.uid,
+                    data.value,
+                    _nonces[request.revoker]++,
+                    request.deadline
+                )
+            )
+        );
+        if (!SignatureChecker.isValidERC1271SignatureNow(request.revoker, hash, signature)) {
             revert InvalidSignature();
         }
     }

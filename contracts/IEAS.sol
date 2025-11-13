@@ -31,6 +31,15 @@ struct DelegatedAttestationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
+/// @notice A struct representing the full arguments of the ERC1271 delegated attestation request.
+struct ERC1271DelegatedAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData data; // The arguments of the attestation request.
+    bytes signature; // The ERC1271 signature data.
+    address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
 /// @notice A struct representing the full arguments of the multi attestation request.
 struct MultiAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
@@ -42,6 +51,15 @@ struct MultiDelegatedAttestationRequest {
     bytes32 schema; // The unique identifier of the schema.
     AttestationRequestData[] data; // The arguments of the attestation requests.
     Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    address attester; // The attesting account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
+/// @notice A struct representing the full arguments of the ERC1271 delegated multi attestation request.
+struct MultiERC1271DelegatedAttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData[] data; // The arguments of the attestation requests.
+    bytes[] signatures; // The ERC1271 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address attester; // The attesting account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -67,6 +85,15 @@ struct DelegatedRevocationRequest {
     uint64 deadline; // The deadline of the signature/request.
 }
 
+/// @notice A struct representing the arguments of the ERC1271 delegated revocation request.
+struct ERC1271DelegatedRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData data; // The arguments of the revocation request.
+    bytes signature; // The ERC1271 signature data.
+    address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
 /// @notice A struct representing the full arguments of the multi revocation request.
 struct MultiRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
@@ -78,6 +105,15 @@ struct MultiDelegatedRevocationRequest {
     bytes32 schema; // The unique identifier of the schema.
     RevocationRequestData[] data; // The arguments of the revocation requests.
     Signature[] signatures; // The ECDSA signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
+    address revoker; // The revoking account.
+    uint64 deadline; // The deadline of the signature/request.
+}
+
+/// @notice A struct representing the full arguments of the ERC1271 delegated multi revocation request.
+struct MultiERC1271DelegatedRevocationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    RevocationRequestData[] data; // The arguments of the revocation requests.
+    bytes[] signatures; // The ERC1271 signatures data. Please note that the signatures are assumed to be signed with increasing nonces.
     address revoker; // The revoking account.
     uint64 deadline; // The deadline of the signature/request.
 }
@@ -159,6 +195,13 @@ interface IEAS is ISemver {
         DelegatedAttestationRequest calldata delegatedRequest
     ) external payable returns (bytes32);
 
+    /// @notice Attests to a specific schema via the provided ERC1271 signature.
+    /// @param delegatedRequest The arguments of the ERC1271 delegated attestation request.
+    /// @return The UID of the new attestation.
+    function attestByERC1271Delegation(
+        ERC1271DelegatedAttestationRequest calldata delegatedRequest
+    ) external payable returns (bytes32);
+
     /// @notice Attests to multiple schemas.
     /// @param multiRequests The arguments of the multi attestation requests. The requests should be grouped by distinct
     ///     schema ids to benefit from the best batching optimization.
@@ -238,6 +281,14 @@ interface IEAS is ISemver {
         MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
     ) external payable returns (bytes32[] memory);
 
+    /// @notice Attests to multiple schemas using via provided ERC1271 signatures.
+    /// @param multiDelegatedRequests The arguments of the ERC1271 delegated multi attestation requests. The requests should be
+    ///     grouped by distinct schema ids to benefit from the best batching optimization.
+    /// @return The UIDs of the new attestations.
+    function multiAttestByERC1271Delegation(
+        MultiERC1271DelegatedAttestationRequest[] calldata multiDelegatedRequests
+    ) external payable returns (bytes32[] memory);
+
     /// @notice Revokes an existing attestation to a specific schema.
     /// @param request The arguments of the revocation request.
     ///
@@ -270,6 +321,10 @@ interface IEAS is ISemver {
     ///         deadline: 1673891048
     ///     })
     function revokeByDelegation(DelegatedRevocationRequest calldata delegatedRequest) external payable;
+
+    /// @notice Revokes an existing attestation to a specific schema via the provided ERC1271 signature.
+    /// @param delegatedRequest The arguments of the ERC1271 delegated revocation request.
+    function revokeByERC1271Delegation(ERC1271DelegatedRevocationRequest calldata delegatedRequest) external payable;
 
     /// @notice Revokes existing attestations to multiple schemas.
     /// @param multiRequests The arguments of the multi revocation requests. The requests should be grouped by distinct
@@ -326,6 +381,13 @@ interface IEAS is ISemver {
     ///     }])
     function multiRevokeByDelegation(
         MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests
+    ) external payable;
+
+    /// @notice Revokes existing attestations to multiple schemas via provided ERC1271 signatures.
+    /// @param multiDelegatedRequests The arguments of the ERC1271 delegated multi revocation requests. The requests
+    ///     should be grouped by distinct schema ids to benefit from the best batching optimization.
+    function multiRevokeByERC1271Delegation(
+        MultiERC1271DelegatedRevocationRequest[] calldata multiDelegatedRequests
     ) external payable;
 
     /// @notice Timestamps the specified bytes32 data.
