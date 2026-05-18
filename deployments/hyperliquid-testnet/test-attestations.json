@@ -1,0 +1,379 @@
+{
+  "0x0081196516957509db14e998fa4191dd2d7e0c9a21377214806b3fbb8566f4c1": {
+    "schema": "uint8 holdType,uint8 useType,uint64 expiration,int40[2][] polygonArea",
+    "data": [
+      {
+        "uid": "0xf89d528aaa0cfccc3281a795688d7febf9b454635073f67e2625cb11aa6c05af",
+        "recipient": "0xDD94e03BBfe318c878Bb2D5CED350623e958af4A",
+        "data": {
+          "description": "Tower of Belem, Lisbon, Portugal",
+          "holdType": "Lease",
+          "useType": "Cultural",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              38.69146,
+              -9.21607
+            ],
+            [
+              38.69182,
+              -9.21607
+            ],
+            [
+              38.69172,
+              -9.21574
+            ],
+            [
+              38.69144,
+              -9.2158
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0x5d35bc7903c2113191c3fb376e2a11300b1f4849593ee1c6a08c5cd2e22640d0",
+        "recipient": "0xB6983DC184D67ef6DC8F86Fdb2f15D438FAA5C51",
+        "data": {
+          "description": "Statue of Liberty, New York, United States",
+          "holdType": "Lease",
+          "useType": "Cultural",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              40.68886,
+              -74.04463
+            ],
+            [
+              40.69003,
+              -74.04721
+            ],
+            [
+              40.69101,
+              -74.04669
+            ],
+            [
+              40.69065,
+              -74.04429
+            ],
+            [
+              40.68976,
+              -74.04326
+            ],
+            [
+              40.68872,
+              -74.0436
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0x3da9c71cb04d568c6e119b1127f55c28e01fac3dad80cf6136cf2d16c556318a",
+        "recipient": "0x351D0C46C0949D686B823AD44d108FABA7C783e0",
+        "data": {
+          "description": "Athens Metro Mall, Agios Dimitrios, Greece",
+          "holdType": "Free",
+          "useType": "Commercial",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              37.93983,
+              23.73881
+            ],
+            [
+              37.93885,
+              23.73929
+            ],
+            [
+              37.93878,
+              23.74107
+            ],
+            [
+              37.94091,
+              23.74025
+            ],
+            [
+              37.94066,
+              23.73934
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0x480f7539bc3c4274481e0d9ff89d0ee0ef09fb6830d5bd9dc70bdc96fb530cfa",
+        "recipient": "0xeB56cA53440fD433C4B469e9313af4a4c384e2Fe",
+        "data": {
+          "description": "Acropolis Museum, Athens, Greece",
+          "holdType": "Free",
+          "useType": "Educational",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              37.9683,
+              23.72791
+            ],
+            [
+              37.96902,
+              23.72815
+            ],
+            [
+              37.96898,
+              23.72826
+            ],
+            [
+              37.96866,
+              23.72839
+            ],
+            [
+              37.96869,
+              23.7289
+            ],
+            [
+              37.96809,
+              23.7291
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0xff760df092acd4d20bc15b9cdba2e889f94783a70945bd292db33380438ce9e5",
+        "recipient": "0x6A2581a98372955d304d2709E28C9636af5b2761",
+        "data": {
+          "description": "Karamanlidika restaurant, Athens, Greece",
+          "holdType": "Free",
+          "useType": "Commercial",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              37.98014,
+              23.72569
+            ],
+            [
+              37.98015,
+              23.72557
+            ],
+            [
+              37.98029,
+              23.7256
+            ],
+            [
+              37.98027,
+              23.72573
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0xb398740b87d7a487ed6054b11b613362aeb5d2467582eb7c85c26de6cb47500a",
+        "recipient": "0x59f0A118C43acD907779a87f355862478D56af91",
+        "data": {
+          "description": "Ermou street, Municipal unit of Polichni, Greece",
+          "holdType": "Lease",
+          "useType": "Residential",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              40.65963,
+              22.95344
+            ],
+            [
+              40.65999,
+              22.95335
+            ],
+            [
+              40.65999,
+              22.95328
+            ],
+            [
+              40.65969,
+              22.95336
+            ],
+            [
+              40.65958,
+              22.95341
+            ],
+            [
+              40.65923,
+              22.95403
+            ],
+            [
+              40.65925,
+              22.95407
+            ],
+            [
+              40.65912,
+              22.95417
+            ],
+            [
+              40.65912,
+              22.9541
+            ],
+            [
+              40.6593,
+              22.95401
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0xb100ddbfc41226cd542039cc368a92b2aa7681f3aad0dad1e2de08ad0ab81918",
+        "recipient": "0xcFc7309e2A4e84805f8E2B09A082450D4C487e41",
+        "data": {
+          "description": "Hellenic Parliament, Athens, Greece",
+          "holdType": "Lease",
+          "useType": "Governmental",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              37.97597,
+              23.73636
+            ],
+            [
+              37.97462,
+              23.73611
+            ],
+            [
+              37.97449,
+              23.73748
+            ],
+            [
+              37.97581,
+              23.73787
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0x79f04842a7560442a0d9ca746df4bd19c83caa92ba0937d26745561ba7dc895e",
+        "recipient": "0x377611cd5A06fDCF66f540e1E5a82099C828Cb87",
+        "data": {
+          "description": "Supreme Civil and Criminal Court of Greece, Athens, Greece",
+          "holdType": "Lease",
+          "useType": "Governmental",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              37.98905,
+              23.75222
+            ],
+            [
+              37.98864,
+              23.7522
+            ],
+            [
+              37.98855,
+              23.75269
+            ],
+            [
+              37.98841,
+              23.75265
+            ],
+            [
+              37.98835,
+              23.75298
+            ],
+            [
+              37.98849,
+              23.75303
+            ],
+            [
+              37.98841,
+              23.75347
+            ],
+            [
+              37.98859,
+              23.75354
+            ],
+            [
+              37.98862,
+              23.75342
+            ],
+            [
+              37.98878,
+              23.75346
+            ],
+            [
+              37.98874,
+              23.75369
+            ],
+            [
+              37.98914,
+              23.75379
+            ],
+            [
+              37.9893,
+              23.75307
+            ],
+            [
+              37.98942,
+              23.75248
+            ],
+            [
+              37.9894,
+              23.75234
+            ]
+          ]
+        }
+      },
+      {
+        "uid": "0xe18df789540b7f4b05eedeccaeac6705e16b9577235dac15a3b2032afe679d07",
+        "recipient": "0x8bf7d843588BF543113346903d926eec0b26a731",
+        "data": {
+          "description": "University of Crete, Gallos, Greece",
+          "holdType": "Lease",
+          "useType": "Educational",
+          "expiration": "0",
+          "polygonArea": [
+            [
+              35.35284,
+              24.44718
+            ],
+            [
+              35.35368,
+              24.44625
+            ],
+            [
+              35.35508,
+              24.44724
+            ],
+            [
+              35.35599,
+              24.44868
+            ],
+            [
+              35.35587,
+              24.45066
+            ],
+            [
+              35.35514,
+              24.45324
+            ],
+            [
+              35.35266,
+              24.45269
+            ],
+            [
+              35.35205,
+              24.45239
+            ],
+            [
+              35.35157,
+              24.45082
+            ],
+            [
+              35.35161,
+              24.44959
+            ],
+            [
+              35.35205,
+              24.44861
+            ],
+            [
+              35.35222,
+              24.44773
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

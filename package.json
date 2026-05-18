@@ -41,7 +41,8 @@
     "/deployments/arbitrum-sepolia/**/*",
     "/deployments/polygon-amoy/**/*",
     "/deployments/scroll-sepolia/**/*",
-    "/deployments/linea-goerli/**/*"
+    "/deployments/linea-goerli/**/*",
+    "/deployments/hyperliquid-testnet/**/*"
   ],
   "scripts": {
     "compile": "hardhat compile",

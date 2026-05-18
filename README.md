@@ -447,6 +447,23 @@ Version 1.4.1-beta.1:
   * Contract: [0x367A20665BAB1bb4DB6D80A4CF20db5Be1568d1e](https://explorer-sepolia.inkonchain.com/address/0x367A20665BAB1bb4DB6D80A4CF20db5Be1568d1e)
   * Deployment and ABI: [Indexer.json](./deployments/ink-sepolia/Indexer.json)
 
+#### Hyperliquid Testnet
+
+Version 1.4.0:
+
+* **EAS**:
+  * Contract: `0x6979890518713840f44FCb33A0935847EB9621dc`
+  * Deployment and ABI: [EAS.json](./deployments/hyperliquid-testnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: `0xe8Effc1542443742d5F2c68EB97280b36C6d247F`
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/hyperliquid-testnet/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: `0xd71F6332B7F3707D60d997918B9eD65d5D38C44F`
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/hyperliquid-testnet/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: `0xb003FFd2df2D9e7778dafe24F097B3B8d6A0dD72`
+  * Deployment and ABI: [Indexer.json](./deployments/hyperliquid-testnet/Indexer.json)
+
 #### Linea Goerli
 
 Version 1.2.0:
