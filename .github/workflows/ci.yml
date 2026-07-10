@@ -50,5 +50,8 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Gas Report
+        uses: saifyoussuf/foundry-gas-reporter-action@v1
+        if: always()
       - name: Compile (Foundry)
         run: forge build
