@@ -255,6 +255,23 @@ Version 1.4.1-beta.1:
   * Contract: [0xE6afd49f7beF444e39BFDFbB6BE63119a8BdE88F](https://uniscan.xyz/address/0xE6afd49f7beF444e39BFDFbB6BE63119a8BdE88F)
   * Deployment and ABI: [Indexer.json](./deployments/unichain/Indexer.json)
 
+#### PulseChain
+
+Version 1.4.0:
+
+* **EAS**:
+  * Contract: [0x9e84Aa4BD0C1931A34B14C1EC918A53C33e2B0F8](https://scan.pulsechain.com/address/0x9e84Aa4BD0C1931A34B14C1EC918A53C33e2B0F8)
+  * Deployment and ABI: [EAS.json](./deployments/pulsechain/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x0a36739bAc658b0E3222CFe372077382Dc60a318](https://scan.pulsechain.com/address/0x0a36739bAc658b0E3222CFe372077382Dc60a318)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/pulsechain/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x824A0b042163c4f0033E4C57aaA76F6B594E4149](https://scan.pulsechain.com/address/0x824A0b042163c4f0033E4C57aaA76F6B594E4149)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/pulsechain/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x5E618076cFf40827a56d42517F217de3166BB801](https://scan.pulsechain.com/address/0x5E618076cFf40827a56d42517F217de3166BB801)
+  * Deployment and ABI: [Indexer.json](./deployments/pulsechain/Indexer.json)
+
 #### Blast
 
 Version 1.3.0:
@@ -463,6 +480,23 @@ Version 1.4.0:
 * **Indexer**:
   * Contract: `0xb003FFd2df2D9e7778dafe24F097B3B8d6A0dD72`
   * Deployment and ABI: [Indexer.json](./deployments/hyperliquid-testnet/Indexer.json)
+
+#### PulseChain Testnet v4
+
+Version 1.4.0:
+
+* **EAS**:
+  * Contract: [0x9e84Aa4BD0C1931A34B14C1EC918A53C33e2B0F8](https://scan.v4.testnet.pulsechain.com/address/0x9e84Aa4BD0C1931A34B14C1EC918A53C33e2B0F8)
+  * Deployment and ABI: [EAS.json](./deployments/pulsechain-testnet/EAS.json)
+* **SchemaRegistry**:
+  * Contract: [0x0a36739bAc658b0E3222CFe372077382Dc60a318](https://scan.v4.testnet.pulsechain.com/address/0x0a36739bAc658b0E3222CFe372077382Dc60a318)
+  * Deployment and ABI: [SchemaRegistry.json](./deployments/pulsechain-testnet/SchemaRegistry.json)
+* **EIP712Proxy**:
+  * Contract: [0x824A0b042163c4f0033E4C57aaA76F6B594E4149](https://scan.v4.testnet.pulsechain.com/address/0x824A0b042163c4f0033E4C57aaA76F6B594E4149)
+  * Deployment and ABI: [EIP712Proxy.json](./deployments/pulsechain-testnet/EIP712Proxy.json)
+* **Indexer**:
+  * Contract: [0x5E618076cFf40827a56d42517F217de3166BB801](https://scan.v4.testnet.pulsechain.com/address/0x5E618076cFf40827a56d42517F217de3166BB801)
+  * Deployment and ABI: [Indexer.json](./deployments/pulsechain-testnet/Indexer.json)
 
 #### Linea Goerli
 
